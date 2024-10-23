@@ -28,6 +28,8 @@ from sgs_tools.util.path_utils import add_extension
 from sgs_tools.util.timer import timer
 from xarray.core.types import T_Xarray
 
+from .arg_parsers import add_dask_group, add_input_group, add_plotting_group
+
 
 def parser() -> dict[str, Any]:
     parser = ArgumentParser(
@@ -35,25 +37,15 @@ def parser() -> dict[str, Any]:
         formatter_class=ArgumentDefaultsHelpFormatter,
     )
 
-    fname = parser.add_argument_group("I/O datasets on disk")
-    fname.add_argument(
-        "input_files",
-        type=Path,
-        help=""" location of UM NetCDF diagnostic file(s). Recognizes glob patterns and walks directory trees, e.g. './my_file_p[br]*nc'
-                (All files in the pattern should belong to the same simulation). """,
-    )
-
-    fname.add_argument(
-        "h_resolution",
-        type=float,
-        help="horizontal resolution (will use to overwrite horizontal coordinates). **NB** works for ideal simulations",
-    )
-
+    fname = add_input_group(parser)
     fname.add_argument(
         "output_file",
         type=Path,
         help="output path, will create/overwrite existing file and create any missing intermediate directories",
     )
+
+    add_plotting_group(parser)
+    add_dask_group(parser)
 
     filter = parser.add_argument_group("Filter parameters")
     filter.add_argument(
@@ -92,42 +84,6 @@ def parser() -> dict[str, Any]:
         "Otherwise, must provide as many values as for `filter_scale`",
     )
 
-    plotting = parser.add_argument_group("Plotting parameters")
-
-    plotting.add_argument(
-        "--plot_show",
-        action="store_true",
-        help="flag to display generated plots",
-    )
-
-    plotting.add_argument(
-        "--plot_path",
-        type=Path,
-        default=None,
-        help="output directory, for storing generated plots",
-    )
-
-    plotting = parser.add_argument_group("Dask parameters")
-
-    plotting.add_argument(
-        "--z_chunk_size",
-        type=int,
-        default=None,
-        help="""
-        Size of dask array chunks in the vertical direction. Should divide the total number of levels.
-        Smaller size leads to smaller memory footprint, but may penalize walltime.
-        NB:The default value has not been optimised.""",
-    )
-
-    plotting.add_argument(
-        "--t_chunk_size",
-        type=int,
-        default=None,
-        help="""
-        Size of dask array chunks in the time direction. Should divide the total number time snapshots.
-        Smaller size leads to smaller memory footprint, but may penalize walltime.
-        NB:The default value has not been optimised.""",
-    )
     # parse arguments into a dictionary
     args = vars(parser.parse_args())
 

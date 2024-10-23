@@ -14,6 +14,7 @@ from sgs_tools.io.um import (
     read_stash_files,
     rename_variables,
     restrict_ds,
+    standardize_varnames,
     unify_coords,
 )
 from sgs_tools.physics.fields import strain_from_vel
@@ -139,6 +140,9 @@ def data_ingest(
     simulation = read_stash_files(fname_pattern)
     # parse UM stash codes into variable names
     simulation = rename_variables(simulation)
+
+    # rename to sgs_tools naming convention
+    simulation = standardize_varnames(simulation)
 
     # restrict to interesting fields and rename to simple names
     simulation = restrict_ds(simulation, fields=required_fields)

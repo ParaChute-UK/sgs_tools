@@ -64,6 +64,7 @@ dynamic_SGS_diag_dict = {
     "Tdecorr_heat": "Tdecorr_heat",
 }
 field_names_dict = base_fields_dict | Water_dict | Smagorinsky_dict | dynamic_SGS_dict
+"Variable names map"
 
 
 # IO
@@ -77,11 +78,13 @@ def read_stash_files(fname_pattern: Path) -> xr.Dataset:
 
     print(f"Reading {fname_pattern}")
     # parse any glob wildcards in directory or filename
-    parsed = Path(fname_pattern.root).glob(
-        str(Path(*fname_pattern.parts[fname_pattern.is_absolute() :]))
+    parsed = list(
+        Path(fname_pattern.root).glob(
+            str(Path(*fname_pattern.parts[fname_pattern.is_absolute() :]))
+        )
     )
     # turn parsed into list because of incomplete typehints of xr.open_mfdataset
-    dataset = xr.open_mfdataset(list(parsed), chunks="auto")
+    dataset = xr.open_mfdataset(parsed, chunks="auto")
     return dataset
 
 
@@ -149,24 +152,26 @@ def rename_variables(ds: xr.Dataset) -> xr.Dataset:
     return ds
 
 
-def restrict_ds(ds: xr.Dataset, fields: None | Iterable[str] = None) -> xr.Dataset:
-    """restrict the dataset to fields of interest
+def standardize_varnames(ds: xr.Dataset) -> xr.Dataset:
+    """rename variables in `ds` using ``field_names_dict``
 
     :param ds: input dataset
     :return: dataset with renamed variables
     """
+    restricted_dict = {k: v for k, v in field_names_dict.items() if k in ds}
+    return ds.rename(restricted_dict)
 
-    intersection = {k: v for k, v in field_names_dict.items() if k in ds}
-    if fields is not None:
-        intersection = {k: v for k, v in intersection.items() if v in fields}
 
+def restrict_ds(ds: xr.Dataset, fields: Iterable[str]) -> xr.Dataset:
+    """restrict the dataset to fields of interest and rename using fields dict
+
+    :param ds: input dataset
+    :param fields: list of fields to restrict to, must be contained by `ds`
+    :return: dataset with renamed variables
+    """
+    intersection = [k for k in fields if k in ds]
     # print ("Missing fields:", {k for k in fields if k not in intersection})
-
-    # drop all secondary fields
-    ds = ds[list(intersection)]
-    # rename primary fields for convenience
-    ds = ds.rename(intersection)
-    return ds
+    return ds[intersection]
 
 
 # unify coordinates and implement correct x-spacing

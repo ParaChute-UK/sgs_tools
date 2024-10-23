@@ -4,6 +4,7 @@ from typing import Any, Sequence
 
 import matplotlib.pyplot as plt
 import xarray as xr
+from numpy import inf
 from sgs_tools.geometry.staggered_grid import (
     compose_vector_components_on_grid,
     interpolate_to_grid,
@@ -106,8 +107,19 @@ def parser() -> dict[str, Any]:
 
     assert len(args["filter_scales"]) == len(args["regularize_filter_scales"])
 
+    # add any pottentially missing file extension
     args["output_file"] = add_extension(args["output_file"], ".nc")
 
+    # parse negative values in the [t,z]_range
+    if args["t_range"][0] < 0:
+        args["t_range"][0] = -inf
+    if args["t_range"][1] < 0:
+        args["t_range"][1] = inf
+
+    if args["z_range"][0] < 0:
+        args["z_range"][0] = -inf
+    if args["z_range"][1] < 0:
+        args["z_range"][1] = inf
     return args
 
 
@@ -143,6 +155,26 @@ def data_ingest(
     simulation = simulation.rename(dim_names)
 
     return simulation
+
+
+def data_slice(
+    ds: xr.Dataset, t_range: Sequence[float], z_range: Sequence[float]
+) -> xr.Dataset:
+    """restrit ds to the intervals inside [t,z]_range.
+       Restrict a set of standard coordinate names for t and z.
+    :param ds: input dataset/dataarray
+    :param t_range: time interval
+    :param t_range: verical interval
+    """
+    for z in "z", "z_rho", "z_theta":
+        if z in ds:
+            zslice = (z_range[0] <= ds[z]) * (ds[z] <= z_range[1])
+            ds = ds.where(zslice, drop=True)
+    for t in "t", "t_0":
+        if "t" in ds:
+            tslice = (t_range[0] <= ds[t]) * (ds[t] <= t_range[1])
+            ds = ds.where(tslice, drop=True)
+    return ds
 
 
 def make_filter(shape: str, scale: int, dims=Sequence[str]) -> Filter:
@@ -196,9 +228,10 @@ def main() -> None:
             args["h_resolution"],
             required_fields=["u", "v", "w", "theta"],
         )
-    simulation = simulation.chunk(
-        {"z": args["z_chunk_size"], "t_0": args["t_chunk_size"]}
-    )
+        simulation = data_slice(simulation, args["t_range"], args["z_range"])
+        simulation = simulation.chunk(
+            {"z": args["z_chunk_size"], "t_0": args["t_chunk_size"]}
+        )
 
     # check scales make sense
     nhoriz = min(simulation["x"].shape[0], simulation["y"].shape[0])

@@ -16,6 +16,23 @@ def add_input_group(parser: ArgumentParser) -> _ArgumentGroup:
         type=float,
         help="horizontal resolution (will use to overwrite horizontal coordinates). **NB** works for ideal simulations",
     )
+
+    fname.add_argument(
+        "--t_range",
+        type=float,
+        nargs=2,
+        default=[-1, -1],
+        help="time interval to consider, in code coordinates, negative value are interpreted as inv",
+    )
+
+    fname.add_argument(
+        "--z_range",
+        type=float,
+        nargs=2,
+        default=[-1, -1],
+        help="vertical interval to consider, in code coordinates, negative values are interpreted as take the min/max respectively",
+    )
+
     return fname
 
 

@@ -124,7 +124,7 @@ def parser() -> dict[str, Any]:
     return args
 
 
-def data_ingest(
+def data_ingest_UM_on_single_grid(
     fname_pattern: Path,
     res: float,
     required_fields: list[str] = ["u", "v", "w", "theta"],
@@ -227,7 +227,7 @@ def main() -> None:
 
     # read UM stasth files: data
     with timer("Read Dataset", "s"):
-        simulation = data_ingest(
+        simulation = data_ingest_UM_on_single_grid(
             args["input_files"],
             args["h_resolution"],
             required_fields=["u", "v", "w", "theta"],

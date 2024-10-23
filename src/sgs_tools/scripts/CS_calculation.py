@@ -7,16 +7,9 @@ import xarray as xr
 from numpy import inf
 from sgs_tools.geometry.staggered_grid import (
     compose_vector_components_on_grid,
-    interpolate_to_grid,
 )
 from sgs_tools.geometry.vector_calculus import grad_scalar
-from sgs_tools.io.um import (
-    read_stash_files,
-    rename_variables,
-    restrict_ds,
-    standardize_varnames,
-    unify_coords,
-)
+from sgs_tools.io.um import data_ingest_UM_on_single_grid
 from sgs_tools.physics.fields import strain_from_vel
 from sgs_tools.sgs.dynamic_coefficient import dynamic_coeff
 from sgs_tools.sgs.filter import Filter, box_kernel, weight_gauss_3d, weight_gauss_5d
@@ -122,43 +115,6 @@ def parser() -> dict[str, Any]:
     if args["z_range"][1] < 0:
         args["z_range"][1] = inf
     return args
-
-
-def data_ingest_UM_on_single_grid(
-    fname_pattern: Path,
-    res: float,
-    required_fields: list[str] = ["u", "v", "w", "theta"],
-):
-    """read and pre-process UM data
-
-    :param dir_path: directory containing
-    :param fname_pattern: UM NetCDF diagnostic file(s) to read. will be interpreted as a glob pattern. (should belong to the same simulation)
-    :param res: horizontal resolution (will use to overwrite horizontal coordinates). **NB** works for ideal simulations
-    :parm  required_fields: list of fields to read and pre-process. Defaults to ['u', 'v', 'w', 'theta']
-    """
-    # all the fields we will need for the Cs calculations
-    simulation = read_stash_files(fname_pattern)
-    # parse UM stash codes into variable names
-    simulation = rename_variables(simulation)
-
-    # rename to sgs_tools naming convention
-    simulation = standardize_varnames(simulation)
-
-    # restrict to interesting fields and rename to simple names
-    simulation = restrict_ds(simulation, fields=required_fields)
-
-    # unify coordinatesh
-    simulation = unify_coords(simulation, res=res)
-
-    # interpolate all vars to a cell-centred grid
-    centre_dims = ["x_centre", "y_centre", "z_theta"]
-    simulation = interpolate_to_grid(simulation, centre_dims, drop_coords=True)
-    # rename spatial dimensions to 'xyz'
-    simple_dims = ["x", "y", "z"]
-    dim_names = {d_new: d_old for d_new, d_old in zip(centre_dims, simple_dims)}
-    simulation = simulation.rename(dim_names)
-
-    return simulation
 
 
 def data_slice(

@@ -24,10 +24,14 @@ def trace(
 
     :param tensor: tensor input
     :param dims: dimensions with respect to which to take the trace.
-        The `tensor` must be square with respect to them
+        The `tensor` must be square with respect to them.
+        All coordinates of `dims` must match.
     """
-    assert tensor[dims[0]].size == tensor[dims[1]].size  # only for square arrays
     assert len(dims) == 2  # only 2-dimensional trace
+
+    xr.align(tensor[dims[0]], tensor[dims[1]], join='exact')
+
+
     diagonal = tensor.sel({dims[0]: tensor[dims[1]]})
     tr = diagonal.sum(dims[1])
     if name is not None:
@@ -75,10 +79,14 @@ def symmetrise(
     :param dims: dimensions with respect to which to take the transpose.
         Can be any length and the transpose means that the order is reversed.
         so ``[c1, c2, c3]`` will transpose to ``[c3, c2, c1]``.
+        All coordinates of `dims` must match.
         Note that no checks are performed whether `dims` are dimensions of `tensor` or
         whether `tensor` is square with respect to the transposed dimensions.
     :param name: name of symmetrized tensor.
     """
+    for c in dims[1:]:
+      xr.align(tensor[dims[0]], tensor[c], join='exact')
+
     transpose_map = dict(zip(dims, dims[::-1]))
     sij = 0.5 * (tensor + tensor.rename(transpose_map))
     if name is not None:

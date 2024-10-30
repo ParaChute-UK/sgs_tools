@@ -29,8 +29,7 @@ def trace(
     """
     assert len(dims) == 2  # only 2-dimensional trace
 
-    xr.align(tensor[dims[0]], tensor[dims[1]], join='exact')
-
+    xr.align(tensor[dims[0]], tensor[dims[1]], join="exact")
 
     diagonal = tensor.sel({dims[0]: tensor[dims[1]]})
     tr = diagonal.sum(dims[1])
@@ -86,7 +85,7 @@ def symmetrise(
     :param name: name of symmetrized tensor.
     """
     for c in dims[1:]:
-      xr.align(tensor[dims[0]], tensor[c], join='exact')
+        xr.align(tensor[dims[0]], tensor[c], join="exact")
 
     transpose_map = dict(zip(dims, dims[::-1]))
     sij = 0.5 * (tensor + tensor.rename(transpose_map))

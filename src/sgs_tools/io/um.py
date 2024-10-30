@@ -24,8 +24,8 @@ Water_dict = {
 }
 Smagorinsky_dict = {
     "SMAG__S__SHEAR_TERM_": "s_smag",
-    "SMAG__VISC_M": "SMAG__VISC_M",
-    "SMAG__VISC_H": "SMAG__VISC_H",
+    "SMAG__VISC_M": "smag_visc_m",
+    "SMAG__VISC_H": "smag_visc_h",
     "SHEAR_AT_SCALE_DELTA": "s",
     "MIXING_LENGTH_RNEUTML": "csDelta",
     "CS_THETA": "cs_theta",

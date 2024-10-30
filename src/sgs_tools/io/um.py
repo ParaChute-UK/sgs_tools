@@ -65,7 +65,13 @@ dynamic_SGS_diag_dict = {
     "Tdecorr_momentum": "Tdecorr_momentum",
     "Tdecorr_heat": "Tdecorr_heat",
 }
-field_names_dict = base_fields_dict | Water_dict | Smagorinsky_dict | dynamic_SGS_dict
+field_names_dict = (
+    base_fields_dict
+    | Water_dict
+    | Smagorinsky_dict
+    | dynamic_SGS_dict
+    | dynamic_SGS_diag_dict
+)
 "Variable names map"
 
 

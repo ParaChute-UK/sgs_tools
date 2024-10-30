@@ -28,7 +28,9 @@ from .arg_parsers import add_dask_group, add_input_group, add_plotting_group
 
 def parser() -> dict[str, Any]:
     parser = ArgumentParser(
-        description="Compute dynamic Smagorinsky coefficients as function of scale from UM NetCDF output and store them in a NetCDF files",
+        description="""Compute dynamic Smagorinsky coefficients as function
+                        of scale from UM NetCDF output and store them in
+                        a NetCDF files""",
         formatter_class=ArgumentDefaultsHelpFormatter,
     )
 
@@ -36,7 +38,8 @@ def parser() -> dict[str, Any]:
     fname.add_argument(
         "output_file",
         type=Path,
-        help="output path, will create/overwrite existing file and create any missing intermediate directories",
+        help="""output path, will create/overwrite existing file and
+                create any missing intermediate directories""",
     )
 
     add_plotting_group(parser)

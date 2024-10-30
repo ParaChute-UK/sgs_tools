@@ -149,14 +149,22 @@ def rename_variables(ds: xr.Dataset) -> xr.Dataset:
 
     # swap to an easy time-dimension
     tname = "min15T0"
-    torigin = ds["min15T0_0"][0]
+    if "min15T0_0" in ds:
+        torigin = ds["min15T0_0"][0]
+    else:
+        torigin = ds["min15T0"][0]
     for tsuffix in "", "_0":
-        delta_t = np.rint(
-            (ds[tname + tsuffix] - torigin) / np.timedelta64(1, "m")
-        ).astype(int)
-        ds = ds.assign_coords({"t" + tsuffix: (tname + tsuffix, delta_t.data)})
-        ds["t" + tsuffix].attrs = {"standard_name": "time", "axis": "T", "unit": "min"}
-        ds = ds.swap_dims({tname + tsuffix: "t" + tsuffix})
+        if tname + tsuffix in ds:
+            delta_t = np.rint(
+                (ds[tname + tsuffix] - torigin) / np.timedelta64(1, "m")
+            ).astype(int)
+            ds = ds.assign_coords({"t" + tsuffix: (tname + tsuffix, delta_t.data)})
+            ds["t" + tsuffix].attrs = {
+                "standard_name": "time",
+                "axis": "T",
+                "unit": "min",
+            }
+            ds = ds.swap_dims({tname + tsuffix: "t" + tsuffix})
     return ds
 
 

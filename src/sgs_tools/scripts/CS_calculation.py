@@ -189,7 +189,7 @@ def main() -> None:
         simulation = data_ingest_UM_on_single_grid(
             args["input_files"],
             args["h_resolution"],
-            required_fields=["u", "v", "w", "theta"],
+            requested_fields=["u", "v", "w", "theta"],
         )
         simulation = data_slice(simulation, args["t_range"], args["z_range"])
         simulation = simulation.chunk(

@@ -49,5 +49,5 @@ def vertical_heat_flux(
     theta_prime = pot_temperature - pot_temperature.mean(hor_axes)
     ans = w_prime * theta_prime
     ans.name = "vertical_heat_flux"
-    ans["long_name"] = r"$w' \theta'$ "
+    ans.attrs["long_name"] = r"$w' \theta'$ "
     return ans

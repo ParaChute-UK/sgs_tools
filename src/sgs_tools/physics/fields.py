@@ -24,9 +24,13 @@ def strain_from_vel(
     :param grad_operator: operator that computes vector gradient (To be replaced by a grid)
     """
     gradvel = grad_operator(vel, space_dims, new_dim)
+    # perform manual alignment of c1 and c2 indices (assumed sorted)
+    c2 = gradvel[new_dim].data
+    gradvel[new_dim] = gradvel[vec_dim].data
     sij = symmetrise(gradvel, [vec_dim, new_dim])
     if make_traceless:
         sij = traceless(sij, (vec_dim, new_dim))
+    sij[new_dim] = c2
     return sij
 
 

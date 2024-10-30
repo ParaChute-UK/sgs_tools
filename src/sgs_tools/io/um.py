@@ -149,14 +149,22 @@ def rename_variables(ds: xr.Dataset) -> xr.Dataset:
 
     # swap to an easy time-dimension
     tname = "min15T0"
-    torigin = ds["min15T0_0"][0]
+    if "min15T0_0" in ds:
+        torigin = ds["min15T0_0"][0]
+    else:
+        torigin = ds["min15T0"][0]
     for tsuffix in "", "_0":
-        delta_t = np.rint(
-            (ds[tname + tsuffix] - torigin) / np.timedelta64(1, "m")
-        ).astype(int)
-        ds = ds.assign_coords({"t" + tsuffix: (tname + tsuffix, delta_t.data)})
-        ds["t" + tsuffix].attrs = {"standard_name": "time", "axis": "T", "unit": "min"}
-        ds = ds.swap_dims({tname + tsuffix: "t" + tsuffix})
+        if tname + tsuffix in ds:
+            delta_t = np.rint(
+                (ds[tname + tsuffix] - torigin) / np.timedelta64(1, "m")
+            ).astype(int)
+            ds = ds.assign_coords({"t" + tsuffix: (tname + tsuffix, delta_t.data)})
+            ds["t" + tsuffix].attrs = {
+                "standard_name": "time",
+                "axis": "T",
+                "unit": "min",
+            }
+            ds = ds.swap_dims({tname + tsuffix: "t" + tsuffix})
     return ds
 
 
@@ -261,17 +269,16 @@ def compose_diagnostic_tensor(ds: xr.Dataset) -> xr.Dataset:
     return ds
 
 
-def data_ingest_UM_on_single_grid(
+def data_ingest_UM(
     fname_pattern: Path,
     res: float,
-    required_fields: list[str] = ["u", "v", "w", "theta"],
-):
+    requested_fields: list[str] = ["u", "v", "w", "theta"],
+) -> xr.Dataset:
     """read and pre-process UM data
 
-    :param dir_path: directory containing
     :param fname_pattern: UM NetCDF diagnostic file(s) to read. will be interpreted as a glob pattern. (should belong to the same simulation)
     :param res: horizontal resolution (will use to overwrite horizontal coordinates). **NB** works for ideal simulations
-    :parm  required_fields: list of fields to read and pre-process. Defaults to ['u', 'v', 'w', 'theta']
+    :param  requested_fields: list of fields to read and pre-process. Defaults to ['u', 'v', 'w', 'theta']
     """
     # all the fields we will need for the Cs calculations
     simulation = read_stash_files(fname_pattern)
@@ -282,10 +289,25 @@ def data_ingest_UM_on_single_grid(
     simulation = standardize_varnames(simulation)
 
     # restrict to interesting fields and rename to simple names
-    simulation = restrict_ds(simulation, fields=required_fields)
-
-    # unify coordinatesh
+    simulation = restrict_ds(simulation, fields=requested_fields)
+    # unify coordinates
     simulation = unify_coords(simulation, res=res)
+    return simulation
+
+
+def data_ingest_UM_on_single_grid(
+    fname_pattern: Path,
+    res: float,
+    requested_fields: list[str] = ["u", "v", "w", "theta"],
+) -> xr.Dataset:
+    """read and pre-process UM data
+
+    :param fname_pattern: UM NetCDF diagnostic file(s) to read. will be interpreted as a glob pattern. (should belong to the same simulation)
+    :param res: horizontal resolution (will use to overwrite horizontal coordinates). **NB** works for ideal simulations
+    :param  requested_fields: list of fields to read and pre-process. Defaults to ['u', 'v', 'w', 'theta']
+    """
+    # read, constrain fields, unify grids
+    simulation = data_ingest_UM(fname_pattern, res, requested_fields)
 
     # interpolate all vars to a cell-centred grid
     centre_dims = ["x_centre", "y_centre", "z_theta"]

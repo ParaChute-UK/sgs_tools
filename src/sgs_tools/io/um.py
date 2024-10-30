@@ -290,6 +290,7 @@ def data_ingest_UM(
 
     # restrict to interesting fields and rename to simple names
     simulation = restrict_ds(simulation, fields=requested_fields)
+    assert len(simulation) > 0, "None of the requested fields are available"
     # unify coordinates
     simulation = unify_coords(simulation, res=res)
     return simulation

@@ -2,7 +2,8 @@ from typing import Callable, Collection, Iterable
 
 import xarray as xr
 
-from ..geometry.tensor_algebra import symmetrise, traceless
+from ..geometry.staggered_grid import compose_vector_components_on_grid
+from ..geometry.tensor_algebra import symmetrise, tensor_self_outer_product, traceless
 from ..geometry.vector_calculus import grad_vector
 
 
@@ -50,4 +51,41 @@ def vertical_heat_flux(
     ans = w_prime * theta_prime
     ans.name = "vertical_heat_flux"
     ans.attrs["long_name"] = r"$w' \theta'$ "
+    return ans
+
+
+def Reynolds_fluct_stress(
+    u: xr.DataArray,
+    v: xr.DataArray,
+    w: xr.DataArray,
+    target_dims: Iterable[str],
+    reduction_axes: Collection[str],
+) -> xr.DataArray:
+    """compute Reynolds stress :math:`$\mathbf{u}'_i \mathbf{u}'_j$`
+
+    :param u: velocity field component 1
+    :param v: velocity field component 2
+    :param w: velocity field component 3
+
+    :param target_dims: axes on which the interpolate the stress --
+        must be contained among the coordinates of ``u, v, w``
+    :param reduction_axes: labels of dimensions
+        w.r.t which to compute the fluctuations. Subset of ``target_dims``.
+
+    Note: First performs an interpolation to ``target_dims`` and then computes the fluctuations
+    w.r.t. ``reduction_axes``. There can be a commutation error when the
+    interpolation happens along dimensions other than ``reduction_axes``.
+    """
+    # first interpolate
+    vel = compose_vector_components_on_grid(
+        [u, v, w], target_dims=target_dims, vector_dim="c1", drop_coords=True
+    )
+    # then take the fluctuations
+    vel_prime = vel - vel.mean(dim=reduction_axes)
+    vel_prime["c1"] = ["u'", "v'", "w'"]
+    # take the outer product
+    ans = tensor_self_outer_product(vel_prime)
+    # add attributes
+    ans.name = "Reynolds_fluct_stress"
+    ans.attrs["long_name"] = r"$u'_i u'_j$"
     return ans

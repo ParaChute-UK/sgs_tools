@@ -68,6 +68,7 @@ def interpolate_to_grid(
             )
 
     else:
+        assert coord_map, "Should specify one of target_dims or coord_map"
         missing_dims = [dim for dim in coord_map.keys() if dim not in ds.dims]
         assert (
             len(missing_dims) == 0

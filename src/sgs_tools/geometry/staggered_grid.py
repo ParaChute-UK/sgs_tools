@@ -121,13 +121,15 @@ def compose_vector_components_on_grid(
             "The components' dimensions don't match. "
             "Choose a set of dimensions to interpolate to!"
         )
-        vec_arr = xr.concat(components, dim=xr.DataArray(range(1, 4), dims=[vector_dim]))
+        vec_arr = xr.concat(
+            components, dim=xr.DataArray(range(1, 4), dims=[vector_dim])
+        )
     else:
         assert all([c.name for c in components])
-        vec_ds = xr.Dataset({c.name : c for c in components})
-        vec_arr = (interpolate_to_grid(vec_ds, target_dims, drop_coords=drop_coords)
-            .to_array(dim = vector_dim)
-        )
+        vec_ds = xr.Dataset({c.name: c for c in components})
+        vec_arr = interpolate_to_grid(
+            vec_ds, target_dims, drop_coords=drop_coords
+        ).to_array(dim=vector_dim)
     # combine into a vector
     # add meta data
     if name:

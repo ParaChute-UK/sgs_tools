@@ -30,6 +30,7 @@ Smagorinsky_dict = {
     "MIXING_LENGTH_RNEUTML": "csDelta",
     "CS_THETA": "cs_theta",
     "TURBULENT_KINETIC_ENERGY": "tke",
+    "GRADIENT_RICHARDSON_NUMBER" : "Richardson",
 }
 dynamic_SGS_dict = {
     "CS_SQUARED_AT_2_DELTA": "cs2d",

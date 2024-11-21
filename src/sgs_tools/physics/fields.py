@@ -59,7 +59,7 @@ def Reynolds_fluct_stress(
     v: xr.DataArray,
     w: xr.DataArray,
     target_dims: Iterable[str],
-    reduction_axes: Collection[str],
+    fluctuation_axes: Collection[str],
 ) -> xr.DataArray:
     """compute Reynolds stress :math:`$\mathbf{u}'_i \mathbf{u}'_j$`
 
@@ -69,19 +69,19 @@ def Reynolds_fluct_stress(
 
     :param target_dims: axes on which the interpolate the stress --
         must be contained among the coordinates of ``u, v, w``
-    :param reduction_axes: labels of dimensions
+    :param fluctuation_axes: labels of dimensions
         w.r.t which to compute the fluctuations. Subset of ``target_dims``.
 
     Note: First performs an interpolation to ``target_dims`` and then computes the fluctuations
-    w.r.t. ``reduction_axes``. There can be a commutation error when the
-    interpolation happens along dimensions other than ``reduction_axes``.
+    w.r.t. ``fluctuation_axes``. There can be a commutation error when the
+    interpolation happens along dimensions other than ``fluctuation_axes``.
     """
     # first interpolate
     vel = compose_vector_components_on_grid(
         [u, v, w], target_dims=target_dims, vector_dim="c1", drop_coords=True
     )
     # then take the fluctuations
-    vel_prime = vel - vel.mean(dim=reduction_axes)
+    vel_prime = vel - vel.mean(dim=fluctuation_axes)
     vel_prime["c1"] = ["u'", "v'", "w'"]
     # take the outer product
     ans = tensor_self_outer_product(vel_prime)

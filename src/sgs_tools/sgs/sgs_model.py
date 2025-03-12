@@ -50,7 +50,7 @@ class DynamicSGSModel(ABC):
             {tdim: [1, 2, 3] for tdim in self.StaticModel.tensor_dims if tdim in M.dims}
         )
 
-    # this is abstract becaue the mulitplication operation
+    # this is abstract because the mulitplication operation
     # changes for vector and scalar models
     @abstractmethod
     def Leonard_tensor(self, filter: Filter) -> xr.DataArray:

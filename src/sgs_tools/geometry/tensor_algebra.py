@@ -5,7 +5,9 @@ import xarray as xr
 
 
 # Vector algebra
-def tensor_self_outer_product(arr: xr.DataArray, vec_dim = 'c1', new_dim='c2') -> xr.DataArray:
+def tensor_self_outer_product(
+    arr: xr.DataArray, vec_dim="c1", new_dim="c2"
+) -> xr.DataArray:
     """tensor product :math:`a_i a_j` from vector field `arr`.
         Assumes that `arr` has dimensions ``c1`` but no dimension ``c2``
 

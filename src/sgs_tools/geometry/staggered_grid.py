@@ -26,7 +26,7 @@ def interpolate_to_grid(
     :param ds: input data array or dataset. Needs to have dimensions with coordinates
         that are labelled 'x*', 'y*', 'z*' etc. or
 
-    :param target_dims: list of 3 dimension names  to interpolate to, in the order xdim, ydim, zdim.
+    :param target_dims: list of dimension names  to interpolate to, in the order xdim, ydim, zdim.
         They must exist in ds as DataArry/coordinates
     :param coord_map: dictionary of {existing_dimension_in_ds : target_coordinate_as_DataArray}
     :param drop_coords: flag to exclude spatial coordinates relying on removed dims from output
@@ -122,15 +122,18 @@ def compose_vector_components_on_grid(
             "Choose a set of dimensions to interpolate to!"
         )
         vec_arr = xr.concat(
-            components, dim=xr.DataArray(range(1, len(components)+1), dims=[vector_dim])
+            components,
+            dim=xr.DataArray(range(1, len(components) + 1), dims=[vector_dim]),
         )
     else:
         assert all([c.name for c in components])
         vec_ds = xr.Dataset({c.name: c for c in components})
         vec_arr = interpolate_to_grid(
             vec_ds, target_dims, drop_coords=drop_coords
-        ).to_array(dim='vel')
-        vec_arr = vec_arr.assign_coords(vector_dim = ('vel', range(1,len(components)+1))).swap_dims({'vel': vector_dim})
+        ).to_array(dim="vel")
+        vec_arr = vec_arr.assign_coords(
+            vector_dim=("vel", range(1, len(components) + 1))
+        ).swap_dims({"vel": vector_dim})
     # combine into a vector
     # add meta data
     if name:
@@ -264,7 +267,7 @@ def grad_vec_on_grid(
         # convert to a dataarray
         grad_f_on_cent = grad_f_on_cent_ds.to_dataarray(d_name).sortby(d_name)
         # rename c1 coordinates: fragile this works only because of
-        # the naming in interpolate_to_grid
+        # the naming connvention in interpolate_to_grid
         grad_f_on_cent[d_name] = [f"d{x.item()[-1]}" for x in grad_f_on_cent[d_name]]
         grad_f_on_cent[d_name] = [f"d{x.item()[-1]}" for x in grad_f_on_cent[d_name]]
         gradvec_comp[f] = grad_f_on_cent

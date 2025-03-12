@@ -36,7 +36,9 @@ def strain_from_vel(
 
 
 def vertical_heat_flux(
-    vert_vel: xr.DataArray, pot_temperature: xr.DataArray, hor_axes: Collection[str]
+    vert_vel: xr.DataArray,
+    pot_temperature: xr.DataArray,
+    hor_axes: Collection[str],
 ) -> xr.DataArray:
     """compute vertical heat flux :math:`$w' \\theta'$` from :math:`w` and :math:`$\\theta$`
 

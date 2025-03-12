@@ -32,6 +32,8 @@ def strain_from_vel(
     if make_traceless:
         sij = traceless(sij, (vec_dim, new_dim))
     sij[new_dim] = c2
+    sij.name = "rate-of-strain"
+    sij.attrs["long_name"] = r"$S$"
     return sij
 
 

@@ -9,6 +9,7 @@ from sgs_tools.geometry.staggered_grid import (
     compose_vector_components_on_grid,
 )
 from sgs_tools.geometry.vector_calculus import grad_scalar
+from sgs_tools.io.monc import data_ingest_monc_on_single_grid
 from sgs_tools.io.um import data_ingest_UM_on_single_grid
 from sgs_tools.physics.fields import strain_from_vel
 from sgs_tools.sgs.dynamic_coefficient import dynamic_coeff
@@ -41,6 +42,7 @@ def parser() -> dict[str, Any]:
         help="""output path, will create/overwrite existing file and
                 create any missing intermediate directories""",
     )
+    fname.add_argument("--input_format", type=str, choices=["um", "monc"], default="um")
 
     add_plotting_group(parser)
     add_dask_group(parser)
@@ -186,12 +188,19 @@ def main() -> None:
 
     # read UM stasth files: data
     with timer("Read Dataset", "s"):
-        simulation = data_ingest_UM_on_single_grid(
-            args["input_files"],
-            args["h_resolution"],
-            requested_fields=["u", "v", "w", "theta"],
-        )
-        simulation = data_slice(simulation, args["t_range"], args["z_range"])
+        if args["input_format"] == "um":
+            simulation = data_ingest_UM_on_single_grid(
+                args["input_files"],
+                args["h_resolution"],
+                requested_fields=["u", "v", "w", "theta"],
+            )
+        elif args["input_format"] == "monc":
+            assert len(args["input_files"]) == 1
+            simulation = data_ingest_monc_on_single_grid(
+                args["input_files"][0],
+                args["h_resolution"],
+                requested_fields=["u", "v", "w", "theta"],
+            )
         simulation = simulation.chunk(
             {"z": args["z_chunk_size"], "t_0": args["t_chunk_size"]}
         )

@@ -30,7 +30,7 @@ Smagorinsky_dict = {
     "MIXING_LENGTH_RNEUTML": "csDelta",
     "CS_THETA": "cs_theta",
     "TURBULENT_KINETIC_ENERGY": "tke",
-    "GRADIENT_RICHARDSON_NUMBER" : "Richardson",
+    "GRADIENT_RICHARDSON_NUMBER": "Richardson",
 }
 dynamic_SGS_dict = {
     "CS_SQUARED_AT_2_DELTA": "cs2d",
@@ -38,6 +38,17 @@ dynamic_SGS_dict = {
     "CS_THETA_AT_SCALE_2DELTA": "cs_theta_2d",
     "CS_THETA_AT_SCALE_4DELTA": "cs_theta_4d",
 }
+dynamic_anisotropic_SGS_dict = {
+    "RHOKM_DIFF_COEFF___LOCAL_SCHEME": "smag_visc_m_vert",
+    "RHOKH_DIFF_COEFF___LOCAL_SCHEME": "smag_visc_h_vert",
+    "CS_1": "cs_1",
+    "CS_2": "cs_2",
+    "CS_3": "cs_3",
+    "CS_THETA_1": "cs_theta_1",
+    "CS_THETA_2": "cs_theta_2",
+    "CS_THETA_3": "cs_theta_3",
+}
+
 dynamic_SGS_diag_dict = {
     "LijMij_CONT_TENSORS": "lm",
     "QijNij_CONT_TENSORS": "qn",
@@ -65,6 +76,7 @@ dynamic_SGS_diag_dict = {
     "Lagrangian_averaged_FjFj_vector": "FF",
     "Tdecorr_momentum": "Tdecorr_momentum",
     "Tdecorr_heat": "Tdecorr_heat",
+    "Richardson": "Richardson_diag",
 }
 field_names_dict = (
     base_fields_dict
@@ -72,6 +84,7 @@ field_names_dict = (
     | Smagorinsky_dict
     | dynamic_SGS_dict
     | dynamic_SGS_diag_dict
+    | dynamic_anisotropic_SGS_dict
 )
 "Variable names map"
 

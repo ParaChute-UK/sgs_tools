@@ -122,7 +122,7 @@ def parser() -> dict[str, Any]:
     return args
 
 
-def data_slice(
+def dataset_slice(
     ds: xr.Dataset, t_range: Sequence[float], z_range: Sequence[float]
 ) -> xr.Dataset:
     """restrit ds to the intervals inside [t,z]_range.
@@ -201,6 +201,8 @@ def main() -> None:
                 args["h_resolution"],
                 requested_fields=["u", "v", "w", "theta"],
             )
+
+        simulation = dataset_slice(simulation, args["t_range"], args["z_range"])
         simulation = simulation.chunk(
             {"z": args["z_chunk_size"], "t_0": args["t_chunk_size"]}
         )

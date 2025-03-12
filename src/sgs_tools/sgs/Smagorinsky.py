@@ -29,7 +29,7 @@ class SmagorinskyVelocityModel(SGSModel):
     strain: xr.DataArray
     cs: float
     dx: float
-    tensor_dims: tuple[str, str] = ("c1", "c2")
+    tensor_dims: tuple[str, str]
 
     def _snorm(self, filter: Filter) -> xr.DataArray:
         """compute the rate of strain norm at a given scale"""
@@ -74,7 +74,7 @@ class SmagorinskyHeatModel(SGSModel):
     strain: xr.DataArray
     ctheta: float
     dx: float
-    tensor_dims: tuple[str, str] = ("c1", "c2")
+    tensor_dims: tuple[str, str]
 
     def _snorm(self, filter: Filter) -> xr.DataArray:
         """compute the rate-of-strain norm at a given scale"""

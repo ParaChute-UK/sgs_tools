@@ -50,8 +50,14 @@ def vertical_heat_flux(
     :param hor_axes: labels of horizontal dimensions
         (w.r.t which to compute the fluctuations)
     """
-    w_prime = vert_vel - vert_vel.mean(dim=hor_axes)
-    theta_prime = pot_temperature - pot_temperature.mean(hor_axes)
+    assert set(vert_vel.dims) == set(
+        pot_temperature.dims
+    ), "Mismatched dimensions of vert_vel and pot_temperature"
+    w, theta = xr.align(
+        vert_vel, pot_temperature, join="exact"
+    )  # assert matching coordinates
+    w_prime = w - w.mean(dim=hor_axes)
+    theta_prime = theta - theta.mean(hor_axes)
     ans = w_prime * theta_prime
     ans.name = "vertical_heat_flux"
     ans.attrs["long_name"] = r"$w' \theta'$ "

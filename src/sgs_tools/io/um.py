@@ -105,6 +105,7 @@ def read_stash_files(fname_pattern: Path) -> xr.Dataset:
             str(Path(*fname_pattern.parts[fname_pattern.is_absolute() :]))
         )
     )
+    print(f"Reading {parsed}")
     # turn parsed into list because of incomplete typehints of xr.open_mfdataset
     dataset = xr.open_mfdataset(parsed, chunks="auto")
     return dataset
@@ -229,40 +230,48 @@ def unify_coords(ds: xr.Dataset, res: float) -> xr.Dataset:
 
     # rename dimensions/coords of staggered variables
     ds_stag = ds[stag_vars]
-    ds_stag["x_centre"] = xr.DataArray(
-        x_centre, coords={"x_cv": ds.x_cv}, dims="x_cv", name="x_centre"
-    )
-    ds_stag["y_centre"] = xr.DataArray(
-        x_centre, coords={"y_cu": ds.y_cu}, dims="y_cu", name="y_centre"
-    )
-    ds_stag["x_face"] = xr.DataArray(
-        x_face, coords={"x_cu": ds.x_cu}, dims="x_cu", name="x_face"
-    )
-    ds_stag["y_face"] = xr.DataArray(
-        x_face, coords={"y_cv": ds.y_cv}, dims="y_cv", name="y_face"
-    )
+    if ds_stag:
+        ds_stag["x_centre"] = xr.DataArray(
+            x_centre, coords={"x_cv": ds.x_cv}, dims="x_cv", name="x_centre"
+        )
+        ds_stag["y_centre"] = xr.DataArray(
+            x_centre, coords={"y_cu": ds.y_cu}, dims="y_cu", name="y_centre"
+        )
+        ds_stag["x_face"] = xr.DataArray(
+            x_face, coords={"x_cu": ds.x_cu}, dims="x_cu", name="x_face"
+        )
+        ds_stag["y_face"] = xr.DataArray(
+            x_face, coords={"y_cv": ds.y_cv}, dims="y_cv", name="y_face"
+        )
 
-    ds_stag = ds_stag.swap_dims(
-        {
-            "x_cu": "x_face",
-            "x_cv": "x_centre",
-            "y_cu": "y_centre",
-            "y_cv": "y_face",
-        }
-    )
+        ds_stag = ds_stag.swap_dims(
+            {
+                "x_cu": "x_face",
+                "x_cv": "x_centre",
+                "y_cu": "y_centre",
+                "y_cv": "y_face",
+            }
+        )
 
     # rename dimensions/coords of centred variables
     ds_cent = ds[cent_vars]
-    ds_cent["x_centre"] = xr.DataArray(
-        x_centre, coords={"x_theta": ds.x_theta}, dims="x_theta", name="x_centre"
-    )
-    ds_cent["y_centre"] = xr.DataArray(
-        x_centre, coords={"y_theta": ds.y_theta}, dims="y_theta", name="y_centre"
-    )
-    ds_cent = ds_cent.swap_dims({"x_theta": "x_centre", "y_theta": "y_centre"})
+    if ds_cent:
+        ds_cent["x_centre"] = xr.DataArray(
+            x_centre, coords={"x_theta": ds.x_theta}, dims="x_theta", name="x_centre"
+        )
+        ds_cent["y_centre"] = xr.DataArray(
+            x_centre, coords={"y_theta": ds.y_theta}, dims="y_theta", name="y_centre"
+        )
+        ds_cent = ds_cent.swap_dims({"x_theta": "x_centre", "y_theta": "y_centre"})
 
-    ds = xr.merge([ds_stag, ds_cent])
-
+    if ds_stag and ds_cent:
+        ds = xr.merge([ds_stag, ds_cent])
+    elif ds_stag:
+        ds = ds_stag
+    elif ds_cent:
+        ds = ds_cent
+    else:
+        raise ValueError("No recocognized coordinates in ds")
     return ds
 
 

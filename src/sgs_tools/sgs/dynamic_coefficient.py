@@ -4,7 +4,7 @@ from .filter import Filter
 from .sgs_model import DynamicSGSModel
 
 
-def dynamic_coeff(
+def LillyMinimisation(
     model: DynamicSGSModel,
     filter: Filter,
     filter_regularize: Filter,

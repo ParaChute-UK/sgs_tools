@@ -12,8 +12,8 @@ from sgs_tools.geometry.vector_calculus import grad_scalar
 from sgs_tools.io.monc import data_ingest_monc_on_single_grid
 from sgs_tools.io.um import data_ingest_UM_on_single_grid
 from sgs_tools.physics.fields import strain_from_vel
-from sgs_tools.sgs.dynamic_coefficient import dynamic_coeff
 from sgs_tools.sgs.filter import Filter, box_kernel, weight_gauss_3d, weight_gauss_5d
+from sgs_tools.sgs.dynamic_coefficient import LillyMinimisation
 from sgs_tools.sgs.Smagorinsky import (
     DynamicSmagorinskyHeatModel,
     DynamicSmagorinskyVelocityModel,
@@ -276,7 +276,7 @@ def main() -> None:
                 )
                 with timer("    Cs isotropic", "s"):
                     # compute isotropic Cs for velocity
-                    cs_isotropic = dynamic_coeff(
+                    cs_isotropic = LillyMinimisation(
                         dyn_smag_vel, filter, regularization, ["c1", "c2"]
                     )
                     # force execution for timer logging
@@ -284,7 +284,7 @@ def main() -> None:
 
                 with timer("    Cs diagonal", "s"):
                     # compute diagonal Cs for velocity
-                    cs_diagonal = dynamic_coeff(
+                    cs_diagonal = LillyMinimisation(
                         dyn_smag_vel, filter, regularization, ["c2"]
                     )
                     # force execution for timer logging
@@ -292,7 +292,7 @@ def main() -> None:
 
                 with timer("    Cs theta isotropic", "s"):
                     # compute isotropic Cs for velocity
-                    ctheta = dynamic_coeff(
+                    ctheta = LillyMinimisation(
                         dyn_smag_theta, filter, regularization, ["c1"]
                     )
                     # force execution for timer logging

@@ -31,14 +31,6 @@ class SmagorinskyVelocityModel(SGSModel):
     dx: float
     tensor_dims: tuple[str, str]
 
-    def _snorm(self, filter: Filter) -> xr.DataArray:
-        """compute the rate of strain norm at a given scale"""
-        sij = filter.filter(self.strain)
-        s = Frobenius_norm(sij, self.tensor_dims)
-        s.name = "S_norm"
-        s.attrs["long_name"] = "|<S>|"
-        return s
-
     def sgs_tensor(self, filter: Filter) -> xr.DataArray:
         """compute model for SGS tensor
             :math:`$\\tau = (c_s \Delta) ^2 |\overline{Sij}| \overline{Sij}$`
@@ -52,8 +44,8 @@ class SmagorinskyVelocityModel(SGSModel):
         for arr in [self.vel, self.strain]:
             _assert_coord_dx(filter.filter_dims, arr, self.dx)
 
-        snorm = self._snorm(filter)
         sij = filter.filter(self.strain)
+        snorm = Frobenius_norm(sij, self.tensor_dims)
         return (self.cs * self.dx) ** 2 * snorm * sij
 
 
@@ -76,14 +68,6 @@ class SmagorinskyHeatModel(SGSModel):
     dx: float
     tensor_dims: tuple[str, str]
 
-    def _snorm(self, filter: Filter) -> xr.DataArray:
-        """compute the rate-of-strain norm at a given scale"""
-        sij = filter.filter(self.strain)
-        s = Frobenius_norm(sij, self.tensor_dims)
-        s.name = "S_norm"
-        s.attrs["long_name"] = "|<S>|"
-        return s
-
     def sgs_tensor(self, filter):
         """compute model for SGS tensor
             :math:`$\\tau =  c_\\theta \\Delta^2 |\overline{Sij}| \overline{\\nabla \\theta} $`
@@ -97,7 +81,7 @@ class SmagorinskyHeatModel(SGSModel):
         for arr in [self.vel, self.grad_theta, self.strain]:
             _assert_coord_dx(filter.filter_dims, arr, self.dx)
 
-        snorm = self._snorm(filter)
+        snorm = Frobenius_norm(filter.filter(self.strain), self.tensor_dims)
         grad_theta = filter.filter(self.grad_theta)
         return self.ctheta * self.dx**2 * snorm * grad_theta
 

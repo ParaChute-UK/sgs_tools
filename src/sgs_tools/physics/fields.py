@@ -68,7 +68,7 @@ def Reynolds_fluct_stress(
     u: xr.DataArray,
     v: xr.DataArray,
     w: xr.DataArray,
-    target_dims: Iterable[str],
+    target_dims: list[str],
     fluctuation_axes: Collection[str],
 ) -> xr.DataArray:
     """compute Reynolds stress :math:`$\mathbf{u}'_i \mathbf{u}'_j$`

@@ -22,14 +22,12 @@ class SmagorinskyVelocityModel(SGSModel):
     :ivar strain: grid-scale rate-of-strain
     :ivar cs: Smagorinsky coefficient
     :ivar dx: constant resolution with respect to dimension to-be-filtered
-    :ivar tensor_dims: labels of dimensions indexing tensor components
     """
 
     vel: xr.DataArray
     strain: xr.DataArray
     cs: float
     dx: float
-    tensor_dims: tuple[str, str]
 
     def sgs_tensor(self, filter: Filter) -> xr.DataArray:
         """compute model for SGS tensor
@@ -58,7 +56,6 @@ class SmagorinskyHeatModel(SGSModel):
     :ivar strain: grid-scale rate-of-strain
     :ivar ctheta: Smagorinsky coefficient for the heat equation
     :ivar dx: constant resolution with respect to dimension to-be-filtered
-    :ivar tensor_dims: labels of dimensions indexing tensor components
     """
 
     vel: xr.DataArray
@@ -66,7 +63,6 @@ class SmagorinskyHeatModel(SGSModel):
     strain: xr.DataArray
     ctheta: float
     dx: float
-    tensor_dims: tuple[str, str]
 
     def sgs_tensor(self, filter):
         """compute model for SGS tensor

@@ -4,12 +4,14 @@ from typing import Any, Sequence
 
 import matplotlib.pyplot as plt
 import xarray as xr
+import numpy as np
+import pandas as pd
 from numpy import inf
 from sgs_tools.geometry.staggered_grid import (
     compose_vector_components_on_grid,
 )
 from sgs_tools.geometry.vector_calculus import grad_scalar
-from sgs_tools.io.um import data_ingest_UM_on_single_grid
+from sgs_tools.io.um import data_ingest_UM_on_single_grid, restrict_ds
 from sgs_tools.physics.fields import strain_from_vel
 from sgs_tools.sgs.dynamic_coefficient import dynamic_coeff
 from sgs_tools.sgs.filter import Filter, box_kernel, weight_gauss_3d, weight_gauss_5d
@@ -24,7 +26,9 @@ from sgs_tools.util.timer import timer
 from xarray.core.types import T_Xarray
 
 from .arg_parsers import add_dask_group, add_input_group, add_plotting_group
-
+from dask.diagnostics import ProgressBar
+import dask 
+from dask.distributed import Client
 
 def parser() -> dict[str, Any]:
     parser = ArgumentParser(
@@ -41,6 +45,7 @@ def parser() -> dict[str, Any]:
         help="""output path, will create/overwrite existing file and
                 create any missing intermediate directories""",
     )
+    fname.add_argument("--input_format", type=str, choices=["um", "monc"], default="um")
 
     add_plotting_group(parser)
     add_dask_group(parser)
@@ -120,26 +125,6 @@ def parser() -> dict[str, Any]:
     return args
 
 
-def data_slice(
-    ds: xr.Dataset, t_range: Sequence[float], z_range: Sequence[float]
-) -> xr.Dataset:
-    """restrit ds to the intervals inside [t,z]_range.
-       Restrict a set of standard coordinate names for t and z.
-    :param ds: input dataset/dataarray
-    :param t_range: time interval
-    :param t_range: verical interval
-    """
-    for z in "z", "z_rho", "z_theta":
-        if z in ds:
-            zslice = (z_range[0] <= ds[z]) * (ds[z] <= z_range[1])
-            ds = ds.where(zslice, drop=True)
-    for t in "t", "t_0":
-        if "t" in ds:
-            tslice = (t_range[0] <= ds[t]) * (ds[t] <= t_range[1])
-            ds = ds.where(tslice, drop=True)
-    return ds
-
-
 def make_filter(shape: str, scale: int, dims=Sequence[str]) -> Filter:
     """make filter object. **NB** Choices are limited!!!
 
@@ -179,21 +164,88 @@ def add_scale_coords(
     return ds
 
 
+def data_ingest_MONC_on_single_grid(fname):
+  ds = xr.open_mfdataset(fname, chunks={}, parallel=True)
+
+  #parse metadata
+  metadata = ds['options_database'].load().data
+  metadata = dict(np.char.decode(metadata))
+  for k, v in metadata.items():
+      if v in ['true', 'false']:
+          v = (v == 'true')
+      metadata[k] = pd.to_numeric(v, errors='ignore')
+  metadata = dict(sorted(metadata.items()))
+  del ds['options_database']
+
+  ds = ds.squeeze()
+
+  base_field_dict = {'th': 'theta',
+                    'p': 'P'}
+  coord_dict = {'zn' : 'z_theta'}
+
+  ds = ds.squeeze()
+  #change variable names
+  ds = ds.rename(base_field_dict)
+
+  # standardize coordinate names
+  ds = ds.rename(coord_dict)
+  ds['x'] = ds['x']*metadata['dxx']
+  ds['y'] = ds['y']*metadata['dyy']
+
+  # interpolate theta to vel grid
+  ds['theta_interp'] = ds['theta'].rename({'z_theta' : 'z'}).interp(z=ds['w'].z, method='linear', assume_sorted=True)
+  del ds['theta']
+  ds = ds.rename({'theta_interp':'theta'})
+  ds = restrict_ds(ds, ['u', 'v', 'w', 'theta'])
+  for coord in ds.coords:
+      ds[coord].attrs.update({'units' : 'm'})
+  return metadata, ds
+
+
+
+def data_slice(
+    ds: xr.Dataset, t_range: Sequence[float], z_range: Sequence[float]
+) -> xr.Dataset:
+    """restrit ds to the intervals inside [t,z]_range.
+       Restrict a set of standard coordinate names for t and z.
+    :param ds: input dataset/dataarray
+    :param t_range: time interval
+    :param t_range: verical interval
+    """
+    for z in "z", "z_rho", "z_theta":
+        if z in ds:
+            zslice = (z_range[0] <= ds[z]) * (ds[z] <= z_range[1])
+            ds = ds.where(zslice, drop=True)
+    for t in "t", "t_0":
+        if "t" in ds:
+            tslice = (t_range[0] <= ds[t]) * (ds[t] <= t_range[1])
+            ds = ds.where(tslice, drop=True)
+    return ds
+
 def main() -> None:
     # read and pre-process simulation
     with timer("Arguments", "ms"):
         args = parser()
+    print (args)
 
     # read UM stasth files: data
     with timer("Read Dataset", "s"):
-        simulation = data_ingest_UM_on_single_grid(
-            args["input_files"],
-            args["h_resolution"],
-            requested_fields=["u", "v", "w", "theta"],
-        )
+        if args["input_format"] == "um":
+            simulation = data_ingest_UM_on_single_grid(
+                args["input_files"],
+                args["h_resolution"],
+                requested_fields=["u", "v", "w", "theta"],
+            )
+        elif args["input_format"] == "monc":
+            meta, simulation = data_ingest_MONC_on_single_grid(
+                args["input_files"],
+            )
+
         simulation = data_slice(simulation, args["t_range"], args["z_range"])
         simulation = simulation.chunk(
-            {"z": args["z_chunk_size"], "t_0": args["t_chunk_size"]}
+            {"z": args["z_chunk_size"], 
+            # "z_theta": args["z_chunk_size"],
+            }
         )
 
     # check scales make sense
@@ -225,12 +277,21 @@ def main() -> None:
             new_dim="c2",
             make_traceless=True,
         )
+
         grad_theta = grad_scalar(
             simulation["theta"],
             space_dims=simple_dims,
             new_dim_name="c1",
             name="grad_theta",
         )
+
+        output = xr.Dataset(
+            {
+                "vel": vel,
+                "sij": sij,
+                "grad_theta": grad_theta,
+            }
+            )
 
     with timer("Setup SGS models", "ms"):
         # setup dynamic Smagorinsky model for velocity
@@ -255,6 +316,7 @@ def main() -> None:
         cs_iso_at_scale_ls = []
         cs_diag_at_scale_ls = []
         ctheta_at_scale_ls = []
+        ctheta_diag_at_scale_ls = []
         for scale, regularization_scale in zip(
             args["filter_scales"], args["regularize_filter_scales"]
         ):
@@ -280,33 +342,41 @@ def main() -> None:
                     cs_diag_at_scale_ls.append(cs_diagonal)  # .load())
 
                 with timer("    Cs theta isotropic", "s"):
-                    # compute isotropic Cs for velocity
+                    # compute isotropic Cs for theta
                     ctheta = dynamic_coeff(
                         dyn_smag_theta, filter, regularization, ["c1"]
                     )
                     # force execution for timer logging
                     ctheta_at_scale_ls.append(ctheta)  # .load())
+                with timer("    Cs theta diagonal", "s"):
+                    # compute diagonal Cs for theta
+                    ctheta = dynamic_coeff(
+                        dyn_smag_theta, filter, regularization, []
+                    )
+                    # force execution for timer logging
+                    ctheta_diag_at_scale_ls.append(ctheta)  # .load())
 
     with timer("Collect coefficients", "s"):
         cs_iso_at_scale = xr.concat(cs_iso_at_scale_ls, dim="scale")
         cs_diag_at_scale = xr.concat(cs_diag_at_scale_ls, dim="scale")
         ctheta_at_scale = xr.concat(ctheta_at_scale_ls, dim="scale")
+        ctheta_diag_at_scale = xr.concat(ctheta_diag_at_scale_ls, dim="scale").drop_vars('vel')
 
-        coeff_at_scale = xr.Dataset(
-            {
-                "Cs_isotropic": cs_iso_at_scale,
-                "Cs_diagonal": cs_diag_at_scale,
-                "Ctheta_isotropic": ctheta_at_scale,
-            }
-        )
+        output['Cs_isotropic']     = cs_iso_at_scale 
+        output['Cs_diagonal']      = cs_diag_at_scale
+        output['Ctheta_isotropic'] = ctheta_at_scale 
+        output['Ctheta_diagonal']  = ctheta_diag_at_scale 
+
         # add scale coordinates
-        coeff_at_scale = add_scale_coords(
-            coeff_at_scale,
+        output = add_scale_coords(
+            output,
             list(args["filter_scales"]),
             list(args["regularize_filter_scales"]),
         )
+
     # plot horizontal mean profiles
     if args["plot_show"] or args["plot_path"] is not None:
+      try:
         with timer("Plotting", "s"):
             if len(args["filter_scales"]) > 1:
                 row_lbl = "scale"
@@ -352,15 +422,18 @@ def main() -> None:
                 fig_cs.savefig(args["plot_path"] / "Cs_isotropic.png", dpi=180)
                 fig_cs_diag.savefig(args["plot_path"] / "Cs_diagonal.png", dpi=180)
                 fig_ctheta.savefig(args["plot_path"] / "Ctheta_isotropic.png", dpi=180)
+      except:
+        print("Failed in generating plots")
 
     # interactive plotting out of time
     if args["plot_show"]:
         plt.show()
 
     with timer("Write to disk", "s"):
-        coeff_at_scale.to_netcdf(
-            args["output_file"], mode="w", compute=True, unlimited_dims=["t_0", "scale"]
-        )
+        with ProgressBar():
+            output.to_netcdf(
+                args["output_file"], mode="w", compute=True, unlimited_dims=["scale"], engine='h5netcdf'
+            )
 
 
 if __name__ == "__main__":

@@ -10,7 +10,7 @@ authors = [
     {name = "Dimtar Vlaykov", email = "d.vlaykov@exeter.ac.uk"},
 ]
 
-#urls = {homepage = "https://bitbucket.org/git/pymusic/"}
+#urls = {homepage = "https://bitbucket.org/git/dvlaykov/pymusic/"}
 
 classifiers = [
     "Development Status :: 2 - Pre-Alpha",

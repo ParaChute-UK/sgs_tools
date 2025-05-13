@@ -11,7 +11,7 @@ from .sgs_model import DynamicHeatModel, DynamicVelocityModel, SGSModel
 # check that arr is uniform along `filter_dims` with spacing of `dx`
 def _assert_coord_dx(filter_dims: list[Hashable], arr: xr.DataArray, dx: float) -> None:
     for c in filter_dims:
-        assert (arr[c].diff(dim=c) == dx).all()
+        assert (arr[c].diff(dim=c) == dx).all(), f"Not uniform dimension {c}: {arr[c]}"
 
 
 @dataclass(frozen=True)
@@ -29,7 +29,7 @@ class SmagorinskyVelocityModel(SGSModel):
     strain: xr.DataArray
     cs: float
     dx: float
-    tensor_dims: tuple[str, str] = ("c1", "c2")
+    tensor_dims: tuple[str, str]
 
     def _snorm(self, filter: Filter) -> xr.DataArray:
         """compute the rate of strain norm at a given scale"""
@@ -74,7 +74,7 @@ class SmagorinskyHeatModel(SGSModel):
     strain: xr.DataArray
     ctheta: float
     dx: float
-    tensor_dims: tuple[str, str] = ("c1", "c2")
+    tensor_dims: tuple[str, str]
 
     def _snorm(self, filter: Filter) -> xr.DataArray:
         """compute the rate-of-strain norm at a given scale"""

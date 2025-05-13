@@ -32,6 +32,8 @@ def strain_from_vel(
     if make_traceless:
         sij = traceless(sij, (vec_dim, new_dim))
     sij[new_dim] = c2
+    sij.name = "rate-of-strain"
+    sij.attrs["long_name"] = r"$S$"
     return sij
 
 
@@ -46,13 +48,14 @@ def vertical_heat_flux(
     :param hor_axes: labels of horizontal dimensions
         (w.r.t which to compute the fluctuations)
     """
-    w_prime = vert_vel - vert_vel.mean(dim=hor_axes)
-    theta_prime = pot_temperature - pot_temperature.mean(hor_axes)
+    w, theta = xr.align(vert_vel, pot_temperature, join='exact') # assert matching coordinates
+    w_prime = w - w.mean(dim=hor_axes)
+    theta_prime = theta - theta.mean(hor_axes)
     ans = w_prime * theta_prime
     ans.name = "vertical_heat_flux"
     ans.attrs["long_name"] = r"$w' \theta'$ "
     return ans
-
+    
 
 def Reynolds_fluct_stress(
     u: xr.DataArray,

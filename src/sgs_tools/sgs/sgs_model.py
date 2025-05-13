@@ -45,7 +45,8 @@ class DynamicSGSModel(ABC):
         filtered = filter.filter(self.StaticModel.sgs_tensor(id))
         resolved = self.StaticModel.sgs_tensor(filter)
         alpha_sq = filter.kernel.size
-        return filtered - alpha_sq * resolved
+        M = filtered - alpha_sq * resolved
+        return M.assign_coords({tdim:[1,2,3] for tdim in self.StaticModel.tensor_dims if tdim in M.dims})
 
     # this is abstract becaue the mulitplication operation
     # changes for vector and scalar models
@@ -83,9 +84,17 @@ class DynamicVelocityModel(DynamicSGSModel):
 
         :param filter: Filter used to separate "large" and "small" scales
         """
-        resolved = tensor_self_outer_product(filter.filter(self.vel))
+        resolved = tensor_self_outer_product(
+            filter.filter(self.vel), *self.StaticModel.tensor_dims
+        )
         filtered = filter.filter(tensor_self_outer_product(self.vel))
-        return filtered - resolved
+        L = filtered - resolved
+        return L.assign_coords(
+            {
+                self.StaticModel.tensor_dims[0]: [1, 2, 3],
+                self.StaticModel.tensor_dims[1]: [1, 2, 3],
+            }
+        )
 
 
 @dataclass(frozen=True)

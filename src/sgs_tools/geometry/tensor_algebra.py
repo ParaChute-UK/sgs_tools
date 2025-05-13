@@ -5,16 +5,18 @@ import xarray as xr
 
 
 # Vector algebra
-def tensor_self_outer_product(arr: xr.DataArray) -> xr.DataArray:
+def tensor_self_outer_product(
+    arr: xr.DataArray, vec_dim="c1", new_dim="c2"
+) -> xr.DataArray:
     """tensor product :math:`a_i a_j` from vector field `arr`.
         Assumes that `arr` has dimensions ``c1`` but no dimension ``c2``
 
     :param arr: xarray Dataset with dimension `c1` which will be used for the tensor product
     :param returns: xarray DataArray with the 'i' and 'j' dimensions sorted to the front.
     """
-    assert "c1" in arr.dims
-    assert "c2" not in arr.dims
-    return (arr * arr.rename({"c1": "c2"})).transpose("c1", "c2", ...)
+    assert vec_dim in arr.dims
+    assert new_dim not in arr.dims
+    return (arr * arr.rename({vec_dim: new_dim})).transpose(vec_dim, new_dim, ...)
 
 
 def trace(

@@ -69,7 +69,7 @@ def Frobenius_norm(
     :param tensor: tensor input
     :param dims: dimensions with respect to which to take the norm.
     """
-    return np.sqrt(xr.dot(tensor, tensor, dims=tens_dims))
+    return np.sqrt(xr.dot(tensor, tensor, dim=tens_dims))
 
 
 def symmetrise(

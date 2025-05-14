@@ -129,8 +129,10 @@ def compose_vector_components_on_grid(
         vec_ds = xr.Dataset({c.name: c for c in components})
         vec_arr = interpolate_to_grid(
             vec_ds, target_dims, drop_coords=drop_coords
-        ).to_array(dim='vel')
-        vec_arr = vec_arr.assign_coords({vector_dim : ('vel', range(1,4))}).swap_dims({'vel': vector_dim})
+        ).to_array(dim="vel")
+        vec_arr = vec_arr.assign_coords({vector_dim: ("vel", range(1, 4))}).swap_dims(
+            {"vel": vector_dim}
+        )
     # combine into a vector
     # add meta data
     if name:

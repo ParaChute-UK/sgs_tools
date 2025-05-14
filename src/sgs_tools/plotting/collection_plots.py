@@ -24,9 +24,9 @@ def plot_vertical_prof_time_slice_compare_sims_slice(
     :param tcoord: name of time coordinate -- will generate one panel per time index
     :param with_markers: general flag to add markers to the plotted lines.
     """
-    times = None
+    times = xr.DataArray([])
     for k in da_collection:
-        if times is not None:
+        if len(times) != 0:
             assert np.allclose(times, da_collection[k][tcoord])
         else:
             times = da_collection[k][tcoord].data
@@ -76,9 +76,9 @@ def plot_horizontal_slice_tseries(
     :param field_lbl: a display label for the plotted field
     """
 
-    times = None
+    times = xr.DataArray([])
     for k in da_collection:
-        if times is not None:
+        if len(times) != 0:
             assert np.allclose(times, da_collection[k][tcoord])
         else:
             times = da_collection[k][tcoord].data
@@ -144,7 +144,7 @@ def plot_vertical_prof_time_slice_compare_fields(
     times = list(tslice.values())[0]
     fig, axes = plt.subplots(1, len(times), figsize=(6 * len(times), 5), sharey=False)
 
-    tcoord = list(tslice.keys())[0]
+    tcoord = list(times.keys())[0]
 
     for time, ax in zip(times, axes):
         # if les_reference is not None and reduction == "mean":

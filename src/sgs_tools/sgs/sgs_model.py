@@ -46,7 +46,9 @@ class DynamicSGSModel(ABC):
         resolved = self.StaticModel.sgs_tensor(filter)
         alpha_sq = filter.kernel.size
         M = filtered - alpha_sq * resolved
-        return M.assign_coords({tdim:[1,2,3] for tdim in self.StaticModel.tensor_dims if tdim in M.dims})
+        return M.assign_coords(
+            {tdim: [1, 2, 3] for tdim in self.StaticModel.tensor_dims if tdim in M.dims}
+        )
 
     # this is abstract becaue the mulitplication operation
     # changes for vector and scalar models

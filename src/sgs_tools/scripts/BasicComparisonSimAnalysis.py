@@ -5,7 +5,7 @@ from typing import Any, Callable, Dict, Iterable, Mapping, Union
 
 import matplotlib.pyplot as plt
 import xarray as xr
-from numpy import arange, array, inf
+from numpy import arange, array, inf, ndarray
 from pint import UnitRegistry
 from sgs_tools.io.um import data_ingest_UM
 from sgs_tools.physics.fields import Reynolds_fluct_stress, vertical_heat_flux
@@ -188,8 +188,8 @@ def parse_args() -> dict[str, Any]:
         colors = plt.rcParams["axes.prop_cycle"].by_key()["color"]
         for i in range(len(args["input_files"])):
             plot_styles.append(default_plotting_style)
-            plot_styles[i]["color"] = colors[i % len(colors)]
-            plot_styles[i]["label"] = f"sim{i}"
+            plot_styles[-1]["color"] = colors[i % len(colors)]
+            plot_styles[-1]["label"] = f"sim{i}"
     else:
         with open(args["plot_style_file"]) as f:
             plot_styles = json.load(f)
@@ -217,7 +217,7 @@ def parse_args() -> dict[str, Any]:
 
 def preprocess_dataset(
     ds: xr.Dataset, args: ArgumentParser
-) -> list[xr.Dataset, Dict[str, field_plot_kwargs]]:
+) -> tuple[xr.Dataset, Dict[str, field_plot_kwargs]]:
     """preprocess data:
        fix coordinates, take time/z constraints, add offline fields
     :param ds: xarray dataset to be modified:
@@ -243,6 +243,7 @@ def preprocess_dataset(
             ds = ds.sel({z: zslice})
 
     # take time slice
+    times: ndarray
     if args["times"].size == 0:
         times = arange(0, ds["t"].max(), 60)
     else:

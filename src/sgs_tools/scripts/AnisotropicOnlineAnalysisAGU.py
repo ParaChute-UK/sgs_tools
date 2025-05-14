@@ -1,12 +1,12 @@
 import json
 from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
 from pathlib import Path
-from typing import Any, Callable, Dict, Iterable, Mapping, Union
+from typing import Any, Callable, Collection, Dict, Mapping
 
 import matplotlib.pyplot as plt
 import numpy as np
 import xarray as xr
-from numpy import arange, array, inf, sqrt
+from numpy import allclose, arange, array, inf, ndarray, sqrt
 from pint import UnitRegistry
 from sgs_tools.io.um import data_ingest_UM
 
@@ -39,7 +39,7 @@ plotting_styles = [
         "marker": "o",
     },
     {
-        "label": "ds_smag",
+        "label": "a",
         "linestyle": ":",
         "color": "k",
         "linewidth": 1,
@@ -94,7 +94,7 @@ prof_fields = (
 verbose = False
 
 
-def parse_args() -> dict[str, Any]:
+def parse_args() -> ArgumentParser:
     parser = ArgumentParser(
         description="""Create (and optionally save) standard diagnostic plots for
                     a dry atmospheric boundary layer UM simulation
@@ -225,9 +225,9 @@ def parse_args() -> dict[str, Any]:
 
 def add_offline_fields(
     ds: xr.Dataset,
-) -> list[xr.Dataset, Dict[str, field_plot_kwargs]]:
+) -> tuple[xr.Dataset, Dict[str, field_plot_kwargs]]:
     # add offline fields
-    offline_field_map = {}
+    offline_field_map: Dict[str, field_plot_kwargs] = {}
 
     # extract cs from mixing length
     try:
@@ -280,7 +280,7 @@ def add_offline_fields(
 
 def preprocess_dataset(
     ds: xr.Dataset, args: ArgumentParser
-) -> list[xr.Dataset, Dict[str, field_plot_kwargs]]:
+) -> tuple[xr.Dataset, Dict[str, field_plot_kwargs]]:
     """preprocess data:
        fix coordinates, take time/z constraints, add offline fields
     :param ds: xarray dataset to be modified:
@@ -306,6 +306,7 @@ def preprocess_dataset(
             ds = ds.sel({z: zslice})
 
     # take time slice
+    times: ndarray
     if args["times"].size == 0:
         times = arange(0, ds["t"].max(), 60)
     else:
@@ -321,7 +322,7 @@ def preprocess_dataset(
     return ds, offline_field_map
 
 
-def io(args) -> None:
+def io(args) -> tuple[Mapping[str, xr.Dataset], Dict[str, field_plot_kwargs]]:
     # read UM stasth files: data
     ds_collection: Mapping[str, xr.Dataset] = {}
     with timer("Read Dataset", "s"):
@@ -332,7 +333,7 @@ def io(args) -> None:
             ds = data_ingest_UM(
                 f,
                 res,
-                requested_fields=slice_fields + prof_fields,
+                requested_fields=list(slice_fields + prof_fields),
             )
             if len(ds) == 0:
                 continue
@@ -358,7 +359,7 @@ def io(args) -> None:
 def vert_profile_reduction(
     da: xr.DataArray,
     reduction: Callable | str,
-    reduction_dims: Iterable[str],
+    reduction_dims: Collection[str],
 ) -> xr.DataArray:
     if reduction == "mean":
         data = da.mean(reduction_dims).squeeze()
@@ -369,11 +370,12 @@ def vert_profile_reduction(
     elif reduction == "median":
         data = da.median(reduction_dims).squeeze()
     else:
+        assert callable(reduction)
         data = reduction(da, reduction_dims).squeeze()
     return data
 
 
-def plot1(ds_diag: xr.Dataset, ds_iso: xr.DataArray, ds_smag: xr.DataArray, plot_map):
+def plot1(ds_diag: xr.Dataset, ds_iso: xr.Dataset, ds_smag: xr.Dataset, plot_map):
     # data reduction
     da_collection = {}
     linecolor = {}
@@ -404,10 +406,10 @@ def plot1(ds_diag: xr.Dataset, ds_iso: xr.DataArray, ds_smag: xr.DataArray, plot
     linestyle["cs_smag"] = "--"
     # plot
     tcoord = "t"
-    times = None
+    times = xr.DataArray([])
     for k in da_collection:
-        if times is not None:
-            assert np.allclose(times, da_collection[k][tcoord])
+        if len(times) != 0:
+            assert allclose(times, da_collection[k][tcoord])
         else:
             times = da_collection[k][tcoord].data
         assert len(da_collection[k].dims) == 2, f"Too many dimensions in dataarray {k}"

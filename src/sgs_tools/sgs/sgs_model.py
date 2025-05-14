@@ -58,11 +58,6 @@ class DynamicSGSModel(ABC):
         """
         ...
 
-    # @abstractmethod
-    # def dynamic_coeff(self, filter: Filter, regularizer: Filter) -> xr.DataArray:
-    #     """compute dynamic coefficient"""
-    #     ...
-
 
 @dataclass(frozen=True)
 class DynamicVelocityModel(DynamicSGSModel):

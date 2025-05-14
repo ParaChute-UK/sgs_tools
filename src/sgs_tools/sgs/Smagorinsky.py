@@ -46,7 +46,8 @@ class SmagorinskyVelocityModel(SGSModel):
 
         sij = filter.filter(self.strain)
         snorm = Frobenius_norm(sij, self.tensor_dims)
-        return (self.cs * self.dx) ** 2 * snorm * sij
+        tau = (self.cs * self.dx) ** 2 * snorm * sij
+        return tau
 
 
 @dataclass(frozen=True)
@@ -83,7 +84,8 @@ class SmagorinskyHeatModel(SGSModel):
 
         snorm = Frobenius_norm(filter.filter(self.strain), self.tensor_dims)
         grad_theta = filter.filter(self.grad_theta)
-        return self.ctheta * self.dx**2 * snorm * grad_theta
+        tau = self.ctheta * self.dx**2 * snorm * grad_theta
+        return tau
 
 
 def DynamicSmagorinskyVelocityModel(

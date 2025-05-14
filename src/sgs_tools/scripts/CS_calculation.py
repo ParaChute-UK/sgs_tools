@@ -242,15 +242,19 @@ def main() -> None:
     with timer("Setup SGS models", "ms"):
         # setup dynamic Smagorinsky model for velocity
         smag_vel = SmagorinskyVelocityModel(
-            vel, sij, cs=1.0, dx=args["h_resolution"], tensor_dims=("c1", "c2")
+            vel=vel,
+            strain=sij,
+            cs=1.0,
+            dx=args["h_resolution"],
+            tensor_dims=("c1", "c2"),
         )
         dyn_smag_vel = DynamicSmagorinskyVelocityModel(smag_vel)
 
         # setup dynamic Smagorinsky model for potential temperature
         smag_theta = SmagorinskyHeatModel(
-            vel,
-            grad_theta,
-            sij,
+            vel=vel,
+            grad_theta=grad_theta,
+            strain=sij,
             ctheta=1.0,
             dx=args["h_resolution"],
             tensor_dims=("c1", "c2"),
@@ -325,6 +329,7 @@ def main() -> None:
                 .plot(x="t_0", row=row_lbl, col="c1", robust=True)  # type: ignore
                 .fig
             )
+
             # -1 because no label on colorbar
             for ax in fig_cs_diag.axes[:-1]:
                 ax.text(

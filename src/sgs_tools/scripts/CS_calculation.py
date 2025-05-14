@@ -9,7 +9,7 @@ from sgs_tools.geometry.staggered_grid import (
     compose_vector_components_on_grid,
 )
 from sgs_tools.geometry.vector_calculus import grad_scalar
-from sgs_tools.io.monc import data_ingest_monc_on_single_grid
+from sgs_tools.io.monc import data_ingest_MONC_on_single_grid
 from sgs_tools.io.um import data_ingest_UM_on_single_grid
 from sgs_tools.physics.fields import strain_from_vel
 from sgs_tools.sgs.dynamic_coefficient import dynamic_coeff
@@ -196,11 +196,7 @@ def main() -> None:
             )
         elif args["input_format"] == "monc":
             assert len(args["input_files"]) == 1
-            simulation = data_ingest_monc_on_single_grid(
-                args["input_files"][0],
-                args["h_resolution"],
-                requested_fields=["u", "v", "w", "theta"],
-            )
+            simulation = data_ingest_MONC_on_single_grid(args["input_files"][0])
 
         simulation = dataset_slice(simulation, args["t_range"], args["z_range"])
         simulation = simulation.chunk(

@@ -89,7 +89,7 @@ class SmagorinskyHeatModel(SGSModel):
 def DynamicSmagorinskyVelocityModel(
     smag_vel: SmagorinskyVelocityModel,
 ) -> DynamicVelocityModel:
-    return DynamicVelocityModel(smag_vel, smag_vel.vel)
+    return DynamicVelocityModel(smag_vel, smag_vel.vel, smag_vel.tensor_dims)
 
 
 def DynamicSmagorinskyHeatModel(

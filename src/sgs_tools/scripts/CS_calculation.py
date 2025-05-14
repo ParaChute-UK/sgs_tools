@@ -355,15 +355,16 @@ def main() -> None:
                     .fig
                 )
                 # -1 because no label on colorbar
-                for ax in fig_cs_diag.axes[:-1]:
+                for i, ax in enumerate(fig_cs_diag.axes[:-1]):
                     ax.text(
                         0.05,
                         0.85,
-                        r"$C_s$ diagonal",
+                        r"$C_s$ diagonal" + f"{i+1}",
                         fontsize=14,
                         transform=ax.transAxes,
                     )
                 plt.figure()
+
                 q = cs_iso_at_scale.mean(["x", "y"]).plot(
                     x="t_0", row=row_lbl, col_wrap=3, robust=True
                 )  # type: ignore
@@ -376,7 +377,22 @@ def main() -> None:
                 )
                 fig_cs = q.get_figure()
 
+                fig_ctheta_diag = (
+                    ctheta_diag_at_scale.mean(["x", "y"])
+                    .plot(x="t_0", row=row_lbl, col="c1", robust=True)  # type: ignore
+                    .fig
+                )
+                # -1 because no label on colorbar
+                for i, ax in enumerate(fig_ctheta_diag.axes[:-1]):
+                    ax.text(
+                        0.05,
+                        0.85,
+                        r"$C_\theta$ diagonal" + f"{i+1}",
+                        fontsize=14,
+                        transform=ax.transAxes,
+                    )
                 plt.figure()
+
                 q = ctheta_at_scale.mean(["x", "y"]).plot(
                     x="t_0", row=row_lbl, col_wrap=3, robust=True
                 )  # type: ignore
@@ -397,6 +413,10 @@ def main() -> None:
                     fig_ctheta.savefig(
                         args["plot_path"] / "Ctheta_isotropic.png", dpi=180
                     )
+                    fig_ctheta_diag.savefig(
+                        args["plot_path"] / "Ctheta_diagonal.png", dpi=180
+                    )
+
         except:
             print("Failed in generating plots")
 

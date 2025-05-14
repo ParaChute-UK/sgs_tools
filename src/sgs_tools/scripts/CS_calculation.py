@@ -322,7 +322,7 @@ def main() -> None:
 
             fig_cs_diag = (
                 cs_diag_at_scale.mean(["x", "y"])
-                .plot(x="t_0", row=row_lbl, col="c1", robust=True)
+                .plot(x="t_0", row=row_lbl, col="c1", robust=True)  # type: ignore
                 .fig
             )
             # -1 because no label on colorbar
@@ -334,7 +334,7 @@ def main() -> None:
             plt.figure()
             q = cs_iso_at_scale.mean(["x", "y"]).plot(
                 x="t_0", row=row_lbl, col_wrap=3, robust=True
-            )
+            )  # type: ignore
             q.axes.text(
                 0.05, 0.85, r"$C_s$ isotropic", fontsize=14, transform=q.axes.transAxes
             )
@@ -343,7 +343,7 @@ def main() -> None:
             plt.figure()
             q = ctheta_at_scale.mean(["x", "y"]).plot(
                 x="t_0", row=row_lbl, col_wrap=3, robust=True
-            )
+            )  # type: ignore
             q.axes.text(
                 0.05,
                 0.85,

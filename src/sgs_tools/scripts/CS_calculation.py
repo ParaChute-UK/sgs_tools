@@ -199,8 +199,7 @@ def main() -> None:
                 requested_fields=["u", "v", "w", "theta"],
             )
         elif args["input_format"] == "monc":
-            assert len(args["input_files"]) == 1
-            _, simulation = data_ingest_MONC_on_single_grid(args["input_files"][0])
+            _, simulation = data_ingest_MONC_on_single_grid(args["input_files"])
 
         simulation = data_slice(simulation, args["t_range"], args["z_range"])
         simulation = simulation.chunk(

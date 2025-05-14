@@ -2,18 +2,17 @@ from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
 from pathlib import Path
 from typing import Any, Sequence
 
-import dask
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import xarray as xr
 from dask.diagnostics import ProgressBar
-from dask.distributed import Client
 from numpy import inf
 from sgs_tools.geometry.staggered_grid import (
     compose_vector_components_on_grid,
 )
 from sgs_tools.geometry.vector_calculus import grad_scalar
+from sgs_tools.io.monc import data_ingest_MONC_on_single_grid
 from sgs_tools.io.um import data_ingest_UM_on_single_grid, restrict_ds
 from sgs_tools.physics.fields import strain_from_vel
 from sgs_tools.sgs.dynamic_coefficient import dynamic_coeff
@@ -165,47 +164,6 @@ def add_scale_coords(
     return ds
 
 
-def data_ingest_MONC_on_single_grid(fname):
-    ds = xr.open_mfdataset(fname, chunks={}, parallel=True)
-
-    # parse metadata
-    metadata = ds["options_database"].load().data
-    metadata = dict(np.char.decode(metadata))
-    for k, v in metadata.items():
-        if v in ["true", "false"]:
-            v = v == "true"
-        metadata[k] = pd.to_numeric(v, errors="ignore")
-    metadata = dict(sorted(metadata.items()))
-    del ds["options_database"]
-
-    ds = ds.squeeze()
-
-    base_field_dict = {"th": "theta", "p": "P"}
-    coord_dict = {"zn": "z_theta"}
-
-    ds = ds.squeeze()
-    # change variable names
-    ds = ds.rename(base_field_dict)
-
-    # standardize coordinate names
-    ds = ds.rename(coord_dict)
-    ds["x"] = ds["x"] * metadata["dxx"]
-    ds["y"] = ds["y"] * metadata["dyy"]
-
-    # interpolate theta to vel grid
-    ds["theta_interp"] = (
-        ds["theta"]
-        .rename({"z_theta": "z"})
-        .interp(z=ds["w"].z, method="linear", assume_sorted=True)
-    )
-    del ds["theta"]
-    ds = ds.rename({"theta_interp": "theta"})
-    ds = restrict_ds(ds, ["u", "v", "w", "theta"])
-    for coord in ds.coords:
-        ds[coord].attrs.update({"units": "m"})
-    return metadata, ds
-
-
 def data_slice(
     ds: xr.Dataset, t_range: Sequence[float], z_range: Sequence[float]
 ) -> xr.Dataset:
@@ -241,9 +199,8 @@ def main() -> None:
                 requested_fields=["u", "v", "w", "theta"],
             )
         elif args["input_format"] == "monc":
-            meta, simulation = data_ingest_MONC_on_single_grid(
-                args["input_files"],
-            )
+            assert len(args["input_files"]) == 1
+            _, simulation = data_ingest_MONC_on_single_grid(args["input_files"][0])
 
         simulation = data_slice(simulation, args["t_range"], args["z_range"])
         simulation = simulation.chunk(
@@ -301,15 +258,19 @@ def main() -> None:
     with timer("Setup SGS models", "ms"):
         # setup dynamic Smagorinsky model for velocity
         smag_vel = SmagorinskyVelocityModel(
-            vel, sij, cs=1.0, dx=args["h_resolution"], tensor_dims=("c1", "c2")
+            vel=vel,
+            strain=sij,
+            cs=1.0,
+            dx=args["h_resolution"],
+            tensor_dims=("c1", "c2"),
         )
         dyn_smag_vel = DynamicSmagorinskyVelocityModel(smag_vel)
 
         # setup dynamic Smagorinsky model for potential temperature
         smag_theta = SmagorinskyHeatModel(
-            vel,
-            grad_theta,
-            sij,
+            vel=vel,
+            grad_theta=grad_theta,
+            strain=sij,
             ctheta=1.0,
             dx=args["h_resolution"],
             tensor_dims=("c1", "c2"),
@@ -390,7 +351,7 @@ def main() -> None:
 
                 fig_cs_diag = (
                     cs_diag_at_scale.mean(["x", "y"])
-                    .plot(x="t_0", row=row_lbl, col="c1", robust=True)
+                    .plot(x="t_0", row=row_lbl, col="c1", robust=True)  # type: ignore
                     .fig
                 )
                 # -1 because no label on colorbar
@@ -402,11 +363,10 @@ def main() -> None:
                         fontsize=14,
                         transform=ax.transAxes,
                     )
-
                 plt.figure()
                 q = cs_iso_at_scale.mean(["x", "y"]).plot(
                     x="t_0", row=row_lbl, col_wrap=3, robust=True
-                )
+                )  # type: ignore
                 q.axes.text(
                     0.05,
                     0.85,
@@ -419,7 +379,7 @@ def main() -> None:
                 plt.figure()
                 q = ctheta_at_scale.mean(["x", "y"]).plot(
                     x="t_0", row=row_lbl, col_wrap=3, robust=True
-                )
+                )  # type: ignore
                 q.axes.text(
                     0.05,
                     0.85,

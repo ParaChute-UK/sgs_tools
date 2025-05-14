@@ -38,7 +38,9 @@ def strain_from_vel(
 
 
 def vertical_heat_flux(
-    vert_vel: xr.DataArray, pot_temperature: xr.DataArray, hor_axes: Collection[str]
+    vert_vel: xr.DataArray,
+    pot_temperature: xr.DataArray,
+    hor_axes: Collection[str],
 ) -> xr.DataArray:
     """compute vertical heat flux :math:`$w' \\theta'$` from :math:`w` and :math:`$\\theta$`
 
@@ -48,6 +50,9 @@ def vertical_heat_flux(
     :param hor_axes: labels of horizontal dimensions
         (w.r.t which to compute the fluctuations)
     """
+    assert set(vert_vel.dims) == set(
+        pot_temperature.dims
+    ), "Mismatched dimensions of vert_vel and pot_temperature"
     w, theta = xr.align(
         vert_vel, pot_temperature, join="exact"
     )  # assert matching coordinates
@@ -63,7 +68,7 @@ def Reynolds_fluct_stress(
     u: xr.DataArray,
     v: xr.DataArray,
     w: xr.DataArray,
-    target_dims: Iterable[str],
+    target_dims: list[str],
     fluctuation_axes: Collection[str],
 ) -> xr.DataArray:
     """compute Reynolds stress :math:`$\mathbf{u}'_i \mathbf{u}'_j$`

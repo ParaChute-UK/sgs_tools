@@ -199,8 +199,10 @@ def main() -> None:
                 requested_fields=["u", "v", "w", "theta"],
             )
         elif args["input_format"] == "monc":
-            _, simulation = data_ingest_MONC_on_single_grid(args["input_files"])
-
+            meta, simulation = data_ingest_MONC_on_single_grid(args["input_files"])
+            # overwrite resolution
+            assert np.isclose(meta["dxx"], meta["dyy"])
+            args["h_resolution"] = meta["dxx"]
         simulation = data_slice(simulation, args["t_range"], args["z_range"])
         simulation = simulation.chunk(
             {

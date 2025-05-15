@@ -183,32 +183,42 @@ def data_slice(
     return ds
 
 
+def read(args: dict[str, Any]) -> xr.Dataset:
+    # read UM stash files
+    if args["input_format"] == "um":
+        simulation = data_ingest_UM_on_single_grid(
+            args["input_files"],
+            args["h_resolution"],
+            requested_fields=args["requested_fields"],
+        )
+    elif args["input_format"] == "monc":
+        # read MONC files
+        meta, simulation = data_ingest_MONC_on_single_grid(
+            args["input_files"],
+            requested_fields=args["requested_fields"],
+        )
+        # overwrite resolution
+        assert np.isclose(meta["dxx"], meta["dyy"])
+        args["h_resolution"] = meta["dxx"]
+    simulation = data_slice(simulation, args["t_range"], args["z_range"])
+    simulation = simulation.chunk(
+        {
+            "z": args["z_chunk_size"],
+            # "z_theta": args["z_chunk_size"],
+        }
+    )
+    return simulation
+
+
 def main() -> None:
     # read and pre-process simulation
     with timer("Arguments", "ms"):
         args = parser()
     print(args)
-
+    args["requested_fields"] = ["u", "v", "w", "theta"]
     # read UM stasth files: data
     with timer("Read Dataset", "s"):
-        if args["input_format"] == "um":
-            simulation = data_ingest_UM_on_single_grid(
-                args["input_files"],
-                args["h_resolution"],
-                requested_fields=["u", "v", "w", "theta"],
-            )
-        elif args["input_format"] == "monc":
-            meta, simulation = data_ingest_MONC_on_single_grid(args["input_files"])
-            # overwrite resolution
-            assert np.isclose(meta["dxx"], meta["dyy"])
-            args["h_resolution"] = meta["dxx"]
-        simulation = data_slice(simulation, args["t_range"], args["z_range"])
-        simulation = simulation.chunk(
-            {
-                "z": args["z_chunk_size"],
-                # "z_theta": args["z_chunk_size"],
-            }
-        )
+        simulation = read(args)
 
     # check scales make sense
     nhoriz = min(simulation["x"].shape[0], simulation["y"].shape[0])
@@ -425,14 +435,16 @@ def main() -> None:
         plt.show()
 
     with timer("Write to disk", "s"):
-        with ProgressBar():
-            output.to_netcdf(
-                args["output_file"],
-                mode="w",
-                compute=True,
-                unlimited_dims=["scale"],
-                engine="h5netcdf",
-            )
+        if args["output_file"]:
+            print(args["output_file"])
+            with ProgressBar():
+                output.to_netcdf(
+                    args["output_file"],
+                    mode="w",
+                    compute=True,
+                    unlimited_dims=["scale"],
+                    engine="h5netcdf",
+                )
 
 
 if __name__ == "__main__":

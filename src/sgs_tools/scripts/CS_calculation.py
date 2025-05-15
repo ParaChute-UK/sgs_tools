@@ -438,16 +438,14 @@ def main() -> None:
         plt.show()
 
     with timer("Write to disk", "s"):
-        if args["output_file"]:
-            print(args["output_file"])
-            with ProgressBar():
-                output.to_netcdf(
-                    args["output_file"],
-                    mode="w",
-                    compute=True,
-                    unlimited_dims=["scale"],
-                    engine="h5netcdf",
-                )
+        with ProgressBar():
+            output.to_netcdf(
+                args["output_file"],
+                mode="w",
+                compute=True,
+                unlimited_dims=["scale"],
+                engine="h5netcdf",
+            )
 
 
 if __name__ == "__main__":

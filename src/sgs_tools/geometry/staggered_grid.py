@@ -132,7 +132,7 @@ def compose_vector_components_on_grid(
             vec_ds, target_dims, drop_coords=drop_coords
         ).to_array(dim="vel")
         vec_arr = vec_arr.assign_coords(
-            vector_dim=("vel", range(1, len(components) + 1))
+            {vector_dim: ("vel", range(1, len(components) + 1))}
         ).swap_dims({"vel": vector_dim})
     # combine into a vector
     # add meta data
@@ -248,7 +248,7 @@ def grad_vec_on_grid(
     gradvec_comp = {}
 
     for i, f in enumerate(ds):
-        # individual sapce dimensions for each staggered field
+        # individual space dimensions for each staggered field
         space_dims = sorted([str(d) for d in ds[f].dims if str(d)[0] in "xyz"])
         grad_f = grad_on_cart_grid(ds[f], space_dims)
         # interpolate onto target coordinates from original ds (must exist)
@@ -256,9 +256,8 @@ def grad_vec_on_grid(
         # so make an explicit coordinate map
         coord_map = {}
         for k in grad_f.dims:
-            k_str = str(
-                k
-            )  # xr.Dataset.dims is a Hashable and interpolate expects a str
+            # xr.Dataset.dims is a Hashable and interpolate expects a str
+            k_str = str(k)
             if k_str[0] in "xyz":
                 # name match by first character xyz
                 target_coord = [c for c in target_dims if c[0] == k_str[0]][0]
@@ -266,16 +265,14 @@ def grad_vec_on_grid(
         grad_f_on_cent_ds = interpolate_to_grid(grad_f, coord_map=coord_map)
         # convert to a dataarray
         grad_f_on_cent = grad_f_on_cent_ds.to_dataarray(d_name).sortby(d_name)
-        # rename c1 coordinates: fragile this works only because of
-        # the naming connvention in interpolate_to_grid
-        grad_f_on_cent[d_name] = [f"d{x.item()[-1]}" for x in grad_f_on_cent[d_name]]
-        grad_f_on_cent[d_name] = [f"d{x.item()[-1]}" for x in grad_f_on_cent[d_name]]
+        # rename c1 coordinates
+        grad_f_on_cent[d_name] = range(1, len(grad_f_on_cent[d_name]) + 1)
         gradvec_comp[f] = grad_f_on_cent
 
     gradvec_da = xr.Dataset(gradvec_comp).to_dataarray(dim=vec_name)
     gradvec_da = gradvec_da.sortby(vec_name)
-    # rename c2 coordinates: less fragile but still a bit idiosyncratic
-    gradvec_da[vec_name] = [f"v{i+1}" for i in range(len(gradvec_comp))]
+    # rename c2 coordinates
+    gradvec_da[vec_name] = range(1, len(gradvec_comp) + 1)
     if name is not None:
         gradvec_da.name = name
     return gradvec_da

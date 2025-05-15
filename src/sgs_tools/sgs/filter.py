@@ -70,6 +70,7 @@ class Filter:
 
         :param field: array to be filtered; must contain all of `filter_dims`
         """
+        assert (d in field.dims for d in self.filter_dims)
         dic_dims = self._filter_kernel_map()
         dic_roll: dict[Hashable, int] = {}
         for d in self.filter_dims:

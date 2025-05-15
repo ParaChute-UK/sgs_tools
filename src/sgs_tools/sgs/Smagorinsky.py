@@ -28,6 +28,7 @@ class SmagorinskyVelocityModel(SGSModel):
     strain: xr.DataArray
     cs: float
     dx: float
+    tensor_dims: tuple[str, str]
 
     def sgs_tensor(self, filter: Filter) -> xr.DataArray:
         """compute model for SGS tensor
@@ -44,7 +45,8 @@ class SmagorinskyVelocityModel(SGSModel):
 
         sij = filter.filter(self.strain)
         snorm = Frobenius_norm(sij, self.tensor_dims)
-        return (self.cs * self.dx) ** 2 * snorm * sij
+        tau = (self.cs * self.dx) ** 2 * snorm * sij
+        return tau
 
 
 @dataclass(frozen=True)
@@ -63,6 +65,7 @@ class SmagorinskyHeatModel(SGSModel):
     strain: xr.DataArray
     ctheta: float
     dx: float
+    tensor_dims: tuple[str, str]
 
     def sgs_tensor(self, filter):
         """compute model for SGS tensor
@@ -79,13 +82,14 @@ class SmagorinskyHeatModel(SGSModel):
 
         snorm = Frobenius_norm(filter.filter(self.strain), self.tensor_dims)
         grad_theta = filter.filter(self.grad_theta)
-        return self.ctheta * self.dx**2 * snorm * grad_theta
+        tau = self.ctheta * self.dx**2 * snorm * grad_theta
+        return tau
 
 
 def DynamicSmagorinskyVelocityModel(
     smag_vel: SmagorinskyVelocityModel,
 ) -> DynamicVelocityModel:
-    return DynamicVelocityModel(smag_vel, smag_vel.vel)
+    return DynamicVelocityModel(smag_vel, smag_vel.vel, smag_vel.tensor_dims)
 
 
 def DynamicSmagorinskyHeatModel(

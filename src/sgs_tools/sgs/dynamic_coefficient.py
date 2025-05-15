@@ -21,8 +21,8 @@ def LillyMinimisation(
     L = model.Leonard_tensor(filter)
     M = model.M_Germano_tensor(filter)
 
-    MM = xr.dot(M, M, dims=contraction_dims)
-    LM = xr.dot(L, M, dims=contraction_dims)
+    MM = xr.dot(M, M, dim=contraction_dims)
+    LM = xr.dot(L, M, dim=contraction_dims)
     filt_LM = filter_regularize.filter(LM)
     filt_MM = filter_regularize.filter(MM)
 

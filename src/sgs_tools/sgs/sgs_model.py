@@ -25,7 +25,7 @@ class SGSModel(ABC):
 
 
 @dataclass(frozen=True)
-class DynamicSGSModel(ABC):
+class DynamicSGSModel(ABC):  # rename to GermanoScaleSimilarity
     """Dynamic SGS model based on Germano's identity
 
     :ivar StaticModel: Static (scale-unaware) SGS model

@@ -5,6 +5,8 @@ from typing import Iterable
 import numpy as np
 import xarray as xr
 
+from sgs_tools.geometry.staggered_grid import interpolate_to_grid
+
 base_fields_dict = {
     "U_COMPNT_OF_WIND_AFTER_TIMESTEP": "u",
     "V_COMPNT_OF_WIND_AFTER_TIMESTEP": "v",
@@ -22,12 +24,13 @@ Water_dict = {
 }
 Smagorinsky_dict = {
     "SMAG__S__SHEAR_TERM_": "s_smag",
-    "SMAG__VISC_M": "SMAG__VISC_M",
-    "SMAG__VISC_H": "SMAG__VISC_H",
+    "SMAG__VISC_M": "smag_visc_m",
+    "SMAG__VISC_H": "smag_visc_h",
     "SHEAR_AT_SCALE_DELTA": "s",
     "MIXING_LENGTH_RNEUTML": "csDelta",
     "CS_THETA": "cs_theta",
     "TURBULENT_KINETIC_ENERGY": "tke",
+    "GRADIENT_RICHARDSON_NUMBER": "Richardson",
 }
 dynamic_SGS_dict = {
     "CS_SQUARED_AT_2_DELTA": "cs2d",
@@ -35,6 +38,17 @@ dynamic_SGS_dict = {
     "CS_THETA_AT_SCALE_2DELTA": "cs_theta_2d",
     "CS_THETA_AT_SCALE_4DELTA": "cs_theta_4d",
 }
+dynamic_anisotropic_SGS_dict = {
+    "RHOKM_DIFF_COEFF___LOCAL_SCHEME": "smag_visc_m_vert",
+    "RHOKH_DIFF_COEFF___LOCAL_SCHEME": "smag_visc_h_vert",
+    "CS_1": "cs_1",
+    "CS_2": "cs_2",
+    "CS_3": "cs_3",
+    "CS_THETA_1": "cs_theta_1",
+    "CS_THETA_2": "cs_theta_2",
+    "CS_THETA_3": "cs_theta_3",
+}
+
 dynamic_SGS_diag_dict = {
     "LijMij_CONT_TENSORS": "lm",
     "QijNij_CONT_TENSORS": "qn",
@@ -62,8 +76,17 @@ dynamic_SGS_diag_dict = {
     "Lagrangian_averaged_FjFj_vector": "FF",
     "Tdecorr_momentum": "Tdecorr_momentum",
     "Tdecorr_heat": "Tdecorr_heat",
+    "Richardson": "Richardson_diag",
 }
-field_names_dict = base_fields_dict | Water_dict | Smagorinsky_dict | dynamic_SGS_dict
+field_names_dict = (
+    base_fields_dict
+    | Water_dict
+    | Smagorinsky_dict
+    | dynamic_SGS_dict
+    | dynamic_SGS_diag_dict
+    | dynamic_anisotropic_SGS_dict
+)
+"Variable names map"
 
 
 # IO
@@ -76,12 +99,15 @@ def read_stash_files(fname_pattern: Path) -> xr.Dataset:
     """
 
     print(f"Reading {fname_pattern}")
-    # parse any glob wildcards in directory or filename
-    parsed = Path(fname_pattern.root).glob(
-        str(Path(*fname_pattern.parts[fname_pattern.is_absolute() :]))
-    )
+    # parse any glob wildcards in directory or filena
     # turn parsed into list because of incomplete typehints of xr.open_mfdataset
-    dataset = xr.open_mfdataset(list(parsed), chunks="auto")
+    parsed = list(
+        Path(fname_pattern.root).glob(
+            str(Path(*fname_pattern.parts[fname_pattern.is_absolute() :]))
+        )
+    )
+    print(f"Reading {parsed}")
+    dataset = xr.open_mfdataset(parsed, chunks="auto")
     return dataset
 
 
@@ -138,35 +164,45 @@ def rename_variables(ds: xr.Dataset) -> xr.Dataset:
 
     # swap to an easy time-dimension
     tname = "min15T0"
-    torigin = ds["min15T0_0"][0]
+    if "min15T0_0" in ds:
+        torigin = ds["min15T0_0"][0]
+    else:
+        torigin = ds["min15T0"][0]
     for tsuffix in "", "_0":
-        delta_t = np.rint(
-            (ds[tname + tsuffix] - torigin) / np.timedelta64(1, "m")
-        ).astype(int)
-        ds = ds.assign_coords({"t" + tsuffix: (tname + tsuffix, delta_t.data)})
-        ds["t" + tsuffix].attrs = {"standard_name": "time", "axis": "T", "unit": "min"}
-        ds = ds.swap_dims({tname + tsuffix: "t" + tsuffix})
+        if tname + tsuffix in ds:
+            delta_t = np.rint(
+                (ds[tname + tsuffix] - torigin) / np.timedelta64(1, "m")
+            ).astype(int)
+            ds = ds.assign_coords({"t" + tsuffix: (tname + tsuffix, delta_t.data)})
+            ds["t" + tsuffix].attrs = {
+                "standard_name": "time",
+                "axis": "T",
+                "unit": "min",
+            }
+            ds = ds.swap_dims({tname + tsuffix: "t" + tsuffix})
     return ds
 
 
-def restrict_ds(ds: xr.Dataset, fields: None | Iterable[str] = None) -> xr.Dataset:
-    """restrict the dataset to fields of interest
+def standardize_varnames(ds: xr.Dataset) -> xr.Dataset:
+    """rename variables in `ds` using ``field_names_dict``
 
     :param ds: input dataset
     :return: dataset with renamed variables
     """
+    restricted_dict = {k: v for k, v in field_names_dict.items() if k in ds}
+    return ds.rename(restricted_dict)
 
-    intersection = {k: v for k, v in field_names_dict.items() if k in ds}
-    if fields is not None:
-        intersection = {k: v for k, v in intersection.items() if v in fields}
 
+def restrict_ds(ds: xr.Dataset, fields: Iterable[str]) -> xr.Dataset:
+    """restrict the dataset to fields of interest and rename using fields dict
+
+    :param ds: input dataset
+    :param fields: list of fields to restrict to, must be contained by `ds`
+    :return: dataset with renamed variables
+    """
+    intersection = [k for k in fields if k in ds]
     # print ("Missing fields:", {k for k in fields if k not in intersection})
-
-    # drop all secondary fields
-    ds = ds[list(intersection)]
-    # rename primary fields for convenience
-    ds = ds.rename(intersection)
-    return ds
+    return ds[intersection]
 
 
 # unify coordinates and implement correct x-spacing
@@ -194,40 +230,48 @@ def unify_coords(ds: xr.Dataset, res: float) -> xr.Dataset:
 
     # rename dimensions/coords of staggered variables
     ds_stag = ds[stag_vars]
-    ds_stag["x_centre"] = xr.DataArray(
-        x_centre, coords={"x_cv": ds.x_cv}, dims="x_cv", name="x_centre"
-    )
-    ds_stag["y_centre"] = xr.DataArray(
-        x_centre, coords={"y_cu": ds.y_cu}, dims="y_cu", name="y_centre"
-    )
-    ds_stag["x_face"] = xr.DataArray(
-        x_face, coords={"x_cu": ds.x_cu}, dims="x_cu", name="x_face"
-    )
-    ds_stag["y_face"] = xr.DataArray(
-        x_face, coords={"y_cv": ds.y_cv}, dims="y_cv", name="y_face"
-    )
+    if ds_stag:
+        ds_stag["x_centre"] = xr.DataArray(
+            x_centre, coords={"x_cv": ds.x_cv}, dims="x_cv", name="x_centre"
+        )
+        ds_stag["y_centre"] = xr.DataArray(
+            x_centre, coords={"y_cu": ds.y_cu}, dims="y_cu", name="y_centre"
+        )
+        ds_stag["x_face"] = xr.DataArray(
+            x_face, coords={"x_cu": ds.x_cu}, dims="x_cu", name="x_face"
+        )
+        ds_stag["y_face"] = xr.DataArray(
+            x_face, coords={"y_cv": ds.y_cv}, dims="y_cv", name="y_face"
+        )
 
-    ds_stag = ds_stag.swap_dims(
-        {
-            "x_cu": "x_face",
-            "x_cv": "x_centre",
-            "y_cu": "y_centre",
-            "y_cv": "y_face",
-        }
-    )
+        ds_stag = ds_stag.swap_dims(
+            {
+                "x_cu": "x_face",
+                "x_cv": "x_centre",
+                "y_cu": "y_centre",
+                "y_cv": "y_face",
+            }
+        )
 
     # rename dimensions/coords of centred variables
     ds_cent = ds[cent_vars]
-    ds_cent["x_centre"] = xr.DataArray(
-        x_centre, coords={"x_theta": ds.x_theta}, dims="x_theta", name="x_centre"
-    )
-    ds_cent["y_centre"] = xr.DataArray(
-        x_centre, coords={"y_theta": ds.y_theta}, dims="y_theta", name="y_centre"
-    )
-    ds_cent = ds_cent.swap_dims({"x_theta": "x_centre", "y_theta": "y_centre"})
+    if ds_cent:
+        ds_cent["x_centre"] = xr.DataArray(
+            x_centre, coords={"x_theta": ds.x_theta}, dims="x_theta", name="x_centre"
+        )
+        ds_cent["y_centre"] = xr.DataArray(
+            x_centre, coords={"y_theta": ds.y_theta}, dims="y_theta", name="y_centre"
+        )
+        ds_cent = ds_cent.swap_dims({"x_theta": "x_centre", "y_theta": "y_centre"})
 
-    ds = xr.merge([ds_stag, ds_cent])
-
+    if ds_stag and ds_cent:
+        ds = xr.merge([ds_stag, ds_cent])
+    elif ds_stag:
+        ds = ds_stag
+    elif ds_cent:
+        ds = ds_cent
+    else:
+        raise ValueError("No recocognized coordinates in ds")
     return ds
 
 
@@ -246,3 +290,55 @@ def compose_diagnostic_tensor(ds: xr.Dataset) -> xr.Dataset:
     ds["Diag_ij"] = diag_ij
     ds = ds.drop_vars(["diag11", "diag22", "diag33", "diag12", "diag13", "diag23"])
     return ds
+
+
+def data_ingest_UM(
+    fname_pattern: Path,
+    res: float,
+    requested_fields: list[str] = ["u", "v", "w", "theta"],
+) -> xr.Dataset:
+    """read and pre-process UM data
+
+    :param fname_pattern: UM NetCDF diagnostic file(s) to read. will be interpreted as a glob pattern. (should belong to the same simulation)
+    :param res: horizontal resolution (will use to overwrite horizontal coordinates). **NB** works for ideal simulations
+    :param  requested_fields: list of fields to read and pre-process. Defaults to ['u', 'v', 'w', 'theta']
+    """
+    # all the fields we will need for the Cs calculations
+    simulation = read_stash_files(fname_pattern)
+    # parse UM stash codes into variable names
+    simulation = rename_variables(simulation)
+
+    # rename to sgs_tools naming convention
+    simulation = standardize_varnames(simulation)
+
+    # restrict to interesting fields and rename to simple names
+    simulation = restrict_ds(simulation, fields=requested_fields)
+    assert len(simulation) > 0, "None of the requested fields are available"
+    # unify coordinates
+    simulation = unify_coords(simulation, res=res)
+    return simulation
+
+
+def data_ingest_UM_on_single_grid(
+    fname_pattern: Path,
+    res: float,
+    requested_fields: list[str] = ["u", "v", "w", "theta"],
+) -> xr.Dataset:
+    """read and pre-process UM data
+
+    :param fname_pattern: UM NetCDF diagnostic file(s) to read. will be interpreted as a glob pattern. (should belong to the same simulation)
+    :param res: horizontal resolution (will use to overwrite horizontal coordinates). **NB** works for ideal simulations
+    :param  requested_fields: list of fields to read and pre-process. Defaults to ['u', 'v', 'w', 'theta']
+    """
+    # read, constrain fields, unify grids
+    simulation = data_ingest_UM(fname_pattern, res, requested_fields)
+
+    # interpolate all vars to a cell-centred grid
+    centre_dims = ["x_centre", "y_centre", "z_theta"]
+    simulation = interpolate_to_grid(simulation, centre_dims, drop_coords=True)
+    # rename spatial dimensions to 'xyz'
+    simple_dims = ["x", "y", "z"]
+    dim_names = {d_new: d_old for d_new, d_old in zip(centre_dims, simple_dims)}
+    simulation = simulation.rename(dim_names)
+
+    return simulation

@@ -3,18 +3,16 @@ from pathlib import Path
 from typing import Any, Sequence
 
 import matplotlib.pyplot as plt
+import numpy as np
 import xarray as xr
+from dask.diagnostics import ProgressBar
+from numpy import inf
 from sgs_tools.geometry.staggered_grid import (
     compose_vector_components_on_grid,
-    interpolate_to_grid,
 )
 from sgs_tools.geometry.vector_calculus import grad_scalar
-from sgs_tools.io.um import (
-    read_stash_files,
-    rename_variables,
-    restrict_ds,
-    unify_coords,
-)
+from sgs_tools.io.monc import data_ingest_MONC_on_single_grid
+from sgs_tools.io.um import data_ingest_UM_on_single_grid
 from sgs_tools.physics.fields import strain_from_vel
 from sgs_tools.sgs.dynamic_coefficient import dynamic_coeff
 from sgs_tools.sgs.filter import Filter, box_kernel, weight_gauss_3d, weight_gauss_5d
@@ -28,32 +26,28 @@ from sgs_tools.util.path_utils import add_extension
 from sgs_tools.util.timer import timer
 from xarray.core.types import T_Xarray
 
+from .arg_parsers import add_dask_group, add_input_group, add_plotting_group
+
 
 def parser() -> dict[str, Any]:
     parser = ArgumentParser(
-        description="Compute dynamic Smagorinsky coefficients as function of scale from UM NetCDF output and store them in a NetCDF files",
+        description="""Compute dynamic Smagorinsky coefficients as function
+                        of scale from UM NetCDF output and store them in
+                        a NetCDF files""",
         formatter_class=ArgumentDefaultsHelpFormatter,
     )
 
-    fname = parser.add_argument_group("I/O datasets on disk")
-    fname.add_argument(
-        "input_files",
-        type=Path,
-        help=""" location of UM NetCDF diagnostic file(s). Recognizes glob patterns and walks directory trees, e.g. './my_file_p[br]*nc'
-                (All files in the pattern should belong to the same simulation). """,
-    )
-
-    fname.add_argument(
-        "h_resolution",
-        type=float,
-        help="horizontal resolution (will use to overwrite horizontal coordinates). **NB** works for ideal simulations",
-    )
-
+    fname = add_input_group(parser)
     fname.add_argument(
         "output_file",
         type=Path,
-        help="output path, will create/overwrite existing file and create any missing intermediate directories",
+        help="""output path, will create/overwrite existing file and
+                create any missing intermediate directories""",
     )
+    fname.add_argument("--input_format", type=str, choices=["um", "monc"], default="um")
+
+    add_plotting_group(parser)
+    add_dask_group(parser)
 
     filter = parser.add_argument_group("Filter parameters")
     filter.add_argument(
@@ -92,42 +86,6 @@ def parser() -> dict[str, Any]:
         "Otherwise, must provide as many values as for `filter_scale`",
     )
 
-    plotting = parser.add_argument_group("Plotting parameters")
-
-    plotting.add_argument(
-        "--plot_show",
-        action="store_true",
-        help="flag to display generated plots",
-    )
-
-    plotting.add_argument(
-        "--plot_path",
-        type=Path,
-        default=None,
-        help="output directory, for storing generated plots",
-    )
-
-    plotting = parser.add_argument_group("Dask parameters")
-
-    plotting.add_argument(
-        "--z_chunk_size",
-        type=int,
-        default=None,
-        help="""
-        Size of dask array chunks in the vertical direction. Should divide the total number of levels.
-        Smaller size leads to smaller memory footprint, but may penalize walltime.
-        NB:The default value has not been optimised.""",
-    )
-
-    plotting.add_argument(
-        "--t_chunk_size",
-        type=int,
-        default=None,
-        help="""
-        Size of dask array chunks in the time direction. Should divide the total number time snapshots.
-        Smaller size leads to smaller memory footprint, but may penalize walltime.
-        NB:The default value has not been optimised.""",
-    )
     # parse arguments into a dictionary
     args = vars(parser.parse_args())
 
@@ -150,43 +108,20 @@ def parser() -> dict[str, Any]:
 
     assert len(args["filter_scales"]) == len(args["regularize_filter_scales"])
 
+    # add any pottentially missing file extension
     args["output_file"] = add_extension(args["output_file"], ".nc")
 
+    # parse negative values in the [t,z]_range
+    if args["t_range"][0] < 0:
+        args["t_range"][0] = -inf
+    if args["t_range"][1] < 0:
+        args["t_range"][1] = inf
+
+    if args["z_range"][0] < 0:
+        args["z_range"][0] = -inf
+    if args["z_range"][1] < 0:
+        args["z_range"][1] = inf
     return args
-
-
-def data_ingest(
-    fname_pattern: Path,
-    res: float,
-    required_fields: list[str] = ["u", "v", "w", "theta"],
-):
-    """read and pre-process UM data
-
-    :param dir_path: directory containing
-    :param fname_pattern: UM NetCDF diagnostic file(s) to read. will be interpreted as a glob pattern. (should belong to the same simulation)
-    :param res: horizontal resolution (will use to overwrite horizontal coordinates). **NB** works for ideal simulations
-    :parm  required_fields: list of fields to read and pre-process. Defaults to ['u', 'v', 'w', 'theta']
-    """
-    # all the fields we will need for the Cs calculations
-    simulation = read_stash_files(fname_pattern)
-    # parse UM stash codes into variable names
-    simulation = rename_variables(simulation)
-
-    # restrict to interesting fields and rename to simple names
-    simulation = restrict_ds(simulation, fields=required_fields)
-
-    # unify coordinatesh
-    simulation = unify_coords(simulation, res=res)
-
-    # interpolate all vars to a cell-centred grid
-    centre_dims = ["x_centre", "y_centre", "z_theta"]
-    simulation = interpolate_to_grid(simulation, centre_dims, drop_coords=True)
-    # rename spatial dimensions to 'xyz'
-    simple_dims = ["x", "y", "z"]
-    dim_names = {d_new: d_old for d_new, d_old in zip(centre_dims, simple_dims)}
-    simulation = simulation.rename(dim_names)
-
-    return simulation
 
 
 def make_filter(shape: str, scale: int, dims=Sequence[str]) -> Filter:
@@ -228,21 +163,62 @@ def add_scale_coords(
     return ds
 
 
+def data_slice(
+    ds: xr.Dataset, t_range: Sequence[float], z_range: Sequence[float]
+) -> xr.Dataset:
+    """restrit ds to the intervals inside [t,z]_range.
+       Restrict a set of standard coordinate names for t and z.
+    :param ds: input dataset/dataarray
+    :param t_range: time interval
+    :param t_range: verical interval
+    """
+    for z in "z", "z_rho", "z_theta":
+        if z in ds:
+            zslice = (z_range[0] <= ds[z]) * (ds[z] <= z_range[1])
+            ds = ds.where(zslice, drop=True)
+    for t in "t", "t_0":
+        if "t" in ds:
+            tslice = (t_range[0] <= ds[t]) * (ds[t] <= t_range[1])
+            ds = ds.where(tslice, drop=True)
+    return ds
+
+
+def read(args: dict[str, Any]) -> xr.Dataset:
+    # read UM stash files
+    if args["input_format"] == "um":
+        simulation = data_ingest_UM_on_single_grid(
+            args["input_files"],
+            args["h_resolution"],
+            requested_fields=args["requested_fields"],
+        )
+    elif args["input_format"] == "monc":
+        # read MONC files
+        meta, simulation = data_ingest_MONC_on_single_grid(
+            args["input_files"],
+            requested_fields=args["requested_fields"],
+        )
+        # overwrite resolution
+        assert np.isclose(meta["dxx"], meta["dyy"])
+        args["h_resolution"] = meta["dxx"]
+    simulation = data_slice(simulation, args["t_range"], args["z_range"])
+    simulation = simulation.chunk(
+        {
+            "z": args["z_chunk_size"],
+            # "z_theta": args["z_chunk_size"],
+        }
+    )
+    return simulation
+
+
 def main() -> None:
     # read and pre-process simulation
     with timer("Arguments", "ms"):
         args = parser()
-
+    print(args)
+    args["requested_fields"] = ["u", "v", "w", "theta"]
     # read UM stasth files: data
     with timer("Read Dataset", "s"):
-        simulation = data_ingest(
-            args["input_files"],
-            args["h_resolution"],
-            required_fields=["u", "v", "w", "theta"],
-        )
-    simulation = simulation.chunk(
-        {"z": args["z_chunk_size"], "t_0": args["t_chunk_size"]}
-    )
+        simulation = read(args)
 
     # check scales make sense
     nhoriz = min(simulation["x"].shape[0], simulation["y"].shape[0])
@@ -273,6 +249,7 @@ def main() -> None:
             new_dim="c2",
             make_traceless=True,
         )
+
         grad_theta = grad_scalar(
             simulation["theta"],
             space_dims=simple_dims,
@@ -280,18 +257,30 @@ def main() -> None:
             name="grad_theta",
         )
 
+        output = xr.Dataset(
+            {
+                "vel": vel,
+                "sij": sij,
+                "grad_theta": grad_theta,
+            }
+        )
+
     with timer("Setup SGS models", "ms"):
         # setup dynamic Smagorinsky model for velocity
         smag_vel = SmagorinskyVelocityModel(
-            vel, sij, cs=1.0, dx=args["h_resolution"], tensor_dims=("c1", "c2")
+            vel=vel,
+            strain=sij,
+            cs=1.0,
+            dx=args["h_resolution"],
+            tensor_dims=("c1", "c2"),
         )
         dyn_smag_vel = DynamicSmagorinskyVelocityModel(smag_vel)
 
         # setup dynamic Smagorinsky model for potential temperature
         smag_theta = SmagorinskyHeatModel(
-            vel,
-            grad_theta,
-            sij,
+            vel=vel,
+            grad_theta=grad_theta,
+            strain=sij,
             ctheta=1.0,
             dx=args["h_resolution"],
             tensor_dims=("c1", "c2"),
@@ -303,6 +292,7 @@ def main() -> None:
         cs_iso_at_scale_ls = []
         cs_diag_at_scale_ls = []
         ctheta_at_scale_ls = []
+        ctheta_diag_at_scale_ls = []
         for scale, regularization_scale in zip(
             args["filter_scales"], args["regularize_filter_scales"]
         ):
@@ -328,87 +318,133 @@ def main() -> None:
                     cs_diag_at_scale_ls.append(cs_diagonal)  # .load())
 
                 with timer("    Cs theta isotropic", "s"):
-                    # compute isotropic Cs for velocity
+                    # compute isotropic Cs for theta
                     ctheta = dynamic_coeff(
                         dyn_smag_theta, filter, regularization, ["c1"]
                     )
                     # force execution for timer logging
                     ctheta_at_scale_ls.append(ctheta)  # .load())
+                with timer("    Cs theta diagonal", "s"):
+                    # compute diagonal Cs for theta
+                    ctheta = dynamic_coeff(dyn_smag_theta, filter, regularization, [])
+                    # force execution for timer logging
+                    ctheta_diag_at_scale_ls.append(ctheta)  # .load())
 
     with timer("Collect coefficients", "s"):
         cs_iso_at_scale = xr.concat(cs_iso_at_scale_ls, dim="scale")
         cs_diag_at_scale = xr.concat(cs_diag_at_scale_ls, dim="scale")
         ctheta_at_scale = xr.concat(ctheta_at_scale_ls, dim="scale")
+        ctheta_diag_at_scale = xr.concat(
+            ctheta_diag_at_scale_ls, dim="scale"
+        ).drop_vars("vel")
 
-        coeff_at_scale = xr.Dataset(
-            {
-                "Cs_isotropic": cs_iso_at_scale,
-                "Cs_diagonal": cs_diag_at_scale,
-                "Ctheta_isotropic": ctheta_at_scale,
-            }
-        )
+        output["Cs_isotropic"] = cs_iso_at_scale
+        output["Cs_diagonal"] = cs_diag_at_scale
+        output["Ctheta_isotropic"] = ctheta_at_scale
+        output["Ctheta_diagonal"] = ctheta_diag_at_scale
+
         # add scale coordinates
-        coeff_at_scale = add_scale_coords(
-            coeff_at_scale,
+        output = add_scale_coords(
+            output,
             list(args["filter_scales"]),
             list(args["regularize_filter_scales"]),
         )
+
     # plot horizontal mean profiles
     if args["plot_show"] or args["plot_path"] is not None:
-        with timer("Plotting", "s"):
-            if len(args["filter_scales"]) > 1:
-                row_lbl = "scale"
-            else:
-                row_lbl = None
+        try:
+            with timer("Plotting", "s"):
+                if len(args["filter_scales"]) > 1:
+                    row_lbl = "scale"
+                else:
+                    row_lbl = None
 
-            fig_cs_diag = (
-                cs_diag_at_scale.mean(["x", "y"])
-                .plot(x="t_0", row=row_lbl, col="c1", robust=True)
-                .fig
-            )
-            # -1 because no label on colorbar
-            for ax in fig_cs_diag.axes[:-1]:
-                ax.text(
-                    0.05, 0.85, r"$C_s$ diagonal", fontsize=14, transform=ax.transAxes
+                fig_cs_diag = (
+                    cs_diag_at_scale.mean(["x", "y"])
+                    .plot(x="t_0", row=row_lbl, col="c1", robust=True)  # type: ignore
+                    .fig
                 )
+                # -1 because no label on colorbar
+                for i, ax in enumerate(fig_cs_diag.axes[:-1]):
+                    ax.text(
+                        0.05,
+                        0.85,
+                        r"$C_s$ diagonal" + f"{i+1}",
+                        fontsize=14,
+                        transform=ax.transAxes,
+                    )
+                plt.figure()
 
-            plt.figure()
-            q = cs_iso_at_scale.mean(["x", "y"]).plot(
-                x="t_0", row=row_lbl, col_wrap=3, robust=True
-            )
-            q.axes.text(
-                0.05, 0.85, r"$C_s$ isotropic", fontsize=14, transform=q.axes.transAxes
-            )
-            fig_cs = q.get_figure()
+                q = cs_iso_at_scale.mean(["x", "y"]).plot(
+                    x="t_0", row=row_lbl, col_wrap=3, robust=True
+                )  # type: ignore
+                q.axes.text(
+                    0.05,
+                    0.85,
+                    r"$C_s$ isotropic",
+                    fontsize=14,
+                    transform=q.axes.transAxes,
+                )
+                fig_cs = q.get_figure()
 
-            plt.figure()
-            q = ctheta_at_scale.mean(["x", "y"]).plot(
-                x="t_0", row=row_lbl, col_wrap=3, robust=True
-            )
-            q.axes.text(
-                0.05,
-                0.85,
-                r"$C_\theta$ isotropic",
-                fontsize=14,
-                transform=q.axes.transAxes,
-            )
-            fig_ctheta = q.get_figure()
+                fig_ctheta_diag = (
+                    ctheta_diag_at_scale.mean(["x", "y"])
+                    .plot(x="t_0", row=row_lbl, col="c1", robust=True)  # type: ignore
+                    .fig
+                )
+                # -1 because no label on colorbar
+                for i, ax in enumerate(fig_ctheta_diag.axes[:-1]):
+                    ax.text(
+                        0.05,
+                        0.85,
+                        r"$C_\theta$ diagonal" + f"{i+1}",
+                        fontsize=14,
+                        transform=ax.transAxes,
+                    )
+                plt.figure()
 
-            if args["plot_path"] is not None:
-                print(f"Saving plots to {args['plot_path']}")
-                args["plot_path"].mkdir(parents=True, exist_ok=True)
-                fig_cs.savefig(args["plot_path"] / "Cs_isotropic.png", dpi=180)
-                fig_cs_diag.savefig(args["plot_path"] / "Cs_diagonal.png", dpi=180)
-                fig_ctheta.savefig(args["plot_path"] / "Ctheta_isotropic.png", dpi=180)
+                q = ctheta_at_scale.mean(["x", "y"]).plot(
+                    x="t_0", row=row_lbl, col_wrap=3, robust=True
+                )  # type: ignore
+                q.axes.text(
+                    0.05,
+                    0.85,
+                    r"$C_\theta$ isotropic",
+                    fontsize=14,
+                    transform=q.axes.transAxes,
+                )
+                fig_ctheta = q.get_figure()
+
+                if args["plot_path"] is not None:
+                    print(f"Saving plots to {args['plot_path']}")
+                    args["plot_path"].mkdir(parents=True, exist_ok=True)
+                    fig_cs.savefig(args["plot_path"] / "Cs_isotropic.png", dpi=180)
+                    fig_cs_diag.savefig(args["plot_path"] / "Cs_diagonal.png", dpi=180)
+                    fig_ctheta.savefig(
+                        args["plot_path"] / "Ctheta_isotropic.png", dpi=180
+                    )
+                    fig_ctheta_diag.savefig(
+                        args["plot_path"] / "Ctheta_diagonal.png", dpi=180
+                    )
+
+        except:
+            print("Failed in generating plots")
 
     # interactive plotting out of time
     if args["plot_show"]:
         plt.show()
 
     with timer("Write to disk", "s"):
-        coeff_at_scale.to_netcdf(
-            args["output_file"], mode="w", compute=True, unlimited_dims=["t_0", "scale"]
-        )
+        if args["output_file"]:
+            print(args["output_file"])
+            with ProgressBar():
+                output.to_netcdf(
+                    args["output_file"],
+                    mode="w",
+                    compute=True,
+                    unlimited_dims=["scale"],
+                    engine="h5netcdf",
+                )
 
 
 if __name__ == "__main__":

@@ -10,7 +10,7 @@ authors = [
     {name = "Dimtar Vlaykov", email = "d.vlaykov@exeter.ac.uk"},
 ]
 
-#urls = {homepage = "https://bitbucket.org/git/pymusic/"}
+#urls = {homepage = "https://bitbucket.org/git/dvlaykov/pymusic/"}
 
 classifiers = [
     "Development Status :: 2 - Pre-Alpha",
@@ -31,7 +31,8 @@ dev = [
     "tox",
     "mypy",
     "pytest",
-    "ruff"
+    "ruff",
+    "pint"
 ]
 doc = [
     "sphinx",
@@ -42,6 +43,9 @@ doc = [
 ]
 [project.scripts]
 cs_dynamic = "sgs_tools.scripts.CS_calculation:main"
+sim_comparison = "sgs_tools.scripts.BasicComparisonSimAnalysis:main"
+ref_comparison = "sgs_tools.scripts.ReferenceComparisonSimAnalysis:main"
+
 um_levels = "sgs_tools.scripts.make_UM_level_sets:main"
 
 [tool.setuptools_scm]

@@ -29,8 +29,9 @@ def data_ingest_MONC_on_single_grid(
     metadata = dict(np.char.decode(metadata))
     for k, v in metadata.items():
         if v in ["true", "false"]:
-            v = v == "true"
-        metadata[k] = to_numeric(v, errors="ignore")
+            metadata[k] = v == "true"
+        else:
+            metadata[k] = to_numeric(v, errors="ignore")  # type: ignore
     metadata = dict(sorted(metadata.items()))
     del ds["options_database"]
 

@@ -41,11 +41,12 @@ def LinComb2ModelLillyMinimisation(
     filter_regularize: Filter,
     contraction_dims: list[str],
 ) -> tuple[xr.DataArray, xr.DataArray]:
-    """Compute dynamic coefficient using Germano identity as :math:`$\overline{L M} / \overline{M M}$`.
-        where :math:`$\overline{*}$` means regularisation
+    """Compute dynamic coefficients of a 2-component models using Germano identity as :math:`$L = C1 M1 + C2 M2$`.
+        using regularized least-square minimisation (inverting the {M_i M_j} matrix analytically)
 
-    "param models: List of dynamic SGS models used for computing the Model :math:`M` and Leonard :math:`L` tensors
-    :param filter: Filter used by the SGS model
+    :param model1, model2: Dynamic SGS models used for computing the Model :math:`M` and Leonard :math:`L` tensors.
+                   Both models must have the same Leonard tensors (unchecked). Will use the one from model 1.
+    :param filter: Filter used for the SGS model
     :param filter_regularize: Filter used to regularize the coefficient calculation
     :param contraction_dims: labels of dimensions to be contracted to form LM and MM tensors/scalars. Must have at least one.
     """
@@ -83,9 +84,11 @@ def LinComb3ModelLillyMinimisation(
     filter_regularize: Filter,
     contraction_dims: list[str],
 ) -> tuple[xr.DataArray, xr.DataArray, xr.DataArray]:
-    """Compute dynamic coefficient using Germano identity as :math:`$\overline{L M} / \overline{M M}$`.
-        where :math:`$\overline{*}$` means regularisation
+    """Compute dynamic coefficients of a 3-component models using Germano identity as :math:`$L = C1 M1 + C2 M2 + C3 M3$`.
+       using regularized least-square minimisation (inverting the {M_i M_j} matrix explicitly)
 
+    :param model1, model2, model3: Dynamic SGS models used for computing the Model :math:`M` and Leonard :math:`L` tensors.
+                   All models must have the same Leonard tensors (unchecked). Will use the one from model 1.
     "param models: List of dynamic SGS models used for computing the Model :math:`M` and Leonard :math:`L` tensors
     :param filter: Filter used by the SGS model
     :param filter_regularize: Filter used to regularize the coefficient calculation
@@ -142,10 +145,11 @@ def LinCombModelLillyMinimisation(
     filter_regularize: Filter,
     contraction_dims: list[str],
 ) -> xr.DataArray:
-    """Compute dynamic coefficient using Germano identity as :math:`$\overline{L M} / \overline{M M}$`.
-        where :math:`$\overline{*}$` means regularisation
+    """Compute dynamic coefficients of a general milti-component model using Germano identity as :math:`$L = \Sum _i C_ M_i$`.
+        using regularized least-square minimisation (solving the linear system numerically with `np.linalg.solve`)
 
-    "param models: List of dynamic SGS models used for computing the Model :math:`M` and Leonard :math:`L` tensors
+    :param models: List of dynamic SGS models used for computing the Model :math:`M` and Leonard :math:`L` tensors.
+                   Both models must have the same Leonard tensors (unchecked). Will use the one from model 1.
     :param filter: Filter used by the SGS model
     :param filter_regularize: Filter used to regularize the coefficient calculation
     :param contraction_dims: labels of dimensions to be contracted to form LM and MM tensors/scalars. Must have at least one.

@@ -14,8 +14,6 @@ class SGSModel(ABC):
     * :meth:`sgs_tensor`: returns the SGS tensor for a given filter
     """
 
-    tensor_dims: tuple[str, str]
-
     @abstractmethod
     def sgs_tensor(self, filter: Filter) -> xr.DataArray:
         """compute model for SGS tensor :math:`$\\tau$` for a given filter

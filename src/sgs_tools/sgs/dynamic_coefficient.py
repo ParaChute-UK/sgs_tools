@@ -77,17 +77,15 @@ def LinComb2ModelLillyMinimisation(
 
 
 def LinComb3ModelLillyMinimisation(
-    model1: DynamicSGSModel,
-    model2: DynamicSGSModel,
-    model3: DynamicSGSModel,
+    models: list[DynamicSGSModel],
     filter: Filter,
     filter_regularize: Filter,
     contraction_dims: list[str],
-) -> tuple[xr.DataArray, xr.DataArray, xr.DataArray]:
+) -> xr.DataArray:
     """Compute dynamic coefficients of a 3-component models using Germano identity as :math:`$L = C1 M1 + C2 M2 + C3 M3$`.
        using regularized least-square minimisation (inverting the {M_i M_j} matrix explicitly)
 
-    :param model1, model2, model3: Dynamic SGS models used for computing the Model :math:`M` and Leonard :math:`L` tensors.
+    :param models: 3 Dynamic SGS models used for computing the Model :math:`M` and Leonard :math:`L` tensors.
                    All models must have the same Leonard tensors (unchecked). Will use the one from model 1.
     "param models: List of dynamic SGS models used for computing the Model :math:`M` and Leonard :math:`L` tensors
     :param filter: Filter used by the SGS model
@@ -98,11 +96,12 @@ def LinComb3ModelLillyMinimisation(
     warnings.warn(
         "Warning: No check that all input models have the same leonard tensor!"
     )
+    assert len(models) == 3
 
-    L = model1.Leonard_tensor(filter)
-    M1 = model1.M_Germano_tensor(filter)
-    M2 = model2.M_Germano_tensor(filter)
-    M3 = model3.M_Germano_tensor(filter)
+    L = models[0].Leonard_tensor(filter)
+    M1 = models[0].M_Germano_tensor(filter)
+    M2 = models[1].M_Germano_tensor(filter)
+    M3 = models[2].M_Germano_tensor(filter)
     # Filtered Leonard contractions
     LM1 = filter_regularize.filter(xr.dot(L, M1, dim=contraction_dims, optimize=True))
     LM2 = filter_regularize.filter(xr.dot(L, M2, dim=contraction_dims, optimize=True))
@@ -135,8 +134,7 @@ def LinComb3ModelLillyMinimisation(
     coeff1 = (AdjM11 * LM1 + AdjM12 * LM2 + AdjM13 * LM3) / detM
     coeff2 = (AdjM12 * LM1 + AdjM22 * LM2 + AdjM23 * LM3) / detM
     coeff3 = (AdjM13 * LM1 + AdjM23 * LM2 + AdjM33 * LM3) / detM
-
-    return coeff1, coeff2, coeff3
+    return xr.concat([coeff1, coeff2, coeff3], dim="coeff_dim1")
 
 
 def LinCombModelLillyMinimisation(

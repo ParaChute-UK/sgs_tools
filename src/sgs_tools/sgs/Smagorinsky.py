@@ -3,13 +3,13 @@ from dataclasses import dataclass
 import xarray as xr  # only used for type hints
 
 from ..geometry.tensor_algebra import Frobenius_norm
+from .dynamic_sgs_model import DynamicModel, LeonardThetaTensor, LeonardVelocityTensor
 from .filter import Filter
-from .sgs_model import DynamicHeatModel, DynamicVelocityModel, SGSModel
 from .util import _assert_coord_dx
 
 
 @dataclass(frozen=True)
-class SmagorinskyVelocityModel(SGSModel):
+class SmagorinskyVelocityModel:
     """Smagorinsky model for the velocity equation
 
     :ivar vel: grid-scale velocity
@@ -44,7 +44,7 @@ class SmagorinskyVelocityModel(SGSModel):
 
 
 @dataclass(frozen=True)
-class SmagorinskyHeatModel(SGSModel):
+class SmagorinskyHeatModel:
     """Smagorinsky model for the Heat equation
 
     :ivar vel: grid-scale velocity
@@ -82,11 +82,13 @@ class SmagorinskyHeatModel(SGSModel):
 
 def DynamicSmagorinskyVelocityModel(
     smag_vel: SmagorinskyVelocityModel,
-) -> DynamicVelocityModel:
-    return DynamicVelocityModel(smag_vel, smag_vel.vel, smag_vel.tensor_dims)
+) -> DynamicModel:
+    leonard = LeonardVelocityTensor(smag_vel.vel, smag_vel.tensor_dims)
+    return DynamicModel(smag_vel, leonard)
 
 
 def DynamicSmagorinskyHeatModel(
     smag_theta: SmagorinskyHeatModel, theta: xr.DataArray
-) -> DynamicHeatModel:
-    return DynamicHeatModel(smag_theta, smag_theta.vel, theta)
+) -> DynamicModel:
+    leonard = LeonardThetaTensor(smag_theta.vel, theta, smag_theta.tensor_dims)
+    return DynamicModel(smag_theta, leonard)

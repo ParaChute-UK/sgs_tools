@@ -9,8 +9,9 @@ from ..geometry.tensor_algebra import (
     tensor_self_outer_product,
     traceless,
 )
+from .dynamic_sgs_model import LeonardVelocityTensor, LinCombDynamicModel
 from .filter import Filter
-from .sgs_model import SGSModel
+from .sgs_model import LinCombSGSModel
 from .util import _assert_coord_dx
 
 
@@ -36,7 +37,7 @@ def s_perpendicular(
 
 
 @dataclass(frozen=True)
-class SparallelVelocityModel(SGSModel):
+class SparallelVelocityModel:
     """Carati & Cabot Proceedings of the 1996 Summer Program -- Center for Turbulence Research
     S_parallel component = |S| Traceless[Symmetric[(S.n)n]]
 
@@ -80,7 +81,7 @@ class SparallelVelocityModel(SGSModel):
 
 
 @dataclass(frozen=True)
-class SperpVelocityModel(SGSModel):
+class SperpVelocityModel:
     """Carati & Cabot Proceedings of the 1996 Summer Program -- Center for Turbulence Research
     S_perp component = |S| Traceless(S - (S.n + n.S))
 
@@ -124,7 +125,7 @@ class SperpVelocityModel(SGSModel):
 
 
 @dataclass(frozen=True)
-class NVelocityModel(SGSModel):
+class NVelocityModel:
     """Carati & Cabot Proceedings of the 1996 Summer Program -- Center for Turbulence Research
        N component = |S|(n.s.n) Traceless(n * n)
 
@@ -168,3 +169,51 @@ class NVelocityModel(SGSModel):
         return tau.assign_coords(
             {tdim: [1, 2, 3] for tdim in self.tensor_dims if tdim in tau.dims}
         )
+
+
+def DynamicCaratiCabotModel(
+    sij: xr.DataArray,
+    vel: xr.DataArray,
+    res: float,
+    compoment_coeff: Sequence[float],
+    n=Sequence[float],
+    tensor_dims: tuple[str, str] = ("c1", "c2"),
+) -> LinCombDynamicModel:
+    """Dynamic version of the model by
+    Carati & Cabot Proceedings of the 1996 Summer Program -- Center for Turbulence Research
+
+    :param sij: grid-scale rate-of-strain tensor
+    :param vel: velocity field used for dynamic coefficient computation
+    :param res: constant resolution with respect to dimension to-be-filtered
+    :param compoment_coeff: tuple of three Smagorinsky coefficients for parallel, perpendicular, and normal components
+    :param n: triple of floats to be coerced as a 3d constant vector along one of the tensor dimensions
+    :param tensor_dims: labels of dimensions indexing tensor components, defaults to ("c1", "c2")
+    :return: Combined SGS model with dynamically computed coefficients
+    """
+    static_model = LinCombSGSModel(
+        [
+            SparallelVelocityModel(
+                strain=sij,
+                cs=compoment_coeff[0],
+                dx=res,
+                n=n,
+                tensor_dims=tensor_dims,
+            ),
+            SperpVelocityModel(
+                strain=sij,
+                cs=compoment_coeff[1],
+                dx=res,
+                n=n,
+                tensor_dims=tensor_dims,
+            ),
+            NVelocityModel(
+                strain=sij,
+                cs=compoment_coeff[2],
+                dx=res,
+                n=n,
+                tensor_dims=tensor_dims,
+            ),
+        ]
+    )
+    leonard = LeonardVelocityTensor(vel, tensor_dims)
+    return LinCombDynamicModel(static_model, leonard)

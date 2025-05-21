@@ -1,7 +1,6 @@
 from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
-from functools import partial
 from pathlib import Path
-from typing import Any, Callable, Sequence
+from typing import Any, Sequence
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -20,17 +19,14 @@ from sgs_tools.scripts.arg_parsers import (
     add_input_group,
     add_plotting_group,
 )
-from sgs_tools.sgs.CaratiCabot import (
-    NVelocityModel,
-    SparallelVelocityModel,
-    SperpVelocityModel,
-)
+from sgs_tools.sgs.CaratiCabot import DynamicCaratiCabotModel
 from sgs_tools.sgs.dynamic_coefficient import (
-    LillyMinimisation,
-    LinComb3ModelLillyMinimisation,
+    LillyMinimisation1Model,
+    LillyMinimisation3Model,
+    Minimisation,
 )
+from sgs_tools.sgs.dynamic_sgs_model import DynamicModel, LinCombDynamicModel
 from sgs_tools.sgs.filter import Filter, box_kernel, weight_gauss_3d, weight_gauss_5d
-from sgs_tools.sgs.sgs_model import DynamicSGSModel, DynamicVelocityModel, SGSModel
 from sgs_tools.sgs.Smagorinsky import (
     DynamicSmagorinskyHeatModel,
     DynamicSmagorinskyVelocityModel,
@@ -183,59 +179,6 @@ def make_filter(shape: str, scale: int, dims=Sequence[str]) -> Filter:
         raise ValueError(f"Unsupported filter shape {shape}")
 
 
-def make_velocity_model(
-    simulation, res: float, model: str = ""
-) -> list[DynamicSGSModel]:
-    tensor_dims = ("c1", "c2")
-
-    # Carati & Cabot model
-    n = [0.0, 0.0, 1.0]  # gravity direction
-    Carati_model_componets: list[DynamicSGSModel] = [
-        DynamicVelocityModel(mod, simulation.vel, tensor_dims=tensor_dims)
-        for mod in (
-            SparallelVelocityModel(
-                strain=simulation.sij,
-                cs=1.0,
-                dx=res,
-                n=n,
-                tensor_dims=tensor_dims,
-            ),
-            SperpVelocityModel(
-                strain=simulation.sij,
-                cs=1.0,
-                dx=res,
-                n=n,
-                tensor_dims=tensor_dims,
-            ),
-            NVelocityModel(
-                strain=simulation.sij,
-                cs=1.0,
-                dx=res,
-                n=n,
-                tensor_dims=tensor_dims,
-            ),
-        )
-    ]
-    return Carati_model_componets
-    # model_components.append(DynamicVelocityModel(
-    #       SperpVelocityModel(
-    #           strain=simulation.sij,
-    #           cs=1.0,
-    #           dx=res,
-    #           n = (0,0,1), #gravity direction
-    #           tensor_dims=tensor_dims,
-    #       ), simulation.vel, tensor_dims=tensor_dims))
-    # model_components.append(DynamicVelocityModel(
-    #       NVelocityModel(
-    #           strain=simulation.sij,
-    #           cs=1.0,
-    #           dx=res,
-    #           n = (0,0,1), #gravity direction
-    #           tensor_dims=tensor_dims,
-    #       ), simulation.vel, tensor_dims=tensor_dims))
-    # return
-
-
 def add_scale_coords(
     ds: T_Xarray, scales: list[float], regularization_scales: list[float]
 ) -> T_Xarray:
@@ -304,15 +247,14 @@ def read(args: dict[str, Any]) -> xr.Dataset:
 
 
 def compute_cs(
-    dyn_model: DynamicSGSModel | list[DynamicSGSModel],
+    dyn_model: DynamicModel | LinCombDynamicModel,
     filters: list[Filter],
-    regularize_filters: list[Filter],
-    minimisation: Callable,
+    minimisations: Sequence[Minimisation],
 ) -> xr.DataArray:
     cs_at_scale_ls = []
-    for filter, regularization in zip(filters, regularize_filters):
+    for filter, minimisation in zip(filters, minimisations):
         # compute Cs
-        cs = minimisation(dyn_model, filter, regularization)
+        cs = dyn_model.compute_coeff(filter, minimisation)
         # force execution for timer logging
         cs_at_scale_ls.append(cs)  # .load())
     cs_at_scale = xr.concat(cs_at_scale_ls, dim="scale")
@@ -402,40 +344,58 @@ def main() -> None:
         )
         if "Smag_vel" in args["sgs_model"]:
             with timer(f"    Cs_isotropic", "s"):
+                minimisations = [
+                    LillyMinimisation1Model(
+                        filt, contraction_dims=["c1", "c2"], coeff_dim="cdim"
+                    )
+                    for filt in regularization_filters
+                ]
+                dyn_smag_vel.compute_coeff(filters[0], minimisations[0])
                 # compute isotropic Cs for velocity
                 output["Cs_isotropic"] = compute_cs(
                     dyn_smag_vel,
                     filters,
-                    regularization_filters,
-                    partial(LillyMinimisation, contraction_dims=["c1", "c2"]),
+                    minimisations,
                 )
         if "Smag_vel_diag" in args["sgs_model"]:
             with timer(f"    Cs_diagonal", "s"):
+                minimisations = [
+                    LillyMinimisation1Model(
+                        filt, contraction_dims=["c2"], coeff_dim="cdim"
+                    )
+                    for filt in regularization_filters
+                ]
                 # compute diagonal Cs for velocity
-                output["Cs_diagonal"] = compute_cs(
-                    dyn_smag_vel,
-                    filters,
-                    regularization_filters,
-                    partial(LillyMinimisation, contraction_dims=["c2"]),
-                )
+                output["Cs_diagonal"] = compute_cs(dyn_smag_vel, filters, minimisations)
 
-        dyn_carati_vel = make_velocity_model(output, args["h_resolution"])
+        dyn_carati_vel = DynamicCaratiCabotModel(
+            output.sij,
+            res=args["h_resolution"],
+            compoment_coeff=[1.0, 1.0, 1.0],
+            n=[0.0, 0.0, 1.0],  # gravity direction
+            tensor_dims=("c1", "c2"),
+            vel=output.vel,
+        )
+        # dyn_carati_vel = make_velocity_model(output, args["h_resolution"])
         if "Carati" in args["sgs_model"]:
             with timer(f"    Cs_CaratiCabot", "s"):
+                minimisations3 = [
+                    LillyMinimisation3Model(
+                        filt, contraction_dims=["c1", "c2"], coeff_dim="cdim"
+                    )
+                    for filt in regularization_filters
+                ]
                 # compute Carati Cabon Cs for velocity:
                 output["Cs_CaratiCabot"] = compute_cs(
                     dyn_carati_vel,
                     filters,
-                    regularization_filters,
-                    partial(
-                        LinComb3ModelLillyMinimisation, contraction_dims=["c1", "c2"]
-                    ),
-                ).rename({"coeff_dim1": "c1"})
+                    minimisations3,
+                ).rename({"cdim": "c1"})
 
         # setup dynamic Smagorinsky model for potential temperature
         dyn_smag_theta = DynamicSmagorinskyHeatModel(
             SmagorinskyHeatModel(
-                vel=vel,
+                vel=vel.reset_coords(names="vel", drop=True),
                 grad_theta=grad_theta,
                 strain=sij,
                 ctheta=1.0,
@@ -447,21 +407,29 @@ def main() -> None:
         if "Smag_theta" in args["sgs_model"]:
             with timer(f"    Ctheta_isotropic", "s"):
                 # compute isotropic Cs for theta
+                minimisations = [
+                    LillyMinimisation1Model(
+                        filt, contraction_dims=["c1"], coeff_dim="cdim"
+                    )
+                    for filt in regularization_filters
+                ]
                 output["Ctheta_isotropic"] = compute_cs(
                     dyn_smag_theta,
                     filters,
-                    regularization_filters,
-                    partial(LillyMinimisation, contraction_dims=["c1"]),
+                    minimisations,
                 )
         if "Smag_theta_diag" in args["sgs_model"]:
             with timer(f"    Ctheta_diagonal", "s"):
                 # compute diagonal Cs for theta
+                minimisations = [
+                    LillyMinimisation1Model(filt, contraction_dims=[], coeff_dim="cdim")
+                    for filt in regularization_filters
+                ]
                 output["Ctheta_diagonal"] = compute_cs(
                     dyn_smag_theta,
                     filters,
-                    regularization_filters,
-                    partial(LillyMinimisation, contraction_dims=[]),
-                )  # .drop_vars("vel")
+                    minimisations,
+                )
 
     # add scale coordinates
     output = add_scale_coords(

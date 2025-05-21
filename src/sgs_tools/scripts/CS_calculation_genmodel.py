@@ -441,10 +441,7 @@ def main() -> None:
     # plot horizontal mean profiles
     if args["plot_show"] or args["plot_path"] is not None:
         try:
-            if len(args["filter_scales"]) > 1:
-                row_lbl = "scale"
-            else:
-                row_lbl = None
+            row_lbl = "scale"
 
             def wrap_label(text: str, width: int = 20) -> str:
                 """
@@ -462,24 +459,31 @@ def main() -> None:
                 )
 
             models = [m for m in output if str(m).startswith("C")]
+            figures = {}
             for model in models:
                 with timer(f"Plotting {model}", "s"):
                     mean = output[model].mean(["x", "y"])
                     if "c1" in mean.dims:
-                        fig = mean.plot(x="t_0", row=row_lbl, col="c1", robust=True).fig  # type: ignore
+                        figures[model] = mean.plot(
+                            x="t_0", row=row_lbl, col="c1", robust=True
+                        ).fig  # type: ignore
                     else:
-                        fig = mean.plot(
-                            x="t_0", row=row_lbl, col_wrap=3, robust=True
-                        ).figure  # type: ignore
-                        fig.axes[0].set_title("")
-                    for ax in fig.axes:
+                        figures[model] = mean.plot(
+                            x="t_0", row=row_lbl, robust=True
+                        ).fig  # type: ignore
+                        # figures[model].axes[0].set_title("")
+                    for ax in figures[model].axes:
                         ax.set_title(wrap_label(ax.get_title()))
-                    fig.suptitle(model, fontsize=14, y=1)
+                    figures[model].suptitle(str(model).replace("_", " "), fontsize=14, y=1)
                 if args["plot_path"] is not None:
                     args["plot_path"].mkdir(parents=True, exist_ok=True)
-                    fig.savefig(args["plot_path"] / f"{model}.png", dpi=180)
+                    figures[model].savefig(args["plot_path"] / f"{model}.png", dpi=180)
             # interactive plotting out of time
             if args["plot_show"]:
+
+                for name, fig in figures.items():
+                    fig.canvas.manager.set_window_title(name)  # set window title
+                    fig.show()
                 plt.show()
         except:
             print("Failed in generating plots")

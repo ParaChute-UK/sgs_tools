@@ -96,3 +96,27 @@ def symmetrise(
     if name is not None:
         sij.name = name
     return sij
+
+
+def antisymmetrise(
+    tensor: xr.DataArray, dims: Sequence[str] = ["c1", "c2"], name=None
+) -> xr.DataArray:
+    """:math:`0.5 (a - a^T)`.
+
+    :param tensor: tensor input
+    :param dims: dimensions with respect to which to take the transpose.
+        Can be any length and the transpose means that the order is reversed.
+        so ``[c1, c2, c3]`` will transpose to ``[c3, c2, c1]``.
+        All coordinates of `dims` must match.
+        Note that no checks are performed whether `dims` are dimensions of `tensor` or
+        whether `tensor` is square with respect to the transposed dimensions.
+    :param name: name of anti-symmetrized tensor.
+    """
+    for c in dims[1:]:
+        assert np.allclose(tensor[dims[0]].values, tensor[c].values)
+
+    transpose_map = dict(zip(dims, dims[::-1]))
+    omij = 0.5 * (tensor - tensor.rename(transpose_map))
+    if name is not None:
+        omij.name = name
+    return omij

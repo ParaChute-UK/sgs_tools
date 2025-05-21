@@ -19,7 +19,7 @@ from sgs_tools.scripts.arg_parsers import (
     add_input_group,
     add_plotting_group,
 )
-from sgs_tools.sgs.dynamic_coefficient import LillyMinimisation
+from sgs_tools.sgs.dynamic_coefficient import LillyMinimisation1Model
 from sgs_tools.sgs.filter import Filter, box_kernel, weight_gauss_3d, weight_gauss_5d
 from sgs_tools.sgs.Smagorinsky import (
     DynamicSmagorinskyHeatModel,
@@ -305,36 +305,42 @@ def main() -> None:
                 regularization = make_filter(
                     args["regularize_filter_type"], regularization_scale, ["x", "y"]
                 )
+
                 with timer("    Cs isotropic", "s"):
                     # compute isotropic Cs for velocity
-                    cs_isotropic = LillyMinimisation(
-                        dyn_smag_vel, filter, regularization, ["c1", "c2"]
+                    minimisation = LillyMinimisation1Model(
+                        regularization, ["c1", "c2"], "cdim"
                     )
+                    cs_isotropic = dyn_smag_vel.compute_coeff(filter, minimisation)
                     # force execution for timer logging
                     cs_iso_at_scale_ls.append(cs_isotropic)  # .load())
 
                 with timer("    Cs diagonal", "s"):
                     # compute diagonal Cs for velocity
-                    cs_diagonal = LillyMinimisation(
-                        dyn_smag_vel, filter, regularization, ["c2"]
+                    minimisation = LillyMinimisation1Model(
+                        regularization, ["c2"], "cdim"
                     )
+                    cs_diagonal = dyn_smag_vel.compute_coeff(filter, minimisation)
                     # force execution for timer logging
                     cs_diag_at_scale_ls.append(cs_diagonal)  # .load())
 
                 with timer("    Cs theta isotropic", "s"):
                     # compute isotropic Cs for theta
-                    ctheta = LillyMinimisation(
-                        dyn_smag_theta, filter, regularization, ["c1"]
+                    minimisation = LillyMinimisation1Model(
+                        regularization, ["c1"], "cdim"
                     )
+                    ctheta_isotropic = dyn_smag_theta.compute_coeff(
+                        filter, minimisation
+                    )
+
                     # force execution for timer logging
-                    ctheta_at_scale_ls.append(ctheta)  # .load())
+                    ctheta_at_scale_ls.append(ctheta_isotropic)  # .load())
                 with timer("    Cs theta diagonal", "s"):
                     # compute diagonal Cs for theta
-                    ctheta = LillyMinimisation(
-                        dyn_smag_theta, filter, regularization, []
-                    )
+                    minimisation = LillyMinimisation1Model(regularization, [], "cdim")
+                    ctheta_diag = dyn_smag_theta.compute_coeff(filter, minimisation)
                     # force execution for timer logging
-                    ctheta_diag_at_scale_ls.append(ctheta)  # .load())
+                    ctheta_diag_at_scale_ls.append(ctheta_diag)  # .load())
 
     with timer("Collect coefficients", "s"):
         cs_iso_at_scale = xr.concat(cs_iso_at_scale_ls, dim="scale")

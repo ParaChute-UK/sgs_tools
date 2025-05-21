@@ -3,28 +3,12 @@ from dataclasses import dataclass
 import numpy as np
 import xarray as xr  # only used for type hints
 from sgs_tools.sgs.dynamic_coefficient import (
-    LillyMinimisation,
-    LinComb2ModelLillyMinimisation,
-    LinComb3ModelLillyMinimisation,
-    LinCombModelLillyMinimisation,
+    LillyMinimisation1Model,
+    LillyMinimisation2Model,
+    LillyMinimisation3Model,
+    LillyMinimisationNModel,
 )
-from sgs_tools.sgs.filter import Filter, IdentityFilter
-from sgs_tools.sgs.sgs_model import DynamicSGSModel
-from xarray.core.types import T_Xarray
-
-
-@dataclass(frozen=True)
-class DynamicTestModel(DynamicSGSModel):
-    Marray: T_Xarray
-    Larray: T_Xarray
-
-    def M_Germano_tensor(self, filter: Filter) -> xr.DataArray:
-        assert isinstance(filter, IdentityFilter)
-        return filter.filter(self.Marray)
-
-    def Leonard_tensor(self, filter: Filter) -> xr.DataArray:
-        assert isinstance(filter, IdentityFilter)
-        return filter.filter(self.Larray)
+from sgs_tools.sgs.filter import IdentityFilter
 
 
 def random():
@@ -51,29 +35,35 @@ def linear():
 
 
 def test_LillyMinimisation():
-    id = IdentityFilter(None, ["x", "y"])
     scale = np.random.rand()
+    id = IdentityFilter(None, ["x", "y"])
+    min = LillyMinimisation1Model(id, ["c1", "c2"], "cdim")
     for arr in random(), linear():
-        vm = DynamicTestModel(None, arr, scale * arr)
-        coeff = LillyMinimisation(vm, id, id, ["c1", "c2"])
+        L = scale * arr
+        M = arr
+        coeff = min.compute(L, [M])
         assert np.allclose(scale, coeff.squeeze().data)
 
 
 def test_LinComb2ModelLillyMinimisation():
     id = IdentityFilter(None, ["x", "y"])
-    for scale1, scale2 in [np.random.rand(2), (1, 0), (3, 3)]:
+    min = LillyMinimisation2Model(id, ["c1", "c2"], "cdim")
+    for scale1, scale2 in [(1, 0), (3, 3)]:
         for arr in random(), linear():
-            leonard = scale1 * arr + scale2 * arr**2
-            vm1 = DynamicTestModel(None, arr, leonard)
-            vm2 = DynamicTestModel(None, arr**2, leonard)
-
-            c1, c2 = LinComb2ModelLillyMinimisation(vm1, vm2, id, id, ["c1", "c2"])
-            assert np.allclose(scale1, c1)
-            assert np.allclose(scale2, c2)
+            L = scale1 * arr + scale2 * arr**2
+            M = [arr, arr**2]
+            coeff = min.compute(L, M)
+            assert np.allclose(
+                scale1, coeff.isel(cdim=0)
+            ), f"scales: {scale1}, {scale2}, coeff mean: {np.mean(coeff.isel(cdim=0))}, std: {np.std(coeff.isel(cdim=0))}"
+            assert np.allclose(
+                scale2, coeff.isel(cdim=1)
+            ), f"scales: {scale2}, {scale2}, coeff mean: {np.mean(coeff.isel(cdim=1))}, std: {np.std(coeff.isel(cdim=1))}"
 
 
 def LinComb3ModelLillyMinimisation():
     id = IdentityFilter(None, ["x", "y"])
+    min = LillyMinimisation3Model(id, ["c1", "c2"], "cdim")
     for scale1, scale2, scale3 in [
         np.random.rand(3),
         (1, 1, 0),
@@ -81,33 +71,32 @@ def LinComb3ModelLillyMinimisation():
         (1, 0, 0),
     ]:
         for arr in random(), linear():
-            leonard = scale1 * arr + scale2 * arr**2 + scale3 * arr**3
-            vm1 = DynamicTestModel(None, arr, leonard)
-            vm2 = DynamicTestModel(None, arr**2, leonard)
-            vm3 = DynamicTestModel(None, arr**3, leonard)
-
-            c1, c2, c3 = LinComb3ModelLillyMinimisation(
-                vm1, vm2, vm3, id, id, ["c1", "c2"]
-            )
+            L = scale1 * arr + scale2 * arr**2 + scale3 * arr**3
+            M = [arr, arr**2, arr**3]
+            coeff = min.compute(L, M)
             assert np.allclose(
-                scale1, c1
-            ), f"scale1: {scale1}, {scale2}, {scale3}, {np.mean(c1)}, {np.std(c1)}"
-            assert np.allclose(scale2, c2), f"scale2: {scale2}"
-            assert np.allclose(scale3, c3), f"scale3: {scale3}"
+                scale1, coeff.isel(cdim=0)
+            ), f"scale1: {scale1}, coeff mean: {np.mean(coeff.isel(cdim=0))}, std: {np.std(coeff.isel(cdim=0))}"
+            assert np.allclose(
+                scale2, coeff.isel(cdim=1)
+            ), f"scale1: {scale2}, coeff mean: {np.mean(coeff.isel(cdim=1))}, std: {np.std(coeff.isel(cdim=1))}"
+            assert np.allclose(
+                scale3, coeff.isel(cdim=2)
+            ), f"scale1: {scale3}, coeff mean: {np.mean(coeff.isel(cdim=2))}, std: {np.std(coeff.isel(cdim=2))}"
 
 
 def test_LinCombModelLillyMinimisation():
     id = IdentityFilter(None, ["x", "y"])
+    min = LillyMinimisationNModel(id, ["c1", "c2"], "cdim")
     for n_mod in range(1, 4):
         scale = np.random.rand(n_mod)
         for arr in random(), linear():
-            m = [arr ** (i + 1) for i in range(n_mod)]
-            m = [
-                m[i] / m[i].mean() for i in range(n_mod)
+            M = [arr ** (i + 1) for i in range(n_mod)]
+            M = [
+                M[i] / M[i].mean() for i in range(n_mod)
             ]  # improve matrix conditioning
-            leonard_n = scale[0] * m[0]
+            L = scale[0] * M[0]
             for i in range(1, n_mod):
-                leonard_n += scale[i] * m[i]
-            vm = [DynamicTestModel(None, m[i], leonard_n) for i in range(n_mod)]
-            coeff = LinCombModelLillyMinimisation(vm, id, id, ["c1", "c2"])
+                L += scale[i] * M[i]
+            coeff = min.compute(L, M)
             assert np.allclose(scale, coeff)

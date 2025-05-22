@@ -305,7 +305,6 @@ def main() -> None:
             space_dims=simple_dims,
             vec_dim="c1",
             new_dim="c2",
-            make_traceless=True,
         )
 
         grad_theta = grad_scalar(

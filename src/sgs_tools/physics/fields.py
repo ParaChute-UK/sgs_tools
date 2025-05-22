@@ -47,7 +47,6 @@ def omega_from_vel(
     space_dims: Iterable[str],
     vec_dim: str,
     new_dim: str = "c2",
-    make_traceless: bool = True,
     grad_operator: Callable = grad_vector,
 ) -> xr.DataArray:
     """compute rate of rotation tensor from velocity
@@ -56,7 +55,6 @@ def omega_from_vel(
     :param space_dims: labels of spacial dimensions
     :param vec_dim: label of vector dimension
     :param new_dim: label of new dimension indexing derivatives
-    :param make_traceless: should we make the strain traceless
     :param grad_operator: operator that computes vector gradient (To be replaced by a grid)
     """
     gradvel = grad_operator(vel, space_dims, new_dim)

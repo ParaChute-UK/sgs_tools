@@ -375,17 +375,16 @@ def main() -> None:
                 # compute diagonal Cs for velocity
                 output["Cs_diagonal"] = compute_cs(dyn_smag_vel, filters, minimisations)
 
-        dyn_carati_vel = DynamicCaratiCabotModel(
-            output.sij,
-            res=args["h_resolution"],
-            compoment_coeff=[1.0, 1.0, 1.0],
-            n=[0.0, 0.0, 1.0],  # gravity direction
-            tensor_dims=("c1", "c2"),
-            vel=output.vel,
-        )
-        # dyn_carati_vel = make_velocity_model(output, args["h_resolution"])
         if "Carati" in args["sgs_model"]:
             with timer(f"    Cs_CaratiCabot", "s"):
+                dyn_carati_vel = DynamicCaratiCabotModel(
+                    output.sij,
+                    res=args["h_resolution"],
+                    compoment_coeff=[1.0, 1.0, 1.0],
+                    n=[0.0, 0.0, 1.0],  # gravity direction
+                    tensor_dims=("c1", "c2"),
+                    vel=output.vel,
+                )
                 minimisations3 = [
                     LillyMinimisation3Model(
                         filt, contraction_dims=["c1", "c2"], coeff_dim="cdim"

@@ -1,5 +1,6 @@
 from typing import Sequence
 
+import dask.array as da
 import numpy as np
 import xarray as xr
 
@@ -51,14 +52,25 @@ def traceless(
     :param tensor: tensor input
     :param dims: dimensions with respect to which to take the trace.
     """
-    # compute trace along dims
-    trace_normed = trace(tensor, dims) / tensor[dims[1]].size
+    d1, d2 = dims
+    # Check tensor is square in dims
+    assert np.allclose(tensor[d1].values, tensor[d2].values), "Coordinates must match"
 
-    # copy input for modification
-    traceless = tensor.copy()
+    dim_size = tensor.sizes[d1]
+    # compute trace along dims
+    trace_normed = trace(tensor, dims) / dim_size
+
+    # create masked array for lazy computation
+    identity_dask = da.eye(
+        dim_size,
+        chunks=min(dim_size, 1),
+    )
+    diag_mask = xr.DataArray(
+        identity_dask, dims=dims, coords={d1: tensor.coords[d1], d2: tensor.coords[d2]}
+    )
+
     # remove trace from diagonal
-    for i in tensor[dims[0]]:
-        traceless.loc[{dims[0]: i.item(), dims[1]: i.item()}] -= trace_normed
+    traceless = tensor - trace_normed * diag_mask
     return traceless
 
 

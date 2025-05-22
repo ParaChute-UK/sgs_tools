@@ -420,6 +420,7 @@ def main() -> None:
                     filters,
                     minimisations2,
                 )
+
         # setup dynamic Smagorinsky model for potential temperature
         dyn_smag_theta = DynamicSmagorinskyHeatModel(
             SmagorinskyHeatModel(
@@ -510,7 +511,6 @@ def main() -> None:
                     figures[model].savefig(args["plot_path"] / f"{model}.png", dpi=180)
             # interactive plotting out of time
             if args["plot_show"]:
-
                 for name, fig in figures.items():
                     fig.canvas.manager.set_window_title(name)  # set window title
                     fig.show()

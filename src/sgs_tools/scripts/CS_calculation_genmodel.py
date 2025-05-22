@@ -210,7 +210,7 @@ def data_slice(
             zslice = (z_range[0] <= ds[z]) * (ds[z] <= z_range[1])
             ds = ds.where(zslice, drop=True)
     for t in "t", "t_0":
-        if "t" in ds:
+        if t in ds:
             tslice = (t_range[0] <= ds[t]) * (ds[t] <= t_range[1])
             ds = ds.where(tslice, drop=True)
     return ds

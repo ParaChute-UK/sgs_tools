@@ -13,7 +13,7 @@ from sgs_tools.geometry.staggered_grid import (
 from sgs_tools.geometry.vector_calculus import grad_scalar
 from sgs_tools.io.monc import data_ingest_MONC_on_single_grid
 from sgs_tools.io.um import data_ingest_UM_on_single_grid
-from sgs_tools.physics.fields import strain_from_vel
+from sgs_tools.physics.fields import omega_from_vel, strain_from_vel
 from sgs_tools.scripts.arg_parsers import (
     add_dask_group,
     add_input_group,
@@ -22,11 +22,13 @@ from sgs_tools.scripts.arg_parsers import (
 from sgs_tools.sgs.CaratiCabot import DynamicCaratiCabotModel
 from sgs_tools.sgs.dynamic_coefficient import (
     LillyMinimisation1Model,
+    LillyMinimisation2Model,
     LillyMinimisation3Model,
     Minimisation,
 )
 from sgs_tools.sgs.dynamic_sgs_model import DynamicModel, LinCombDynamicModel
 from sgs_tools.sgs.filter import Filter, box_kernel, weight_gauss_3d, weight_gauss_5d
+from sgs_tools.sgs.Kosovic import DynamicKosovicModel
 from sgs_tools.sgs.Smagorinsky import (
     DynamicSmagorinskyHeatModel,
     DynamicSmagorinskyVelocityModel,
@@ -59,11 +61,7 @@ def parser() -> dict[str, Any]:
     add_dask_group(parser)
 
     model = parser.add_argument_group("Model parameters")
-    vel_models = [
-        "Smag_vel",
-        "Smag_vel_diag",
-        "Carati",
-    ]
+    vel_models = ["Smag_vel", "Smag_vel_diag", "Carati", "Kosovic"]
     theta_models = ["Smag_theta", "Smag_theta_diag"]
     model_choices = ["all", "vel_all", "theta_all"] + vel_models + theta_models
     model.add_argument(
@@ -293,8 +291,16 @@ def main() -> None:
             vector_dim="c1",
         )
 
-        # compute strain and potential temperature gradient
+        # compute strain, rotation and potential temperature gradient
         sij = strain_from_vel(
+            vel,
+            space_dims=simple_dims,
+            vec_dim="c1",
+            new_dim="c2",
+            make_traceless=True,
+        )
+
+        omegaij = omega_from_vel(
             vel,
             space_dims=simple_dims,
             vec_dim="c1",
@@ -313,6 +319,7 @@ def main() -> None:
             {
                 "vel": vel,
                 "sij": sij,
+                "omegaij": omegaij,
                 "grad_theta": grad_theta,
             }
         )
@@ -392,6 +399,28 @@ def main() -> None:
                     minimisations3,
                 ).rename({"cdim": "c1"})
 
+        if "Kosovic" in args["sgs_model"]:
+            with timer(f"    Cs_Kosovic", "s"):
+                dyn_kosovic_vel = DynamicKosovicModel(
+                    output.sij,
+                    output.omegaij,
+                    res=args["h_resolution"],
+                    compoment_coeff=[1.0, 1.0],
+                    tensor_dims=("c1", "c2"),
+                    vel=output.vel,
+                )
+                minimisations2 = [
+                    LillyMinimisation2Model(
+                        filt, contraction_dims=["c1", "c2"], coeff_dim="cdim"
+                    )
+                    for filt in regularization_filters
+                ]
+                # compute Carati Cabon Cs for velocity:
+                output["Cs_Kosovic"] = compute_cs(
+                    dyn_kosovic_vel,
+                    filters,
+                    minimisations2,
+                )
         # setup dynamic Smagorinsky model for potential temperature
         dyn_smag_theta = DynamicSmagorinskyHeatModel(
             SmagorinskyHeatModel(
@@ -463,6 +492,8 @@ def main() -> None:
             for model in models:
                 with timer(f"Plotting {model}", "s"):
                     mean = output[model].mean(["x", "y"])
+                    if "cdim" in mean.dims:
+                        mean = mean.rename(cdim="c1")
                     if "c1" in mean.dims:
                         figures[model] = mean.plot(
                             x="t_0", row=row_lbl, col="c1", robust=True

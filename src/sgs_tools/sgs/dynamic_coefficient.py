@@ -12,8 +12,8 @@ from .filter import Filter
 class Minimisation(Protocol):
     """
     Protocol for solving the over-determined tensor equation
-    :math:`L = \sum_i c_i M_i`, where `L` and `M_i` are tensors and
-    :math:`c_i` are scalar coefficients to be computed.
+    :math:`L = \sum_i c_i M_i`, where `L` and `M_i` are tensors of the same rank and dimensions,
+    and :math:`c_i` are scalar coefficient arrays to be computed.
 
     :ivar reg_filter: Filter used to regularize the contracted tensor products.
     :ivar contraction_dims: Names of the dimensions to contract when forming the

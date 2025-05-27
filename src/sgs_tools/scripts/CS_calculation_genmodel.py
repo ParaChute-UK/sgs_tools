@@ -254,7 +254,7 @@ def compute_cs(
         # compute Cs
         cs = dyn_model.compute_coeff(filter, minimisation)
         # force execution for timer logging
-        cs_at_scale_ls.append(cs)  # .load())
+        cs_at_scale_ls.append(cs)
     cs_at_scale = xr.concat(cs_at_scale_ls, dim="scale")
 
     return cs_at_scale

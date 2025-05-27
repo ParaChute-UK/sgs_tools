@@ -504,7 +504,9 @@ def main() -> None:
                         # figures[model].axes[0].set_title("")
                     for ax in figures[model].axes:
                         ax.set_title(wrap_label(ax.get_title()))
-                    figures[model].suptitle(str(model).replace("_", " "), fontsize=14, y=1)
+                    figures[model].suptitle(
+                        str(model).replace("_", " "), fontsize=14, y=1
+                    )
                 if args["plot_path"] is not None:
                     args["plot_path"].mkdir(parents=True, exist_ok=True)
                     figures[model].savefig(args["plot_path"] / f"{model}.png", dpi=180)

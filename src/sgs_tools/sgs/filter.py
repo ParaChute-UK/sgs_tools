@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from typing import Hashable
 
+import dask.array as da
 import numpy as np
 import xarray as xr
 
@@ -8,20 +9,22 @@ import xarray as xr
 
 #: 3x3 2d Gaussian filter -- binomial approximation
 weight_gauss_3d = xr.DataArray(
-    np.array([[1, 2, 1], [2, 4, 2], [1, 2, 1]]) / 16.0, dims=["w1", "w2"]
+    da.from_array([[1, 2, 1], [2, 4, 2], [1, 2, 1]], chunks={}) / 16.0,
+    dims=["w1", "w2"],
 )
 
 #: 5x5 2d Gaussian filter -- binomial approximation
 weight_gauss_5d = (
     xr.DataArray(
-        np.array(
+        da.from_array(
             [
                 [1, 2, 2, 2, 1],
                 [2, 4, 4, 4, 2],
                 [2, 4, 4, 4, 2],
                 [2, 4, 4, 4, 2],
                 [1, 2, 2, 2, 1],
-            ]
+            ],
+            chunks={},
         ),
         dims=["w1", "w2"],
     )
@@ -35,7 +38,9 @@ def box_kernel(shape: list[int]) -> xr.DataArray:
     :param shape:
     :return: the kernel array with dimesions ``w1``, ``w2``
     """
-    return xr.DataArray(np.ones(shape) / np.prod(shape), dims=["w1", "w2"])
+    np_arr = np.ones(shape) / np.prod(shape)
+    da_arr = da.from_array(np_arr, chunks={})
+    return xr.DataArray(da_arr, dims=["w1", "w2"])
 
 
 # Filter objects

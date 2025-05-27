@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from typing import Sequence
 
+import dask.array as da
 import xarray as xr
 
 from ..geometry.tensor_algebra import (
@@ -67,9 +68,11 @@ class SparallelVelocityModel:
         _assert_coord_dx(filter.filter_dims, self.strain, self.dx)
 
         sij = filter.filter(self.strain)
+        chunks = sij.chunks[sij.get_axis_num(self.tensor_dims[0])]
+        n_dask = da.from_array(self.n, chunks=chunks)
         n = xr.DataArray(
-            list(self.n),
-            dims=self.tensor_dims[0],
+            n_dask,
+            dims=[self.tensor_dims[0]],
             coords={self.tensor_dims[0]: self.strain.coords[self.tensor_dims[0]]},
         )
         s_par = s_parallel(sij, n, self.tensor_dims)
@@ -111,8 +114,10 @@ class SperpVelocityModel:
         _assert_coord_dx(filter.filter_dims, self.strain, self.dx)
 
         sij = filter.filter(self.strain)
+        chunks = sij.chunks[sij.get_axis_num(self.tensor_dims[0])]
+        n_dask = da.from_array(self.n, chunks=chunks)
         n = xr.DataArray(
-            list(self.n),
+            n_dask,
             dims=[self.tensor_dims[0]],
             coords={self.tensor_dims[0]: self.strain.coords[self.tensor_dims[0]]},
         )
@@ -153,15 +158,17 @@ class NVelocityModel:
         # only makes sense for uniform coordinates in the filtering directions
         # with spacing of self.dx
         _assert_coord_dx(filter.filter_dims, self.strain, self.dx)
-
+        n_dask = da.from_array(self.n, chunks=-1)
         n = xr.DataArray(
-            list(self.n),
+            n_dask,
             dims=[self.tensor_dims[0]],
             coords={self.tensor_dims[0]: self.strain.coords[self.tensor_dims[0]]},
         )
         nij = traceless(
             tensor_self_outer_product(n, self.tensor_dims[0], self.tensor_dims[1])
         )
+        # rechunk like sij for consistency with other model components
+        nij = nij.chunk()
         sij = filter.filter(self.strain)
         sn = xr.dot(sij, nij, dim=self.tensor_dims)
         snorm = Frobenius_norm(sij, self.tensor_dims)

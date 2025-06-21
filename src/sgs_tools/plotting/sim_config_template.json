@@ -1,0 +1,18 @@
+{
+    "name": "cx072_200ma_p[rb]*.nc",
+    "flag": "200m",
+    "grid": {"resolution": "200m", "level_set": "L100"},
+    "dynamic_model": {
+        "scale_dependent": true,
+        "dynamic_Prandtl": true,
+        "regularization": "Lagr"
+    },
+    "driving": {"Qh": 300, "wind": "2 m/s"},
+    "plotting_style": {
+        "linestyle": 1,
+        "color": "C0",
+        "linewdith": 1,
+        "marker": "x",
+        "label": "flag"
+    }
+}

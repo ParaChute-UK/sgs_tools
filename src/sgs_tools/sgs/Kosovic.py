@@ -8,11 +8,12 @@ from ..geometry.tensor_algebra import (
     symmetrise,
     traceless,
 )
+from .dynamic_coefficient import LillyMinimisation2Model, Minimisation
 from .dynamic_sgs_model import LeonardVelocityTensor, LinCombDynamicModel
 from .filter import Filter
 from .sgs_model import LinCombSGSModel
 from .util import _assert_coord_dx
-
+from ..util.dask_opt_util import dask_layered
 
 @dataclass(frozen=True)
 class SSquaredVelocityModel:
@@ -102,6 +103,9 @@ def DynamicKosovicModel(
     res: float,
     compoment_coeff: Sequence[float],
     tensor_dims: tuple[str, str] = ("c1", "c2"),
+    minimisation: Minimisation = LillyMinimisation2Model(
+        contraction_dims=["c1", "c2"], coeff_dim="cdim"
+    ),
 ) -> LinCombDynamicModel:
     """Dynamic version of the model by
     Carati & Cabot Proceedings of the 1996 Summer Program -- Center for Turbulence Research
@@ -132,4 +136,4 @@ def DynamicKosovicModel(
         ]
     )
     leonard = LeonardVelocityTensor(vel, tensor_dims)
-    return LinCombDynamicModel(static_model, leonard)
+    return LinCombDynamicModel(static_model, leonard, minimisation)

@@ -10,12 +10,14 @@ from ..geometry.tensor_algebra import (
     tensor_self_outer_product,
     traceless,
 )
+from .dynamic_coefficient import LillyMinimisation3Model, Minimisation
 from .dynamic_sgs_model import LeonardVelocityTensor, LinCombDynamicModel
 from .filter import Filter
 from .sgs_model import LinCombSGSModel
 from .util import _assert_coord_dx
+from ..util.dask_opt_util import dask_layered
 
-
+@dask_layered
 def s_parallel(
     s: xr.DataArray, n: xr.DataArray, tensor_dims: tuple[str, str]
 ) -> xr.DataArray:
@@ -30,7 +32,7 @@ def s_parallel(
     S_parallel_traceless = traceless(S_parallel, dims=tensor_dims)  # add the last term
     return S_parallel_traceless
 
-
+@dask_layered
 def s_perpendicular(
     s: xr.DataArray, n: xr.DataArray, tensor_dims: tuple[str, str]
 ) -> xr.DataArray:
@@ -55,6 +57,7 @@ class SparallelVelocityModel:
     tensor_dims: tuple[str, str]
     n: Sequence[float]
 
+    @dask_layered('SparallelVelocityModel')
     def sgs_tensor(self, filter: Filter) -> xr.DataArray:
         """compute model for SGS tensor
             :math:`$\\tau = (c_s \Delta) ^2 |\overline{Sij}| \overline{Sij}$`
@@ -66,10 +69,9 @@ class SparallelVelocityModel:
         # only makes sense for uniform coordinates in the filtering directions
         # with spacing of self.dx
         _assert_coord_dx(filter.filter_dims, self.strain, self.dx)
-
         sij = filter.filter(self.strain)
-        chunks = sij.chunks[sij.get_axis_num(self.tensor_dims[0])]
-        n_dask = da.from_array(self.n, chunks=chunks)
+        assert sij.chunks is not None, "Expected Dask chunked array"
+        n_dask = da.from_array(self.n, chunks=-1)
         n = xr.DataArray(
             n_dask,
             dims=[self.tensor_dims[0]],
@@ -101,6 +103,7 @@ class SperpVelocityModel:
     n: Sequence[float]
     tensor_dims: tuple[str, str]
 
+    @dask_layered('SperpVelocityModel')
     def sgs_tensor(self, filter: Filter) -> xr.DataArray:
         """compute model for SGS tensor
             :math:`$\\tau = (c_s \Delta) ^2 |\overline{Sij}| \overline{Sij}$`
@@ -114,8 +117,8 @@ class SperpVelocityModel:
         _assert_coord_dx(filter.filter_dims, self.strain, self.dx)
 
         sij = filter.filter(self.strain)
-        chunks = sij.chunks[sij.get_axis_num(self.tensor_dims[0])]
-        n_dask = da.from_array(self.n, chunks=chunks)
+        assert sij.chunks is not None, "Expected Dask chunked array"
+        n_dask = da.from_array(self.n, chunks=-1)
         n = xr.DataArray(
             n_dask,
             dims=[self.tensor_dims[0]],
@@ -147,6 +150,7 @@ class NVelocityModel:
     n: Sequence[float]
     tensor_dims: tuple[str, str]
 
+    @dask_layered('NVelocityModel')
     def sgs_tensor(self, filter: Filter) -> xr.DataArray:
         """compute model for SGS tensor
             :math:`$\\tau = (c_s \Delta) ^2 |\overline{Sij}| \overline{Sik Nkj}$`
@@ -168,7 +172,7 @@ class NVelocityModel:
             tensor_self_outer_product(n, self.tensor_dims[0], self.tensor_dims[1])
         )
         # rechunk like sij for consistency with other model components
-        nij = nij.chunk()
+        # nij = nij.chunk()
         sij = filter.filter(self.strain)
         sn = xr.dot(sij, nij, dim=self.tensor_dims)
         snorm = Frobenius_norm(sij, self.tensor_dims)
@@ -183,8 +187,11 @@ def DynamicCaratiCabotModel(
     vel: xr.DataArray,
     res: float,
     compoment_coeff: Sequence[float],
-    n=Sequence[float],
+    n: Sequence[float],
     tensor_dims: tuple[str, str] = ("c1", "c2"),
+    minimisation: Minimisation = LillyMinimisation3Model(
+        contraction_dims=["c1", "c2"], coeff_dim="cdim"
+    ),
 ) -> LinCombDynamicModel:
     """Dynamic version of the model by
     Carati & Cabot Proceedings of the 1996 Summer Program -- Center for Turbulence Research
@@ -223,4 +230,4 @@ def DynamicCaratiCabotModel(
         ]
     )
     leonard = LeonardVelocityTensor(vel, tensor_dims)
-    return LinCombDynamicModel(static_model, leonard)
+    return LinCombDynamicModel(static_model, leonard, minimisation)

@@ -3,9 +3,10 @@ from typing import Sequence
 import dask.array as da
 import numpy as np
 import xarray as xr
-
+from ..util.dask_opt_util import dask_layered
 
 # Vector algebra
+@dask_layered
 def tensor_self_outer_product(
     arr: xr.DataArray, vec_dim="c1", new_dim="c2"
 ) -> xr.DataArray:
@@ -19,7 +20,7 @@ def tensor_self_outer_product(
     assert new_dim not in arr.dims
     return (arr * arr.rename({vec_dim: new_dim})).transpose(vec_dim, new_dim, ...)
 
-
+@dask_layered
 def trace(
     tensor: xr.DataArray, dims: tuple[str, str] = ("c1", "c2"), name=None
 ) -> xr.DataArray:
@@ -43,6 +44,7 @@ def trace(
 
 
 # Make a tensor Traceless along 2 dimensions
+@dask_layered
 def traceless(
     tensor: xr.DataArray, dims: tuple[str, str] = ("c1", "c2")
 ) -> xr.DataArray:
@@ -63,7 +65,7 @@ def traceless(
     # create masked array for lazy computation
     identity_dask = da.eye(
         dim_size,
-        chunks=min(dim_size, 1),
+        chunks=-1,
     )
     diag_mask = xr.DataArray(
         identity_dask, dims=dims, coords={d1: tensor.coords[d1], d2: tensor.coords[d2]}
@@ -73,7 +75,7 @@ def traceless(
     traceless = tensor - trace_normed * diag_mask
     return traceless
 
-
+@dask_layered
 def Frobenius_norm(
     tensor: xr.DataArray, tens_dims: Sequence[str] = ["c1", "c2"]
 ) -> xr.DataArray:
@@ -84,7 +86,7 @@ def Frobenius_norm(
     """
     return np.sqrt(xr.dot(tensor, tensor, dim=tens_dims))
 
-
+@dask_layered
 def symmetrise(
     tensor: xr.DataArray, dims: Sequence[str] = ["c1", "c2"], name=None
 ) -> xr.DataArray:
@@ -111,7 +113,7 @@ def symmetrise(
         sij.name = name
     return sij
 
-
+@dask_layered
 def antisymmetrise(
     tensor: xr.DataArray, dims: Sequence[str] = ["c1", "c2"], name=None
 ) -> xr.DataArray:

@@ -10,8 +10,9 @@ from ..geometry.tensor_algebra import (
     traceless,
 )
 from ..geometry.vector_calculus import grad_vector
+from ..util.dask_opt_util import dask_layered
 
-
+@dask_layered
 def strain_from_vel(
     vel: xr.Dataset | Iterable[xr.DataArray],
     space_dims: Iterable[str],
@@ -41,7 +42,7 @@ def strain_from_vel(
     sij.attrs["long_name"] = r"$S$"
     return sij
 
-
+@dask_layered
 def omega_from_vel(
     vel: xr.Dataset | Iterable[xr.DataArray],
     space_dims: Iterable[str],
@@ -68,7 +69,7 @@ def omega_from_vel(
     sij.attrs["long_name"] = r"$\Omega$"
     return sij
 
-
+@dask_layered
 def vertical_heat_flux(
     vert_vel: xr.DataArray,
     pot_temperature: xr.DataArray,
@@ -95,7 +96,7 @@ def vertical_heat_flux(
     ans.attrs["long_name"] = r"$w' \theta'$ "
     return ans
 
-
+@dask_layered
 def Reynolds_fluct_stress(
     u: xr.DataArray,
     v: xr.DataArray,
@@ -131,3 +132,13 @@ def Reynolds_fluct_stress(
     ans.name = "Reynolds_fluct_stress"
     ans.attrs["long_name"] = r"$u'_i u'_j$"
     return ans
+
+@dask_layered
+def anisotropy_tensor(vel: xr.DataArray) -> xr.DataArray:
+    """compute anisotropy tensor from velocity
+
+    :param vel: velocity field
+    """
+    assert set(vel.dims) == set(["c1", "x", "y", "z"]), "Unexpected dimensions"
+
+    raise NotImplementedError()

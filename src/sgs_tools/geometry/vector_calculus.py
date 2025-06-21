@@ -1,8 +1,10 @@
 import numpy as np
 import xarray as xr
+from ..util.dask_opt_util import dask_layered
 
 
 # Vector calculus
+@dask_layered
 def grad_scalar(
     sca: xr.DataArray, space_dims: list[str], new_dim_name: str = "c1", name=None
 ) -> xr.DataArray:
@@ -24,7 +26,7 @@ def grad_scalar(
         grad_xarr.name = name
     return grad_xarr
 
-
+@dask_layered
 def grad_vector(
     vec: xr.DataArray, space_dims: list[str], new_dim_name: str = "c2", name=None
 ) -> xr.DataArray:
@@ -46,7 +48,7 @@ def grad_vector(
         gradvec_xarr.name = name
     return gradvec_xarr
 
-
+@dask_layered
 def grad_vector_lin(
     vec: xr.DataArray, space_dims: list[str], new_dim_name: str = "c2", name=None
 ) -> xr.DataArray:

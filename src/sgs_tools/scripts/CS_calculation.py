@@ -1,35 +1,30 @@
 from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
 from pathlib import Path
-from typing import Any, Sequence
+from typing import Any
 
 import matplotlib.pyplot as plt
 import numpy as np
 import xarray as xr
 from dask.diagnostics import ProgressBar
 from numpy import inf
-from sgs_tools.geometry.staggered_grid import (
-    compose_vector_components_on_grid,
-)
-from sgs_tools.geometry.vector_calculus import grad_scalar
 from sgs_tools.io.monc import data_ingest_MONC_on_single_grid
 from sgs_tools.io.um import data_ingest_UM_on_single_grid
-from sgs_tools.physics.fields import strain_from_vel
 from sgs_tools.scripts.arg_parsers import (
     add_dask_group,
     add_input_group,
     add_plotting_group,
 )
-from sgs_tools.sgs.dynamic_coefficient import LillyMinimisation1Model
-from sgs_tools.sgs.filter import Filter, box_kernel, weight_gauss_3d, weight_gauss_5d
-from sgs_tools.sgs.Smagorinsky import (
-    DynamicSmagorinskyHeatModel,
-    DynamicSmagorinskyVelocityModel,
-    SmagorinskyHeatModel,
-    SmagorinskyVelocityModel,
+from sgs_tools.scripts.CS_calculation_genmodel import (
+    compute_cs,
+    data_slice,
+    gather_model_inputs,
+    make_filter,
+    model_name_map,
+    model_selection,
+    plot,
 )
 from sgs_tools.util.path_utils import add_extension
 from sgs_tools.util.timer import timer
-from xarray.core.types import T_Xarray
 
 
 def parser() -> dict[str, Any]:
@@ -127,65 +122,6 @@ def parser() -> dict[str, Any]:
     return args
 
 
-def make_filter(shape: str, scale: int, dims=Sequence[str]) -> Filter:
-    """make filter object. **NB** Choices are limited!!!
-
-    :param shape: shape of filter kernel
-    :param scale: length scale of filter kernel
-    :param dims: dimensions along which to filter
-    """
-    if shape == "gaussian":
-        if scale == 2:
-            return Filter(weight_gauss_3d, dims)
-        elif scale == 4:
-            return Filter(weight_gauss_5d, dims)
-        else:
-            raise ValueError(f"Unsupported filter scale{scale} for gaussian filters")
-    elif shape == "box":
-        return Filter(box_kernel([scale, scale]), dims)
-    else:
-        raise ValueError(f"Unsupported filter shape {shape}")
-
-
-def add_scale_coords(
-    ds: T_Xarray, scales: list[float], regularization_scales: list[float]
-) -> T_Xarray:
-    """add scale dim and regularization_scale coordinate
-    :param ds: input dataset/dataarray
-    :param scales: the coordinates for the scale dimension
-    :param regularization_scales: sequence of coordinates
-    :return: the update dataset/dataarray
-    """
-    if "scale" not in ds.dims:
-        ds = ds.expand_dims(scale=scales)
-    else:
-        ds = ds.assign_coords(scale=("scale", scales))
-    ds = ds.assign_coords(regularization_scale=("scale", regularization_scales))
-    ds["scale"].attrs["units"] = r"$\Delta x$"
-    ds["regularization_scale"].attrs["units"] = r"$\Delta x$"
-    return ds
-
-
-def data_slice(
-    ds: xr.Dataset, t_range: Sequence[float], z_range: Sequence[float]
-) -> xr.Dataset:
-    """restrit ds to the intervals inside [t,z]_range.
-       Restrict a set of standard coordinate names for t and z.
-    :param ds: input dataset/dataarray
-    :param t_range: time interval
-    :param t_range: verical interval
-    """
-    for z in "z", "z_rho", "z_theta":
-        if z in ds:
-            zslice = (z_range[0] <= ds[z]) * (ds[z] <= z_range[1])
-            ds = ds.where(zslice, drop=True)
-    for t in "t", "t_0":
-        if t in ds:
-            tslice = (t_range[0] <= ds[t]) * (ds[t] <= t_range[1])
-            ds = ds.where(tslice, drop=True)
-    return ds
-
-
 def read(args: dict[str, Any]) -> xr.Dataset:
     # read UM stash files
     if args["input_format"] == "um":
@@ -236,209 +172,58 @@ def main() -> None:
         ), f"regularization_scale {scale} must be less than horizontal number of grid cells {nhoriz}"
 
     with timer("Extract grid-based fields", "s"):
-        # ensure velocity components are co-located
-        simple_dims = ["x", "y", "z"]  # coordinates already exist in simulation
-        vel = compose_vector_components_on_grid(
-            [simulation["u"], simulation["v"], simulation["w"]],
-            simple_dims,
-            name="vel",
-            vector_dim="c1",
-        )
+        simulation = gather_model_inputs(simulation)
+        output = simulation["vel", "sij", "grad_theta"]
 
-        # compute strain and potential temperature gradient
-        sij = strain_from_vel(
-            vel,
-            space_dims=simple_dims,
-            vec_dim="c1",
-            new_dim="c2",
-            make_traceless=True,
-        )
-
-        grad_theta = grad_scalar(
-            simulation["theta"],
-            space_dims=simple_dims,
-            new_dim_name="c1",
-            name="grad_theta",
-        )
-
-        output = xr.Dataset(
-            {
-                "vel": vel,
-                "sij": sij,
-                "grad_theta": grad_theta,
-            }
-        )
-
-    with timer("Setup SGS models", "ms"):
-        # setup dynamic Smagorinsky model for velocity
-        smag_vel = SmagorinskyVelocityModel(
-            vel=vel,
-            strain=sij,
-            cs=1.0,
-            dx=args["h_resolution"],
-            tensor_dims=("c1", "c2"),
-        )
-        dyn_smag_vel = DynamicSmagorinskyVelocityModel(smag_vel)
-
-        # setup dynamic Smagorinsky model for potential temperature
-        smag_theta = SmagorinskyHeatModel(
-            vel=vel,
-            grad_theta=grad_theta,
-            strain=sij,
-            ctheta=1.0,
-            dx=args["h_resolution"],
-            tensor_dims=("c1", "c2"),
-        )
-        dyn_smag_theta = DynamicSmagorinskyHeatModel(smag_theta, simulation["theta"])
-
-    # process for each filter scale
-    with timer("Setup Cs", "s", "Setup Cs"):
-        cs_iso_at_scale_ls = []
-        cs_diag_at_scale_ls = []
-        ctheta_at_scale_ls = []
-        ctheta_diag_at_scale_ls = []
+    with timer("Setup filtering operators"):
+        test_filters = []
+        regularization_filters = []
         for scale, regularization_scale in zip(
             args["filter_scales"], args["regularize_filter_scales"]
         ):
-            with timer(f"  At scale {scale}", "s", f"  At scale {scale}"):
-                filter = make_filter(args["filter_type"], scale, ["x", "y"])
-                regularization = make_filter(
+            test_filters.append(make_filter(args["filter_type"], scale, ["x", "y"]))
+            regularization_filters.append(
+                make_filter(
                     args["regularize_filter_type"], regularization_scale, ["x", "y"]
                 )
+            )
+    for m in "Smag_vel", "Smag_vel_diag", "Smag_theta", "Smag_theta_diag":
+        # setup dynamic model
+        with timer(f"Coeff calculation SETUP for {model_name_map[m]} model", "s"):
+            dynamic_model = model_selection(m, simulation, args["h_resolution"])
 
-                with timer("    Cs isotropic", "s"):
-                    # compute isotropic Cs for velocity
-                    minimisation = LillyMinimisation1Model(
-                        regularization, ["c1", "c2"], "cdim"
-                    )
-                    cs_isotropic = dyn_smag_vel.compute_coeff(filter, minimisation)
-                    # force execution for timer logging
-                    cs_iso_at_scale_ls.append(cs_isotropic)  # .load())
-
-                with timer("    Cs diagonal", "s"):
-                    # compute diagonal Cs for velocity
-                    minimisation = LillyMinimisation1Model(
-                        regularization, ["c2"], "cdim"
-                    )
-                    cs_diagonal = dyn_smag_vel.compute_coeff(filter, minimisation)
-                    # force execution for timer logging
-                    cs_diag_at_scale_ls.append(cs_diagonal)  # .load())
-
-                with timer("    Cs theta isotropic", "s"):
-                    # compute isotropic Cs for theta
-                    minimisation = LillyMinimisation1Model(
-                        regularization, ["c1"], "cdim"
-                    )
-                    ctheta_isotropic = dyn_smag_theta.compute_coeff(
-                        filter, minimisation
-                    )
-
-                    # force execution for timer logging
-                    ctheta_at_scale_ls.append(ctheta_isotropic)  # .load())
-                with timer("    Cs theta diagonal", "s"):
-                    # compute diagonal Cs for theta
-                    minimisation = LillyMinimisation1Model(regularization, [], "cdim")
-                    ctheta_diag = dyn_smag_theta.compute_coeff(filter, minimisation)
-                    # force execution for timer logging
-                    ctheta_diag_at_scale_ls.append(ctheta_diag)  # .load())
-
-    with timer("Collect coefficients", "s"):
-        cs_iso_at_scale = xr.concat(cs_iso_at_scale_ls, dim="scale")
-        cs_diag_at_scale = xr.concat(cs_diag_at_scale_ls, dim="scale")
-        ctheta_at_scale = xr.concat(ctheta_at_scale_ls, dim="scale")
-        ctheta_diag_at_scale = xr.concat(
-            ctheta_diag_at_scale_ls, dim="scale"
-        ).drop_vars("vel")
-
-        output["Cs_isotropic"] = cs_iso_at_scale
-        output["Cs_diagonal"] = cs_diag_at_scale
-        output["Ctheta_isotropic"] = ctheta_at_scale
-        output["Ctheta_diagonal"] = ctheta_diag_at_scale
-
-        # add scale coordinates
-        output = add_scale_coords(
-            output,
-            list(args["filter_scales"]),
-            list(args["regularize_filter_scales"]),
+            coeff = compute_cs(
+                dynamic_model,
+                test_filters,
+                regularization_filters,
+            )
+            # for multi-coefficient models
+            if "cdim" in coeff.dims:
+                coeff = coeff.rename({"cdim": "c1"})
+        out_fname = args["output_file"].with_stem(
+            f'{model_name_map[m]}_{args["output_file"].stem}'
         )
+
+        # trigger computation
+        with timer(f"Coeff calculation compute for {model_name_map[m]} model", "s"):
+            with ProgressBar():
+                coeff.compute()
+        # write to disk
+        with timer(f"Coeff calculation write for {model_name_map[m]} model", "s"):
+            with ProgressBar():
+                coeff.to_netcdf(
+                    out_fname,
+                    mode="w",
+                    compute=True,
+                    unlimited_dims=["scale"],
+                    engine="h5netcdf",
+                )
 
     # plot horizontal mean profiles
     if args["plot_show"] or args["plot_path"] is not None:
         try:
             with timer("Plotting", "s"):
-                if len(args["filter_scales"]) > 1:
-                    row_lbl = "scale"
-                else:
-                    row_lbl = None
-
-                fig_cs_diag = (
-                    cs_diag_at_scale.mean(["x", "y"])
-                    .plot(x="t_0", row=row_lbl, col="c1", robust=True)  # type: ignore
-                    .fig
-                )
-                # -1 because no label on colorbar
-                for i, ax in enumerate(fig_cs_diag.axes[:-1]):
-                    ax.text(
-                        0.05,
-                        0.85,
-                        r"$C_s$ diagonal" + f"{i+1}",
-                        fontsize=14,
-                        transform=ax.transAxes,
-                    )
-                plt.figure()
-
-                q = cs_iso_at_scale.mean(["x", "y"]).plot(
-                    x="t_0", row=row_lbl, col_wrap=3, robust=True
-                )  # type: ignore
-                q.axes.text(
-                    0.05,
-                    0.85,
-                    r"$C_s$ isotropic",
-                    fontsize=14,
-                    transform=q.axes.transAxes,
-                )
-                fig_cs = q.get_figure()
-
-                fig_ctheta_diag = (
-                    ctheta_diag_at_scale.mean(["x", "y"])
-                    .plot(x="t_0", row=row_lbl, col="c1", robust=True)  # type: ignore
-                    .fig
-                )
-                # -1 because no label on colorbar
-                for i, ax in enumerate(fig_ctheta_diag.axes[:-1]):
-                    ax.text(
-                        0.05,
-                        0.85,
-                        r"$C_\theta$ diagonal" + f"{i+1}",
-                        fontsize=14,
-                        transform=ax.transAxes,
-                    )
-                plt.figure()
-
-                q = ctheta_at_scale.mean(["x", "y"]).plot(
-                    x="t_0", row=row_lbl, col_wrap=3, robust=True
-                )  # type: ignore
-                q.axes.text(
-                    0.05,
-                    0.85,
-                    r"$C_\theta$ isotropic",
-                    fontsize=14,
-                    transform=q.axes.transAxes,
-                )
-                fig_ctheta = q.get_figure()
-
-                if args["plot_path"] is not None:
-                    print(f"Saving plots to {args['plot_path']}")
-                    args["plot_path"].mkdir(parents=True, exist_ok=True)
-                    fig_cs.savefig(args["plot_path"] / "Cs_isotropic.png", dpi=180)
-                    fig_cs_diag.savefig(args["plot_path"] / "Cs_diagonal.png", dpi=180)
-                    fig_ctheta.savefig(
-                        args["plot_path"] / "Ctheta_isotropic.png", dpi=180
-                    )
-                    fig_ctheta_diag.savefig(
-                        args["plot_path"] / "Ctheta_diagonal.png", dpi=180
-                    )
-
+                plot(args)
         except:
             print("Failed in generating plots")
 

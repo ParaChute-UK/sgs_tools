@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Any
 
 import numpy as np
 import xarray as xr
@@ -14,6 +15,7 @@ coord_dict = {"zn": "z_theta"}
 def data_ingest_MONC_on_single_grid(
     fname_pattern,
     requested_fields: list[str] = ["u", "v", "w", "theta"],
+    chunks: Any = "auto",
 ):
     """read and pre-process MONC data
 
@@ -26,7 +28,7 @@ def data_ingest_MONC_on_single_grid(
         )
     )
 
-    ds = xr.open_mfdataset(fname, chunks={}, parallel=True)
+    ds = xr.open_mfdataset(fname, chunks=chunks, parallel=True)
 
     # parse metadata
     metadata = ds["options_database"].load().data

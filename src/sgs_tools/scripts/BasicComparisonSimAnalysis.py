@@ -1,12 +1,13 @@
 import json
 from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
 from pathlib import Path
-from typing import Any, Callable, Dict, Iterable, Mapping, Union
+from typing import Any, Callable, Collection, Dict, Iterable, Mapping
 
 import matplotlib.pyplot as plt
 import xarray as xr
+from matplotlib.figure import Figure
 from numpy import arange, array, inf, ndarray
-from pint import UnitRegistry
+from pint import UnitRegistry  # type: ignore
 from sgs_tools.io.um import data_ingest_UM
 from sgs_tools.physics.fields import Reynolds_fluct_stress, vertical_heat_flux
 from sgs_tools.plotting.collection_plots import (
@@ -184,12 +185,11 @@ def parse_args() -> dict[str, Any]:
 
     # parse plotting style
     if args["plot_style_file"] is None:
-        plot_styles: list[Mapping[str, Any]] = []
+        plot_styles = [default_plotting_style] * len(args["input_files"])
         colors = plt.rcParams["axes.prop_cycle"].by_key()["color"]
-        for i in range(len(args["input_files"])):
-            plot_styles.append(default_plotting_style)
-            plot_styles[-1]["color"] = colors[i % len(colors)]
-            plot_styles[-1]["label"] = f"sim{i}"
+        for i, _ in enumerate(plot_styles):
+            plot_styles[i]["color"] = colors[i % len(colors)]
+            plot_styles[i]["label"] = f"sim{i}"
     else:
         with open(args["plot_style_file"]) as f:
             plot_styles = json.load(f)
@@ -216,7 +216,7 @@ def parse_args() -> dict[str, Any]:
 
 
 def preprocess_dataset(
-    ds: xr.Dataset, args: ArgumentParser
+    ds: xr.Dataset, args: dict[str, Any]
 ) -> tuple[xr.Dataset, Dict[str, field_plot_kwargs]]:
     """preprocess data:
        fix coordinates, take time/z constraints, add offline fields
@@ -261,7 +261,7 @@ def preprocess_dataset(
 
 def add_offline_fields(
     ds: xr.Dataset,
-) -> list[xr.Dataset, Dict[str, field_plot_kwargs]]:
+) -> tuple[xr.Dataset, Dict[str, field_plot_kwargs]]:
     # add offline fields
     offline_field_map = {}
     # velocity squared
@@ -370,7 +370,7 @@ def add_offline_fields(
 def vert_profile_reduction(
     da: xr.DataArray,
     reduction: Callable | str,
-    reduction_dims: Iterable[str],
+    reduction_dims: Collection[str],
 ) -> xr.DataArray:
     if reduction == "mean":
         data = da.mean(reduction_dims).squeeze()
@@ -381,6 +381,7 @@ def vert_profile_reduction(
     elif reduction == "median":
         data = da.median(reduction_dims).squeeze()
     else:
+        assert callable(reduction)
         data = reduction(da, reduction_dims).squeeze()
     return data
 
@@ -390,8 +391,8 @@ def plot_horiz_slices(
     fields: Iterable[str],
     zlevels: Iterable[float],
     field_plot_map,
-) -> Dict[str, plt.figure]:
-    hor_slice = {}
+) -> Dict[float, Dict[str, Figure]]:
+    hor_slice: Dict[float, Dict[str, Figure]] = {}
     for z in zlevels:
         hor_slice[z] = {}
         for field in fields:
@@ -400,17 +401,19 @@ def plot_horiz_slices(
             da_collection = {
                 k: ds[field].sel({field_plot_map[field].zcoord: z}, method="nearest")
                 for k, ds in ds_collection.items()
+                if field in ds
             }
-            f = plot_horizontal_slice_tseries(
-                da_collection,
-                "t",
-                field_plot_map[field].cmap,
-                field_plot_map[field].label,
-                field_plot_map[field].zcoord,
-            )
-            f.suptitle(field_plot_map[field].label)
-            f.tight_layout()
-            hor_slice[z][field] = f.get_figure()
+            if da_collection:
+                f = plot_horizontal_slice_tseries(
+                    da_collection,
+                    "t",
+                    field_plot_map[field].cmap,
+                    field_plot_map[field].label,
+                    field_plot_map[field].zcoord,
+                )
+                f.suptitle(field_plot_map[field].label)
+                f.tight_layout()
+                hor_slice[z][field] = f.get_figure()
     return hor_slice
 
 
@@ -419,8 +422,8 @@ def plot_vert_profiles(
     fields: Iterable[str],
     reductions: Iterable[str],
     plot_map,
-) -> Dict[str, plt.figure]:
-    vert_prof = {}
+) -> Dict[str, Dict[str, Figure]]:
+    vert_prof: Dict[str, Dict[str, Figure]] = {}
     for reduction in reductions:
         vert_prof[reduction] = {}
         for field in fields:
@@ -454,7 +457,7 @@ def plot_clouds(
     clevels: Iterable[float],
     field_plot_map,
     collection_plot_map,
-):
+) -> Figure | None:
     fig, _ = plt.subplots(len(ds_collection), 1, figsize=(6, len(ds_collection) * 6))
     axes = fig.axes
     empty = True
@@ -492,7 +495,7 @@ def plot_clouds(
 
 def plot(
     ds_collection: Mapping[str, xr.Dataset],
-    args: ArgumentParser,
+    args: dict[str, Any],
     slice_fields: Iterable[str],
     prof_fields: Iterable[str],
     field_plot_map,
@@ -511,7 +514,7 @@ def plot(
             print("Detected Keyboard interrup, proceeding with vertical profiles")
     # plot vertical profiles
     # transpose plot map and match to dataset labels
-    plot_map = {
+    plot_map: Dict[str, Dict[str, Any]] = {
         "color_map": {},
         "linestyle_map": {},
         "linewidth_map": {},
@@ -570,9 +573,9 @@ def plot(
     plt.close()
 
 
-def io(args) -> None:
+def io(args) -> tuple[Dict[str, xr.Dataset], Dict[str, field_plot_kwargs]]:
     # read UM stasth files: data
-    ds_collection: Mapping[str, xr.Dataset] = {}
+    ds_collection: Dict[str, xr.Dataset] = {}
     with timer("Read Dataset", "s"):
         for f, res, plot_map in zip(
             args["input_files"], args["h_resolution"], args["plot_map"]
@@ -581,7 +584,7 @@ def io(args) -> None:
             ds = data_ingest_UM(
                 f,
                 res,
-                requested_fields=slice_fields + prof_fields + cloud_fields,
+                requested_fields=list(slice_fields + prof_fields + cloud_fields),
             )
             if len(ds) == 0:
                 continue
@@ -603,7 +606,7 @@ def io(args) -> None:
     return ds_collection, field_plot_map
 
 
-if __name__ == "__main__":
+def main():
     with timer("Total execution time", "min"):
         with timer("Arguments", "ms"):
             args = parse_args()
@@ -613,3 +616,7 @@ if __name__ == "__main__":
         # make plots
         with timer("Make plots", "s"):
             plot(ds_collection, args, slice_fields, prof_fields, field_plot_map)
+
+
+if __name__ == "__main__":
+    main()

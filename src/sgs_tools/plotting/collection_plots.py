@@ -1,10 +1,8 @@
-from typing import Any, Dict, Iterable, Mapping
+from typing import Any, Collection, Dict, Iterable, Mapping
 
 import matplotlib.pyplot as plt
 import numpy as np
 import xarray as xr
-
-from .field_plot_map import field_plot_map
 
 
 def plot_vertical_prof_time_slice_compare_sims_slice(
@@ -52,7 +50,7 @@ def plot_vertical_prof_time_slice_compare_sims_slice(
                     lw=plot_kwargs["linewidth_map"][k],
                     label=plot_kwargs["label_map"][k],
                     marker=marker,
-                )
+                )  # type: ignore
             ax.legend()
             ax.set_xlabel(x_lbl, fontsize=14)
             ax.set_title(f"time: {time.item()/60} h", fontsize=14)
@@ -108,12 +106,12 @@ def plot_horizontal_slice_tseries(
                         cmap=cmap,
                         cbar_kwargs={"label": field_lbl},
                         robust=True,
-                    )
+                    )  # type: ignore
                 else:
                     # no colorbar label
                     data.plot(
                         ax=ax, y=data.dims[0], cmap=cmap, cbar_kwargs={"label": None}
-                    )
+                    )  # type: ignore
             # ax.set_xlabel(, fontsize=14)
             ax.set_title(
                 f"{sim_lbl}: z = {data[zcoord].item():g}m, time= {time/60} h",
@@ -130,8 +128,8 @@ def plot_vertical_prof_time_slice_compare_fields(
     fields: Iterable[str],
     reduction: str,
     zcoord: str,
-    tslice: Dict[str, Iterable] = {"t": np.arange(1, 16) * 60},
-    field_lbls: Iterable[str] = [""] * 20,
+    tslice: Dict[str, Collection] = {"t": np.arange(1, 16) * 60},
+    field_lbls: list[str] = [""] * 20,
     les_reference=None,
     zmax=1e6,
     ds_label="",
@@ -144,7 +142,7 @@ def plot_vertical_prof_time_slice_compare_fields(
     times = list(tslice.values())[0]
     fig, axes = plt.subplots(1, len(times), figsize=(6 * len(times), 5), sharey=False)
 
-    tcoord = list(times.keys())[0]
+    tcoord = list(tslice.keys())[0]
 
     for time, ax in zip(times, axes):
         # if les_reference is not None and reduction == "mean":
@@ -160,7 +158,7 @@ def plot_vertical_prof_time_slice_compare_fields(
         for i, field in enumerate(fields):
             local_time = {tcoord: ds[tcoord].isin(time)}
 
-            reduction_dims = [x for x in ds[field].dims if x not in zcoord + [tcoord]]
+            reduction_dims = [x for x in ds[field].dims if x not in [zcoord, tcoord]]
             if reduction == "mean":
                 data = (
                     ds[field]

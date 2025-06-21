@@ -99,14 +99,14 @@ def read_stash_files(fname_pattern: Path) -> xr.Dataset:
     """
 
     print(f"Reading {fname_pattern}")
-    # parse any glob wildcards in directory or filename
+    # parse any glob wildcards in directory or filena
+    # turn parsed into list because of incomplete typehints of xr.open_mfdataset
     parsed = list(
         Path(fname_pattern.root).glob(
             str(Path(*fname_pattern.parts[fname_pattern.is_absolute() :]))
         )
     )
     print(f"Reading {parsed}")
-    # turn parsed into list because of incomplete typehints of xr.open_mfdataset
     dataset = xr.open_mfdataset(parsed, chunks="auto")
     return dataset
 

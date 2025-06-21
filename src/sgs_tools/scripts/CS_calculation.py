@@ -4,7 +4,6 @@ from typing import Any, Sequence
 
 import matplotlib.pyplot as plt
 import numpy as np
-import pandas as pd
 import xarray as xr
 from dask.diagnostics import ProgressBar
 from numpy import inf
@@ -13,7 +12,7 @@ from sgs_tools.geometry.staggered_grid import (
 )
 from sgs_tools.geometry.vector_calculus import grad_scalar
 from sgs_tools.io.monc import data_ingest_MONC_on_single_grid
-from sgs_tools.io.um import data_ingest_UM_on_single_grid, restrict_ds
+from sgs_tools.io.um import data_ingest_UM_on_single_grid
 from sgs_tools.physics.fields import strain_from_vel
 from sgs_tools.sgs.dynamic_coefficient import dynamic_coeff
 from sgs_tools.sgs.filter import Filter, box_kernel, weight_gauss_3d, weight_gauss_5d
@@ -184,32 +183,42 @@ def data_slice(
     return ds
 
 
+def read(args: dict[str, Any]) -> xr.Dataset:
+    # read UM stash files
+    if args["input_format"] == "um":
+        simulation = data_ingest_UM_on_single_grid(
+            args["input_files"],
+            args["h_resolution"],
+            requested_fields=args["requested_fields"],
+        )
+    elif args["input_format"] == "monc":
+        # read MONC files
+        meta, simulation = data_ingest_MONC_on_single_grid(
+            args["input_files"],
+            requested_fields=args["requested_fields"],
+        )
+        # overwrite resolution
+        assert np.isclose(meta["dxx"], meta["dyy"])
+        args["h_resolution"] = meta["dxx"]
+    simulation = data_slice(simulation, args["t_range"], args["z_range"])
+    simulation = simulation.chunk(
+        {
+            "z": args["z_chunk_size"],
+            # "z_theta": args["z_chunk_size"],
+        }
+    )
+    return simulation
+
+
 def main() -> None:
     # read and pre-process simulation
     with timer("Arguments", "ms"):
         args = parser()
     print(args)
-
+    args["requested_fields"] = ["u", "v", "w", "theta"]
     # read UM stasth files: data
     with timer("Read Dataset", "s"):
-        if args["input_format"] == "um":
-            simulation = data_ingest_UM_on_single_grid(
-                args["input_files"],
-                args["h_resolution"],
-                requested_fields=["u", "v", "w", "theta"],
-            )
-        elif args["input_format"] == "monc":
-            meta, simulation = data_ingest_MONC_on_single_grid(args["input_files"])
-            # overwrite resolution
-            assert np.isclose(meta["dxx"], meta["dyy"])
-            args["h_resolution"] = meta["dxx"]
-        simulation = data_slice(simulation, args["t_range"], args["z_range"])
-        simulation = simulation.chunk(
-            {
-                "z": args["z_chunk_size"],
-                # "z_theta": args["z_chunk_size"],
-            }
-        )
+        simulation = read(args)
 
     # check scales make sense
     nhoriz = min(simulation["x"].shape[0], simulation["y"].shape[0])

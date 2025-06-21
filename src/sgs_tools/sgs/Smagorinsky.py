@@ -11,7 +11,7 @@ from .sgs_model import DynamicHeatModel, DynamicVelocityModel, SGSModel
 # check that arr is uniform along `filter_dims` with spacing of `dx`
 def _assert_coord_dx(filter_dims: list[Hashable], arr: xr.DataArray, dx: float) -> None:
     for c in filter_dims:
-        assert (arr[c].diff(dim=c) == dx).all()
+        assert (arr[c].diff(dim=c) == dx).all(), f"Not uniform dimension {c}: {arr[c]}"
 
 
 @dataclass(frozen=True)
@@ -29,15 +29,7 @@ class SmagorinskyVelocityModel(SGSModel):
     strain: xr.DataArray
     cs: float
     dx: float
-    tensor_dims: tuple[str, str] = ("c1", "c2")
-
-    def _snorm(self, filter: Filter) -> xr.DataArray:
-        """compute the rate of strain norm at a given scale"""
-        sij = filter.filter(self.strain)
-        s = Frobenius_norm(sij, self.tensor_dims)
-        s.name = "S_norm"
-        s.attrs["long_name"] = "|<S>|"
-        return s
+    tensor_dims: tuple[str, str]
 
     def sgs_tensor(self, filter: Filter) -> xr.DataArray:
         """compute model for SGS tensor
@@ -52,9 +44,10 @@ class SmagorinskyVelocityModel(SGSModel):
         for arr in [self.vel, self.strain]:
             _assert_coord_dx(filter.filter_dims, arr, self.dx)
 
-        snorm = self._snorm(filter)
         sij = filter.filter(self.strain)
-        return (self.cs * self.dx) ** 2 * snorm * sij
+        snorm = Frobenius_norm(sij, self.tensor_dims)
+        tau = (self.cs * self.dx) ** 2 * snorm * sij
+        return tau
 
 
 @dataclass(frozen=True)
@@ -74,15 +67,7 @@ class SmagorinskyHeatModel(SGSModel):
     strain: xr.DataArray
     ctheta: float
     dx: float
-    tensor_dims: tuple[str, str] = ("c1", "c2")
-
-    def _snorm(self, filter: Filter) -> xr.DataArray:
-        """compute the rate-of-strain norm at a given scale"""
-        sij = filter.filter(self.strain)
-        s = Frobenius_norm(sij, self.tensor_dims)
-        s.name = "S_norm"
-        s.attrs["long_name"] = "|<S>|"
-        return s
+    tensor_dims: tuple[str, str]
 
     def sgs_tensor(self, filter):
         """compute model for SGS tensor
@@ -97,15 +82,16 @@ class SmagorinskyHeatModel(SGSModel):
         for arr in [self.vel, self.grad_theta, self.strain]:
             _assert_coord_dx(filter.filter_dims, arr, self.dx)
 
-        snorm = self._snorm(filter)
+        snorm = Frobenius_norm(filter.filter(self.strain), self.tensor_dims)
         grad_theta = filter.filter(self.grad_theta)
-        return self.ctheta * self.dx**2 * snorm * grad_theta
+        tau = self.ctheta * self.dx**2 * snorm * grad_theta
+        return tau
 
 
 def DynamicSmagorinskyVelocityModel(
     smag_vel: SmagorinskyVelocityModel,
 ) -> DynamicVelocityModel:
-    return DynamicVelocityModel(smag_vel, smag_vel.vel)
+    return DynamicVelocityModel(smag_vel, smag_vel.vel, smag_vel.tensor_dims)
 
 
 def DynamicSmagorinskyHeatModel(

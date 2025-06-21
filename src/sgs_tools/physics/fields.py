@@ -32,11 +32,15 @@ def strain_from_vel(
     if make_traceless:
         sij = traceless(sij, (vec_dim, new_dim))
     sij[new_dim] = c2
+    sij.name = "rate-of-strain"
+    sij.attrs["long_name"] = r"$S$"
     return sij
 
 
 def vertical_heat_flux(
-    vert_vel: xr.DataArray, pot_temperature: xr.DataArray, hor_axes: Collection[str]
+    vert_vel: xr.DataArray,
+    pot_temperature: xr.DataArray,
+    hor_axes: Collection[str],
 ) -> xr.DataArray:
     """compute vertical heat flux :math:`$w' \\theta'$` from :math:`w` and :math:`$\\theta$`
 
@@ -46,8 +50,14 @@ def vertical_heat_flux(
     :param hor_axes: labels of horizontal dimensions
         (w.r.t which to compute the fluctuations)
     """
-    w_prime = vert_vel - vert_vel.mean(dim=hor_axes)
-    theta_prime = pot_temperature - pot_temperature.mean(hor_axes)
+    assert set(vert_vel.dims) == set(
+        pot_temperature.dims
+    ), "Mismatched dimensions of vert_vel and pot_temperature"
+    w, theta = xr.align(
+        vert_vel, pot_temperature, join="exact"
+    )  # assert matching coordinates
+    w_prime = w - w.mean(dim=hor_axes)
+    theta_prime = theta - theta.mean(hor_axes)
     ans = w_prime * theta_prime
     ans.name = "vertical_heat_flux"
     ans.attrs["long_name"] = r"$w' \theta'$ "
@@ -58,7 +68,7 @@ def Reynolds_fluct_stress(
     u: xr.DataArray,
     v: xr.DataArray,
     w: xr.DataArray,
-    target_dims: Iterable[str],
+    target_dims: list[str],
     fluctuation_axes: Collection[str],
 ) -> xr.DataArray:
     """compute Reynolds stress :math:`$\mathbf{u}'_i \mathbf{u}'_j$`

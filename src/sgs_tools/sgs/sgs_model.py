@@ -45,9 +45,10 @@ class DynamicSGSModel(ABC):
         filtered = filter.filter(self.StaticModel.sgs_tensor(id))
         resolved = self.StaticModel.sgs_tensor(filter)
         alpha_sq = filter.kernel.size
-        return filtered - alpha_sq * resolved
+        M = filtered - alpha_sq * resolved
+        return M
 
-    # this is abstract becaue the mulitplication operation
+    # this is abstract because the mulitplication operation
     # changes for vector and scalar models
     @abstractmethod
     def Leonard_tensor(self, filter: Filter) -> xr.DataArray:
@@ -57,11 +58,6 @@ class DynamicSGSModel(ABC):
         """
         ...
 
-    # @abstractmethod
-    # def dynamic_coeff(self, filter: Filter, regularizer: Filter) -> xr.DataArray:
-    #     """compute dynamic coefficient"""
-    #     ...
-
 
 @dataclass(frozen=True)
 class DynamicVelocityModel(DynamicSGSModel):
@@ -69,12 +65,14 @@ class DynamicVelocityModel(DynamicSGSModel):
 
     :ivar StaticModel: Static (scale-unaware) SGS model
     :ivar vel: grid-scale/base velocity field
+    :ivar tensor_dims: labels of dimensions indexing tensor components
 
     * :meth:`M_Germano_tensor`: returns the Germano model tensor "M" for a given filter
     * :meth:`Leonard_tensor`: returns the Leonard tensor "L" for a given filter
     """
 
     vel: xr.DataArray
+    tensor_dims: tuple[str, str]
 
     def Leonard_tensor(self, filter: Filter) -> xr.DataArray:
         """compute the Leonard tensor as
@@ -83,9 +81,10 @@ class DynamicVelocityModel(DynamicSGSModel):
 
         :param filter: Filter used to separate "large" and "small" scales
         """
-        resolved = tensor_self_outer_product(filter.filter(self.vel))
-        filtered = filter.filter(tensor_self_outer_product(self.vel))
-        return filtered - resolved
+        resolved = tensor_self_outer_product(filter.filter(self.vel), *self.tensor_dims)
+        filtered = filter.filter(tensor_self_outer_product(self.vel, *self.tensor_dims))
+        L = filtered - resolved
+        return L
 
 
 @dataclass(frozen=True)
@@ -112,4 +111,5 @@ class DynamicHeatModel(DynamicSGSModel):
         """
         resolved = filter.filter(self.vel) * filter.filter(self.theta)
         filtered = filter.filter(self.vel * self.theta)
-        return filtered - resolved
+        L = filtered - resolved
+        return L

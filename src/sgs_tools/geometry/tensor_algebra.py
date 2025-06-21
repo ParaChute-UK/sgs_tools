@@ -5,16 +5,18 @@ import xarray as xr
 
 
 # Vector algebra
-def tensor_self_outer_product(arr: xr.DataArray) -> xr.DataArray:
+def tensor_self_outer_product(
+    arr: xr.DataArray, vec_dim="c1", new_dim="c2"
+) -> xr.DataArray:
     """tensor product :math:`a_i a_j` from vector field `arr`.
         Assumes that `arr` has dimensions ``c1`` but no dimension ``c2``
 
     :param arr: xarray Dataset with dimension `c1` which will be used for the tensor product
     :param returns: xarray DataArray with the 'i' and 'j' dimensions sorted to the front.
     """
-    assert "c1" in arr.dims
-    assert "c2" not in arr.dims
-    return (arr * arr.rename({"c1": "c2"})).transpose("c1", "c2", ...)
+    assert vec_dim in arr.dims
+    assert new_dim not in arr.dims
+    return (arr * arr.rename({vec_dim: new_dim})).transpose(vec_dim, new_dim, ...)
 
 
 def trace(
@@ -28,8 +30,9 @@ def trace(
         All coordinates of `dims` must match.
     """
     assert len(dims) == 2  # only 2-dimensional trace
-
-    xr.align(tensor[dims[0]], tensor[dims[1]], join="exact")
+    assert np.allclose(tensor[dims[0]].values, tensor[dims[1]].values)
+    # # check for square array with compatible coordinates
+    # xr.align(tensor[dims[0]], tensor[dims[1]], join="exact")
 
     diagonal = tensor.sel({dims[0]: tensor[dims[1]]})
     tr = diagonal.sum(dims[1])
@@ -67,7 +70,7 @@ def Frobenius_norm(
     :param tensor: tensor input
     :param dims: dimensions with respect to which to take the norm.
     """
-    return np.sqrt(xr.dot(tensor, tensor, dims=tens_dims))
+    return np.sqrt(xr.dot(tensor, tensor, dim=tens_dims))
 
 
 def symmetrise(
@@ -85,7 +88,8 @@ def symmetrise(
     :param name: name of symmetrized tensor.
     """
     for c in dims[1:]:
-        xr.align(tensor[dims[0]], tensor[c], join="exact")
+        assert np.allclose(tensor[dims[0]].values, tensor[c].values)
+        # xr.align(tensor[dims[0]], tensor[c], join="exact")
 
     transpose_map = dict(zip(dims, dims[::-1]))
     sij = 0.5 * (tensor + tensor.rename(transpose_map))

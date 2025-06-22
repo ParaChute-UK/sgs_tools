@@ -6,10 +6,6 @@ from pandas import to_numeric
 
 from sgs_tools.io.um import restrict_ds
 
-base_field_dict = {"th": "theta", "p": "P"}
-
-coord_dict = {"zn": "z_theta"}
-
 
 def data_ingest_MONC_on_single_grid(
     fname_pattern,
@@ -38,6 +34,11 @@ def data_ingest_MONC_on_single_grid(
             metadata[k] = to_numeric(v, errors="ignore")  # type: ignore
     metadata = dict(sorted(metadata.items()))
     del ds["options_database"]
+
+    ds = ds.squeeze()
+
+    base_field_dict = {"th": "theta", "p": "P"}
+    coord_dict = {"zn": "z_theta"}
 
     ds = ds.squeeze()
     # change variable names

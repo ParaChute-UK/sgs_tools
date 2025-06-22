@@ -4,13 +4,9 @@ from typing import Any
 
 from numpy import array, inf
 from sgs_tools.scripts.arg_parsers import add_dask_group, add_plotting_group
-from sgs_tools.scripts.BasicComparisonSimAnalysis import (
-    io,
-    plot,
-    prof_fields,
-    slice_fields,
-)
 from sgs_tools.util.timer import timer
+
+from .BasicComparisonSimAnalysis import io, plot, prof_fields, slice_fields
 
 plotting_styles = [
     {

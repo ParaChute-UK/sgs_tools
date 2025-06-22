@@ -1,11 +1,17 @@
 from dataclasses import dataclass
+from typing import Hashable
 
 import xarray as xr  # only used for type hints
 
 from ..geometry.tensor_algebra import Frobenius_norm
 from .dynamic_sgs_model import DynamicModel, LeonardThetaTensor, LeonardVelocityTensor
 from .filter import Filter
-from .util import _assert_coord_dx
+
+
+# check that arr is uniform along `filter_dims` with spacing of `dx`
+def _assert_coord_dx(filter_dims: list[Hashable], arr: xr.DataArray, dx: float) -> None:
+    for c in filter_dims:
+        assert (arr[c].diff(dim=c) == dx).all(), f"Not uniform dimension {c}: {arr[c]}"
 
 
 @dataclass(frozen=True)

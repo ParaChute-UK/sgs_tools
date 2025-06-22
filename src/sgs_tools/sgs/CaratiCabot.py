@@ -178,7 +178,7 @@ class NVelocityModel:
         )
 
 
-def DynamicCaratiCabotModel(
+def DynamicCaratiCabotModel2(
     sij: xr.DataArray,
     vel: xr.DataArray,
     res: float,
@@ -188,6 +188,49 @@ def DynamicCaratiCabotModel(
 ) -> LinCombDynamicModel:
     """Dynamic version of the model by
     Carati & Cabot Proceedings of the 1996 Summer Program -- Center for Turbulence Research
+    the model version without the third term NiNj
+
+    :param sij: grid-scale rate-of-strain tensor
+    :param vel: velocity field used for dynamic coefficient computation
+    :param res: constant resolution with respect to dimension to-be-filtered
+    :param compoment_coeff: tuple of three Smagorinsky coefficients for parallel, perpendicular, and normal components
+    :param n: triple of floats to be coerced as a 3d constant vector along one of the tensor dimensions
+    :param tensor_dims: labels of dimensions indexing tensor components, defaults to ("c1", "c2")
+    :return: Combined SGS model with dynamically computed coefficients
+    """
+    static_model = LinCombSGSModel(
+        [
+            SparallelVelocityModel(
+                strain=sij,
+                cs=compoment_coeff[0],
+                dx=res,
+                n=n,
+                tensor_dims=tensor_dims,
+            ),
+            SperpVelocityModel(
+                strain=sij,
+                cs=compoment_coeff[1],
+                dx=res,
+                n=n,
+                tensor_dims=tensor_dims,
+            )
+        ]
+    )
+    leonard = LeonardVelocityTensor(vel, tensor_dims)
+    return LinCombDynamicModel(static_model, leonard)
+
+
+def DynamicCaratiCabotModel3(
+    sij: xr.DataArray,
+    vel: xr.DataArray,
+    res: float,
+    compoment_coeff: Sequence[float],
+    n=Sequence[float],
+    tensor_dims: tuple[str, str] = ("c1", "c2"),
+) -> LinCombDynamicModel:
+    """Dynamic version of the model by
+    Carati & Cabot Proceedings of the 1996 Summer Program -- Center for Turbulence Research
+    Adding the ignored term NiNj
 
     :param sij: grid-scale rate-of-strain tensor
     :param vel: velocity field used for dynamic coefficient computation

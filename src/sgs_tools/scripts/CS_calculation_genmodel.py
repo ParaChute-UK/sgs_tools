@@ -19,7 +19,7 @@ from sgs_tools.scripts.arg_parsers import (
     add_input_group,
     add_plotting_group,
 )
-from sgs_tools.sgs.CaratiCabot import DynamicCaratiCabotModel
+from sgs_tools.sgs.CaratiCabot import DynamicCaratiCabotModel3
 from sgs_tools.sgs.dynamic_coefficient import (
     LillyMinimisation1Model,
     LillyMinimisation2Model,
@@ -376,7 +376,7 @@ def main() -> None:
 
         if "Carati" in args["sgs_model"]:
             with timer(f"    Cs_CaratiCabot", "s"):
-                dyn_carati_vel = DynamicCaratiCabotModel(
+                dyn_carati_vel = DynamicCaratiCabotModel3(
                     output.sij,
                     res=args["h_resolution"],
                     compoment_coeff=[1.0, 1.0, 1.0],

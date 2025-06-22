@@ -14,6 +14,11 @@ from sgs_tools.geometry.vector_calculus import grad_scalar
 from sgs_tools.io.monc import data_ingest_MONC_on_single_grid
 from sgs_tools.io.um import data_ingest_UM_on_single_grid
 from sgs_tools.physics.fields import strain_from_vel
+from sgs_tools.scripts.arg_parsers import (
+    add_dask_group,
+    add_input_group,
+    add_plotting_group,
+)
 from sgs_tools.sgs.dynamic_coefficient import LillyMinimisation1Model
 from sgs_tools.sgs.filter import Filter, box_kernel, weight_gauss_3d, weight_gauss_5d
 from sgs_tools.sgs.Smagorinsky import (
@@ -25,8 +30,6 @@ from sgs_tools.sgs.Smagorinsky import (
 from sgs_tools.util.path_utils import add_extension
 from sgs_tools.util.timer import timer
 from xarray.core.types import T_Xarray
-
-from .arg_parsers import add_dask_group, add_input_group, add_plotting_group
 
 
 def parser() -> dict[str, Any]:

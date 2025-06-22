@@ -341,12 +341,12 @@ def main() -> None:
         # setup dynamic Smagorinsky model for velocity
         dyn_smag_vel = DynamicSmagorinskyVelocityModel(
             SmagorinskyVelocityModel(
-                vel=vel,
                 strain=sij,
                 cs=1.0,
                 dx=args["h_resolution"],
                 tensor_dims=("c1", "c2"),
-            )
+            ),
+            vel.reset_coords(names="vel", drop=True),
         )
         if "Smag_vel" in args["sgs_model"]:
             with timer(f"    Cs_isotropic", "s"):
@@ -423,13 +423,13 @@ def main() -> None:
         # setup dynamic Smagorinsky model for potential temperature
         dyn_smag_theta = DynamicSmagorinskyHeatModel(
             SmagorinskyHeatModel(
-                vel=vel.reset_coords(names="vel", drop=True),
                 grad_theta=grad_theta,
                 strain=sij,
                 ctheta=1.0,
                 dx=args["h_resolution"],
                 tensor_dims=("c1", "c2"),
             ),
+            vel.reset_coords(names="vel", drop=True),
             simulation["theta"],
         )
         if "Smag_theta" in args["sgs_model"]:

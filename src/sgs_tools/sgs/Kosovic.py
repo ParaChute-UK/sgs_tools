@@ -96,6 +96,42 @@ class SOmegaVelocityModel:
         return tau
 
 
+def DynamicKosovicModel2(
+    sij: xr.DataArray,
+    vel: xr.DataArray,
+    res: float,
+    compoment_coeff: Sequence[float],
+    tensor_dims: tuple[str, str] = ("c1", "c2"),
+) -> LinCombDynamicModel:
+    """Dynamic version of the model by
+    Kosovic 1997 JFM vol. 336, pp. 151–182 model without the S-Omega term
+
+    :param sij: grid-scale rate-of-strain tensor
+    :param vel: velocity field used for dynamic coefficient computation
+    :param res: constant resolution with respect to dimension to-be-filtered
+    :param compoment_coeff: tuple of three Smagorinsky coefficients for parallel, perpendicular, and normal components
+    :param tensor_dims: labels of dimensions indexing tensor components, defaults to ("c1", "c2")
+    :return: Combined SGS model with dynamically computed coefficients
+    """
+    static_model = LinCombSGSModel(
+        [
+            SmagorinskyVelocityModel(strain=sij,
+                cs=compoment_coeff[0],
+                dx=res,
+                tensor_dims=tensor_dims,
+            ),
+            SSquaredVelocityModel(
+                strain=sij,
+                cs=compoment_coeff[1],
+                dx=res,
+                tensor_dims=tensor_dims,
+            )
+        ]
+    )
+    leonard = LeonardVelocityTensor(vel, tensor_dims)
+    return LinCombDynamicModel(static_model, leonard)
+
+
 def DynamicKosovicModel3(
     sij: xr.DataArray,
     omegaij: xr.DataArray,

@@ -28,7 +28,7 @@ from sgs_tools.sgs.dynamic_coefficient import (
 )
 from sgs_tools.sgs.dynamic_sgs_model import DynamicModel, LinCombDynamicModel
 from sgs_tools.sgs.filter import Filter, box_kernel, weight_gauss_3d, weight_gauss_5d
-from sgs_tools.sgs.Kosovic import DynamicKosovicModel
+from sgs_tools.sgs.Kosovic import DynamicKosovicModel3
 from sgs_tools.sgs.Smagorinsky import (
     DynamicSmagorinskyHeatModel,
     DynamicSmagorinskyVelocityModel,
@@ -399,16 +399,16 @@ def main() -> None:
 
         if "Kosovic" in args["sgs_model"]:
             with timer(f"    Cs_Kosovic", "s"):
-                dyn_kosovic_vel = DynamicKosovicModel(
+                dyn_kosovic_vel = DynamicKosovicModel3(
                     output.sij,
                     output.omegaij,
                     res=args["h_resolution"],
-                    compoment_coeff=[1.0, 1.0],
+                    compoment_coeff=[1.0, 1.0, 1.0],
                     tensor_dims=("c1", "c2"),
                     vel=output.vel,
                 )
                 minimisations2 = [
-                    LillyMinimisation2Model(
+                    LillyMinimisation3Model(
                         filt, contraction_dims=["c1", "c2"], coeff_dim="cdim"
                     )
                     for filt in regularization_filters

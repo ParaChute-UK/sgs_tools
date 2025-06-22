@@ -8,6 +8,7 @@ from ..geometry.tensor_algebra import (
     symmetrise,
     traceless,
 )
+from .Smagorinsky import SmagorinskyVelocityModel
 from .dynamic_sgs_model import LeonardVelocityTensor, LinCombDynamicModel
 from .filter import Filter
 from .sgs_model import LinCombSGSModel
@@ -95,7 +96,7 @@ class SOmegaVelocityModel:
         return tau
 
 
-def DynamicKosovicModel(
+def DynamicKosovicModel3(
     sij: xr.DataArray,
     omegaij: xr.DataArray,
     vel: xr.DataArray,
@@ -104,7 +105,7 @@ def DynamicKosovicModel(
     tensor_dims: tuple[str, str] = ("c1", "c2"),
 ) -> LinCombDynamicModel:
     """Dynamic version of the model by
-    Carati & Cabot Proceedings of the 1996 Summer Program -- Center for Turbulence Research
+    Kosovic 1997 JFM vol. 336, pp. 151–182 full model
 
     :param sij: grid-scale rate-of-strain tensor
     :param omegaij: grid-scale rate-of-rotation tensor
@@ -116,16 +117,21 @@ def DynamicKosovicModel(
     """
     static_model = LinCombSGSModel(
         [
+            SmagorinskyVelocityModel(strain=sij,
+                cs=compoment_coeff[0],
+                dx=res,
+                tensor_dims=tensor_dims,
+            ),
             SSquaredVelocityModel(
                 strain=sij,
-                cs=compoment_coeff[0],
+                cs=compoment_coeff[1],
                 dx=res,
                 tensor_dims=tensor_dims,
             ),
             SOmegaVelocityModel(
                 strain=sij,
                 rot=omegaij,
-                cs=compoment_coeff[1],
+                cs=compoment_coeff[2],
                 dx=res,
                 tensor_dims=tensor_dims,
             ),

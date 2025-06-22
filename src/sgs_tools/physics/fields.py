@@ -3,10 +3,16 @@ from typing import Callable, Collection, Iterable
 import xarray as xr
 
 from ..geometry.staggered_grid import compose_vector_components_on_grid
-from ..geometry.tensor_algebra import symmetrise, tensor_self_outer_product, traceless
+from ..geometry.tensor_algebra import (
+    antisymmetrise,
+    symmetrise,
+    tensor_self_outer_product,
+    traceless,
+)
 from ..geometry.vector_calculus import grad_vector
+from ..util.dask_opt_util import dask_layered
 
-
+@dask_layered
 def strain_from_vel(
     vel: xr.Dataset | Iterable[xr.DataArray],
     space_dims: Iterable[str],
@@ -36,7 +42,34 @@ def strain_from_vel(
     sij.attrs["long_name"] = r"$S$"
     return sij
 
+@dask_layered
+def omega_from_vel(
+    vel: xr.Dataset | Iterable[xr.DataArray],
+    space_dims: Iterable[str],
+    vec_dim: str,
+    new_dim: str = "c2",
+    grad_operator: Callable = grad_vector,
+) -> xr.DataArray:
+    """compute rate of rotation tensor from velocity
 
+    :param vel: input velocity array (on collocated grid)
+    :param space_dims: labels of spacial dimensions
+    :param vec_dim: label of vector dimension
+    :param new_dim: label of new dimension indexing derivatives
+    :param grad_operator: operator that computes vector gradient (To be replaced by a grid)
+    """
+    gradvel = grad_operator(vel, space_dims, new_dim)
+    # perform manual alignment of c1 and c2 indices (assumed sorted)
+    c2 = gradvel[new_dim].data
+    gradvel[new_dim] = gradvel[vec_dim].data
+    sij = antisymmetrise(gradvel, [vec_dim, new_dim])
+
+    sij[new_dim] = c2
+    sij.name = "rate-of-rotation"
+    sij.attrs["long_name"] = r"$\Omega$"
+    return sij
+
+@dask_layered
 def vertical_heat_flux(
     vert_vel: xr.DataArray,
     pot_temperature: xr.DataArray,
@@ -63,7 +96,7 @@ def vertical_heat_flux(
     ans.attrs["long_name"] = r"$w' \theta'$ "
     return ans
 
-
+@dask_layered
 def Reynolds_fluct_stress(
     u: xr.DataArray,
     v: xr.DataArray,
@@ -99,3 +132,13 @@ def Reynolds_fluct_stress(
     ans.name = "Reynolds_fluct_stress"
     ans.attrs["long_name"] = r"$u'_i u'_j$"
     return ans
+
+@dask_layered
+def anisotropy_tensor(vel: xr.DataArray) -> xr.DataArray:
+    """compute anisotropy tensor from velocity
+
+    :param vel: velocity field
+    """
+    assert set(vel.dims) == set(["c1", "x", "y", "z"]), "Unexpected dimensions"
+
+    raise NotImplementedError()

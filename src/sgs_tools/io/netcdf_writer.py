@@ -12,8 +12,7 @@ class NetCDFWriter:
         return filename.exists()
 
     def write(self, array: xr.Dataset, filename: Path) -> None:
-        if self.check_filename(filename):
-            if not self.overwrite:
+        if not self.overwrite and self.check_filename(filename):
                 raise OSError(f"{filename} already exists. Won't overwrite.")
         filename.parent.mkdir(exist_ok=True, parents=True)
         array.to_netcdf(

@@ -1,0 +1,228 @@
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Any, Dict, Sequence
+
+import dask
+import dask.array as da
+import numpy as np
+import xarray as xr
+from dask.diagnostics import ProgressBar
+from sgs_tools.util.timer import timer
+
+from sgs_tools.io.netcdf_writer import NetCDFWriter
+from sgs_tools.diagnostics.directional_profile import directional_profile
+
+base_fields = ['u', 'v', 'w', 'theta']
+v_profile_fields = [
+    "vel",
+    "theta",
+    "s",
+    "vert_heat_flux",
+    "vert_mom_flux",
+    "fluct_ke",
+    "tke",
+    "smag_visc_m",
+    "smag_visc_h",
+    "smag_visc_m_vert",
+    "smag_visc_h_vert",
+    "csDelta",
+    "cs_theta",
+    "cs_diag",
+    "cs_theta_diag",
+]
+
+all_fields = (
+    set(base_fields).union(v_profile_fields)
+)
+
+v_prof_name = "post_proc_vert_profiles.nc"
+
+def parse_args(args:Sequence[str]=None) -> Dict[str, Any]:
+    from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
+
+    from sgs_tools.scripts.arg_parsers import add_dask_group, add_input_group
+
+    parser = ArgumentParser(
+        description="""Post process a simulation and save result as NetCDF files
+                """,
+        formatter_class=ArgumentDefaultsHelpFormatter,
+    )
+
+    add_input_group(parser)
+
+    output = parser.add_argument_group("Output datasets on disk")
+    output.add_argument(
+        "output_path",
+        type=Path,
+        help="""output directory, where to store post-processed results
+                will create any missing intermediate directories""",
+    )
+    output.add_argument(
+        "--overwrite_existing",
+        action="store_true",
+        help="""behaviour if diagnostic file already exists. default: skip diagnostic""",
+    )
+    analysis = parser.add_argument_group("Analysis")
+
+    analysis.add_argument(
+        "--vertical_profiles",
+        action="store_true",
+        help="""Vertical profiles""",
+    )
+    
+    add_dask_group(parser)
+
+    # parse arguments into a dictionary
+    args = vars(parser.parse_args(args))
+
+    # add any pottentially missing file extension
+    assert args["output_path"].is_dir()
+
+    # parse negative values in the [t,z]_range
+    if args["t_range"][0] < 0:
+        args["t_range"][0] = -np.inf
+    if args["t_range"][1] < 0:
+        args["t_range"][1] = np.inf
+
+    args["t_range="] = np.sort(args["t_range"])
+
+    if args["z_range"][0] < 0:
+        args["z_range"][0] = -np.inf
+    if args["z_range"][1] < 0:
+        args["z_range"][1] = np.inf
+    args["z_range="] = np.sort(args["z_range"])
+
+    return args
+
+
+def read(
+    fname: Path,
+    resolution: float,
+    requested_fields: Sequence[str],
+    t_range: Sequence[float],
+    z_range: Sequence[float],
+) -> xr.Dataset:
+    from sgs_tools.io.um import data_ingest_UM_on_single_grid
+
+    simulation = data_ingest_UM_on_single_grid(
+        fname,
+        resolution,
+        requested_fields=requested_fields,
+    )
+    simulation = data_slice(simulation, t_range, z_range)
+ 
+    return simulation
+
+
+def data_slice(
+    ds: xr.Dataset, t_range: Sequence[float], z_range: Sequence[float]
+) -> xr.Dataset:
+    """restrit ds to the intervals inside [t,z]_range.
+       Restrict a set of standard coordinate names for t and z.
+    :param ds: input dataset/dataarray
+    :param t_range: time interval
+    :param t_range: verical interval
+    """
+
+    for z in "z", "z_rho", "z_theta":
+        if z in ds:
+            zslice = ds[z].where((ds[z]>=z_range[0]) * (ds[z]<=z_range[1]))
+            z0 = zslice.argmin().item()
+            z1 = zslice.argmax().item()+1
+            ds = ds.isel({z:slice(z0,z1)})
+    for t in "t", "t_0":
+        if t in ds:
+            tslice = ds[t].where((ds[t]>=t_range[0]) * (ds[t]<=t_range[1]))
+            t0 = tslice.argmin().item()
+            t1 = tslice.argmax().item()+1
+            ds = ds.isel({t:slice(t0,t1)})
+    return ds
+
+
+# create simple post-processing fields
+def post_process_fields(simulation: xr.Dataset) -> xr.Dataset:
+    from sgs_tools.geometry.tensor_algebra import Frobenius_norm
+    from sgs_tools.physics.fields import (
+        Fluct_TKE,
+        compose_vector_components_on_grid,
+        strain_from_vel,
+        vertical_heat_flux,
+    )
+    simulation["vel"] = compose_vector_components_on_grid(
+        [simulation["u"], simulation["v"], simulation["w"]],
+        target_dims=["x", "y", "z"],
+    )
+
+    simulation["vert_heat_flux"] = vertical_heat_flux(
+        simulation["w"], simulation["theta"], ["x", "y"]
+    )
+    simulation["Sij"] = strain_from_vel(
+        simulation["vel"],
+        space_dims=["x", "y", "z"],
+        vec_dim="c1",
+        new_dim="c2",
+        make_traceless=True,
+    )
+    simulation["s"] = Frobenius_norm(simulation["Sij"], ["c1", "c2"])
+
+    simulation["vert_mom_flux"] = simulation["vel"] * simulation["w"]
+
+    simulation["fluct_ke"] = Fluct_TKE(
+        simulation["u"], simulation["v"], simulation["w"], ["x", "y", "z"], ["x", "y"]
+    )
+
+    try:
+        simulation["cs_diag"] = compose_vector_components_on_grid(
+            [simulation["cs_1"], simulation["cs_2"], simulation["cs_3"]],
+            target_dims=[],
+            vector_dim="c1",
+        )
+    except KeyError:
+        print ("Skipping missing inputs for cs_diag")
+
+    try:
+        simulation["cs_theta_diag"] = compose_vector_components_on_grid(
+            [simulation["cs_theta_1"], simulation["cs_theta_2"], simulation["cs_theta_3"]],
+            target_dims=[],
+            vector_dim="c1",
+        )
+    except KeyError:
+        print ("Skipping missing inputs for cs_theta_diag")
+
+
+    return simulation
+
+
+def main(args: Dict[str, Any]) -> None:
+    simulation = read(
+        args["input_files"],
+        args["h_resolution"],
+        all_fields,
+        args["t_range"],
+        args["z_range"],
+    )
+    simulation = post_process_fields(simulation)
+
+    writer = NetCDFWriter(overwrite=args["overwrite_existing"])
+    output_dir = args["output_path"]
+
+    hdims = ["x", "y"]
+
+    if args['vertical_profiles']:
+        with timer("Vertical profiles", "s"):
+            f_pr = [f for f in v_profile_fields if f in simulation]
+            f_missing = [f for f in v_profile_fields if f not in simulation]
+            if f_missing:
+                print(f"Missing vertical profile fields {f_missing}")
+            # don't overwrite but skip existing filters/scales
+            output_path = output_dir/v_prof_name
+            if writer.check_filename(output_path) and not writer.overwrite:
+               print (f"Warning: Skip existing file {output_path}.")
+            else:
+                directional_profile(simulation[f_pr], hdims, writer, output_path)
+
+
+if __name__ == "__main__":
+    args = parse_args()
+    with timer("Total execution time", "min"):
+        main(args)

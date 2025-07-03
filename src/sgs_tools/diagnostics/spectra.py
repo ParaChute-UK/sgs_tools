@@ -135,7 +135,7 @@ def spectra_1d_nd_radial(
     extra_coords = []
     for x in hdims:
         extra_coords += [
-            d for d in simulation.coords if d != x and simulation[d].dims[0] == x
+            d for d in simulation.coords if d != x and x in simulation[d].dims
         ]
     sim = simulation.drop_vars(extra_coords, errors="ignore")
 

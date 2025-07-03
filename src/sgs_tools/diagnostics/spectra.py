@@ -112,7 +112,7 @@ def radial_spectrum(
         iso_ps[prefix + "dA"].attrs["description"] = "pi * (rmax^2 - rmin^2)"
         if not truncate:
             msg = "Energy density scaling is inconsistent beyond the min(max(linear frequency)). Interpete with caution!"
-            warnings.warn(msg, FutureWarning)
+            warnings.warn(msg)
     elif scaling == "spectrum":
         iso_ps = iso_ps.assign_coords({prefix + "dA": (dim_name, np.ones_like(iso_ps))})
     else:

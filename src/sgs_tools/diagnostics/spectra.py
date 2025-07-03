@@ -152,7 +152,7 @@ def spectra_1d_nd_radial(
                 prefix="k_",
                 true_phase=True,
             )
-        spec[f"{field}_F{''.join(hdims)}"] = xrft.power_spectrum(
+        nd_spectrum = xrft.power_spectrum(
             data,
             dim=hdims,
             scaling="density",
@@ -160,7 +160,7 @@ def spectra_1d_nd_radial(
             detrend=None,
         )
         spec[f"{field}_Fr"] = radial_spectrum(
-            spec[f"{field}_F{''.join(hdims)}"],
+            nd_spectrum,
             fftdim=[f"k_{x}" for x in hdims],
             nbins=max([data[d].size for d in hdims]) // radial_smooth_factor,
             bin_anchor="left",
@@ -183,11 +183,11 @@ def spectra_1d_nd_radial(
                 true_phase=True,
                 detrend=None,
             )
-        spec[f"{field1}_{field2}_F{''.join(hdims)}"] = xrft.cross_spectrum(
+        nd_spectrum = xrft.cross_spectrum(
             data1, data2, dim=hdims, scaling="density", prefix="k_", true_phase=True
         )
         spec[f"{field1}_{field2}_Fr"] = radial_spectrum(
-            spec[f"{field1}_{field2}_F{''.join(hdims)}"],
+            nd_spectrum,
             fftdim=[f"k_{x}" for x in hdims],
             nbins=max([data[d].size for d in hdims]) // radial_smooth_factor,
             bin_anchor="left",

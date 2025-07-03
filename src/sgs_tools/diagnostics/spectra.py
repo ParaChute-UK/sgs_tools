@@ -1,11 +1,9 @@
 import warnings
-from pathlib import Path
 from typing import Sequence
 
 import numpy as np
 import xarray as xr
 import xrft  # type: ignore
-from sgs_tools.io.netcdf_writer import NetCDFWriter
 
 
 def radial_spectrum(
@@ -128,9 +126,7 @@ def spectra_1d_nd_radial(
     power_spectra_fields: Sequence[str],
     cross_spectra_fields: Sequence[tuple[str, str]],
     radial_smooth_factor: int = 2,
-    writer: NetCDFWriter,
-    output_path: Path,
-) -> None:
+) -> xr.Dataset:
     """
     :param: radial_smooth_factor: smoothing factor for radial spectral bins. If 2 will have radial bin widht is 2*linear wavenumber.
     Note: resulting spectral cooordinates are in units of inverse length, not radians/length.
@@ -199,9 +195,4 @@ def spectra_1d_nd_radial(
             scaling="density",
         )
 
-    spec_ds = xr.Dataset(spec).compute()
-
-    # rechunk for IO optimisation ??
-    # have to do explicit rechunking because UM date-time coordinate is an object
-    # spec_ds = spec_ds.chunk({dim: "auto" for dim in ["x", "y", "z"] if dim in spec_ds.dims})
-    writer.write(spec_ds, output_path)
+    return xr.Dataset(spec)

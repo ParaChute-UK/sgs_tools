@@ -242,7 +242,11 @@ def main(args: Dict[str, Any]) -> None:
             if writer.check_filename(output_path) and not writer.overwrite:
                 print(f"Warning: Skip existing file {output_path}.")
             else:
-                directional_profile(simulation[f_pr], hdims, writer, output_path)
+                profile = directional_profile(simulation[f_pr], hdims)
+                # rechunk for IO optimisation??
+                # have to do explicit rechunking because UM date-time coordinate is an object
+                # profile = profile.chunk({})
+                writer.write(profile, output_path)
 
     if args["horizontal_spectra"]:
         with timer("Horizontal spectra", "s", "Horizontal spectra"):
@@ -253,14 +257,17 @@ def main(args: Dict[str, Any]) -> None:
             if writer.check_filename(output_path) and not writer.overwrite:
                 print(f"Warning: Skip existing file {output_path}.")
             else:
-                spectra_1d_nd_radial(
+                spec_ds = spectra_1d_nd_radial(
                     simulation[spec_fields],
                     hdims,
                     power_spectra_fields,
                     cross_spectra_fields,
-                    writer,
-                    output_path,
                 )
+
+                # rechunk for IO optimisation ??
+                # have to do explicit rechunking because UM date-time coordinate is an object
+                # spec_ds = spec_ds.chunk({dim: "auto" for dim in ["x", "y", "z"] if dim in spec_ds.dims})
+                writer.write(spec_ds, output_path)
 
 
 if __name__ == "__main__":

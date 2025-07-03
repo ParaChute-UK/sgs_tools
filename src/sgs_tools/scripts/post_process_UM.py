@@ -242,7 +242,7 @@ def main(args: Dict[str, Any]) -> None:
             if writer.check_filename(output_path) and not writer.overwrite:
                 print(f"Warning: Skip existing file {output_path}.")
             else:
-                profile = directional_profile(simulation[f_pr], hdims)
+                profile = directional_profile(simulation[f_pr], hdims, ["mean", "std"])
                 # rechunk for IO optimisation??
                 # have to do explicit rechunking because UM date-time coordinate is an object
                 # profile = profile.chunk({})

@@ -33,7 +33,6 @@ power_spectra_fields = ["u", "v", "w", "theta"]
 cross_spectra_fields = [
     ("u", "w"),
     ("v", "w"),
-    ("w", "w"),
     ("u", "v"),
     ("theta", "w"),
 ]
@@ -262,6 +261,8 @@ def main(args: Dict[str, Any]) -> None:
                     hdims,
                     power_spectra_fields,
                     cross_spectra_fields,
+                    radial_smooth_factor=1,
+                    reduce_stats=["mean", "rms"],
                 )
 
                 # rechunk for IO optimisation ??

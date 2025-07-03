@@ -11,6 +11,7 @@ from sgs_tools.util.timer import timer
 
 from sgs_tools.io.netcdf_writer import NetCDFWriter
 from sgs_tools.diagnostics.directional_profile import directional_profile
+from sgs_tools.diagnostics.spectra import spectra_1d_nd_radial
 
 base_fields = ['u', 'v', 'w', 'theta']
 v_profile_fields = [
@@ -30,12 +31,23 @@ v_profile_fields = [
     "cs_diag",
     "cs_theta_diag",
 ]
+power_spectra_fields = ["u", "v", "w", "theta"]
+cross_spectra_fields = [
+    ("u", "w"),
+    ("v", "w"),
+    ("w", "w"),
+    ("u", "v"),
+    ("theta", "w"),
+]
 
 all_fields = (
-    set(base_fields).union(v_profile_fields)
+    set(base_fields)
+    .union(v_profile_fields)
+    .union(power_spectra_fields)
 )
 
 v_prof_name = "post_proc_vert_profiles.nc"
+spectra_name = "post_proc_spectra.nc"
 
 def parse_args(args:Sequence[str]=None) -> Dict[str, Any]:
     from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
@@ -69,7 +81,14 @@ def parse_args(args:Sequence[str]=None) -> Dict[str, Any]:
         action="store_true",
         help="""Vertical profiles""",
     )
-    
+
+    analysis.add_argument(
+        "--horizontal_spectra",
+        action="store_true",
+        help="""Horizontal power spectra and cross spectra
+            """,
+    )
+
     add_dask_group(parser)
 
     # parse arguments into a dictionary
@@ -220,6 +239,24 @@ def main(args: Dict[str, Any]) -> None:
                print (f"Warning: Skip existing file {output_path}.")
             else:
                 directional_profile(simulation[f_pr], hdims, writer, output_path)
+
+    if args["horizontal_spectra"]:
+        with timer("Horizontal spectra", "s", "Horizontal spectra"):
+            cross_fields_list = set([f for fl in cross_spectra_fields for f in fl])
+            spec_fields = set(power_spectra_fields).union(cross_fields_list)
+
+            output_path = output_dir / spectra_name
+            if writer.check_filename(output_path) and not writer.overwrite:
+                print(f"Warning: Skip existing file {output_path}.")
+            else:
+                spectra_1d_nd_radial(
+                    simulation[spec_fields],
+                    hdims,
+                    power_spectra_fields,
+                    cross_spectra_fields,
+                    writer,
+                    output_path,
+                )
 
 
 if __name__ == "__main__":

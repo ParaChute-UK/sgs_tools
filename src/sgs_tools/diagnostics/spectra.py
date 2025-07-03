@@ -5,6 +5,8 @@ import numpy as np
 import xarray as xr
 import xrft  # type: ignore
 
+from .directional_profile import directional_profile
+
 
 def radial_spectrum(
     ps: xr.DataArray,
@@ -126,6 +128,7 @@ def spectra_1d_nd_radial(
     power_spectra_fields: Sequence[str],
     cross_spectra_fields: Sequence[tuple[str, str]],
     radial_smooth_factor: int = 2,
+    reduce_stats: Sequence[str] = ["mean", "rms"],
 ) -> xr.Dataset:
     """
     :param: radial_smooth_factor: smoothing factor for radial spectral bins. If 2 will have radial bin widht is 2*linear wavenumber.
@@ -194,5 +197,7 @@ def spectra_1d_nd_radial(
             truncate=False,
             scaling="density",
         )
-
-    return xr.Dataset(spec)
+    # reduce along non-spectral hdims
+    spec_ds = xr.Dataset(spec)
+    reduced_spec = directional_profile(spec_ds, hdims, reduce_stats)
+    return reduced_spec

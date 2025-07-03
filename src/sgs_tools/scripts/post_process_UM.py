@@ -6,7 +6,7 @@ import numpy as np
 import xarray as xr
 from dask.diagnostics import ProgressBar
 from sgs_tools.diagnostics.directional_profile import directional_profile
-from sgs_tools.diagnostics.spectra import spectra_1d_nd_radial
+from sgs_tools.diagnostics.spectra import spectra_1d_radial
 from sgs_tools.io.netcdf_writer import NetCDFWriter
 
 from sgs_tools.util.timer import timer
@@ -257,7 +257,7 @@ def main(args: Dict[str, Any]) -> None:
             if writer.check_filename(output_path) and not writer.overwrite:
                 print(f"Warning: Skip existing file {output_path}.")
             else:
-                spec_ds = spectra_1d_nd_radial(
+                spec_ds = spectra_1d_radial(
                     simulation[spec_fields],
                     hdims,
                     power_spectra_fields,

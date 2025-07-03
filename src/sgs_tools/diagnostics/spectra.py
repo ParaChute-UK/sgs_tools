@@ -122,7 +122,7 @@ def radial_spectrum(
     return iso_ps
 
 
-def spectra_1d_nd_radial(
+def spectra_1d_radial(
     simulation: xr.Dataset,
     hdims: Sequence[str],
     power_spectra_fields: Sequence[str],

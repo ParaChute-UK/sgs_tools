@@ -23,6 +23,7 @@ requires-python = ">=3.11"
 dependencies = [
     "matplotlib>=3.6",
     "xarray[io,accel,parallel]>=2023.9",
+    "xrft",
     "f90nml"
 ]
 

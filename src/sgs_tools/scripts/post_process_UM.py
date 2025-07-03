@@ -1,19 +1,17 @@
-from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, Sequence
 
 import dask
-import dask.array as da
 import numpy as np
 import xarray as xr
 from dask.diagnostics import ProgressBar
-from sgs_tools.util.timer import timer
-
-from sgs_tools.io.netcdf_writer import NetCDFWriter
 from sgs_tools.diagnostics.directional_profile import directional_profile
 from sgs_tools.diagnostics.spectra import spectra_1d_nd_radial
+from sgs_tools.io.netcdf_writer import NetCDFWriter
 
-base_fields = ['u', 'v', 'w', 'theta']
+from sgs_tools.util.timer import timer
+
+base_fields = ["u", "v", "w", "theta"]
 v_profile_fields = [
     "vel",
     "theta",
@@ -49,7 +47,8 @@ all_fields = (
 v_prof_name = "post_proc_vert_profiles.nc"
 spectra_name = "post_proc_spectra.nc"
 
-def parse_args(args:Sequence[str]=None) -> Dict[str, Any]:
+
+def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
     from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
 
     from sgs_tools.scripts.arg_parsers import add_dask_group, add_input_group
@@ -72,7 +71,7 @@ def parse_args(args:Sequence[str]=None) -> Dict[str, Any]:
     output.add_argument(
         "--overwrite_existing",
         action="store_true",
-        help="""behaviour if diagnostic file already exists. default: skip diagnostic""",
+        help="""behaviour if diagnostic file already exists. default: skip""",
     )
     analysis = parser.add_argument_group("Analysis")
 
@@ -92,7 +91,7 @@ def parse_args(args:Sequence[str]=None) -> Dict[str, Any]:
     add_dask_group(parser)
 
     # parse arguments into a dictionary
-    args = vars(parser.parse_args(args))
+    args = vars(parser.parse_args(arguments))
 
     # add any pottentially missing file extension
     assert args["output_path"].is_dir()
@@ -117,7 +116,7 @@ def parse_args(args:Sequence[str]=None) -> Dict[str, Any]:
 def read(
     fname: Path,
     resolution: float,
-    requested_fields: Sequence[str],
+    requested_fields: list[str],
     t_range: Sequence[float],
     z_range: Sequence[float],
 ) -> xr.Dataset:
@@ -129,7 +128,7 @@ def read(
         requested_fields=requested_fields,
     )
     simulation = data_slice(simulation, t_range, z_range)
- 
+
     return simulation
 
 
@@ -145,16 +144,17 @@ def data_slice(
 
     for z in "z", "z_rho", "z_theta":
         if z in ds:
-            zslice = ds[z].where((ds[z]>=z_range[0]) * (ds[z]<=z_range[1]))
-            z0 = zslice.argmin().item()
-            z1 = zslice.argmax().item()+1
-            ds = ds.isel({z:slice(z0,z1)})
+            zslice = ds[z].where((ds[z] >= z_range[0]) * (ds[z] <= z_range[1]))
+            z0 = zslice.argmin(...)[z].item()
+            z1 = zslice.argmax(...)[z].item() + 1
+
+            ds = ds.isel({z: slice(z0, z1)})
     for t in "t", "t_0":
         if t in ds:
-            tslice = ds[t].where((ds[t]>=t_range[0]) * (ds[t]<=t_range[1]))
-            t0 = tslice.argmin().item()
-            t1 = tslice.argmax().item()+1
-            ds = ds.isel({t:slice(t0,t1)})
+            tslice = ds[t].where((ds[t] >= t_range[0]) * (ds[t] <= t_range[1]))
+            t0 = tslice.argmin(...)[t].item()
+            t1 = tslice.argmax(...)[t].item() + 1
+            ds = ds.isel({t: slice(t0, t1)})
     return ds
 
 
@@ -167,6 +167,7 @@ def post_process_fields(simulation: xr.Dataset) -> xr.Dataset:
         strain_from_vel,
         vertical_heat_flux,
     )
+
     simulation["vel"] = compose_vector_components_on_grid(
         [simulation["u"], simulation["v"], simulation["w"]],
         target_dims=["x", "y", "z"],
@@ -197,17 +198,20 @@ def post_process_fields(simulation: xr.Dataset) -> xr.Dataset:
             vector_dim="c1",
         )
     except KeyError:
-        print ("Skipping missing inputs for cs_diag")
+        print("Skipping missing inputs for cs_diag")
 
     try:
         simulation["cs_theta_diag"] = compose_vector_components_on_grid(
-            [simulation["cs_theta_1"], simulation["cs_theta_2"], simulation["cs_theta_3"]],
+            [
+                simulation["cs_theta_1"],
+                simulation["cs_theta_2"],
+                simulation["cs_theta_3"],
+            ],
             target_dims=[],
             vector_dim="c1",
         )
     except KeyError:
-        print ("Skipping missing inputs for cs_theta_diag")
-
+        print("Skipping missing inputs for cs_theta_diag")
 
     return simulation
 
@@ -216,7 +220,7 @@ def main(args: Dict[str, Any]) -> None:
     simulation = read(
         args["input_files"],
         args["h_resolution"],
-        all_fields,
+        list(all_fields),
         args["t_range"],
         args["z_range"],
     )
@@ -227,16 +231,16 @@ def main(args: Dict[str, Any]) -> None:
 
     hdims = ["x", "y"]
 
-    if args['vertical_profiles']:
+    if args["vertical_profiles"]:
         with timer("Vertical profiles", "s"):
             f_pr = [f for f in v_profile_fields if f in simulation]
             f_missing = [f for f in v_profile_fields if f not in simulation]
             if f_missing:
                 print(f"Missing vertical profile fields {f_missing}")
             # don't overwrite but skip existing filters/scales
-            output_path = output_dir/v_prof_name
+            output_path = output_dir / v_prof_name
             if writer.check_filename(output_path) and not writer.overwrite:
-               print (f"Warning: Skip existing file {output_path}.")
+                print(f"Warning: Skip existing file {output_path}.")
             else:
                 directional_profile(simulation[f_pr], hdims, writer, output_path)
 

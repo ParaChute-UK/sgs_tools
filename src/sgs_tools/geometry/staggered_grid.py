@@ -146,7 +146,7 @@ def compose_vector_components_on_grid(
 def diff_lin_on_grid(
     ds: xr.DataArray, dim: str, periodic_field: bool = False
 ) -> xr.DataArray:
-    """differentiate a dataarray on staggered grid
+    r"""differentiate a dataarray on staggered grid
     assumes that we have coordinate staggering as\:
 
     .. parsed-literal::

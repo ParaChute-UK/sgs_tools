@@ -42,7 +42,7 @@ def vertical_heat_flux(
     pot_temperature: xr.DataArray,
     hor_axes: Collection[str],
 ) -> xr.DataArray:
-    """compute vertical heat flux :math:`$w' \\theta'$` from :math:`w` and :math:`$\\theta$`
+    r"""compute vertical heat flux :math:`$w' \\theta'$` from :math:`w` and :math:`$\\theta$`
 
     :param vert_vel: vertical velocity field :math:`w`
     :param pot_temperature: potential temperature :math:`$\\theta$`
@@ -71,7 +71,7 @@ def Reynolds_fluct_stress(
     target_dims: list[str],
     fluctuation_axes: Collection[str],
 ) -> xr.DataArray:
-    """compute Reynolds stress :math:`$\mathbf{u}'_i \mathbf{u}'_j$`
+    r"""compute Reynolds stress :math:`$\mathbf{u}'_i \mathbf{u}'_j$`
 
     :param u: velocity field component 1
     :param v: velocity field component 2
@@ -108,7 +108,7 @@ def Fluct_TKE(
     target_dims: list[str],
     fluctuation_axes: Collection[str],
 ) -> xr.DataArray:
-    """compute Reynolds stress :math:`$\mathbf{u}'_i \mathbf{u}'_j$`
+    r"""compute Reynolds stress :math:`$\mathbf{u}'_i \mathbf{u}'_j$`
 
     :param u: velocity field component 1
     :param v: velocity field component 2
@@ -131,7 +131,7 @@ def Fluct_TKE(
     vel_prime = vel - vel.mean(dim=fluctuation_axes)
     vel_prime["c1"] = ["u'", "v'", "w'"]
     # take the outer product
-    ans = xr.dot(vel_prime, vel_prime, dim = 'c1')
+    ans = xr.dot(vel_prime, vel_prime, dim="c1")
     # add attributes
     ans.name = "fluct_tke"
     ans.attrs["long_name"] = r"$u'_i u'_i / 2$"

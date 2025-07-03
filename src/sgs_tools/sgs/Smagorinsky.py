@@ -31,7 +31,7 @@ class SmagorinskyVelocityModel:
     tensor_dims: tuple[str, str]
 
     def sgs_tensor(self, filter: Filter) -> xr.DataArray:
-        """compute model for SGS tensor
+        r"""compute model for SGS tensor
             :math:`$\\tau = (c_s \Delta) ^2 |\overline{Sij}| \overline{Sij}$`
             for a given `filter` (which can be trivial, i.e. ``IdentityFilter``)
 
@@ -68,7 +68,7 @@ class SmagorinskyHeatModel:
     tensor_dims: tuple[str, str]
 
     def sgs_tensor(self, filter):
-        """compute model for SGS tensor
+        r"""compute model for SGS tensor
             :math:`$\\tau =  c_\\theta \\Delta^2 |\overline{Sij}| \overline{\\nabla \\theta} $`
             for a given filter (which can be trivial, i.e. IdentityFilter)
 

@@ -45,7 +45,7 @@ def trace(
 def traceless(
     tensor: xr.DataArray, dims: tuple[str, str] = ("c1", "c2")
 ) -> xr.DataArray:
-    """returns a traceless version of `tensor`.
+    r"""returns a traceless version of `tensor`.
     **NB** \: bug/unexpected behaviour when nan in trace
 
     :param tensor: tensor input
@@ -65,7 +65,7 @@ def traceless(
 def Frobenius_norm(
     tensor: xr.DataArray, tens_dims: Sequence[str] = ["c1", "c2"]
 ) -> xr.DataArray:
-    """Frobenius norm of a tensor\: :math:`|A| = \sqrt{Aij Aij}`
+    r"""Frobenius norm of a tensor\: :math:`|A| = \sqrt{Aij Aij}`
 
     :param tensor: tensor input
     :param dims: dimensions with respect to which to take the norm.

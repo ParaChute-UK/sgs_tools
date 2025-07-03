@@ -127,10 +127,14 @@ def spectra_1d_nd_radial(
     hdims: Sequence[str],
     power_spectra_fields: Sequence[str],
     cross_spectra_fields: Sequence[tuple[str, str]],
+    radial_smooth_factor: int = 2,
     writer: NetCDFWriter,
     output_path: Path,
 ) -> None:
-    """Note: resulting cooordinates are in units of"""
+    """
+    :param: radial_smooth_factor: smoothing factor for radial spectral bins. If 2 will have radial bin widht is 2*linear wavenumber.
+    Note: resulting spectral cooordinates are in units of inverse length, not radians/length.
+    """
     spec = {}
     extra_coords = []
     for x in hdims:
@@ -139,10 +143,7 @@ def spectra_1d_nd_radial(
         ]
     sim = simulation.drop_vars(extra_coords, errors="ignore")
 
-    smooth = 2  # smoothing factor for radial spectral bins
-    # mypy magic
-    fftdim = [f"k_{x}" for x in hdims]
-
+    # power spectra
     for field in power_spectra_fields:
         data = sim[field]
         for x in hdims:
@@ -164,13 +165,14 @@ def spectra_1d_nd_radial(
         )
         spec[f"{field}_Fr"] = radial_spectrum(
             spec[f"{field}_F{''.join(hdims)}"],
-            fftdim=fftdim,
-            nbins=max([data[d].size for d in hdims]) // smooth,
+            fftdim=[f"k_{x}" for x in hdims],
+            nbins=max([data[d].size for d in hdims]) // radial_smooth_factor,
             bin_anchor="left",
             truncate=False,
             scaling="density",
         )
 
+    # cross spectra
     for field1, field2 in cross_spectra_fields:
         data1 = sim[field1]
         data2 = sim[field2]
@@ -190,8 +192,8 @@ def spectra_1d_nd_radial(
         )
         spec[f"{field1}_{field2}_Fr"] = radial_spectrum(
             spec[f"{field1}_{field2}_F{''.join(hdims)}"],
-            fftdim=fftdim,
-            nbins=max([data[d].size for d in hdims]) // smooth,
+            fftdim=[f"k_{x}" for x in hdims],
+            nbins=max([data[d].size for d in hdims]) // radial_smooth_factor,
             bin_anchor="left",
             truncate=False,
             scaling="density",

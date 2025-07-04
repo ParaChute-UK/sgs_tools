@@ -116,7 +116,7 @@ def compose_vector_components_on_grid(
     :param drop_coords: flag picked up by :meth:`interpolate_to_grid` to exclude spatial coordinates relying on removed dims from output
     """
     # interpolate
-    if target_dims is []:
+    if len(target_dims) == 0:
         assert all([components[0].dims == x.dims for x in components[1:]]), (
             "The components' dimensions don't match. "
             "Choose a set of dimensions to interpolate to!"

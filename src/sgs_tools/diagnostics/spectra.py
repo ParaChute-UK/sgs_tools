@@ -127,6 +127,7 @@ def spectra_1d_radial(
     power_spectra_fields: Sequence[str],
     cross_spectra_fields: Sequence[tuple[str, str]],
     radial_smooth_factor: int = 2,
+    fillnan: float = 0.0,
 ) -> xr.Dataset:
     """
     :param: radial_smooth_factor: smoothing factor for radial spectral bins. If 2 will have radial bin widht is 2*linear wavenumber.
@@ -145,7 +146,7 @@ def spectra_1d_radial(
 
     # power spectra
     for field in power_spectra_fields:
-        data = sim[field]
+        data = sim[field].fillna(fillnan)  # xrft doesn't play well with nan
         for x in hdims:
             spec[f"{field}_F{x}"] = xrft.power_spectrum(
                 data,
@@ -175,8 +176,8 @@ def spectra_1d_radial(
 
     # cross spectra
     for field1, field2 in cross_spectra_fields:
-        data1 = sim[field1]
-        data2 = sim[field2]
+        data1 = sim[field1].fillna(fillnan)  # xrft doesn't play well with nan
+        data2 = sim[field2].fillna(fillnan)  # xrft doesn't play well with nan
         for x in hdims:
             spec[f"{field1}_{field2}_F{x}"] = xrft.cross_spectrum(
                 data1,

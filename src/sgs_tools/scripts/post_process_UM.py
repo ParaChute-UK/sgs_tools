@@ -294,7 +294,7 @@ def main(args: Dict[str, Any]) -> None:
                     power_spectra_fields,
                     cross_spectra_fields,
                     radial_smooth_factor=1,
-                    reduce_stats=["mean", "rms"],
+                    reduce_stats=["mean"],
                 )
 
                 # rechunk for IO optimisation ??

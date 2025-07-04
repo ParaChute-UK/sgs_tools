@@ -12,7 +12,7 @@ from sgs_tools.io.netcdf_writer import NetCDFWriter
 from sgs_tools.util.timer import timer
 
 base_fields = ["u", "v", "w", "theta"]
-v_profile_fields = [
+v_profile_fields_out = [
     "vel",
     "theta",
     "s",
@@ -29,6 +29,34 @@ v_profile_fields = [
     "cs_diag",
     "cs_theta_diag",
 ]
+
+v_profile_fields_in = [
+    # base
+    "u",
+    "v",
+    "w",
+    "theta",
+    # sgs
+    "tke",
+    "csDelta",
+    "cs",
+    "cs_theta",
+    "cs_1",
+    "cs_2",
+    "cs_3",
+    "cs_theta_1",
+    "cs_theta_2",
+    "cs_theta_3",
+    # diffusivities
+    "s",
+    "smag_visc_m",
+    "smag_visc_h",
+    "smag_visc_m_vert",
+    "smag_visc_h_vert",
+    # stability
+    # "Richardson",
+]
+
 power_spectra_fields = ["u", "v", "w", "theta"]
 cross_spectra_fields = [
     ("u", "w"),
@@ -39,7 +67,7 @@ cross_spectra_fields = [
 
 all_fields = (
     set(base_fields)
-    .union(v_profile_fields)
+    .union(v_profile_fields_in)
     .union(power_spectra_fields)
 )
 
@@ -190,16 +218,17 @@ def post_process_fields(simulation: xr.Dataset) -> xr.Dataset:
         simulation["u"], simulation["v"], simulation["w"], ["x", "y", "z"], ["x", "y"]
     )
 
-    try:
+    if all([diag in simulation for diag in ["cs_1", "cs_2", "cs_3"]]):
         simulation["cs_diag"] = compose_vector_components_on_grid(
             [simulation["cs_1"], simulation["cs_2"], simulation["cs_3"]],
             target_dims=[],
             vector_dim="c1",
         )
-    except KeyError:
+    else:
+        print(sorted(simulation))
         print("Skipping missing inputs for cs_diag")
 
-    try:
+    if all([diag in simulation for diag in ["cs_theta_1", "cs_theta_2", "cs_theta_3"]]):
         simulation["cs_theta_diag"] = compose_vector_components_on_grid(
             [
                 simulation["cs_theta_1"],
@@ -209,7 +238,8 @@ def post_process_fields(simulation: xr.Dataset) -> xr.Dataset:
             target_dims=[],
             vector_dim="c1",
         )
-    except KeyError:
+    else:
+        print(sorted(simulation))
         print("Skipping missing inputs for cs_theta_diag")
 
     return simulation
@@ -232,8 +262,8 @@ def main(args: Dict[str, Any]) -> None:
 
     if args["vertical_profiles"]:
         with timer("Vertical profiles", "s"):
-            f_pr = [f for f in v_profile_fields if f in simulation]
-            f_missing = [f for f in v_profile_fields if f not in simulation]
+            f_pr = [f for f in v_profile_fields_out if f in simulation]
+            f_missing = [f for f in v_profile_fields_out if f not in simulation]
             if f_missing:
                 print(f"Missing vertical profile fields {f_missing}")
             # don't overwrite but skip existing filters/scales

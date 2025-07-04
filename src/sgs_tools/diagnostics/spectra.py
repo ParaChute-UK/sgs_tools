@@ -57,10 +57,11 @@ def radial_spectrum(
     freq_r = ((fftcoords**2).to_dataarray().sum("variable") ** 0.5).rename(dim_name)
 
     if nbins > max([fftcoords[d].shape[0] for d in fftcoords]):
-        warnings.warn(
+        msg = (
             f"nbins {nbins} > max number of linear frequencies"
             ", likely to have empty bins with nan values"
         )
+        warnings.warn(UserWarning(msg))
 
     # select radial bins
     if truncate:
@@ -128,7 +129,7 @@ def spectra_1d_radial(
     power_spectra_fields: Sequence[str],
     cross_spectra_fields: Sequence[tuple[str, str]],
     radial_smooth_factor: int = 2,
-    reduce_stats: Sequence[str] = ["mean", "rms"],
+    reduce_stats: Sequence[str] = ["mean"],
 ) -> xr.Dataset:
     """
     :param: radial_smooth_factor: smoothing factor for radial spectral bins. If 2 will have radial bin widht is 2*linear wavenumber.
@@ -141,6 +142,9 @@ def spectra_1d_radial(
             d for d in simulation.coords if d != x and x in simulation[d].dims
         ]
     sim = simulation.drop_vars(extra_coords, errors="ignore")
+    assert (
+        "r" not in hdims
+    ), "'r' dimension found in hdims, but it is reserved for radial spectra"
 
     # power spectra
     for field in power_spectra_fields:
@@ -169,6 +173,7 @@ def spectra_1d_radial(
             bin_anchor="left",
             truncate=False,
             scaling="density",
+            prefix="k_",
         )
 
     # cross spectra
@@ -196,8 +201,12 @@ def spectra_1d_radial(
             bin_anchor="left",
             truncate=False,
             scaling="density",
+            prefix="k_",
         )
     # reduce along non-spectral hdims
+    for f in spec:
+        if not f.endswith("_Fr"):
+            non_spec_hdims = [x for x in hdims if x in spec[f].dims]
+            spec[f] = directional_profile(spec[f], non_spec_hdims, reduce_stats)
     spec_ds = xr.Dataset(spec)
-    reduced_spec = directional_profile(spec_ds, hdims, reduce_stats)
-    return reduced_spec
+    return spec_ds

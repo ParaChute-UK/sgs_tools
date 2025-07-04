@@ -18,7 +18,7 @@ def profile_reduction(
     elif reduction == "median":
         data = da.median(reduction_dims)
     elif reduction == "rms":
-        data = ((da**2).mean(reduction_dims)) ** 0.5
+        data = ((da**2).sum(reduction_dims)) ** 0.5
     elif callable(reduction):
         data = reduction(da, reduction_dims)
     else:

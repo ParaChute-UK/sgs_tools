@@ -5,8 +5,6 @@ import numpy as np
 import xarray as xr
 import xrft  # type: ignore
 
-from .directional_profile import directional_profile
-
 
 def radial_spectrum(
     ps: xr.DataArray,
@@ -129,7 +127,6 @@ def spectra_1d_radial(
     power_spectra_fields: Sequence[str],
     cross_spectra_fields: Sequence[tuple[str, str]],
     radial_smooth_factor: int = 2,
-    reduce_stats: Sequence[str] = ["mean"],
 ) -> xr.Dataset:
     """
     :param: radial_smooth_factor: smoothing factor for radial spectral bins. If 2 will have radial bin widht is 2*linear wavenumber.
@@ -207,6 +204,20 @@ def spectra_1d_radial(
     for f in spec:
         if not f.endswith("_Fr"):
             non_spec_hdims = [x for x in hdims if x in spec[f].dims]
-            spec[f] = directional_profile(spec[f], non_spec_hdims, reduce_stats)
+            spec[f] = spec[f].sum(non_spec_hdims)
+            spec[f].attrs["statistic"] = f"sum_along_{non_spec_hdims}"
     spec_ds = xr.Dataset(spec)
+
+    # add clarifying attributes for linear spectra
+    for x in hdims:
+        spec_ds.attrs[f"N{x}"] = sim[x].size
+        # the fourier spectrum call ensures that the hdims coordinates
+        # are regularly spaced
+        spec_ds.attrs[f"d{x}"] = (sim[x][1] - sim[x][0]).item()
+
+    # add header clarifying spectral conventions
+    spec_ds.attrs["convention"] = """Total signal power =
+        = (g**2).sum([<x>,...]) * d<x> * ...
+        = g_F<x>.sum(k_<x>) * d<x>
+        = (g_Fr*F<k_dA>).sum(k_dr)* """
     return spec_ds

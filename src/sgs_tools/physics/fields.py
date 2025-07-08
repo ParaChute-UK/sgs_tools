@@ -108,7 +108,7 @@ def Fluct_TKE(
     target_dims: list[str],
     fluctuation_axes: Collection[str],
 ) -> xr.DataArray:
-    r"""compute Reynolds stress :math:`$\mathbf{u}'_i \mathbf{u}'_j$`
+    r"""compute fluctuating TKE :math:`$\mathbf{u}'_i \mathbf{u}'_i / 2$`
 
     :param u: velocity field component 1
     :param v: velocity field component 2
@@ -120,8 +120,9 @@ def Fluct_TKE(
         w.r.t which to compute the fluctuations. Subset of ``target_dims``.
 
     Note: First performs an interpolation to ``target_dims`` and then computes the fluctuations
-    w.r.t. ``fluctuation_axes``. There can be a commutation error when the
+    w.r.t. ``fluctuation_axes`` and then square. There can be a commutation error when the
     interpolation happens along dimensions other than ``fluctuation_axes``.
+    There is uncertainty from whether the interpolation happens before/after the squaring.
     """
     # first interpolate
     vel = compose_vector_components_on_grid(
@@ -131,7 +132,7 @@ def Fluct_TKE(
     vel_prime = vel - vel.mean(dim=fluctuation_axes)
     vel_prime["c1"] = ["u'", "v'", "w'"]
     # take the outer product
-    ans = xr.dot(vel_prime, vel_prime, dim="c1")
+    ans = xr.dot(vel_prime, vel_prime, dim="c1") / 2
     # add attributes
     ans.name = "fluct_tke"
     ans.attrs["long_name"] = r"$u'_i u'_i / 2$"

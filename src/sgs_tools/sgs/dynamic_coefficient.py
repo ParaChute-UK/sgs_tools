@@ -1,8 +1,7 @@
 import warnings
 from dataclasses import dataclass
-from typing import Any, Protocol, Sequence
+from typing import Protocol, Sequence
 
-import dask.array as da
 import numpy as np
 import xarray as xr
 

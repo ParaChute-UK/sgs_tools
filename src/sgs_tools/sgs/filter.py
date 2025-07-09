@@ -92,7 +92,6 @@ class Filter:
         return filtered
 
 
-
 @dataclass(frozen=True)
 class IdentityFilter(Filter):
     """identity filter

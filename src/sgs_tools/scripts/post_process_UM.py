@@ -1,14 +1,15 @@
 from pathlib import Path
 from typing import Any, Dict, Sequence
 
-import dask
 import numpy as np
 import xarray as xr
 from dask.diagnostics import ProgressBar
+from sgs_tools.diagnostics.anisotropy import anisotropy_analysis
 from sgs_tools.diagnostics.directional_profile import directional_profile
 from sgs_tools.diagnostics.spectra import spectra_1d_radial
 from sgs_tools.io.netcdf_writer import NetCDFWriter
-
+from sgs_tools.sgs.coarse_grain import CoarseGrain
+from sgs_tools.sgs.filter import Filter, box_kernel, weight_gauss_3d, weight_gauss_5d
 from sgs_tools.util.timer import timer
 
 base_fields = ["u", "v", "w", "theta"]
@@ -64,15 +65,18 @@ cross_spectra_fields = [
     ("u", "v"),
     ("theta", "w"),
 ]
+anisotropy_fields = ["u", "v", "w"]
 
 all_fields = (
     set(base_fields)
     .union(v_profile_fields_in)
     .union(power_spectra_fields)
+    .union(anisotropy_fields)
 )
 
 v_prof_name = "post_proc_vert_profiles.nc"
 spectra_name = "post_proc_spectra.nc"
+anisotropy_name = r"post_proc_anisotropy_{filt_lbl}.nc"
 
 
 def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
@@ -113,6 +117,12 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
         action="store_true",
         help="""Horizontal power spectra and cross spectra
             """,
+    )
+
+    analysis.add_argument(
+        "--anisotropy",
+        action="store_true",
+        help="""Anisotropy of velocity strain and stress""",
     )
 
     add_dask_group(parser)
@@ -198,6 +208,7 @@ def post_process_fields(simulation: xr.Dataset) -> xr.Dataset:
     simulation["vel"] = compose_vector_components_on_grid(
         [simulation["u"], simulation["v"], simulation["w"]],
         target_dims=["x", "y", "z"],
+        vector_dim="c1",
     )
 
     simulation["vert_heat_flux"] = vertical_heat_flux(
@@ -225,8 +236,8 @@ def post_process_fields(simulation: xr.Dataset) -> xr.Dataset:
             vector_dim="c1",
         )
     else:
-        print(sorted(simulation))
-        print("Skipping missing inputs for cs_diag")
+        print("Skipping missing inputs for cs_diag: " "['cs_1', 'cs_2', 'cs_3']")
+        print("Available fields:", sorted(simulation, key=str))
 
     if all([diag in simulation for diag in ["cs_theta_1", "cs_theta_2", "cs_theta_3"]]):
         simulation["cs_theta_diag"] = compose_vector_components_on_grid(
@@ -239,8 +250,11 @@ def post_process_fields(simulation: xr.Dataset) -> xr.Dataset:
             vector_dim="c1",
         )
     else:
-        print(sorted(simulation))
-        print("Skipping missing inputs for cs_theta_diag")
+        print(
+            "Skipping missing inputs for cs_theta_diag: "
+            "['cs_theta_1', 'cs_theta_2', 'cs_theta_3']"
+        )
+        print("Available fields:", sorted(simulation, key=str))
 
     return simulation
 
@@ -300,6 +314,85 @@ def main(args: Dict[str, Any]) -> None:
                 # have to do explicit rechunking because UM date-time coordinate is an object
                 # spec_ds = spec_ds.chunk({dim: "auto" for dim in ["x", "y", "z"] if dim in spec_ds.dims})
                 writer.write(spec_ds, output_path)
+
+    if args["anisotropy"]:
+        with timer("Anisotropy", "s", "Anisotropy"):
+            # anisotropy diagnostic
+
+            # construct filters:
+            hminsize = min([simulation[x].size for x in hdims])
+            # assume horizontally square cells
+            dx = (simulation[hdims[0]][1] - simulation[hdims[0]][0]).item()
+
+            filter_dic: Dict[str, Filter | CoarseGrain] = {}
+            # Box-cart scales
+            res_scales = [2, 4, 8, 16]  # effective resolution/decorelation scales
+            gray_zone_scales = [
+                int(res / dx) for res in [800, 400, 200, 100]
+            ]  # sub-km grey zone resolution scales
+            large_scales = [hminsize // 4, hminsize // 2, hminsize]
+            coarse_scales = large_scales.copy()
+            # only allows scales at least 2 delta_<x> apart
+            for x in gray_zone_scales + res_scales:
+                if (
+                    np.min(np.abs([x - y for y in coarse_scales])) >= 2
+                    and x > 1
+                    and x < hminsize
+                ):
+                    coarse_scales += [x]
+            # sort from fast to slow
+            coarse_scales = sorted(coarse_scales)
+
+            # Coarse-graining filter
+            filter_dic = filter_dic | {
+                f"Coarse{scale}delta": CoarseGrain({x: int(scale) for x in hdims})
+                for scale in coarse_scales[:2]
+            }
+
+            # Box filter
+            # stencil size is (filter_scale + 1)delta under finite-difference data interpretation
+            box_scales = [x for x in coarse_scales if x < min(large_scales)]
+            filter_dic = filter_dic | {
+                f"Box{scale}delta": Filter(
+                    box_kernel([int(scale) + 1 for x in hdims]), hdims
+                )
+                for scale in box_scales[:2]
+            }
+
+            # Gausssian filter
+            filter_dic[f"Gauss{2}delta"] = Filter(weight_gauss_3d, filter_dims=hdims)
+            filter_dic[f"Gauss{4}delta"] = Filter(weight_gauss_5d, filter_dims=hdims)
+
+            # rechunk velocity -- unify filtering and vector dimensions
+            vel = simulation["vel"].chunk({x: -1 for x in hdims + ["c1"]}).persist()
+            print(f"Filters: {filter_dic.keys()}")
+            # run analysis
+            for filt_lbl, filt in filter_dic.items():
+                with timer(
+                    f"{filt_lbl}:{filt.scales()}", "s", f"{filt_lbl}:{filt.scales()}"
+                ):
+                    output_path = output_dir / anisotropy_name.format(filt_lbl=filt_lbl)
+                    # don't over-write but skip existing filters/scales
+                    if not writer.overwrite and writer.check_filename(output_path):
+                        print(f"Warning: Skip existing file {output_path}.")
+                    else:
+                        # with ProgressBar():
+                        evals = anisotropy_analysis(vel, filt)
+                        evals = evals.expand_dims(
+                            {"filter": xr.DataArray([filt_lbl], dims=["filter"])}
+                        )
+                        with timer(f"write {output_path}", "s"):
+                            # rechunk for IO optimisation
+                            # have to do explicit rechunking because UM date-time coordinate is an object
+                            evals.chunk(
+                                {
+                                    dim: "auto"
+                                    for dim in ["x", "y", "z", "c1", "c2"]
+                                    if dim in evals.dims
+                                }
+                            )
+                            print(output_path)
+                            writer.write(evals, output_path)
 
 
 if __name__ == "__main__":

@@ -1,7 +1,9 @@
 from typing import Sequence
 
+import dask.array as da
 import numpy as np
 import xarray as xr
+from xarray.core.types import T_Xarray
 
 
 # Vector algebra
@@ -96,3 +98,33 @@ def symmetrise(
     if name is not None:
         sij.name = name
     return sij
+
+
+def anisotropy_renorm(
+    tensor: T_Xarray, tensor_dims: Sequence[str] = ("c1", "c2")
+) -> T_Xarray:
+    """compute the anisotropy renormalisation of a 2-rank tesnor
+    ie. tensor/trace(tensor) - 1/3 Identity
+    must have trace(tensor) != 0 for sensible results
+
+    :param tensor_dims: tensor dimensions
+    """
+
+    # paramater checks are taken care of in the trace call
+    tr = trace(tensor, dims=tuple(tensor_dims))
+    d1, d2 = tensor_dims
+
+    # create masked array for lazy computation
+    identity_dask = da.eye(
+        tensor.sizes[d1],
+        chunks=-1,
+    )
+    diag_mask = xr.DataArray(
+        identity_dask,
+        dims=tensor_dims,
+        coords={d: tensor.coords[d] for d in tensor_dims},
+    )
+
+    ani = tensor / tr - diag_mask / 3
+    ani.attrs = tensor.attrs
+    return ani

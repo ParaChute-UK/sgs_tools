@@ -21,9 +21,7 @@ def tensor_self_outer_product(
     return (arr * arr.rename({vec_dim: new_dim})).transpose(vec_dim, new_dim, ...)
 
 
-def trace(
-    tensor: xr.DataArray, dims: tuple[str, str] = ("c1", "c2"), name=None
-) -> xr.DataArray:
+def trace(tensor: T_Xarray, dims: Sequence[str] = ("c1", "c2"), name=None) -> T_Xarray:
     """trace along 2 dimesions.
 
     :param tensor: tensor input
@@ -44,9 +42,7 @@ def trace(
 
 
 # Make a tensor Traceless along 2 dimensions
-def traceless(
-    tensor: xr.DataArray, dims: tuple[str, str] = ("c1", "c2")
-) -> xr.DataArray:
+def traceless(tensor: T_Xarray, dims: Sequence[str] = ("c1", "c2")) -> T_Xarray:
     r"""returns a traceless version of `tensor`.
     **NB** \: bug/unexpected behaviour when nan in trace
 
@@ -65,8 +61,8 @@ def traceless(
 
 
 def Frobenius_norm(
-    tensor: xr.DataArray, tens_dims: Sequence[str] = ["c1", "c2"]
-) -> xr.DataArray:
+    tensor: T_Xarray, tens_dims: Sequence[str] = ["c1", "c2"]
+) -> T_Xarray:
     r"""Frobenius norm of a tensor\: :math:`|A| = \sqrt{Aij Aij}`
 
     :param tensor: tensor input
@@ -76,8 +72,8 @@ def Frobenius_norm(
 
 
 def symmetrise(
-    tensor: xr.DataArray, dims: Sequence[str] = ["c1", "c2"], name=None
-) -> xr.DataArray:
+    tensor: T_Xarray, dims: Sequence[str] = ["c1", "c2"], name=None
+) -> T_Xarray:
     """:math:`0.5 (a + a^T)`.
 
     :param tensor: tensor input

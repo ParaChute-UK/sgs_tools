@@ -24,6 +24,7 @@ dependencies = [
     "matplotlib>=3.6",
     "xarray[io,accel,parallel]>=2023.9",
     "xrft",
+    "xarray-einstats",
     "f90nml"
 ]
 

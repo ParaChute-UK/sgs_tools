@@ -41,7 +41,7 @@ class SmagorinskyVelocityModel:
         # only makes sense for uniform coordinates in the filtering directions
         # with spacing of self.dx
         for arr in [self.vel, self.strain]:
-            _assert_coord_dx(filter.filter_dims, arr, self.dx)
+            _assert_coord_dx(list(filter.filter_dims), arr, self.dx)
 
         sij = filter.filter(self.strain)
         snorm = Frobenius_norm(sij, self.tensor_dims)

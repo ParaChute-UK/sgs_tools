@@ -346,7 +346,7 @@ def main(args: Dict[str, Any]) -> None:
             # Coarse-graining filter
             filter_dic = filter_dic | {
                 f"Coarse{scale}delta": CoarseGrain({x: int(scale) for x in hdims})
-                for scale in coarse_scales[:2]
+                for scale in coarse_scales
             }
 
             # Box filter
@@ -356,7 +356,7 @@ def main(args: Dict[str, Any]) -> None:
                 f"Box{scale}delta": Filter(
                     box_kernel([int(scale) + 1 for x in hdims]), hdims
                 )
-                for scale in box_scales[:2]
+                for scale in box_scales
             }
 
             # Gausssian filter

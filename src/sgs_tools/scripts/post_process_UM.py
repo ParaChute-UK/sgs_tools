@@ -509,10 +509,11 @@ def main(args: Dict[str, Any]) -> None:
                 profile = directional_profile(
                     simulation[f_pr], hdims, args["vprofile_stats"]
                 )
-                # rechunk for IO optimisation??
-                # have to do explicit rechunking because UM date-time coordinate is an object
-                # profile = profile.chunk({})
-                writer.write(profile, output_path)
+                with timer(f"write {output_path}", "s"):
+                    # rechunk for IO optimisation??
+                    # have to do explicit rechunking because UM date-time coordinate is an object
+                    profile = profile.chunk({"z": "auto"})
+                    writer.write(profile, output_path)
 
     if args["horizontal_spectra"]:
         with timer("Horizontal spectra", "s", "Horizontal spectra"):
@@ -534,10 +535,13 @@ def main(args: Dict[str, Any]) -> None:
                     radial_truncation=args["radial_truncation"],
                 )
 
-                # rechunk for IO optimisation ??
-                # have to do explicit rechunking because UM date-time coordinate is an object
-                # spec_ds = spec_ds.chunk({dim: "auto" for dim in ["x", "y", "z"] if dim in spec_ds.dims})
-                writer.write(spec_ds, output_path)
+                with timer(f"write {output_path}", "s"):
+                    # rechunk for IO optimisation ??
+                    # have to do explicit rechunking because UM date-time coordinate is an object
+                    spec_ds = spec_ds.chunk(
+                        {dim: "auto" for dim in ["x", "y", "z"] if dim in spec_ds.dims}
+                    )
+                    writer.write(spec_ds, output_path)
 
     if args["anisotropy"]:
         with timer("Anisotropy", "s", "Anisotropy"):

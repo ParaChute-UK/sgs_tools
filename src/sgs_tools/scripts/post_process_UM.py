@@ -1,3 +1,4 @@
+import warnings
 from pathlib import Path
 from typing import Any, Dict, Sequence
 
@@ -8,11 +9,8 @@ from sgs_tools.diagnostics.anisotropy import anisotropy_analysis
 from sgs_tools.diagnostics.directional_profile import directional_profile
 from sgs_tools.diagnostics.spectra import spectra_1d_radial
 from sgs_tools.io.netcdf_writer import NetCDFWriter
-from sgs_tools.sgs.coarse_grain import CoarseGrain
-from sgs_tools.sgs.filter import Filter, box_kernel, weight_gauss_3d, weight_gauss_5d
 from sgs_tools.util.timer import timer
 
-base_fields = ["u", "v", "w", "theta"]
 v_profile_fields_out = [
     "vel",
     "theta",
@@ -30,7 +28,6 @@ v_profile_fields_out = [
     "cs_diag",
     "cs_theta_diag",
 ]
-
 v_profile_fields_in = [
     # base
     "u",
@@ -57,6 +54,9 @@ v_profile_fields_in = [
     # stability
     # "Richardson",
 ]
+v_profiles_stats = ["mean", "std", "median"]
+v_prof_name = "post_proc_vert_profiles.nc"
+
 
 power_spectra_fields = ["u", "v", "w", "theta"]
 cross_spectra_fields = [
@@ -65,22 +65,25 @@ cross_spectra_fields = [
     ("u", "v"),
     ("theta", "w"),
 ]
-anisotropy_fields = ["u", "v", "w"]
-
-all_fields = (
-    set(base_fields)
-    .union(v_profile_fields_in)
-    .union(power_spectra_fields)
-    .union(anisotropy_fields)
-)
-
-v_prof_name = "post_proc_vert_profiles.nc"
 spectra_name = "post_proc_spectra.nc"
-anisotropy_name = r"post_proc_anisotropy_{filt_lbl}.nc"
+
+
+anisotropy_fields = ["u", "v", "w"]
+box_delta_scales = [2, 4, 8, 16]
+box_meter_scales = [800, 400, 200, 100]
+box_domain_scales = [1, 0.5, 0.25]
+gauss_scales = [2, 4]
+
+
+anisotropy_name = r"post_proc_anisotropy"
 
 
 def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
-    from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
+    from argparse import (
+        ArgumentDefaultsHelpFormatter,
+        ArgumentParser,
+        ArgumentTypeError,
+    )
 
     from sgs_tools.scripts.arg_parsers import add_dask_group, add_input_group
 
@@ -104,25 +107,155 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
         action="store_true",
         help="""behaviour if diagnostic file already exists. default: skip""",
     )
-    analysis = parser.add_argument_group("Analysis")
 
-    analysis.add_argument(
+    parser.add_argument(
+        "--hdims",
+        default=["x", "y"],
+        nargs="+",
+        help="""List of horizontal dimension names.""",
+    )
+
+    vprof = parser.add_argument_group("Vertical Profiles")
+
+    vprof.add_argument(
         "--vertical_profiles",
         action="store_true",
-        help="""Vertical profiles""",
+        help="""Swtitch for computing vertical profiles.""",
     )
 
-    analysis.add_argument(
+    vprof.add_argument(
+        "--vprofile_fields",
+        nargs="+",
+        default=v_profile_fields_out,
+        type=str,
+        help="""List of fields whose vertical profile to compute.""",
+    )
+
+    vprof.add_argument(
+        "--vprofile_stats",
+        nargs="+",
+        default=v_profiles_stats,
+        type=str,
+        help="""Statistics to generate vertical profiles with.""",
+    )
+
+    vprof.add_argument(
+        "--vprofile_fname_out",
+        default=v_prof_name,
+        type=str,
+        help="""Filename where to save the generated vertical profile. relative to output_path""",
+    )
+
+    spectra = parser.add_argument_group("Horizontal spectra")
+
+    spectra.add_argument(
         "--horizontal_spectra",
         action="store_true",
-        help="""Horizontal power spectra and cross spectra
-            """,
+        help="""Horizontal power spectra and cross spectra.""",
     )
 
-    analysis.add_argument(
+    spectra.add_argument(
+        "--power_spectra_fields",
+        nargs="+",
+        default=power_spectra_fields,
+        type=str,
+        help="""Fields whose power spectra to compute.""",
+    )
+
+    def tuple_from_comma_str(s):
+        tup = tuple(s.split(","))
+        if len(tup) != 2:
+            raise ArgumentTypeError(
+                f"Expected only 2 fields for each comma-separated cross-spectrum, got {len(tup)}"
+            )
+        return tup
+
+    spectra.add_argument(
+        "--cross_spectra_fields",
+        nargs="+",
+        default=cross_spectra_fields,
+        type=tuple_from_comma_str,
+        help="""Fields whose cross spectra to compute.
+        Use spaces to between cross spectra and commas between fields in each cross-spectrim, e.g.
+        u,v v,w""",
+    )
+
+    spectra.add_argument(
+        "--radial_smooth_factor",
+        default=1,
+        type=int,
+        help="""Radial binning of radial horizontal spectrum in units of delta_kx spacings""",
+    )
+
+    spectra.add_argument(
+        "--radial_truncation",
+        action="store_true",
+        help="""Truncation of radial horizontal spectrum.
+        If True will disregard wavenumbers above the maximum linear wavenumber.
+        """,
+    )
+
+    spectra.add_argument(
+        "--hspectra_fname_out",
+        default=spectra_name,
+        type=str,
+        help="""Filename where to save the generated horisontal spectra. relative to output_path""",
+    )
+
+    anisotropy = parser.add_argument_group("Anisotropy diagnostics")
+
+    anisotropy.add_argument(
         "--anisotropy",
         action="store_true",
         help="""Anisotropy of velocity strain and stress""",
+    )
+
+    anisotropy.add_argument(
+        "--box_domain_scales",
+        nargs="+",
+        default=box_domain_scales,
+        type=float,
+        help="""Anisotropy box filter and coarse-graining scales in fraction of the horizontal domain size.
+        Will round to nearest integer number of horizontal grid cells.
+        Will combine all box scales and ignore entries which are less than `2 delta` apart.
+        """,
+    )
+
+    anisotropy.add_argument(
+        "--box_meter_scales",
+        nargs="+",
+        default=box_meter_scales,
+        type=float,
+        help="""Anisotropy box filter and coarse-graining scales in meters.
+        Will round to nearest integer number of horizontal grid cells.
+        Will combine all box scales and ignore entries which are less than `2 delta` apartn
+        """,
+    )
+
+    anisotropy.add_argument(
+        "--box_delta_scales",
+        nargs="+",
+        default=box_delta_scales,
+        type=int,
+        help="""Anisotropy box filter and coarse-graining scales in units of horizontal grid spacing `delta`.
+        Will combine all box scales and ignore entries which are less than `2 delta` apart.
+        """,
+    )
+    anisotropy.add_argument(
+        "--gauss_scales",
+        nargs="+",
+        default=gauss_scales,
+        type=int,
+        help="""Anisotropy Gaussian filter scales in  units of horizontal grid spacing. Support 2 and 4""",
+    )
+
+    spectra.add_argument(
+        "--aniso_fname_out",
+        default=anisotropy_name,
+        type=Path,
+        help="""**Core** filename where to save the generated anisotropy eigen values. relative to output_path.
+        Will append the filter label. Will set an '.nc' extension (whether given or not).
+        """,
     )
 
     add_dask_group(parser)
@@ -139,13 +272,13 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
     if args["t_range"][1] < 0:
         args["t_range"][1] = np.inf
 
-    args["t_range="] = np.sort(args["t_range"])
+    args["t_range="] = sorted(args["t_range"])
 
     if args["z_range"][0] < 0:
         args["z_range"][0] = -np.inf
     if args["z_range"][1] < 0:
         args["z_range"][1] = np.inf
-    args["z_range="] = np.sort(args["z_range"])
+    args["z_range="] = sorted(args["z_range"])
 
     return args
 
@@ -259,7 +392,96 @@ def post_process_fields(simulation: xr.Dataset) -> xr.Dataset:
     return simulation
 
 
+# select filters based on number of points and horizontal spacing
+def choose_filter_set(
+    hminsize: int,  # number of grid points in horizontal direction
+    dx: float,  # horizontal grid spacing
+    box_delta_scales: Sequence[int] = [
+        2,
+        4,
+        8,
+        16,
+    ],  # effective resolution/decorelation scales
+    box_meter_scales: Sequence[float] = [
+        800.0,
+        400.0,
+        200.0,
+        100.0,
+    ],  # sub-km grey zone horizontal resolutions
+    box_domain_scales: Sequence[float] = [0.25, 0.5, 1],  # domain unit scales
+    gauss_scales: Sequence[float] = [2, 4],  # Gaussian filter scales
+    hdims: Sequence[str] = ["x", "y"],
+):
+    from sgs_tools.sgs.coarse_grain import CoarseGrain
+    from sgs_tools.sgs.filter import (
+        Filter,
+        box_kernel,
+        weight_gauss_3d,
+        weight_gauss_5d,
+    )
+
+    # dictionary of filters
+    filter_dic: Dict[str, Filter | CoarseGrain] = {}
+
+    # Box-cart scales
+    meter_scales = [int(res / dx) for res in box_meter_scales]
+    domain_scales = [int(hminsize * x) for x in box_domain_scales]
+    box_scales = []  # start with something
+    # only allows scales at least 2 (delta_<x>) apart
+    # order of loop determines precedence
+    for x in set(domain_scales + meter_scales + box_delta_scales):
+        if x > 1 and x < hminsize:
+            if not box_scales or np.min(np.abs([x - y for y in box_scales])) >= 2:
+                box_scales += [x]
+
+    # sort from fast to slow to compute coarse grain(small to large scales)
+    box_scales = sorted(box_scales)
+    assert (
+        max(box_scales) <= hminsize
+    ), "Unsupported box_scales greater than domain size."
+    assert min(box_scales) > 1, "Unsupported box_scales less than 0."
+
+    # Coarse-graining filters
+    filter_dic = filter_dic | {
+        f"Coarse{scale}delta": CoarseGrain({x: int(scale) for x in hdims})
+        for scale in box_scales
+    }
+
+    # Box filters
+    # stencil size is (filter_scale + 1)delta under finite-difference data interpretation
+    box_scales = [x for x in box_scales if x < hminsize]
+    filter_dic = filter_dic | {
+        f"Box{scale}delta": Filter(box_kernel([int(scale) + 1 for x in hdims]), hdims)
+        for scale in box_scales
+    }
+
+    # Gausssian filters
+    for s in gauss_scales:
+        if s == 2:
+            filter_dic[f"Gauss{2}delta"] = Filter(weight_gauss_3d, filter_dims=hdims)
+        elif s == 4:
+            filter_dic[f"Gauss{4}delta"] = Filter(weight_gauss_5d, filter_dims=hdims)
+        else:
+            warnings.warn(
+                f"Skipping unsupported Gauss scale {s}. Support only 2 and 4."
+            )
+
+    return filter_dic
+
+
 def main(args: Dict[str, Any]) -> None:
+    spectra_fields_list = set(
+        [f for fl in args["cross_spectra_fields"] for f in fl]
+        + args["power_spectra_fields"]
+    )
+
+    all_fields = (
+        set()
+        .union(v_profile_fields_in)
+        .union(spectra_fields_list)
+        .union(anisotropy_fields)
+    )
+
     simulation = read(
         args["input_files"],
         args["h_resolution"],
@@ -272,21 +494,21 @@ def main(args: Dict[str, Any]) -> None:
     writer = NetCDFWriter(overwrite=args["overwrite_existing"])
     output_dir = args["output_path"]
 
-    hdims = ["x", "y"]
+    hdims = args["hdims"]
 
     if args["vertical_profiles"]:
         with timer("Vertical profiles", "s"):
-            f_pr = [f for f in v_profile_fields_out if f in simulation]
-            f_missing = [f for f in v_profile_fields_out if f not in simulation]
+            f_pr = [f for f in args["vprofile_fields"] if f in simulation]
+            f_missing = [f for f in args["vprofile_fields"] if f not in simulation]
             if f_missing:
                 print(f"Missing vertical profile fields {f_missing}")
             # don't overwrite but skip existing filters/scales
-            output_path = output_dir / v_prof_name
+            output_path = output_dir / args["vprofile_fname_out"]
             if writer.check_filename(output_path) and not writer.overwrite:
                 print(f"Warning: Skip existing file {output_path}.")
             else:
                 profile = directional_profile(
-                    simulation[f_pr], hdims, ["mean", "std", "median"]
+                    simulation[f_pr], hdims, args["vprofile_stats"]
                 )
                 # rechunk for IO optimisation??
                 # have to do explicit rechunking because UM date-time coordinate is an object
@@ -295,19 +517,22 @@ def main(args: Dict[str, Any]) -> None:
 
     if args["horizontal_spectra"]:
         with timer("Horizontal spectra", "s", "Horizontal spectra"):
-            cross_fields_list = set([f for fl in cross_spectra_fields for f in fl])
-            spec_fields = set(power_spectra_fields).union(cross_fields_list)
+            cross_fields_list = set(
+                [f for fl in args["cross_spectra_fields"] for f in fl]
+            )
+            spec_fields = set(args["power_spectra_fields"]).union(cross_fields_list)
 
-            output_path = output_dir / spectra_name
+            output_path = output_dir / args["hspectra_fname_out"]
             if writer.check_filename(output_path) and not writer.overwrite:
                 print(f"Warning: Skip existing file {output_path}.")
             else:
                 spec_ds = spectra_1d_radial(
                     simulation[spec_fields],
                     hdims,
-                    power_spectra_fields,
-                    cross_spectra_fields,
-                    radial_smooth_factor=1,
+                    args["power_spectra_fields"],
+                    args["cross_spectra_fields"],
+                    radial_smooth_factor=args["radial_smooth_factor"],
+                    radial_truncation=args["radial_truncation"],
                 )
 
                 # rechunk for IO optimisation ??
@@ -319,59 +544,33 @@ def main(args: Dict[str, Any]) -> None:
         with timer("Anisotropy", "s", "Anisotropy"):
             # anisotropy diagnostic
 
-            # construct filters:
+            # min horizontal number of cells
             hminsize = min([simulation[x].size for x in hdims])
             # assume horizontally square cells
             dx = (simulation[hdims[0]][1] - simulation[hdims[0]][0]).item()
 
-            filter_dic: Dict[str, Filter | CoarseGrain] = {}
-            # Box-cart scales
-            res_scales = [2, 4, 8, 16]  # effective resolution/decorelation scales
-            gray_zone_scales = [
-                int(res / dx) for res in [800, 400, 200, 100]
-            ]  # sub-km grey zone resolution scales
-            large_scales = [hminsize // 4, hminsize // 2, hminsize]
-            coarse_scales = large_scales.copy()
-            # only allows scales at least 2 delta_<x> apart
-            for x in gray_zone_scales + res_scales:
-                if (
-                    np.min(np.abs([x - y for y in coarse_scales])) >= 2
-                    and x > 1
-                    and x < hminsize
-                ):
-                    coarse_scales += [x]
-            # sort from fast to slow
-            coarse_scales = sorted(coarse_scales)
-
-            # Coarse-graining filter
-            filter_dic = filter_dic | {
-                f"Coarse{scale}delta": CoarseGrain({x: int(scale) for x in hdims})
-                for scale in coarse_scales
-            }
-
-            # Box filter
-            # stencil size is (filter_scale + 1)delta under finite-difference data interpretation
-            box_scales = [x for x in coarse_scales if x < min(large_scales)]
-            filter_dic = filter_dic | {
-                f"Box{scale}delta": Filter(
-                    box_kernel([int(scale) + 1 for x in hdims]), hdims
-                )
-                for scale in box_scales
-            }
-
-            # Gausssian filter
-            filter_dic[f"Gauss{2}delta"] = Filter(weight_gauss_3d, filter_dims=hdims)
-            filter_dic[f"Gauss{4}delta"] = Filter(weight_gauss_5d, filter_dims=hdims)
+            # set up the a dictionary of filters
+            filter_dic = choose_filter_set(
+                hminsize=hminsize,
+                dx=dx,
+                box_delta_scales=args["box_delta_scales"],
+                box_meter_scales=args["box_meter_scales"],
+                box_domain_scales=args["box_domain_scales"],
+                gauss_scales=args["gauss_scales"],
+                hdims=hdims,
+            )
+            print(f"Filters: {filter_dic.keys()}")
 
             # rechunk velocity -- unify filtering and vector dimensions
             vel = simulation["vel"].chunk({x: -1 for x in hdims + ["c1"]}).persist()
-            print(f"Filters: {filter_dic.keys()}")
             # run analysis
             for filt_lbl, filt in filter_dic.items():
                 with timer(
                     f"{filt_lbl}:{filt.scales()}", "s", f"{filt_lbl}:{filt.scales()}"
                 ):
-                    output_path = output_dir / anisotropy_name.format(filt_lbl=filt_lbl)
+                    output_path = (
+                        output_dir / f'{args['aniso_fname_out'].stem}_{filt_lbl}'
+                    ).with_suffix(".nc")
                     # don't over-write but skip existing filters/scales
                     if not writer.overwrite and writer.check_filename(output_path):
                         print(f"Warning: Skip existing file {output_path}.")
@@ -391,7 +590,6 @@ def main(args: Dict[str, Any]) -> None:
                                     if dim in evals.dims
                                 }
                             )
-                            print(output_path)
                             writer.write(evals, output_path)
 
 

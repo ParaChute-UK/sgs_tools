@@ -130,15 +130,17 @@ def spectra_1d_radial(
     power_spectra_fields: Sequence[str],
     cross_spectra_fields: Sequence[tuple[str, str]],
     radial_smooth_factor: int = 2,
+    radial_truncation: bool = False,
     fillnan: float = 0.0,
 ) -> xr.Dataset:
     """
-    :param: radial_smooth_factor: smoothing factor for radial spectral bins. If 2 will have radial bin widht is 2*linear wavenumber.
-    :param: fillnan: value to fill nans with in order to compute spectrum of dirty date. If set to a nan value (e.g. np.nan) will produce nan spectra globally.  Defaults to 0.
-    :param: power_spectra_fields: sequence of fields whose power spectrum to compute
-    :param: power_spectra_fields: sequence of tuples of fields whose cross-spectrum to compute
-    :param: hdims:  horizonal dimensions along which to compute linear spectra. The radial spectrum is computed along the Euclidean radius along vector spanned by these dimensions.
     :param: simulation: xarray Dataset of multidimensional fields. must contain the set of `power_spectra_fields` and `cross_spectra_fields`
+    :param: hdims:  horizonal dimensions along which to compute linear spectra. The radial spectrum is computed along the Euclidean radius along vector spanned by these dimensions.
+    :param: power_spectra_fields: sequence of fields whose power spectrum to compute
+    :param: cross_spectra_fields: sequence of tuples of fields whose cross-spectrum to compute
+    :param: radial_smooth_factor: smoothing factor for radial spectral bins. If 2 will have radial bin widht is 2*linear wavenumber.
+    :param: radial_truncation: switch to include/exclude aliased wavenumber beyond the max. 1d freqeuncy in the radial spectrum. If **True** the result won't respect Parseval exactly.
+    :param: fillnan: value to fill nans with in order to compute spectrum of dirty date. If set to a nan value (e.g. np.nan) will produce nan spectra globally.  Defaults to 0.
     :return: an xarray Dataset with the requested 1d and radial power and co-spectra. The number of physical-space grid size and cell size along hdims is included in the attributes along with the fourier normalization convention.
     Notes: resulting spectral cooordinates are in units of inverse length, not radians/length.
 
@@ -179,7 +181,7 @@ def spectra_1d_radial(
             fftdim=[f"k_{x}" for x in hdims],
             radial_bin_width=min([nd_spectrum[f"k_{d}"].spacing for d in hdims]),
             bin_anchor="left",
-            truncate=False,
+            truncate=radial_truncation,
             scaling="density",
             prefix="k_",
         )
@@ -207,7 +209,7 @@ def spectra_1d_radial(
             fftdim=[f"k_{x}" for x in hdims],
             radial_bin_width=min([nd_spectrum[f"k_{d}"].spacing for d in hdims]),
             bin_anchor="left",
-            truncate=False,
+            truncate=radial_truncation,
             scaling="density",
             prefix="k_",
         )

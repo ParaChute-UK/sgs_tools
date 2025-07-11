@@ -9,7 +9,7 @@ import xrft  # type: ignore
 def radial_spectrum(
     ps: xr.DataArray,
     fftdim: Sequence[str],
-    nbins: int,
+    radial_bin_width: float,
     bin_anchor: str = "center",
     truncate: bool = True,
     scaling: str = "spectrum",
@@ -33,10 +33,10 @@ def radial_spectrum(
         The power spectrum or cross spectrum to be isotropized.
     fftdim : list
         The fft dimensions overwhich the isotropization must be performed.
-    nbins : int
-        Number of linearly spaced bins in which to distribute the power spectrum
+    radial_bin_width : int
+        Width of radial bins in units of inverse length (or whatever the 2d power spectrum is in)
     truncate : bool, optional
-        If True, the spectrum will be truncated for wavenumbers larger than min(max(ps[fftdim])).
+        If True, the spectrum will be truncated for wavenumbers larger than min(max(ps[fftdim].size)).
     bin_anchor: str, optional
         Where to place the radial wavenumber within the bin. Choices {'left', 'right', 'centre', 'com'}. Default: 'mean'
         if 'com' : compute as the centre-of-mass radius: :math: `\sum (ps * k_r) / \sum (ps)` before rescaling.
@@ -54,9 +54,9 @@ def radial_spectrum(
     )
     freq_r = ((fftcoords**2).to_dataarray().sum("variable") ** 0.5).rename(dim_name)
 
-    if nbins > max([fftcoords[d].shape[0] for d in fftcoords]):
+    if radial_bin_width <= max([ps.coords[d].attrs["spacing"] for d in fftdim]):
         msg = (
-            f"nbins {nbins} > max number of linear frequencies"
+            f"radial_bin_width {radial_bin_width} <= max linear frequency spacing"
             ", likely to have empty bins with nan values"
         )
         warnings.warn(UserWarning(msg))
@@ -68,7 +68,7 @@ def radial_spectrum(
         last_bin_edge = freq_r.max().item()
 
     # last_bin_edge *= 1.001 # add tolerance for floating point comparison
-    kr_bins = np.linspace(0, last_bin_edge, nbins + 1, endpoint=True)
+    kr_bins = np.arange(0, last_bin_edge + radial_bin_width, radial_bin_width)
     kr_delta = kr_bins[1:] - kr_bins[:-1]
 
     # total spectral power in annulus
@@ -101,6 +101,7 @@ def radial_spectrum(
     # add a bin coordinates
     iso_ps.coords[dim_name] = kr_ref
     iso_ps[dim_name].attrs["anchor"] = bin_anchor
+    iso_ps[dim_name].attrs["spacing"] = radial_bin_width
     iso_ps = iso_ps.assign_coords({prefix + "dr": (dim_name, kr_delta)})
 
     # rescale amplitude
@@ -114,6 +115,8 @@ def radial_spectrum(
             warnings.warn(msg)
     elif scaling == "spectrum":
         iso_ps = iso_ps.assign_coords({prefix + "dA": (dim_name, np.ones_like(iso_ps))})
+        iso_ps[prefix + "dA"].attrs["description"] = "trivial"
+
     else:
         raise ValueError(
             f"Unrecognised scaling {scaling}. " "Choose from 'spectrum', 'density'."
@@ -174,7 +177,7 @@ def spectra_1d_radial(
         spec[f"{field}_Fr"] = radial_spectrum(
             nd_spectrum,
             fftdim=[f"k_{x}" for x in hdims],
-            nbins=max([data[d].size for d in hdims]) // radial_smooth_factor,
+            radial_bin_width=min([nd_spectrum[f"k_{d}"].spacing for d in hdims]),
             bin_anchor="left",
             truncate=False,
             scaling="density",
@@ -202,7 +205,7 @@ def spectra_1d_radial(
         spec[f"{field1}_{field2}_Fr"] = radial_spectrum(
             nd_spectrum,
             fftdim=[f"k_{x}" for x in hdims],
-            nbins=max([data[d].size for d in hdims]) // radial_smooth_factor,
+            radial_bin_width=min([nd_spectrum[f"k_{d}"].spacing for d in hdims]),
             bin_anchor="left",
             truncate=False,
             scaling="density",

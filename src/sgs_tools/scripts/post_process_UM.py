@@ -4,7 +4,6 @@ from typing import Any, Dict, Sequence
 
 import numpy as np
 import xarray as xr
-from dask.diagnostics import ProgressBar
 from sgs_tools.diagnostics.anisotropy import anisotropy_analysis
 from sgs_tools.diagnostics.directional_profile import directional_profile
 from sgs_tools.diagnostics.spectra import spectra_1d_radial
@@ -575,7 +574,6 @@ def main(args: Dict[str, Any]) -> None:
                     if not writer.overwrite and writer.check_filename(output_path):
                         print(f"Warning: Skip existing file {output_path}.")
                     else:
-                        # with ProgressBar():
                         evals = anisotropy_analysis(vel, filt)
                         evals = evals.expand_dims(
                             {"filter": xr.DataArray([filt_lbl], dims=["filter"])}

@@ -4,8 +4,6 @@ from typing import Dict
 import numpy as np
 import xarray as xr
 
-# TODO: collate with Filter via a Protocol??
-
 
 @dataclass(frozen=True)
 class CoarseGrain:

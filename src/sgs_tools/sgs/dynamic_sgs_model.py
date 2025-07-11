@@ -32,7 +32,7 @@ class LeonardVelocityTensor:
     tensor_dims: tuple[str, str]
 
     def compute(self, filter: Filter) -> xr.DataArray:
-        """compute the Leonard tensor as
+        r"""compute the Leonard tensor as
             :math:`\overline{v_i v_j} - \overline{v_i} \overline{v_j}`,
             where :math:`\overline{\\ast}` means filtering
 
@@ -46,7 +46,7 @@ class LeonardVelocityTensor:
 
 @dataclass(frozen=True)
 class LeonardThetaTensor:
-    """Leonard tensor for the (potential) temperature :math:`$\theta$`
+    r"""Leonard tensor for the (potential) temperature :math:`$\theta$`
 
     :ivar vel: grid-scale/base velocity field
     :ivar theta: grid-scale/base temperature field
@@ -57,7 +57,7 @@ class LeonardThetaTensor:
     tensor_dims: tuple[str, str]
 
     def compute(self, filter: Filter) -> xr.DataArray:
-        """compute the Leonard tensor as
+        r"""compute the Leonard tensor as
             :math:`\overline{v_i \\theta} - \overline{v_i} \overline{\\theta}`,
             where :math:`\overline{\\ast}` means filtering
 
@@ -70,7 +70,7 @@ class LeonardThetaTensor:
 
 
 def M_Germano_tensor(sgs_model: SGSModel, filter: Filter) -> xr.DataArray:
-    """compute the Mij Germano model tensor as
+    r"""compute the Mij Germano model tensor as
     (<tau(at grid)> - alpha^2 tau(at filter))
     where (delta * alpha) is the area/volume spanned by the filter kernel
 

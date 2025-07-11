@@ -107,7 +107,11 @@ def read_stash_files(fname_pattern: Path) -> xr.Dataset:
         )
     )
     print(f"Reading {parsed}")
-    dataset = xr.open_mfdataset(parsed, chunks="auto")
+    dataset = xr.open_mfdataset(
+        parsed,
+        chunks="auto",
+        parallel=True,
+    )
     return dataset
 
 

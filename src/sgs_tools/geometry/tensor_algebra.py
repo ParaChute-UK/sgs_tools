@@ -1,7 +1,9 @@
 from typing import Sequence
 
+import dask.array as da
 import numpy as np
 import xarray as xr
+from xarray.core.types import T_Xarray
 
 
 # Vector algebra
@@ -19,9 +21,7 @@ def tensor_self_outer_product(
     return (arr * arr.rename({vec_dim: new_dim})).transpose(vec_dim, new_dim, ...)
 
 
-def trace(
-    tensor: xr.DataArray, dims: tuple[str, str] = ("c1", "c2"), name=None
-) -> xr.DataArray:
+def trace(tensor: T_Xarray, dims: Sequence[str] = ("c1", "c2"), name=None) -> T_Xarray:
     """trace along 2 dimesions.
 
     :param tensor: tensor input
@@ -42,10 +42,8 @@ def trace(
 
 
 # Make a tensor Traceless along 2 dimensions
-def traceless(
-    tensor: xr.DataArray, dims: tuple[str, str] = ("c1", "c2")
-) -> xr.DataArray:
-    """returns a traceless version of `tensor`.
+def traceless(tensor: T_Xarray, dims: Sequence[str] = ("c1", "c2")) -> T_Xarray:
+    r"""returns a traceless version of `tensor`.
     **NB** \: bug/unexpected behaviour when nan in trace
 
     :param tensor: tensor input
@@ -63,9 +61,9 @@ def traceless(
 
 
 def Frobenius_norm(
-    tensor: xr.DataArray, tens_dims: Sequence[str] = ["c1", "c2"]
-) -> xr.DataArray:
-    """Frobenius norm of a tensor\: :math:`|A| = \sqrt{Aij Aij}`
+    tensor: T_Xarray, tens_dims: Sequence[str] = ["c1", "c2"]
+) -> T_Xarray:
+    r"""Frobenius norm of a tensor\: :math:`|A| = \sqrt{Aij Aij}`
 
     :param tensor: tensor input
     :param dims: dimensions with respect to which to take the norm.
@@ -74,8 +72,8 @@ def Frobenius_norm(
 
 
 def symmetrise(
-    tensor: xr.DataArray, dims: Sequence[str] = ["c1", "c2"], name=None
-) -> xr.DataArray:
+    tensor: T_Xarray, dims: Sequence[str] = ["c1", "c2"], name=None
+) -> T_Xarray:
     """:math:`0.5 (a + a^T)`.
 
     :param tensor: tensor input
@@ -96,3 +94,33 @@ def symmetrise(
     if name is not None:
         sij.name = name
     return sij
+
+
+def anisotropy_renorm(
+    tensor: T_Xarray, tensor_dims: Sequence[str] = ("c1", "c2")
+) -> T_Xarray:
+    """compute the anisotropy renormalisation of a 2-rank tesnor
+    ie. tensor/trace(tensor) - 1/3 Identity
+    must have trace(tensor) != 0 for sensible results
+
+    :param tensor_dims: tensor dimensions
+    """
+
+    # paramater checks are taken care of in the trace call
+    tr = trace(tensor, dims=tuple(tensor_dims))
+    d1, d2 = tensor_dims
+
+    # create masked array for lazy computation
+    identity_dask = da.eye(
+        tensor.sizes[d1],
+        chunks=-1,
+    )
+    diag_mask = xr.DataArray(
+        identity_dask,
+        dims=tensor_dims,
+        coords={d: tensor.coords[d] for d in tensor_dims},
+    )
+
+    ani = tensor / tr - diag_mask / 3
+    ani.attrs = tensor.attrs
+    return ani

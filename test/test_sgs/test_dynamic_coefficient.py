@@ -1,5 +1,3 @@
-from dataclasses import dataclass
-
 import numpy as np
 import xarray as xr  # only used for type hints
 from sgs_tools.sgs.dynamic_coefficient import (

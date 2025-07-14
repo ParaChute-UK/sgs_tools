@@ -75,7 +75,7 @@ def vertical_heat_flux(
     pot_temperature: xr.DataArray,
     hor_axes: Collection[str],
 ) -> xr.DataArray:
-    """compute vertical heat flux :math:`$w' \\theta'$` from :math:`w` and :math:`$\\theta$`
+    r"""compute vertical heat flux :math:`$w' \\theta'$` from :math:`w` and :math:`$\\theta$`
 
     :param vert_vel: vertical velocity field :math:`w`
     :param pot_temperature: potential temperature :math:`$\\theta$`
@@ -104,7 +104,7 @@ def Reynolds_fluct_stress(
     target_dims: list[str],
     fluctuation_axes: Collection[str],
 ) -> xr.DataArray:
-    """compute Reynolds stress :math:`$\mathbf{u}'_i \mathbf{u}'_j$`
+    r"""compute Reynolds stress :math:`$\mathbf{u}'_i \mathbf{u}'_j$`
 
     :param u: velocity field component 1
     :param v: velocity field component 2
@@ -133,12 +133,40 @@ def Reynolds_fluct_stress(
     ans.attrs["long_name"] = r"$u'_i u'_j$"
     return ans
 
-@dask_layered
-def anisotropy_tensor(vel: xr.DataArray) -> xr.DataArray:
-    """compute anisotropy tensor from velocity
 
-    :param vel: velocity field
+def Fluct_TKE(
+    u: xr.DataArray,
+    v: xr.DataArray,
+    w: xr.DataArray,
+    target_dims: list[str],
+    fluctuation_axes: Collection[str],
+) -> xr.DataArray:
+    r"""compute fluctuating TKE :math:`$\mathbf{u}'_i \mathbf{u}'_i / 2$`
+
+    :param u: velocity field component 1
+    :param v: velocity field component 2
+    :param w: velocity field component 3
+
+    :param target_dims: axes on which the interpolate the stress --
+        must be contained among the coordinates of ``u, v, w``
+    :param fluctuation_axes: labels of dimensions
+        w.r.t which to compute the fluctuations. Subset of ``target_dims``.
+
+    Note: First performs an interpolation to ``target_dims`` and then computes the fluctuations
+    w.r.t. ``fluctuation_axes`` and then square. There can be a commutation error when the
+    interpolation happens along dimensions other than ``fluctuation_axes``.
+    There is uncertainty from whether the interpolation happens before/after the squaring.
     """
-    assert set(vel.dims) == set(["c1", "x", "y", "z"]), "Unexpected dimensions"
-
-    raise NotImplementedError()
+    # first interpolate
+    vel = compose_vector_components_on_grid(
+        [u, v, w], target_dims=target_dims, vector_dim="c1", drop_coords=True
+    )
+    # then take the fluctuations
+    vel_prime = vel - vel.mean(dim=fluctuation_axes)
+    vel_prime["c1"] = ["u'", "v'", "w'"]
+    # take the outer product
+    ans = xr.dot(vel_prime, vel_prime, dim="c1") / 2
+    # add attributes
+    ans.name = "fluct_tke"
+    ans.attrs["long_name"] = r"$u'_i u'_i / 2$"
+    return ans

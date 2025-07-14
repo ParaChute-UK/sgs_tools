@@ -22,7 +22,7 @@ def add_input_group(parser: ArgumentParser) -> _ArgumentGroup:
         type=float,
         nargs=2,
         default=[-1, -1],
-        help="time interval to consider, in code coordinates, negative value are interpreted as infinity",
+        help="time interval to consider, in code coordinates, negative value are interpreted as min/max respectively",
     )
 
     fname.add_argument(

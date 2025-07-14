@@ -107,7 +107,12 @@ def read_stash_files(fname_pattern: Path, chunks: Any = "auto") -> xr.Dataset:
         )
     )
     print(f"Reading {parsed}")
-    dataset = xr.open_mfdataset(parsed, chunks=chunks)#, parallel=True) # this gives a segfault on my Mac
+    dataset = xr.open_mfdataset(
+        parsed,
+        chunks="auto",
+        parallel=True,
+        engine='h5netcdf'
+    )
     return dataset
 
 

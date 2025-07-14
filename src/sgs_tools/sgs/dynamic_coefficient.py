@@ -1,9 +1,7 @@
 import warnings
 from dataclasses import dataclass
-from typing import Any, Protocol, Sequence
+from typing import Protocol, Sequence
 
-import dask
-import dask.array as da
 import numpy as np
 import xarray as xr
 
@@ -11,16 +9,19 @@ from .filter import Filter
 from ..util.dask_opt_util import dask_layered
 
 class Minimisation(Protocol):
-    """
+    r"""
     Protocol for solving the over-determined tensor equation
-    :math:`L = \sum_i c_i M_i`, where `L` and `M_i` are tensors of the same rank and dimensions,
-    and :math:`c_i` are scalar coefficient arrays to be computed.
+    :math:`L = \sum_i c_i M_i`, where `L` and `M_i` are tensors and
+    :math:`c_i` are scalar coefficients to be computed.
 
     :ivar contraction_dims: Names of the dimensions to contract when forming the
         tensor products :math:`L M_i` and :math:`M_i M_j`.
     :ivar coeff_dim: Dimension label along which the resulting coefficients
         :math:`c_i` are concatenated.
     """
+
+    @property
+    def reg_filter(self) -> Filter: ...
 
     @property
     def contraction_dims(self) -> Sequence[str]: ...
@@ -31,7 +32,7 @@ class Minimisation(Protocol):
     def compute(
         self, L: xr.DataArray, Mi: Sequence[xr.DataArray], reg_filter: Filter
     ) -> xr.DataArray:
-        """solve for :math:{c_i}` the over-determined system :math:`L = \sum_i(c_i M_i)`.
+        r"""solve for :math:{c_i}` the over-determined system :math:`L = \sum_i(c_i M_i)`.
 
         :param L: LHS tensor
         :param M: a sequence of RHS tensors
@@ -41,7 +42,7 @@ class Minimisation(Protocol):
 
 @dataclass(frozen=True)
 class LillyMinimisation1Model:
-    """Lilly Minimisation (least square error) for a 1-global-coefficient model using
+    r"""Lilly Minimisation (least square error) for a 1-global-coefficient model using
        the Lilly identity as :math:`$\overline{L \cdot M} / \overline{M \cdot M}$`.
        where :math:`$\cdot$`means  tensor contraction, :math:`$\overline{*}$` means regularisation filtering
 
@@ -78,7 +79,7 @@ class LillyMinimisation1Model:
 
 @dataclass(frozen=True)
 class LillyMinimisation2Model:
-    """Lilly Minimisation (least square error) for a 2-coefficient model using
+    r"""Lilly Minimisation (least square error) for a 2-coefficient model using
        the Lilly identity as :math:`$L = \sum_i^2 c_i M_i$`.
 
     :param contraction_dims: labels of dimensions to be contracted to form :math:`L M_i `and :math:`M_i M_j` products.
@@ -107,22 +108,20 @@ class LillyMinimisation2Model:
         # Filtered Leonard contractions
         LM1 = reg_filter.filter(
             xr.dot(L, Mi[0], dim=self.contraction_dims, optimize=True)
-        ).persist()
+        )
         LM2 = reg_filter.filter(
             xr.dot(L, Mi[1], dim=self.contraction_dims, optimize=True)
-        ).persist()
+        )
         # Model matrix
         M11 = reg_filter.filter(
             xr.dot(Mi[0], Mi[0], dim=self.contraction_dims, optimize=True)
-        ).persist()
+        )
         M12 = reg_filter.filter(
             xr.dot(Mi[0], Mi[1], dim=self.contraction_dims, optimize=True)
-        ).persist()
+        )
         M22 = reg_filter.filter(
-          xr.dot(Mi[1], Mi[1], dim=self.contraction_dims, optimize=True)
-        ).persist()
-
-
+            xr.dot(Mi[1], Mi[1], dim=self.contraction_dims, optimize=True)
+        )
         # Model determinant
         detM = M11 * M22 - M12**2
         # the adjoint matrix  = inverse * detM
@@ -138,7 +137,7 @@ class LillyMinimisation2Model:
 
 @dataclass(frozen=True)
 class LillyMinimisation3Model:
-    """Lilly Minimisation (least square error) for a 3-coefficient model using
+    r"""Lilly Minimisation (least square error) for a 3-coefficient model using
        the Lilly identity as :math:`$L = \sum_i^3 c_i M_i$`.
 
     :param contraction_dims: labels of dimensions to be contracted to form :math:`L M_i `and :math:`M_i M_j` products.
@@ -167,34 +166,33 @@ class LillyMinimisation3Model:
         # Filtered Leonard contractions
         LM1 = reg_filter.filter(
             xr.dot(L, Mi[0], dim=self.contraction_dims, optimize=True)
-        ).persist()
+        )
         LM2 = reg_filter.filter(
             xr.dot(L, Mi[1], dim=self.contraction_dims, optimize=True)
-        ).persist()
+        )
         LM3 = reg_filter.filter(
             xr.dot(L, Mi[2], dim=self.contraction_dims, optimize=True)
-        ).persist()
+        )
 
         # Model matrix
         M11 = reg_filter.filter(
             xr.dot(Mi[0], Mi[0], dim=self.contraction_dims, optimize=True)
-        ).persist()
+        )
         M12 = reg_filter.filter(
             xr.dot(Mi[0], Mi[1], dim=self.contraction_dims, optimize=True)
-        ).persist()
+        )
         M13 = reg_filter.filter(
             xr.dot(Mi[0], Mi[2], dim=self.contraction_dims, optimize=True)
-        ).persist()
+        )
         M22 = reg_filter.filter(
             xr.dot(Mi[1], Mi[1], dim=self.contraction_dims, optimize=True)
-        ).persist()
+        )
         M23 = reg_filter.filter(
             xr.dot(Mi[1], Mi[2], dim=self.contraction_dims, optimize=True)
-        ).persist()
+        )
         M33 = reg_filter.filter(
             xr.dot(Mi[2], Mi[2], dim=self.contraction_dims, optimize=True)
-        ).persist()
-
+        )
 
         # Model determinant
         detM = (
@@ -222,7 +220,7 @@ class LillyMinimisation3Model:
 
 @dataclass(frozen=True)
 class LillyMinimisationNModel:
-    """Lilly Minimisation (least square error) for an N-coefficient model using
+    r"""Lilly Minimisation (least square error) for an N-coefficient model using
        the Lilly identity as :math:`$L = \sum_i^N c_i M_i$`.
 
     :param contraction_dims: labels of dimensions to be contracted to form :math:`L M_i `and :math:`M_i M_j` products.
@@ -261,21 +259,9 @@ class LillyMinimisationNModel:
             )
         )
 
-        # FIXME: can't get the distributed xarray API to handle this trivially
-        # so go down to dask mapping of numpy.linalg.solve -> need to reorder axes
         LM = LM.transpose(..., self.coeff_dim)
         LM_expanded = LM.expand_dims(dim="rhs", axis=-1)
         MM = MM.transpose(..., self.coeff_dim, self.coeff_dim + "_dummy")
-        # mm_condition = (
-        #     da.map_blocks(
-        #         np.linalg.cond,
-        #         MM,
-        #         p=None, # order of the norm
-        #         dtype=MM.data.dtype,
-        #     )
-        #     .compute()
-        #     .max()
-        # )
 
         mm_condition = (
             xr.apply_ufunc(
@@ -306,13 +292,8 @@ class LillyMinimisationNModel:
             ],
             output_core_dims=[[self.coeff_dim, "rhs"]],
             vectorize=True,
-            dask="allowed",
+            dask="parallelized",
             output_dtypes=[LM.dtype],
         )
 
         return coefficients.squeeze("rhs")
-
-        # rewrap with Xarray metadata
-        # Note: need to make this eager, otherwise get a 0-size object from da.map_blocks
-        # coefficients = da.map_blocks(np.linalg.solve, MM, LM, dtype=MM.data.dtype)
-        # xr.DataArray(coefficients.compute().squeeze('rhs'), dims=LM.dims, coords=LM.coords)

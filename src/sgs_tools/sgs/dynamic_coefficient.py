@@ -22,9 +22,6 @@ class Minimisation(Protocol):
     """
 
     @property
-    def reg_filter(self) -> Filter: ...
-
-    @property
     def contraction_dims(self) -> Sequence[str]: ...
 
     @property

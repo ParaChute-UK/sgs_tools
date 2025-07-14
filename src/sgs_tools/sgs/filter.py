@@ -111,31 +111,3 @@ class IdentityFilter(Filter):
         :param field: array to be filtered
         """
         return field
-
-
-@dataclass(frozen=True)
-class CoarseGrain(Filter):
-    """Coarse-graining filter class with kernel along dimensions
-    the dimensions of kernel and filter_dims are matched one-to-one as given
-
-        :ivar kernel: filter kernel
-    :ivar filter_dims: dimensions along which to perform filtering;
-        will be paired with dimensions of the kernel.
-    """
-
-    def filter(self, field: xr.DataArray) -> xr.DataArray:
-        """coarse grain field;
-        Note: Warning - unlike Filter.filter, here the output size is different from the input size
-
-        :param field: array to be filtered; must contain all of `filter_dims`
-        """
-        assert (d in field.dims for d in self.filter_dims)
-        dic_dims = self._filter_kernel_map()
-        window: dict[Hashable, int] = {}
-        for d in self.filter_dims:
-            axnum = self.kernel.get_axis_num(dic_dims[d])
-            assert isinstance(axnum, int)  # appease xarray typing
-            window[d] = self.kernel.shape[axnum]
-        return field.coarsen(window, boundary="pad").reduce(
-            np.average, keep_attrs=True, weights=self.kernel
-        )

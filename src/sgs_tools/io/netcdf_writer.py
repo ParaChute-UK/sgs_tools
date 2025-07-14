@@ -3,8 +3,6 @@ from pathlib import Path
 
 import xarray as xr
 
-from ..util.timer import timer
-
 
 @dataclass
 class NetCDFWriter:

@@ -8,7 +8,6 @@ from ..geometry.tensor_algebra import (
     symmetrise,
     traceless,
 )
-from ..util.dask_opt_util import dask_layered
 from .dynamic_coefficient import LillyMinimisation2Model, Minimisation
 from .dynamic_sgs_model import LeonardVelocityTensor, LinCombDynamicModel
 from .filter import Filter

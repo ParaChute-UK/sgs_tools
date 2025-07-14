@@ -1,7 +1,6 @@
 from pathlib import Path
 from typing import Any
 
-import numpy as np
 import xarray as xr
 
 from sgs_tools.io.um import restrict_ds

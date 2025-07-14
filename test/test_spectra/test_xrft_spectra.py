@@ -118,7 +118,7 @@ def test_parseval_2d_radial_powerspec(rand, plane_wave):
             psr = radial_spectrum(
                 ps,
                 ("freq_x", "freq_y"),
-                nbins=ps.shape[0],
+                radial_bin_width=(ps["freq_x"][1] - ps["freq_x"][0]).item(),
                 truncate=False,
                 scaling=scaling,
                 prefix="freq_",
@@ -143,7 +143,7 @@ def test_wavelength_2d_radial_powerspec(plane_wave):
     psr = radial_spectrum(
         ps,
         ("freq_x", "freq_y"),
-        nbins=ps.shape[0],
+        radial_bin_width=(ps["freq_x"][1] - ps["freq_x"][0]).item(),
         truncate=False,
         scaling="spectrum",
         bin_anchor="left",

@@ -572,7 +572,7 @@ def main(args: Dict[str, Any]) -> None:
                     f"{filt_lbl}:{filt.scales()}", "s", f"{filt_lbl}:{filt.scales()}"
                 ):
                     output_path = (
-                        output_dir / f'{args['aniso_fname_out'].stem}_{filt_lbl}'
+                        output_dir / f"{args['aniso_fname_out'].stem}_{filt_lbl}"
                     ).with_suffix(".nc")
                     # don't over-write but skip existing filters/scales
                     if not writer.overwrite and writer.check_filename(output_path):

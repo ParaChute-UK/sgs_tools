@@ -61,14 +61,8 @@ class Filter:
         return tuple(self.kernel.shape)
 
     def scale(self) -> float:
-        return float(np.prod(self.scales()) ** (1 / len(self.filter_dims)))
-
-    def scale(self) -> float:
         shape = self.scales()
         return np.prod(shape) ** (1 / len(shape))
-
-    def scales(self) -> tuple[int, ...]:
-        return self.kernel.shape
 
     def _filter_kernel_map(self) -> dict[Hashable, str]:
         """matches the dimesions of the `kernel` against `self.filter_dims`"""

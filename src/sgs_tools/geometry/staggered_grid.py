@@ -1,7 +1,9 @@
 import xarray as xr
 from numpy import nan
 from xarray.core.types import T_Xarray
+
 from ..util.dask_opt_util import dask_layered
+
 
 @dask_layered
 def get_grid_spacing_coord(coord: xr.DataArray, new_dim: str) -> xr.DataArray:
@@ -14,6 +16,7 @@ def get_grid_spacing_coord(coord: xr.DataArray, new_dim: str) -> xr.DataArray:
     """
     current_name = coord.dims[0]
     return coord.diff(dim=current_name, n=1).rename({current_name: new_dim})
+
 
 @dask_layered
 def interpolate_to_grid(
@@ -99,6 +102,7 @@ def interpolate_to_grid(
     )
     return ds_interp
 
+
 @dask_layered
 def compose_vector_components_on_grid(
     components: list[xr.DataArray],
@@ -142,6 +146,7 @@ def compose_vector_components_on_grid(
     if long_name:
         vec_arr.attrs["long_name"] = long_name
     return vec_arr
+
 
 @dask_layered
 def diff_lin_on_grid(
@@ -206,6 +211,7 @@ def diff_lin_on_grid(
             deriv[c] = centre_point(deriv[c], shift)
     return deriv
 
+
 @dask_layered
 def grad_on_cart_grid(
     ds: xr.DataArray,
@@ -230,6 +236,7 @@ def grad_on_cart_grid(
     # with the same name but on staggered dimensions
     # e.g. d_x.x_cu(x_face) and d_y.x_cu(x_centre) dims
     return xr.merge(grad, compat="minimal")
+
 
 @dask_layered
 def grad_vec_on_grid(

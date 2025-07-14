@@ -12,6 +12,7 @@ from ..geometry.tensor_algebra import (
 from ..geometry.vector_calculus import grad_vector
 from ..util.dask_opt_util import dask_layered
 
+
 @dask_layered
 def strain_from_vel(
     vel: xr.Dataset | Iterable[xr.DataArray],
@@ -42,6 +43,7 @@ def strain_from_vel(
     sij.attrs["long_name"] = r"$S$"
     return sij
 
+
 @dask_layered
 def omega_from_vel(
     vel: xr.Dataset | Iterable[xr.DataArray],
@@ -69,6 +71,7 @@ def omega_from_vel(
     sij.attrs["long_name"] = r"$\Omega$"
     return sij
 
+
 @dask_layered
 def vertical_heat_flux(
     vert_vel: xr.DataArray,
@@ -95,6 +98,7 @@ def vertical_heat_flux(
     ans.name = "vertical_heat_flux"
     ans.attrs["long_name"] = r"$w' \theta'$ "
     return ans
+
 
 @dask_layered
 def Reynolds_fluct_stress(

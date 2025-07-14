@@ -2,10 +2,10 @@ from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
 from pathlib import Path
 from typing import Any, Sequence
 
+import dask
 import matplotlib.pyplot as plt
 import numpy as np
 import xarray as xr
-import dask
 from dask.diagnostics import ProgressBar
 from dask.distributed import Client, LocalCluster
 from numpy import inf
@@ -270,7 +270,7 @@ def gather_model_inputs(simulation: xr.Dataset) -> xr.Dataset:
     return xr.Dataset(
         {
             "vel": vel,
-            'theta': simulation['theta'],
+            "theta": simulation["theta"],
             "sij": sij,
             "omegaij": omegaij,
             "grad_theta": grad_theta,
@@ -319,14 +319,16 @@ def read_write(args: dict[str, Any]) -> xr.Dataset:
             with timer("Extract grid-based fields", "s"):
                 simulation = gather_model_inputs(simulation)
         # chunk
-        simulation = simulation.chunk(chunks={
-            "z": args["z_chunk_size"],
-            "t_0": args["t_chunk_size"],
-            "x": -1,
-            "y": -1,
-            "c1": -1,
-            "c2": -1,
-        })
+        simulation = simulation.chunk(
+            chunks={
+                "z": args["z_chunk_size"],
+                "t_0": args["t_chunk_size"],
+                "x": -1,
+                "y": -1,
+                "c1": -1,
+                "c2": -1,
+            }
+        )
         # out_fname = args["output_file"].with_stem(
         #     "DynCoeffInputFields_" + args["output_file"].stem
         # )
@@ -553,7 +555,6 @@ def main() -> None:
     for m in args["sgs_model"]:
         # setup dynamic model
         with timer(f"Coeff calculation SETUP for {model_name_map[m]} model", "s"):
-
             dynamic_model = model_selection(m, simulation, args["h_resolution"])
 
             coeff = compute_cs(
@@ -566,7 +567,14 @@ def main() -> None:
                 coeff = coeff.rename({"cdim": "c1"})
             coeff.name = m
         # DEBUG
-        print(f"{m} chunksize:", coeff.data.chunksize, "total_size:", coeff.shape, "nbytes", coeff.data.nbytes)
+        print(
+            f"{m} chunksize:",
+            coeff.data.chunksize,
+            "total_size:",
+            coeff.shape,
+            "nbytes",
+            coeff.data.nbytes,
+        )
         # with timer ("Model {m} graph visualize"):
         #   coeff.data.visualize(
         #       filename=f"{model_name_map[m]}_graph_opt.pdf", labels=m, optimize_graph=True, color='order'
@@ -602,10 +610,10 @@ def main() -> None:
     # plot -- first actual calculation
     if args["plot_show"] or args["plot_path"] is not None:
         with timer("Plotting", "s"):
-          # try:
-                plot(args)
-          # except:
-          #   print("Failed in generating plots")
+            # try:
+            plot(args)
+        # except:
+        #   print("Failed in generating plots")
 
 
 if __name__ == "__main__":
@@ -613,7 +621,7 @@ if __name__ == "__main__":
     #           dashboard_address=":8788",
     #           local_dir="/Volumes/Work/tmp",
     #           processes=False  # stays single-process = fewer serialization issues
-          # )
+    # )
     # dask.config.set({"temporary-directory": "/Volumes/Work/tmp/"})
     client = Client(dashboard_address=':8788',  processes=False)  # start distributed scheduler locally.
     print("Dask dashboard at", client.dashboard_link)

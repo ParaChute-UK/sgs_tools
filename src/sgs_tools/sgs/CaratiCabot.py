@@ -10,12 +10,13 @@ from ..geometry.tensor_algebra import (
     tensor_self_outer_product,
     traceless,
 )
+from ..util.dask_opt_util import dask_layered
 from .dynamic_coefficient import LillyMinimisation3Model, Minimisation
 from .dynamic_sgs_model import LeonardVelocityTensor, LinCombDynamicModel
 from .filter import Filter
 from .sgs_model import LinCombSGSModel
 from .util import _assert_coord_dx
-from ..util.dask_opt_util import dask_layered
+
 
 @dask_layered
 def s_parallel(
@@ -31,6 +32,7 @@ def s_parallel(
     S_parallel = symmetrise(n * s_vec, dims=tensor_dims)  # the first two terms
     S_parallel_traceless = traceless(S_parallel, dims=tensor_dims)  # add the last term
     return S_parallel_traceless
+
 
 @dask_layered
 def s_perpendicular(
@@ -57,7 +59,7 @@ class SparallelVelocityModel:
     tensor_dims: tuple[str, str]
     n: Sequence[float]
 
-    @dask_layered('SparallelVelocityModel')
+    @dask_layered("SparallelVelocityModel")
     def sgs_tensor(self, filter: Filter) -> xr.DataArray:
         """compute model for SGS tensor
             :math:`$\\tau = (c_s \Delta) ^2 |\overline{Sij}| \overline{Sij}$`
@@ -103,7 +105,7 @@ class SperpVelocityModel:
     n: Sequence[float]
     tensor_dims: tuple[str, str]
 
-    @dask_layered('SperpVelocityModel')
+    @dask_layered("SperpVelocityModel")
     def sgs_tensor(self, filter: Filter) -> xr.DataArray:
         """compute model for SGS tensor
             :math:`$\\tau = (c_s \Delta) ^2 |\overline{Sij}| \overline{Sij}$`
@@ -150,7 +152,7 @@ class NVelocityModel:
     n: Sequence[float]
     tensor_dims: tuple[str, str]
 
-    @dask_layered('NVelocityModel')
+    @dask_layered("NVelocityModel")
     def sgs_tensor(self, filter: Filter) -> xr.DataArray:
         """compute model for SGS tensor
             :math:`$\\tau = (c_s \Delta) ^2 |\overline{Sij}| \overline{Sik Nkj}$`

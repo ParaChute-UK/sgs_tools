@@ -4,6 +4,7 @@ import dask.array as da
 import numpy as np
 import xarray as xr
 from xarray.core.types import T_Xarray
+
 from ..util.dask_opt_util import dask_layered
 
 
@@ -21,6 +22,7 @@ def tensor_self_outer_product(
     assert vec_dim in arr.dims
     assert new_dim not in arr.dims
     return (arr * arr.rename({vec_dim: new_dim})).transpose(vec_dim, new_dim, ...)
+
 
 @dask_layered
 def trace(
@@ -77,6 +79,7 @@ def traceless(
     traceless = tensor - trace_normed * diag_mask
     return traceless
 
+
 @dask_layered
 def Frobenius_norm(
     tensor: T_Xarray, tens_dims: Sequence[str] = ["c1", "c2"]
@@ -87,6 +90,7 @@ def Frobenius_norm(
     :param dims: dimensions with respect to which to take the norm.
     """
     return np.sqrt(xr.dot(tensor, tensor, dim=tens_dims))
+
 
 @dask_layered
 def symmetrise(
@@ -115,6 +119,7 @@ def symmetrise(
         sij.name = name
     return sij
 
+
 @dask_layered
 def antisymmetrise(
     tensor: xr.DataArray, dims: Sequence[str] = ["c1", "c2"], name=None
@@ -140,6 +145,7 @@ def antisymmetrise(
     if name is not None:
         omij.name = name
     return omij
+
 
 def anisotropy_renorm(
     tensor: T_Xarray, tensor_dims: Sequence[str] = ("c1", "c2")

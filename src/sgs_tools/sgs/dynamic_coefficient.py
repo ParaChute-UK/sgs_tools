@@ -5,8 +5,9 @@ from typing import Protocol, Sequence
 import numpy as np
 import xarray as xr
 
-from .filter import Filter
 from ..util.dask_opt_util import dask_layered
+from .filter import Filter
+
 
 class Minimisation(Protocol):
     r"""
@@ -53,7 +54,7 @@ class LillyMinimisation1Model:
     contraction_dims: Sequence[str]
     coeff_dim: str
 
-    @dask_layered('LillyMinimisation1Model')
+    @dask_layered("LillyMinimisation1Model")
     def compute(
         self, L: xr.DataArray, Mi: Sequence[xr.DataArray], reg_filter: Filter
     ) -> xr.DataArray:
@@ -89,7 +90,7 @@ class LillyMinimisation2Model:
     contraction_dims: Sequence[str]
     coeff_dim: str
 
-    @dask_layered('LillyMinimisation2Model')
+    @dask_layered("LillyMinimisation2Model")
     def compute(
         self, L: xr.DataArray, Mi: Sequence[xr.DataArray], reg_filter: Filter
     ) -> xr.DataArray:
@@ -147,7 +148,7 @@ class LillyMinimisation3Model:
     contraction_dims: Sequence[str]
     coeff_dim: str
 
-    @dask_layered('LillyMinimisation3Model')
+    @dask_layered("LillyMinimisation3Model")
     def compute(
         self, L: xr.DataArray, Mi: Sequence[xr.DataArray], reg_filter: Filter
     ) -> xr.DataArray:
@@ -230,7 +231,7 @@ class LillyMinimisationNModel:
     contraction_dims: Sequence[str]
     coeff_dim: str
 
-    @dask_layered('LillyMinimisationNModel')
+    @dask_layered("LillyMinimisationNModel")
     def compute(
         self, L: xr.DataArray, Mi: Sequence[xr.DataArray], reg_filter: Filter
     ) -> xr.DataArray:

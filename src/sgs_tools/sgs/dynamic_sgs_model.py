@@ -4,11 +4,11 @@ from typing import Protocol
 import xarray as xr
 
 from ..geometry.tensor_algebra import tensor_self_outer_product
+from ..util.dask_opt_util import dask_layered
 from .dynamic_coefficient import Minimisation
 from .filter import Filter, IdentityFilter
 from .sgs_model import LinCombSGSModel, SGSModel
 
-from ..util.dask_opt_util import dask_layered
 
 class LeonardTensor(Protocol):
     """compute the Leonard tensor for a large-scale equation
@@ -69,6 +69,7 @@ class LeonardThetaTensor:
         L = filtered - resolved
         return L
 
+
 @dask_layered
 def M_Germano_tensor(sgs_model: SGSModel, filter: Filter) -> xr.DataArray:
     """compute the Mij Germano model tensor as
@@ -104,7 +105,7 @@ class DynamicModel:
     leonard: LeonardTensor
     minimisation: Minimisation
 
-    @dask_layered('DynamicModel_compute_coeff')
+    @dask_layered("DynamicModel_compute_coeff")
     def compute_coeff(self, test_filter: Filter, reg_filter: Filter) -> xr.DataArray:
         L = self.leonard.compute(test_filter)
         M = M_Germano_tensor(self.static_model, test_filter)
@@ -122,7 +123,7 @@ class LinCombDynamicModel:
     leonard: LeonardTensor
     minimisation: Minimisation
 
-    @dask_layered('DynLinComb_coeff')
+    @dask_layered("DynLinComb_coeff")
     def compute_coeff(self, test_filter: Filter, reg_filter: Filter) -> xr.DataArray:
         L = self.leonard.compute(test_filter)
         M = [

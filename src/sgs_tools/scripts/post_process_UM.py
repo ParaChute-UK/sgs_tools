@@ -425,10 +425,10 @@ def choose_filter_set(
     # Box-cart scales
     meter_scales = [int(res / dx) for res in box_meter_scales]
     domain_scales = [int(hminsize * x) for x in box_domain_scales]
-    box_scales = []  # start with something
+    box_scales: list[float] = []
     # only allows scales at least 2 (delta_<x>) apart
     # order of loop determines precedence
-    for x in set(domain_scales + meter_scales + box_delta_scales):
+    for x in set(domain_scales + meter_scales + list(box_delta_scales)):
         if x > 1 and x < hminsize:
             if not box_scales or np.min(np.abs([x - y for y in box_scales])) >= 2:
                 box_scales += [x]

@@ -2,12 +2,11 @@ from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
 from pathlib import Path
 from typing import Any, Sequence
 
-import dask
 import matplotlib.pyplot as plt
 import numpy as np
 import xarray as xr
 from dask.diagnostics import ProgressBar
-from dask.distributed import Client, LocalCluster
+from dask.distributed import LocalCluster
 from numpy import inf
 from sgs_tools.geometry.staggered_grid import (
     compose_vector_components_on_grid,
@@ -617,14 +616,13 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    # cluster = LocalCluster(
-    #           dashboard_address=":8788",
-    #           local_dir="/Volumes/Work/tmp",
-    #           processes=False  # stays single-process = fewer serialization issues
-    # )
-    # dask.config.set({"temporary-directory": "/Volumes/Work/tmp/"})
-    client = Client(dashboard_address=':8788',  processes=False)  # start distributed scheduler locally.
-    print("Dask dashboard at", client.dashboard_link)
+    # start distributed scheduler locally.
+    cluster = LocalCluster(
+              dashboard_address=":8788",
+              # local_dir="/Volumes/Work/tmp",
+              processes=False  # stays single-process = fewer serialization issues
+    )
+    print("Dask dashboard at", cluster.dashboard_link)
     input("Press Enter to continue...")
     with timer("Total execution time", "min"):
         main()

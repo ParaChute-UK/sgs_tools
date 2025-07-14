@@ -25,7 +25,9 @@ dependencies = [
     "xarray[io,accel,parallel]>=2023.9",
     "xrft",
     "xarray-einstats",
-    "f90nml"
+    "f90nml",
+    "netcdf4",
+    "h5netcdf"
 ]
 
 [project.optional-dependencies]

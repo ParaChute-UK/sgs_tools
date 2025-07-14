@@ -19,5 +19,6 @@ class NetCDFWriter:
             filename,
             mode="w",
             compute=True,
-            engine="h5netcdf",
+            engine="netcdf4",
+            auto_complex=True,
         )

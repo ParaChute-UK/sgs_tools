@@ -22,7 +22,7 @@ from .util import _assert_coord_dx
 def s_parallel(
     s: xr.DataArray, n: xr.DataArray, tensor_dims: tuple[str, str]
 ) -> xr.DataArray:
-    """(n_i (s.n)_j + (s.n)_i n_j - 2/3 \delta_ij (n.s.n) )"""
+    r"""(n_i (s.n)_j + (s.n)_i n_j - 2/3 \delta_ij (n.s.n) )"""
     assert len(n.dims) == 1
     assert len(tensor_dims) == 2
     assert n.dims[0] in tensor_dims
@@ -43,7 +43,7 @@ def s_perpendicular(
 
 @dataclass(frozen=True)
 class SparallelVelocityModel:
-    """Carati & Cabot Proceedings of the 1996 Summer Program -- Center for Turbulence Research
+    r"""Carati & Cabot Proceedings of the 1996 Summer Program -- Center for Turbulence Research
     S_parallel component = |S| Traceless[Symmetric[(S.n)n]]
 
     :ivar strain: grid-scale rate-of-strain
@@ -61,7 +61,7 @@ class SparallelVelocityModel:
 
     @dask_layered("SparallelVelocityModel")
     def sgs_tensor(self, filter: Filter) -> xr.DataArray:
-        """compute model for SGS tensor
+        r"""compute model for SGS tensor
             :math:`$\\tau = (c_s \Delta) ^2 |\overline{Sij}| \overline{Sij}$`
             for a given `filter` (which can be trivial, i.e. ``IdentityFilter``)
 
@@ -89,7 +89,7 @@ class SparallelVelocityModel:
 
 @dataclass(frozen=True)
 class SperpVelocityModel:
-    """Carati & Cabot Proceedings of the 1996 Summer Program -- Center for Turbulence Research
+    r"""Carati & Cabot Proceedings of the 1996 Summer Program -- Center for Turbulence Research
     S_perp component = |S| Traceless(S - (S.n + n.S))
 
     :ivar strain: grid-scale rate-of-strain
@@ -107,7 +107,7 @@ class SperpVelocityModel:
 
     @dask_layered("SperpVelocityModel")
     def sgs_tensor(self, filter: Filter) -> xr.DataArray:
-        """compute model for SGS tensor
+        r"""compute model for SGS tensor
             :math:`$\\tau = (c_s \Delta) ^2 |\overline{Sij}| \overline{Sij}$`
             for a given `filter` (which can be trivial, i.e. ``IdentityFilter``)
 
@@ -136,7 +136,7 @@ class SperpVelocityModel:
 
 @dataclass(frozen=True)
 class NVelocityModel:
-    """Carati & Cabot Proceedings of the 1996 Summer Program -- Center for Turbulence Research
+    r"""Carati & Cabot Proceedings of the 1996 Summer Program -- Center for Turbulence Research
        N component = |S|(n.s.n) Traceless(n * n)
 
     :ivar strain: grid-scale rate-of-strain
@@ -154,7 +154,7 @@ class NVelocityModel:
 
     @dask_layered("NVelocityModel")
     def sgs_tensor(self, filter: Filter) -> xr.DataArray:
-        """compute model for SGS tensor
+        r"""compute model for SGS tensor
             :math:`$\\tau = (c_s \Delta) ^2 |\overline{Sij}| \overline{Sik Nkj}$`
             for a given `filter` (which can be trivial, i.e. ``IdentityFilter``)
 
@@ -195,7 +195,7 @@ def DynamicCaratiCabotModel(
         contraction_dims=["c1", "c2"], coeff_dim="cdim"
     ),
 ) -> LinCombDynamicModel:
-    """Dynamic version of the model by
+    r"""Dynamic version of the model by
     Carati & Cabot Proceedings of the 1996 Summer Program -- Center for Turbulence Research
 
     :param sij: grid-scale rate-of-strain tensor

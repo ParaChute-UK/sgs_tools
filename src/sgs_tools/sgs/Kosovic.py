@@ -17,7 +17,7 @@ from .util import _assert_coord_dx
 
 @dataclass(frozen=True)
 class SSquaredVelocityModel:
-    """Kosovic JFM 1997, 336 / Speziale 1991 Ann Rev Fluid Mech 23
+    r"""Kosovic JFM 1997, 336 / Speziale 1991 Ann Rev Fluid Mech 23
        compoment :math:`$\\tau = (c_s \Delta) ^2 \mathrm{Traceless}[\overline{Sik}\overline{Skj}]$`
 
     :ivar strain: grid-scale rate-of-strain
@@ -32,7 +32,7 @@ class SSquaredVelocityModel:
     tensor_dims: tuple[str, str]
 
     def sgs_tensor(self, filter: Filter) -> xr.DataArray:
-        """compute model for SGS tensor
+        r"""compute model for SGS tensor
            :math:`$\\tau = (c_s \Delta) ^2 \overline{Sik}\overline{Skj}$`
            for a given `filter` (which can be trivial, i.e. ``IdentityFilter``)
 
@@ -54,7 +54,7 @@ class SSquaredVelocityModel:
 
 @dataclass(frozen=True)
 class SOmegaVelocityModel:
-    """Kosovic JFM 1997, 336 / Speziale 1991 Ann Rev Fluid Mech 23
+    r"""Kosovic JFM 1997, 336 / Speziale 1991 Ann Rev Fluid Mech 23
        component :math:`$\\tau = (c_s \Delta) ^2 \mathrm{Sym}[\overline{S_{ik}}\overline{\Omega_{kj}}]$`
 
     :ivar strain: grid-scale rate-of-strain
@@ -71,7 +71,7 @@ class SOmegaVelocityModel:
     tensor_dims: tuple[str, str]
 
     def sgs_tensor(self, filter: Filter) -> xr.DataArray:
-        """compute model for SGS tensor
+        r"""compute model for SGS tensor
             :math:`$\\tau = (c_s \Delta) ^2 \mathrm{Sym}[\overline{S_{ik}}\overline{\Omega_{kj}}]$`
             for a given `filter` (which can be trivial, i.e. ``IdentityFilter``)
 
@@ -107,7 +107,7 @@ def DynamicKosovicModel(
         contraction_dims=["c1", "c2"], coeff_dim="cdim"
     ),
 ) -> LinCombDynamicModel:
-    """Dynamic version of the model by
+    r"""Dynamic version of the model by
     Carati & Cabot Proceedings of the 1996 Summer Program -- Center for Turbulence Research
 
     :param sij: grid-scale rate-of-strain tensor

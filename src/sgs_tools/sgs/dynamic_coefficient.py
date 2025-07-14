@@ -55,7 +55,7 @@ class LillyMinimisation1Model:
     def compute(
         self, L: xr.DataArray, Mi: Sequence[xr.DataArray], reg_filter: Filter
     ) -> xr.DataArray:
-        """Compute :math:`$\overline{L\cdot M} / \overline{M \cdot M}$`.
+        r"""Compute :math:`$\overline{L\cdot M} / \overline{M \cdot M}$`.
         where :math:`$\overline{*}$` means regularisation filtering
 
         :param L: LHS tensor
@@ -91,7 +91,7 @@ class LillyMinimisation2Model:
     def compute(
         self, L: xr.DataArray, Mi: Sequence[xr.DataArray], reg_filter: Filter
     ) -> xr.DataArray:
-        """Compute dynamic coefficients of a 2-component models using Germano identity as :math:`$L = C1 M1 + C2 M2$`.
+        r"""Compute dynamic coefficients of a 2-component models using Germano identity as :math:`$L = C1 M1 + C2 M2$`.
            using regularized least-square minimisation (inverting the :math:`$\overline{M_i M_j}$` matrix analytically)
 
         :param L: LHS tensor
@@ -149,7 +149,7 @@ class LillyMinimisation3Model:
     def compute(
         self, L: xr.DataArray, Mi: Sequence[xr.DataArray], reg_filter: Filter
     ) -> xr.DataArray:
-        """Compute dynamic coefficients of a 3-component models using Germano identity as :math:`$L = C1 M1 + C2 M2 + C3 M3$`.
+        r"""Compute dynamic coefficients of a 3-component models using Germano identity as :math:`$L = C1 M1 + C2 M2 + C3 M3$`.
         using regularized least-square minimisation (inverting the {M_i M_j} matrix explicitly)
 
         :param L: LHS tensor
@@ -232,7 +232,7 @@ class LillyMinimisationNModel:
     def compute(
         self, L: xr.DataArray, Mi: Sequence[xr.DataArray], reg_filter: Filter
     ) -> xr.DataArray:
-        """Solve the system  :math:`$\overline{L \cdot M_i} = \sum_i c_j \overline{M_i \cdot \M_j}$`
+        r"""Solve the system  :math:`$\overline{L \cdot M_i} = \sum_i c_j \overline{M_i \cdot \M_j}$`
         using np.linalg.SVD, where :math:`L \cdot M_i` and :math:`M_i \cdot M_j` are scalar fields
 
         :param L: LHS tensor

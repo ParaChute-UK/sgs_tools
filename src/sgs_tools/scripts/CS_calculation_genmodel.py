@@ -1,6 +1,6 @@
 from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
 from pathlib import Path
-from typing import Any, Sequence
+from typing import Any, Dict, Sequence
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -57,7 +57,7 @@ model_name_map = {
 }
 
 
-def parser() -> dict[str, Any]:
+def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
     parser = ArgumentParser(
         description="""Compute dynamic Smagorinsky coefficients as function
                         of scale from UM NetCDF output and store them in
@@ -127,7 +127,7 @@ def parser() -> dict[str, Any]:
     )
 
     # parse arguments into a dictionary
-    args = vars(parser.parse_args())
+    args = vars(parser.parse_args(arguments))
 
     # model parsing:
     if "all" in args["sgs_model"]:
@@ -518,15 +518,11 @@ def plot(args: dict[str, Any]) -> None:
         plt.show()
 
 
-def main() -> None:
+def main(args: Dict[str, Any]) -> None:
     # read and pre-process simulation
-    with timer("Arguments", "ms"):
-        args = parser()
-    print(args)
     # read UM stasth files: data
     with timer("Read Dataset", "s"):
         simulation = read_write(args)
-        print(simulation)
 
     # check scales make sense
     nhoriz = min(simulation["x"].shape[0], simulation["y"].shape[0])
@@ -624,5 +620,7 @@ if __name__ == "__main__":
     )
     print("Dask dashboard at", cluster.dashboard_link)
     input("Press Enter to continue...")
+    args = parse_args()
+    print(args)
     with timer("Total execution time", "min"):
-        main()
+        main(args)

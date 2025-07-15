@@ -493,11 +493,9 @@ def plot(args: dict[str, Any]) -> None:
             if "cdim" in mean.dims:
                 mean = mean.rename(cdim="c1")
             if "c1" in mean.dims:
-                figures[model] = mean.plot(
-                    x="t_0", row=row_lbl, col="c1", robust=True
-                ).fig  # type: ignore
+                figures[model] = mean.plot(y="z", row=row_lbl, col="c1").fig  # type: ignore
             else:
-                figures[model] = mean.plot(x="t_0", row=row_lbl, robust=True).fig  # type: ignore
+                figures[model] = mean.plot(y="z", row=row_lbl).fig  # type: ignore
                 # figures[model].axes[0].set_title("")
             for ax in figures[model].axes:
                 ax.set_title(wrap_label(ax.get_title()))

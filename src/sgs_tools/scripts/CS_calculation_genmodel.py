@@ -223,10 +223,18 @@ def data_slice(
         if z in ds:
             zslice = (z_range[0] <= ds[z]) * (ds[z] <= z_range[1])
             ds = ds.where(zslice, drop=True)
+        assert not all(ds[var].size == 0 for var in ds), (
+            f"Data z-slice {z_range} results in empty variables. "
+            "Consider relaxing z_range"
+        )
     for t in "t", "t_0":
         if t in ds:
             tslice = (t_range[0] <= ds[t]) * (ds[t] <= t_range[1])
             ds = ds.where(tslice, drop=True)
+        assert not all(ds[var].size == 0 for var in ds), (
+            f"Data t-slice {t_range} results in empty variables. "
+            "Consider relaxing t_range"
+        )
     return ds
 
 

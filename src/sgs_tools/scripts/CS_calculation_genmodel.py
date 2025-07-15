@@ -6,7 +6,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import xarray as xr
 from dask.diagnostics import ProgressBar
-from dask.distributed import LocalCluster
 from numpy import inf
 from sgs_tools.geometry.staggered_grid import (
     compose_vector_components_on_grid,
@@ -333,40 +332,6 @@ def read_write(args: dict[str, Any]) -> xr.Dataset:
                 "c2": -1,
             }
         )
-        # out_fname = ( args["output_path"] / "DynCoeffInputFields.nc")
-        # )
-        # if out_fname.exists():
-        #     raise ValueError(
-        #         f"{out_fname} exists. Will not overwrite! Remove or use it as input with format 'sgs' "
-        #     )
-        # with ProgressBar():
-        #     simulation.to_netcdf(
-        #         out_fname,
-        #         mode="w",
-        #         compute=True,
-        #         engine="h5netcdf",
-        #     )
-
-    # DEBUG
-    # with timer ("Sim graph visualize"):
-    #   for s in simulation:
-    #       print(s, simulation[s].shape, simulation[s].data.chunksize, simulation[s].data.nbytes)
-    #       simulation[s].data.visualize(
-    #           filename=f"{s}_graph.pdf", optimize_graph=False, color='order'
-    #       )
-    #       dask.visualize(
-    #       simulation[s].data,
-    #           filename=f"{s}_graph_opt.pdf", optimize_graph=True, color='order'
-    #       )
-    #       dask.visualize(
-    #       simulation[s].data,
-    #           filename=f"{s}_graph_high_opt.pdf", optimize_graph=True
-    #       )
-    #       dask.visualize(
-    #       simulation[s].data,
-    #           filename=f"{s}_graph_high.pdf", optimize_graph=False
-    #       )
-
     simulation = simulation.persist()
     return simulation
 
@@ -562,28 +527,7 @@ def main(args: Dict[str, Any]) -> None:
             if "cdim" in coeff.dims:
                 coeff = coeff.rename({"cdim": "c1"})
             coeff.name = m
-        # DEBUG
-        print(
-            f"{m} chunksize:",
-            coeff.data.chunksize,
-            "total_size:",
-            coeff.shape,
-            "nbytes",
-            coeff.data.nbytes,
-        )
-        # with timer ("Model {m} graph visualize"):
-        #   coeff.data.visualize(
-        #       filename=f"{model_name_map[m]}_graph_opt.pdf", labels=m, optimize_graph=True, color='order'
-        #   )
-        #   coeff.data.visualize(
-        #         filename=f"{model_name_map[m]}_graph.pdf", labels=m, optimize_graph=False, color='order'
-        #     )
-        #   dask.visualize(coeff.data,
-        #       filename=f"{model_name_map[m]}_graph_high_opt.pdf", optimize_graph=True
-        #   )
-        #   dask.visualize(coeff.data,
-        #       filename=f"{model_name_map[m]}_graph_high.pdf", optimize_graph=False
-        #   )
+
         out_fname = args["output_path"] / f"{model_name_map[m]}.nc"
 
         # trigger computation -- split for time logging
@@ -611,14 +555,6 @@ def main(args: Dict[str, Any]) -> None:
 
 
 if __name__ == "__main__":
-    # start distributed scheduler locally.
-    cluster = LocalCluster(
-              dashboard_address=":8788",
-              # local_dir="/Volumes/Work/tmp",
-              processes=False  # stays single-process = fewer serialization issues
-    )
-    print("Dask dashboard at", cluster.dashboard_link)
-    input("Press Enter to continue...")
     args = parse_args()
     print(args)
     with timer("Total execution time", "min"):

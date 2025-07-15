@@ -38,7 +38,6 @@ from sgs_tools.sgs.Smagorinsky import (
     SmagorinskyHeatModel,
     SmagorinskyVelocityModel,
 )
-from sgs_tools.util.path_utils import add_extension
 from sgs_tools.util.timer import timer
 from xarray.core.types import T_Xarray
 
@@ -67,9 +66,10 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
 
     fname = add_input_group(parser)
     fname.add_argument(
-        "output_file",
+        "output_path",
         type=Path,
-        help="""output path, will create/overwrite existing file and
+        help="""Output directory, where to write netcdf output files.
+                Will create/overwrite existing file and
                 create any missing intermediate directories""",
     )
     fname.add_argument(
@@ -157,9 +157,6 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
         )
 
     assert len(args["filter_scales"]) == len(args["regularize_filter_scales"])
-
-    # add any pottentially missing file extension
-    args["output_file"] = add_extension(args["output_file"], ".nc")
 
     # parse negative values in the [t,z]_range
     if args["t_range"][0] < 0:
@@ -328,8 +325,7 @@ def read_write(args: dict[str, Any]) -> xr.Dataset:
                 "c2": -1,
             }
         )
-        # out_fname = args["output_file"].with_stem(
-        #     "DynCoeffInputFields_" + args["output_file"].stem
+        # out_fname = ( args["output_path"] / "DynCoeffInputFields.nc")
         # )
         # if out_fname.exists():
         #     raise ValueError(
@@ -486,9 +482,8 @@ def plot(args: dict[str, Any]) -> None:
 
     figures = {}
     for model in args["sgs_model"]:
-        mpath = args["output_file"].with_stem(
-            f'{model_name_map[model]}_{args["output_file"].stem}'
-        )
+        mpath = args["output_path"] / f"{model_name_map[model]}.nc"
+
         with timer(f"Plotting {model}", "s"):
             model_data = xr.open_mfdataset(mpath)
             print(model_data)
@@ -583,9 +578,7 @@ def main(args: Dict[str, Any]) -> None:
         #   dask.visualize(coeff.data,
         #       filename=f"{model_name_map[m]}_graph_high.pdf", optimize_graph=False
         #   )
-        out_fname = args["output_file"].with_stem(
-            f'{model_name_map[m]}_{args["output_file"].stem}'
-        )
+        out_fname = args["output_path"] / f"{model_name_map[m]}.nc"
 
         # trigger computation
         with timer(f"Coeff calculation compute for {model_name_map[m]} model", "s"):
@@ -594,6 +587,7 @@ def main(args: Dict[str, Any]) -> None:
         # write to disk
         with timer(f"Coeff calculation write for {model_name_map[m]} model", "s"):
             with ProgressBar():
+                args["output_path"].mkdir(parents=True, exist_ok=True)
                 coeff.to_netcdf(
                     out_fname,
                     mode="w",

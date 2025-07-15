@@ -545,13 +545,6 @@ def main(args: Dict[str, Any]) -> None:
                     unlimited_dims=["scale"],
                     engine="h5netcdf",
                 )
-    # plot
-    if args["plot_show"] or args["plot_path"] is not None:
-        with timer("Plotting", "s"):
-            # try:
-            plot(args)
-        # except:
-        #   print("Failed in generating plots")
 
 
 if __name__ == "__main__":
@@ -559,3 +552,11 @@ if __name__ == "__main__":
     print(args)
     with timer("Total execution time", "min"):
         main(args)
+
+    # plot
+    if args["plot_show"] or args["plot_path"] is not None:
+        with timer("Plotting", "s"):
+            # try:
+            plot(args)
+        # except:
+        #   print("Failed in generating plots")

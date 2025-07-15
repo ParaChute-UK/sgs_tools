@@ -486,12 +486,11 @@ def plot(args: dict[str, Any]) -> None:
 
         with timer(f"Plotting {model}", "s"):
             model_data = xr.open_mfdataset(mpath)
-            print(model_data)
             model_data = model_data[model]
-            print(model_data.shape)
             mean = model_data.mean(["x", "y"])
             if "cdim" in mean.dims:
                 mean = mean.rename(cdim="c1")
+
             if "c1" in mean.dims:
                 figures[model] = mean.plot(y="z", row=row_lbl, col="c1").fig  # type: ignore
             else:
@@ -540,6 +539,7 @@ def main(args: Dict[str, Any]) -> None:
                     args["regularize_filter_type"], regularization_scale, ["x", "y"]
                 )
             )
+
     for m in args["sgs_model"]:
         # setup dynamic model
         with timer(f"Coeff calculation SETUP for {model_name_map[m]} model", "s"):
@@ -578,7 +578,7 @@ def main(args: Dict[str, Any]) -> None:
         #   )
         out_fname = args["output_path"] / f"{model_name_map[m]}.nc"
 
-        # trigger computation
+        # trigger computation -- split for time logging
         with timer(f"Coeff calculation compute for {model_name_map[m]} model", "s"):
             with ProgressBar():
                 coeff.compute()
@@ -593,8 +593,7 @@ def main(args: Dict[str, Any]) -> None:
                     unlimited_dims=["scale"],
                     engine="h5netcdf",
                 )
-
-    # plot -- first actual calculation
+    # plot
     if args["plot_show"] or args["plot_path"] is not None:
         with timer("Plotting", "s"):
             # try:

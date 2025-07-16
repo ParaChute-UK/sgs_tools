@@ -287,14 +287,6 @@ def read(args: dict[str, Any]) -> xr.Dataset:
         simulation = data_ingest_SGS(
             args["input_files"],
             requested_fields=["vel", "theta", "sij", "omegaij", "theta", "grad_theta"],
-            chunks={
-                "z": args["z_chunk_size"],
-                "t_0": args["t_chunk_size"],
-                "x": -1,
-                "y": -1,
-                "c1": -1,
-                "c2": -1,
-            },
         )
         simulation = data_slice(simulation, args["t_range"], args["z_range"])
     else:
@@ -321,17 +313,17 @@ def read(args: dict[str, Any]) -> xr.Dataset:
             simulation = data_slice(simulation, args["t_range"], args["z_range"])
             with timer("Extract grid-based fields", "s"):
                 simulation = gather_model_inputs(simulation)
-        # chunk
-        simulation = simulation.chunk(
-            chunks={
-                "z": args["z_chunk_size"],
-                "t_0": args["t_chunk_size"],
-                "x": -1,
-                "y": -1,
-                "c1": -1,
-                "c2": -1,
-            }
-        )
+    # chunk
+    simulation = simulation.chunk(
+        chunks={
+            "z": args["z_chunk_size"],
+            "t_0": args["t_chunk_size"],
+            "x": -1,
+            "y": -1,
+            "c1": -1,
+            "c2": -1,
+        }
+    )
     simulation = simulation.persist()
     return simulation
 

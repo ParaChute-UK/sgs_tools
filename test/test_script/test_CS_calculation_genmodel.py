@@ -10,7 +10,7 @@ def test_args():
     return [
         "test/test_script/df667_800m_L63_Slicea_p*.nc",
         "800",
-        "test_cs_gen",
+        "__test_cs_gen",
         "--z_chunk_size",
         "10",
         "--t_chunk_size",
@@ -21,7 +21,7 @@ def test_args():
         "--input_format",
         "um",
         "--plot_path",
-        "test_cs_gen/plots",
+        "__test_cs_gen/plots",
         "--filter_type",
         "box",
         "--filter_scale",

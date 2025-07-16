@@ -46,7 +46,7 @@ doc = [
     "pydata-sphinx-theme"
 ]
 [project.scripts]
-cs_dynamic = "sgs_tools.scripts.CS_calculation:main"
+cs_dynamic = "sgs_tools.scripts.CS_calculation_genmodel:main"
 sim_comparison = "sgs_tools.scripts.BasicComparisonSimAnalysis:main"
 ref_comparison = "sgs_tools.scripts.ReferenceComparisonSimAnalysis:main"
 

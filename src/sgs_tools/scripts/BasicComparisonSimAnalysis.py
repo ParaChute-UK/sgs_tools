@@ -1,13 +1,14 @@
 import json
 from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
 from pathlib import Path
-from typing import Any, Callable, Collection, Dict, Iterable, Mapping
+from typing import Any, Dict, Iterable, Mapping, Sequence
 
 import matplotlib.pyplot as plt
 import xarray as xr
 from matplotlib.figure import Figure
 from numpy import arange, array, inf, linspace, ndarray
 from pint import UnitRegistry  # type: ignore
+from sgs_tools.diagnostics.directional_profile import directional_profile
 from sgs_tools.io.um import data_ingest_UM
 from sgs_tools.physics.fields import Reynolds_fluct_stress, vertical_heat_flux
 from sgs_tools.plotting.collection_plots import (
@@ -371,25 +372,6 @@ def add_offline_fields(
     return ds, offline_field_map
 
 
-def vert_profile_reduction(
-    da: xr.DataArray,
-    reduction: Callable | str,
-    reduction_dims: Collection[str],
-) -> xr.DataArray:
-    if reduction == "mean":
-        data = da.mean(reduction_dims).squeeze()
-    elif reduction == "var":
-        data = da.var(reduction_dims).squeeze()
-    elif reduction == "std":
-        data = da.std(reduction_dims).squeeze()
-    elif reduction == "median":
-        data = da.median(reduction_dims).squeeze()
-    else:
-        assert callable(reduction)
-        data = reduction(da, reduction_dims).squeeze()
-    return data
-
-
 def plot_horiz_slices(
     ds_collection: Mapping[str, xr.Dataset],
     fields: Iterable[str],
@@ -428,19 +410,31 @@ def plot_vert_profiles(
     plot_map,
 ) -> Dict[str, Dict[str, Figure]]:
     vert_prof: Dict[str, Dict[str, Figure]] = {}
+    red_coords = set(coord for f in fields for coord in field_plot_map[f].hcoords)
+    dred_collection = {}
+    for sim in ds_collection:
+        local_flist = [f for f in fields if f in ds_collection[sim]]
+        ds = ds_collection[sim][local_flist]
+        local_red_coords = [c for c in red_coords if c in ds.dims]
+        if ds:
+            dred_collection[sim] = directional_profile(
+                ds,
+                local_red_coords,
+                list(reductions),
+            )
     for reduction in reductions:
         vert_prof[reduction] = {}
         for field in fields:
-            da_collection = {}
             if verbose:
                 print(f"Plotting {reduction} of {field}")
-            for k, ds in ds_collection.items():
-                try:
-                    da_collection[k] = vert_profile_reduction(
-                        ds[field], reduction, field_plot_map[field].hcoords
+            da_collection = {}
+            for s in dred_collection:
+                if field in dred_collection[s]:
+                    da_collection[s] = dred_collection[s][field].sel(
+                        statistic=reduction
                     )
-                except:
-                    print(f"Skip missing field {field} from sim {k}")
+                else:
+                    print(f"Skip missing field {field} from sim {s}")
             if da_collection:
                 q = plot_vertical_prof_time_slice_compare_sims_slice(
                     da_collection,
@@ -538,7 +532,7 @@ def plot(
         plot_map["marker_map"][key] = args["plot_map"][i]["marker"]
         plot_map["label_map"][key] = args["plot_map"][i]["label"]
 
-    reductions = ("mean", "var")
+    reductions = ["mean", "var"]
     with timer("Plot vertical profiles", "s"):
         try:
             if args["skip_vert_profiles"]:

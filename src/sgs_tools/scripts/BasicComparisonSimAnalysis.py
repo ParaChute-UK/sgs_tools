@@ -325,12 +325,12 @@ def add_offline_fields(
                     "RdBu_r",
                 )
 
-        ds[f"tke"] = 0.5 * (
+        ds["tke"] = 0.5 * (
             tau.isel(c1=0, c2=0) + tau.isel(c1=1, c2=1) + tau.isel(c1=2, c2=2)
         )
-        ds[f"tke"].attrs.update({"units": "m^2 s-2", "long_name": r"$0.5 (u'_i u'_i)$"})
-        offline_field_map[f"tke"] = field_plot_kwargs(
-            ds[f"tke"].attrs["long_name"],
+        ds["tke"].attrs.update({"units": "m^2 s-2", "long_name": r"$0.5 (u'_i u'_i)$"})
+        offline_field_map["tke"] = field_plot_kwargs(
+            ds["tke"].attrs["long_name"],
             "t",
             "z_theta",
             ("x_centre", "y_centre"),
@@ -358,7 +358,7 @@ def add_offline_fields(
             ds["q_t"] += f
             ds["q_t"].attrs.update({"long_name": "$q_t$"})
         offline_field_map["q_t"] = field_plot_kwargs(
-            ds[f"q_t"].attrs["long_name"],
+            ds["q_t"].attrs["long_name"],
             "t",
             "z_theta",
             ("x_centre", "y_centre"),

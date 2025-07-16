@@ -83,8 +83,6 @@ prof_fields = (
 
 cloud_fields = ("q_l", "q_i", "q_g")
 
-verbose = False
-
 
 def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
     parser = ArgumentParser(
@@ -377,6 +375,7 @@ def plot_horiz_slices(
     fields: Iterable[str],
     zlevels: Iterable[float],
     field_plot_map,
+    verbose: bool = False,
 ) -> Dict[float, Dict[str, Figure]]:
     hor_slice: Dict[float, Dict[str, Figure]] = {}
     for z in zlevels:
@@ -408,6 +407,7 @@ def plot_vert_profiles(
     fields: Iterable[str],
     reductions: Iterable[str],
     plot_map,
+    verbose: bool = False,
 ) -> Dict[str, Dict[str, Figure]]:
     vert_prof: Dict[str, Dict[str, Figure]] = {}
     red_coords = set(coord for f in fields for coord in field_plot_map[f].hcoords)
@@ -434,7 +434,8 @@ def plot_vert_profiles(
                         statistic=reduction
                     )
                 else:
-                    print(f"Skip missing field {field} from sim {s}")
+                    if verbose:
+                        print(f"Skip missing field {field} from sim {s}")
             if da_collection:
                 q = plot_vertical_prof_time_slice_compare_sims_slice(
                     da_collection,
@@ -513,6 +514,7 @@ def plot(
                 slice_fields,
                 args["hor_slice_levels"],
                 field_plot_map,
+                args["verbose"],
             )
         except KeyboardInterrupt:
             print("Detected Keyboard interrup, proceeding with vertical profiles")
@@ -538,7 +540,7 @@ def plot(
             if args["skip_vert_profiles"]:
                 prof_fields = []
             vert_prof = plot_vert_profiles(
-                ds_collection, prof_fields, reductions, plot_map
+                ds_collection, prof_fields, reductions, plot_map, args["verbose"]
             )
         except KeyboardInterrupt:
             print("Detected Keyboard interrup, proceeding with cloud plot.")
@@ -584,7 +586,6 @@ def io(args) -> tuple[Dict[str, xr.Dataset], Dict[str, field_plot_kwargs]]:
         for f, res, plot_map in zip(
             args["input_files"], args["h_resolution"], args["plot_map"]
         ):
-            print(f'{plot_map["label"]}: {f}')
             ds = data_ingest_UM(
                 f,
                 res,
@@ -611,7 +612,6 @@ def io(args) -> tuple[Dict[str, xr.Dataset], Dict[str, field_plot_kwargs]]:
 
 
 def main(args: Dict[str, Any]) -> None:
-    verbose = args["verbose"]
     ds_collection, field_plot_map = io(args)
 
     # make plots

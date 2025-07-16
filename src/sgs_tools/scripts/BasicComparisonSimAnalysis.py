@@ -185,10 +185,13 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
 
     # parse plotting style
     if args["plot_style_file"] is None:
-        plot_styles = [default_plotting_style] * len(args["input_files"])
+        plot_styles = []
         colors = plt.rcParams["axes.prop_cycle"].by_key()["color"]
-        for i, _ in enumerate(plot_styles):
+        linestyles = ["-", "--", ":", "-."]
+        for i in range(len(args["input_files"])):
+            plot_styles.append(default_plotting_style.copy())
             plot_styles[i]["color"] = colors[i % len(colors)]
+            plot_styles[i]["linestyle"] = linestyles[i % len(linestyles)]
             plot_styles[i]["label"] = f"sim{i}"
     else:
         with open(args["plot_style_file"]) as f:

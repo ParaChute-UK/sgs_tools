@@ -22,9 +22,7 @@ def tensor_self_outer_product(
     return (arr * arr.rename({vec_dim: new_dim})).transpose(vec_dim, new_dim, ...)
 
 
-def trace(
-    tensor: xr.DataArray, dims: tuple[str, str] = ("c1", "c2"), name=None
-) -> xr.DataArray:
+def trace(tensor: T_Xarray, dims: Sequence[str] = ("c1", "c2"), name=None) -> T_Xarray:
     r"""trace along 2 dimesions.
 
     :param tensor: tensor input
@@ -47,9 +45,7 @@ def trace(
 # Make a tensor Traceless along 2 dimensions
 
 
-def traceless(
-    tensor: xr.DataArray, dims: tuple[str, str] = ("c1", "c2")
-) -> xr.DataArray:
+def traceless(tensor: xr.DataArray, dims: Sequence[str] = ("c1", "c2")) -> xr.DataArray:
     r"""returns a traceless version of `tensor`.
     **NB** \: bug/unexpected behaviour when nan in trace
 
@@ -154,11 +150,10 @@ def anisotropy_renorm(
 
     # paramater checks are taken care of in the trace call
     tr = trace(tensor, dims=tuple(tensor_dims))
-    d1, d2 = tensor_dims
 
     # create masked array for lazy computation
     identity_dask = da.eye(
-        tensor.sizes[d1],
+        tensor.sizes[tensor_dims[0]],
         chunks=-1,
     )
     diag_mask = xr.DataArray(

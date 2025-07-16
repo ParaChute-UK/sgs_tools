@@ -6,7 +6,7 @@ from typing import Any, Callable, Collection, Dict, Iterable, Mapping
 import matplotlib.pyplot as plt
 import xarray as xr
 from matplotlib.figure import Figure
-from numpy import arange, array, inf, ndarray
+from numpy import arange, array, inf, linspace, ndarray
 from pint import UnitRegistry  # type: ignore
 from sgs_tools.io.um import data_ingest_UM
 from sgs_tools.physics.fields import Reynolds_fluct_stress, vertical_heat_flux
@@ -248,10 +248,11 @@ def preprocess_dataset(
     # take time slice
     times: ndarray
     if args["times"].size == 0:
-        times = arange(0, ds["t"].max(), 60)
+        n = max(1, int((ds["t"].max() - ds["t"].min()) // 60))
+        times = linspace(ds["t"].min().item(), ds["t"].max().item(), n)
     else:
         times = args["times"]
-    ds = ds.sel({"t": times}, method="nearest").drop_duplicates(dim="t")
+        ds = ds.sel({"t": times}, method="nearest").drop_duplicates(dim="t")
 
     # drop top level to align tke to z_theta
     if "thlev_bl_zsea_theta" in ds:
@@ -467,25 +468,31 @@ def plot_clouds(
     for ax, k in zip(axes, ds_collection):
         if "q_t" in ds_collection[k]:
             data = ds_collection[k]["q_t"].mean(field_plot_map["q_t"].hcoords) * 1000
-            data.plot.contourf(
-                ax=ax,
-                y=field_plot_map["q_t"].zcoord,
-                x=field_plot_map["q_t"].tcoord,
-                levels=clevels,
-                robust=True,
-                cmap=field_plot_map["q_t"].cmap,
-                extend="max",
-                add_colorbar=True,
-            )
-            ax.text(
-                0.01,
-                0.99,
-                collection_plot_map["label_map"][k],
-                ha="left",
-                va="top",
-                transform=ax.transAxes,
-                fontsize=24,
-            )
+            if len(field_plot_map["q_t"].tcoord) > 1:
+                data.plot.contourf(
+                    ax=ax,
+                    y=field_plot_map["q_t"].zcoord,
+                    x=field_plot_map["q_t"].tcoord,
+                    levels=clevels,
+                    robust=True,
+                    cmap=field_plot_map["q_t"].cmap,
+                    extend="max",
+                    add_colorbar=True,
+                )
+                ax.text(
+                    0.01,
+                    0.99,
+                    collection_plot_map["label_map"][k],
+                    ha="left",
+                    va="top",
+                    transform=ax.transAxes,
+                    fontsize=24,
+                )
+            else:
+                data.plot(
+                    ax=ax,
+                    y=field_plot_map["q_t"].zcoord,
+                )  # type: ignore
             # ax.tick_params(axis="x", labelsize=16)
             # ax.tick_params(axis="y", labelsize=16)
             empty = False

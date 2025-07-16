@@ -85,7 +85,7 @@ cloud_fields = ("q_l", "q_i", "q_g")
 verbose = False
 
 
-def parse_args() -> dict[str, Any]:
+def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
     parser = ArgumentParser(
         description="""Create (and optionally save) standard diagnostic plots for
                     a dry atmospheric boundary layer UM simulation
@@ -170,7 +170,7 @@ def parse_args() -> dict[str, Any]:
     add_dask_group(parser)
 
     # parse arguments into a dictionary
-    args = vars(parser.parse_args())
+    args = vars(parser.parse_args(arguments))
 
     # check input args
     if len(args["h_resolution"]) == 1:
@@ -606,17 +606,17 @@ def io(args) -> tuple[Dict[str, xr.Dataset], Dict[str, field_plot_kwargs]]:
     return ds_collection, field_plot_map
 
 
-def main():
-    with timer("Total execution time", "min"):
-        with timer("Arguments", "ms"):
-            args = parse_args()
-        verbose = args["verbose"]
-        ds_collection, field_plot_map = io(args)
+def main(args: Dict[str, Any]) -> None:
+    verbose = args["verbose"]
+    ds_collection, field_plot_map = io(args)
 
-        # make plots
-        with timer("Make plots", "s"):
-            plot(ds_collection, args, slice_fields, prof_fields, field_plot_map)
+    # make plots
+    with timer("Make plots", "s"):
+        plot(ds_collection, args, slice_fields, prof_fields, field_plot_map)
 
 
 if __name__ == "__main__":
-    main()
+    with timer("Arguments", "ms"):
+        args = parse_args()
+    with timer("Total execution time", "min"):
+        main(args)

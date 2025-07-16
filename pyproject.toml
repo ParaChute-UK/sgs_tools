@@ -10,7 +10,7 @@ authors = [
     {name = "Dimtar Vlaykov", email = "d.vlaykov@exeter.ac.uk"},
 ]
 
-#urls = {homepage = "https://bitbucket.org/git/dvlaykov/pymusic/"}
+urls = {source = "https://github.com/dvlaykov/sgs_tools.git"}
 
 classifiers = [
     "Development Status :: 2 - Pre-Alpha",

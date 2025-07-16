@@ -281,7 +281,7 @@ def gather_model_inputs(simulation: xr.Dataset) -> xr.Dataset:
     )
 
 
-def read_write(args: dict[str, Any]) -> xr.Dataset:
+def read(args: dict[str, Any]) -> xr.Dataset:
     if args["input_format"] == "sgs":
         # read native SGS_tools  files
         simulation = data_ingest_SGS(
@@ -487,7 +487,7 @@ def main(args: Dict[str, Any]) -> None:
     # read and pre-process simulation
     # read UM stasth files: data
     with timer("Read Dataset", "s"):
-        simulation = read_write(args)
+        simulation = read(args)
 
     # check scales make sense
     nhoriz = min(simulation["x"].shape[0], simulation["y"].shape[0])

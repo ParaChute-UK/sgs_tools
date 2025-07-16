@@ -3,7 +3,6 @@ from dataclasses import dataclass
 import xarray as xr  # only used for type hints
 
 from ..geometry.tensor_algebra import Frobenius_norm
-from ..util.dask_opt_util import dask_layered
 from .dynamic_coefficient import Minimisation
 from .dynamic_sgs_model import DynamicModel, LeonardThetaTensor, LeonardVelocityTensor
 from .filter import Filter
@@ -26,7 +25,6 @@ class SmagorinskyVelocityModel:
     dx: float
     tensor_dims: tuple[str, str]
 
-    @dask_layered("SmagorinskyVelocityModel_sgs")
     def sgs_tensor(self, filter: Filter) -> xr.DataArray:
         r"""compute model for SGS tensor
             :math:`$\\tau = (c_s \Delta) ^2 |\overline{Sij}| \overline{Sij}$`
@@ -64,7 +62,6 @@ class SmagorinskyHeatModel:
     dx: float
     tensor_dims: tuple[str, str]
 
-    @dask_layered("SmagorinskyHeatModel_sgs")
     def sgs_tensor(self, filter):
         r"""compute model for SGS tensor
             :math:`$\\tau =  c_\\theta \\Delta^2 |\overline{Sij}| \overline{\\nabla \\theta} $`

@@ -32,7 +32,8 @@ def plot_vertical_prof_time_slice_compare_sims_slice(
         assert len(da_collection[k].dims) == 2, f"Too many dimensions in dataarray {k}"
 
     # num_sims = len(da_collection)
-    fig, axes = plt.subplots(1, len(times), figsize=(6 * len(times), 4), sharey=False)
+    fig, _ = plt.subplots(1, len(times), figsize=(6 * len(times), 4), sharey=False)
+    axes = fig.axes
     for time, ax in zip(times, axes):
         for k, da in da_collection.items():
             if with_markers:

@@ -27,7 +27,8 @@ dependencies = [
     "xarray-einstats",
     "f90nml",
     "netcdf4",
-    "h5netcdf"
+    "h5netcdf",
+    "pint"
 ]
 
 [project.optional-dependencies]
@@ -36,7 +37,6 @@ dev = [
     "mypy",
     "pytest",
     "ruff",
-    "pint"
 ]
 doc = [
     "sphinx",

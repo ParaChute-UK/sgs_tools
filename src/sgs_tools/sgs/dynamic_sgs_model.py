@@ -70,7 +70,7 @@ class LeonardThetaTensor:
 
 
 def M_Germano_tensor(sgs_model: SGSModel, filter: Filter) -> xr.DataArray:
-    """compute the Mij Germano model tensor as
+    r"""compute the Mij Germano model tensor as
     (<tau(at grid)> - alpha^2 tau(at filter))
     where (delta * alpha) is the area/volume spanned by the filter kernel
 

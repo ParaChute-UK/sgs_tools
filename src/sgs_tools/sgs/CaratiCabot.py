@@ -20,7 +20,7 @@ from .util import _assert_coord_dx
 def s_parallel(
     s: xr.DataArray, n: xr.DataArray, tensor_dims: tuple[str, str]
 ) -> xr.DataArray:
-    r"""(n_i (s.n)_j + (s.n)_i n_j - 2/3 \delta_ij (n.s.n) )"""
+    r"""Project of s in the n-direction: :math: `$(n_i (s.n)_j + (s.n)_i n_j - 2/3 \delta_ij (n.s.n) )$`"""
     assert len(n.dims) == 1
     assert len(tensor_dims) == 2
     assert n.dims[0] in tensor_dims
@@ -58,8 +58,7 @@ class SparallelVelocityModel:
 
     def sgs_tensor(self, filter: Filter) -> xr.DataArray:
         r"""compute model for SGS tensor
-            :math:`$\\tau = (c_s \Delta) ^2 |\overline{Sij}| \overline{Sij}$`
-            for a given `filter` (which can be trivial, i.e. ``IdentityFilter``)
+            :math:`\\tau = |S| Traceless[Symmetric[(S.n)n]]`
 
         :param filter: Filter used to separate "large" and "small" scales
         """
@@ -103,7 +102,7 @@ class SperpVelocityModel:
 
     def sgs_tensor(self, filter: Filter) -> xr.DataArray:
         r"""compute model for SGS tensor
-            :math:`$\\tau = (c_s \Delta) ^2 |\overline{Sij}| \overline{Sij}$`
+            :math:`\\tau = |S| Traceless(S - (S.n + n.S))`
             for a given `filter` (which can be trivial, i.e. ``IdentityFilter``)
 
         :param filter: Filter used to separate "large" and "small" scales
@@ -121,9 +120,9 @@ class SperpVelocityModel:
             dims=[self.tensor_dims[0]],
             coords={self.tensor_dims[0]: self.strain.coords[self.tensor_dims[0]]},
         )
-        s_per = s_perpendicular(sij, n, self.tensor_dims)
+        s_perp = s_perpendicular(sij, n, self.tensor_dims)
         snorm = Frobenius_norm(sij, self.tensor_dims)
-        tau = (self.cs * self.dx) ** 2 * snorm * s_per
+        tau = (self.cs * self.dx) ** 2 * snorm * s_perp
         return tau.assign_coords(
             {tdim: [1, 2, 3] for tdim in self.tensor_dims if tdim in tau.dims}
         )

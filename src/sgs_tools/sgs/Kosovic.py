@@ -108,6 +108,8 @@ def DynamicKosovicModel2(
 ) -> LinCombDynamicModel:
     """Dynamic version of the model by
     Kosovic 1997 JFM vol. 336, pp. 151–182 model without the S-Omega term
+    same as
+    Moin 1993 New Approaches and Concepts in Turbulence, Springer, first model
 
     :param sij: grid-scale rate-of-strain tensor
     :param vel: velocity field used for dynamic coefficient computation

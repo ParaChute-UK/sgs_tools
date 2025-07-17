@@ -20,16 +20,15 @@ from sgs_tools.scripts.arg_parsers import (
     add_input_group,
     add_plotting_group,
 )
-from sgs_tools.sgs.CaratiCabot import DynamicCaratiCabotModel3
+from sgs_tools.sgs.CaratiCabot import DynamicCaratiCabotModel2, DynamicCaratiCabotModel3
 from sgs_tools.sgs.dynamic_coefficient import (
     LillyMinimisation1Model,
     LillyMinimisation2Model,
     LillyMinimisation3Model,
-    Minimisation,
 )
 from sgs_tools.sgs.dynamic_sgs_model import DynamicModelProtcol
 from sgs_tools.sgs.filter import Filter, box_kernel, weight_gauss_3d, weight_gauss_5d
-from sgs_tools.sgs.Kosovic import DynamicKosovicModel3
+from sgs_tools.sgs.Kosovic import DynamicKosovicModel2, DynamicKosovicModel3
 from sgs_tools.sgs.Smagorinsky import (
     DynamicSmagorinskyHeatModel,
     DynamicSmagorinskyVelocityModel,
@@ -40,15 +39,17 @@ from sgs_tools.util.timer import timer
 from xarray.core.types import T_Xarray
 
 # supported models
-vel_models = ["Smag_vel", "Smag_vel_diag", "Carati", "Kosovic"]
+vel_models = ["Smag_vel", "Smag_vel_diag", "Carati2", "Carati3", "Kosovic2", "Kosovic3"]
 theta_models = ["Smag_theta", "Smag_theta_diag"]
 model_choices = ["all", "vel_all", "theta_all"] + vel_models + theta_models
 
 model_name_map = {
     "Smag_vel": "Cs_isotropic",
     "Smag_vel_diag": "Cs_diagonal",
-    "Carati": "Cs_CaratiCabot",
-    "Kosovic": "Cs_Kosovic",
+    "Carati2": "Cs_CaratiCabot_2comp",
+    "Carati3": "Cs_CaratiCabot_3comp",
+    "Kosovic2": "Cs_Kosovic_2comp",
+    "Kosovic3": "Cs_Kosovic_3comp",
     "Smag_theta": "Ctheta_isotropic",
     "Smag_theta_diag": "Ctheta_diagonal",
 }
@@ -352,7 +353,19 @@ def model_selection(
             simulation.vel,
             LillyMinimisation1Model(contraction_dims=["c2"], coeff_dim="cdim"),
         )
-    if model == "Carati":
+    if model == "Carati2":
+        return DynamicCaratiCabotModel2(
+            simulation.sij,
+            res=h_resolution,
+            compoment_coeff=[1.0, 1.0],
+            n=[0.0, 0.0, 1.0],  # gravity direction
+            vel=simulation.vel,
+            tensor_dims=("c1", "c2"),
+            minimisation=LillyMinimisation2Model(
+                contraction_dims=["c1", "c2"], coeff_dim="cdim"
+            ),
+        )
+    if model == "Carati3":
         return DynamicCaratiCabotModel3(
             simulation.sij,
             res=h_resolution,
@@ -364,7 +377,18 @@ def model_selection(
                 contraction_dims=["c1", "c2"], coeff_dim="cdim"
             ),
         )
-    if model == "Kosovic":
+    if model == "Kosovic2":
+        return DynamicKosovicModel2(
+            simulation.sij,
+            res=h_resolution,
+            compoment_coeff=[1.0, 1.0],
+            vel=simulation.vel,
+            tensor_dims=("c1", "c2"),
+            minimisation=LillyMinimisation2Model(
+                contraction_dims=["c1", "c2"], coeff_dim="cdim"
+            ),
+        )
+    if model == "Kosovic3":
         return DynamicKosovicModel3(
             simulation.sij,
             simulation.omegaij,

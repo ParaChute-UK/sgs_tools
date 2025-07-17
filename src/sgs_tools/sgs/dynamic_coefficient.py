@@ -1,8 +1,7 @@
 import warnings
 from dataclasses import dataclass
-from typing import Any, Protocol, Sequence
+from typing import Protocol, Sequence
 
-import dask.array as da
 import numpy as np
 import xarray as xr
 
@@ -10,12 +9,11 @@ from .filter import Filter
 
 
 class Minimisation(Protocol):
-    """
+    r"""
     Protocol for solving the over-determined tensor equation
     :math:`L = \sum_i c_i M_i`, where `L` and `M_i` are tensors and
     :math:`c_i` are scalar coefficients to be computed.
 
-    :ivar reg_filter: Filter used to regularize the contracted tensor products.
     :ivar contraction_dims: Names of the dimensions to contract when forming the
         tensor products :math:`L M_i` and :math:`M_i M_j`.
     :ivar coeff_dim: Dimension label along which the resulting coefficients
@@ -23,43 +21,44 @@ class Minimisation(Protocol):
     """
 
     @property
-    def reg_filter(self) -> Filter: ...
-
-    @property
     def contraction_dims(self) -> Sequence[str]: ...
 
     @property
     def coeff_dim(self) -> str: ...
 
-    def compute(self, L: xr.DataArray, Mi: Sequence[xr.DataArray]) -> xr.DataArray:
-        """solve for :math:{c_i}` the over-determined system :math:`L = \sum_i(c_i M_i)`.
+    def compute(
+        self, L: xr.DataArray, Mi: Sequence[xr.DataArray], reg_filter: Filter
+    ) -> xr.DataArray:
+        r"""solve for :math:{c_i}` the over-determined system :math:`L = \sum_i(c_i M_i)`.
 
         :param L: LHS tensor
         :param M: a sequence of RHS tensors
+        :param reg_filter: Filter used to regularize the contracted tensor products.
         """
 
 
 @dataclass(frozen=True)
 class LillyMinimisation1Model:
-    """Lilly Minimisation (least square error) for a 1-global-coefficient model using
+    r"""Lilly Minimisation (least square error) for a 1-global-coefficient model using
        the Lilly identity as :math:`$\overline{L \cdot M} / \overline{M \cdot M}$`.
        where :math:`$\cdot$`means  tensor contraction, :math:`$\overline{*}$` means regularisation filtering
 
     :param contraction_dims: labels of dimensions to be contracted to form :math:`L M_i `and :math:`M_i M_j` products.
-    :param filter_regularize: Filter used to regularise the tensor products :math:`L M_i`
     :param coeff_dim: label of dimension along which to concatenate the arrays :math:`c_i`
     """
 
-    reg_filter: Filter
     contraction_dims: Sequence[str]
     coeff_dim: str
 
-    def compute(self, L: xr.DataArray, Mi: Sequence[xr.DataArray]) -> xr.DataArray:
-        """Compute :math:`$\overline{L\cdot M} / \overline{M \cdot M}$`.
+    def compute(
+        self, L: xr.DataArray, Mi: Sequence[xr.DataArray], reg_filter: Filter
+    ) -> xr.DataArray:
+        r"""Compute :math:`$\overline{L\cdot M} / \overline{M \cdot M}$`.
         where :math:`$\overline{*}$` means regularisation filtering
 
         :param L: LHS tensor
         :param M: a sequence of *1* RHS tensors
+        :param reg_filter: Filter used to regularize the contracted tensor products.
         """
         assert len(Mi) == 1
         assert all(t in L.dims for t in self.contraction_dims)
@@ -67,8 +66,8 @@ class LillyMinimisation1Model:
 
         MM = xr.dot(Mi[0], Mi[0], dim=self.contraction_dims)
         LM = xr.dot(L, Mi[0], dim=self.contraction_dims)
-        filt_LM = self.reg_filter.filter(LM)
-        filt_MM = self.reg_filter.filter(MM)
+        filt_LM = reg_filter.filter(LM)
+        filt_MM = reg_filter.filter(MM)
 
         coeff = filt_LM / filt_MM
         return coeff
@@ -76,24 +75,25 @@ class LillyMinimisation1Model:
 
 @dataclass(frozen=True)
 class LillyMinimisation2Model:
-    """Lilly Minimisation (least square error) for a 2-coefficient model using
+    r"""Lilly Minimisation (least square error) for a 2-coefficient model using
        the Lilly identity as :math:`$L = \sum_i^2 c_i M_i$`.
 
     :param contraction_dims: labels of dimensions to be contracted to form :math:`L M_i `and :math:`M_i M_j` products.
-    :param filter_regularize: Filter used to regularise the tensor products :math:`L M_i`
     :param coeff_dim: label of dimension along which to concatenate the arrays :math:`c_i`
     """
 
-    reg_filter: Filter
     contraction_dims: Sequence[str]
     coeff_dim: str
 
-    def compute(self, L: xr.DataArray, Mi: Sequence[xr.DataArray]) -> xr.DataArray:
-        """Compute dynamic coefficients of a 2-component models using Germano identity as :math:`$L = C1 M1 + C2 M2$`.
+    def compute(
+        self, L: xr.DataArray, Mi: Sequence[xr.DataArray], reg_filter: Filter
+    ) -> xr.DataArray:
+        r"""Compute dynamic coefficients of a 2-component models using Germano identity as :math:`$L = C1 M1 + C2 M2$`.
            using regularized least-square minimisation (inverting the :math:`$\overline{M_i M_j}$` matrix analytically)
 
         :param L: LHS tensor
         :param M: a sequence of *2* RHS tensors
+        :param reg_filter: Filter used to regularize the contracted tensor products.
         """
         assert len(Mi) == 2
         assert all(t in L.dims for t in self.contraction_dims)
@@ -101,20 +101,20 @@ class LillyMinimisation2Model:
             assert all(t in Mi_tensor.dims for t in self.contraction_dims)
 
         # Filtered Leonard contractions
-        LM1 = self.reg_filter.filter(
+        LM1 = reg_filter.filter(
             xr.dot(L, Mi[0], dim=self.contraction_dims, optimize=True)
         )
-        LM2 = self.reg_filter.filter(
+        LM2 = reg_filter.filter(
             xr.dot(L, Mi[1], dim=self.contraction_dims, optimize=True)
         )
         # Model matrix
-        M11 = self.reg_filter.filter(
+        M11 = reg_filter.filter(
             xr.dot(Mi[0], Mi[0], dim=self.contraction_dims, optimize=True)
         )
-        M12 = self.reg_filter.filter(
+        M12 = reg_filter.filter(
             xr.dot(Mi[0], Mi[1], dim=self.contraction_dims, optimize=True)
         )
-        M22 = self.reg_filter.filter(
+        M22 = reg_filter.filter(
             xr.dot(Mi[1], Mi[1], dim=self.contraction_dims, optimize=True)
         )
         # Model determinant
@@ -132,24 +132,25 @@ class LillyMinimisation2Model:
 
 @dataclass(frozen=True)
 class LillyMinimisation3Model:
-    """Lilly Minimisation (least square error) for a 3-coefficient model using
+    r"""Lilly Minimisation (least square error) for a 3-coefficient model using
        the Lilly identity as :math:`$L = \sum_i^3 c_i M_i$`.
 
     :param contraction_dims: labels of dimensions to be contracted to form :math:`L M_i `and :math:`M_i M_j` products.
-    :param filter_regularize: Filter used to regularise the tensor products :math:`L M_i`
     :param coeff_dim: label of dimension along which to concatenate the arrays :math:`c_i`
     """
 
-    reg_filter: Filter
     contraction_dims: Sequence[str]
     coeff_dim: str
 
-    def compute(self, L: xr.DataArray, Mi: Sequence[xr.DataArray]) -> xr.DataArray:
-        """Compute dynamic coefficients of a 3-component models using Germano identity as :math:`$L = C1 M1 + C2 M2 + C3 M3$`.
+    def compute(
+        self, L: xr.DataArray, Mi: Sequence[xr.DataArray], reg_filter: Filter
+    ) -> xr.DataArray:
+        r"""Compute dynamic coefficients of a 3-component models using Germano identity as :math:`$L = C1 M1 + C2 M2 + C3 M3$`.
         using regularized least-square minimisation (inverting the {M_i M_j} matrix explicitly)
 
         :param L: LHS tensor
         :param M: a sequence of *3* RHS tensors
+        :param reg_filter: Filter used to regularize the contracted tensor products.
         """
         assert len(Mi) == 3
         assert all(t in L.dims for t in self.contraction_dims)
@@ -157,33 +158,33 @@ class LillyMinimisation3Model:
             assert all(t in Mi_tensor.dims for t in self.contraction_dims)
 
         # Filtered Leonard contractions
-        LM1 = self.reg_filter.filter(
+        LM1 = reg_filter.filter(
             xr.dot(L, Mi[0], dim=self.contraction_dims, optimize=True)
         )
-        LM2 = self.reg_filter.filter(
+        LM2 = reg_filter.filter(
             xr.dot(L, Mi[1], dim=self.contraction_dims, optimize=True)
         )
-        LM3 = self.reg_filter.filter(
+        LM3 = reg_filter.filter(
             xr.dot(L, Mi[2], dim=self.contraction_dims, optimize=True)
         )
 
         # Model matrix
-        M11 = self.reg_filter.filter(
+        M11 = reg_filter.filter(
             xr.dot(Mi[0], Mi[0], dim=self.contraction_dims, optimize=True)
         )
-        M12 = self.reg_filter.filter(
+        M12 = reg_filter.filter(
             xr.dot(Mi[0], Mi[1], dim=self.contraction_dims, optimize=True)
         )
-        M13 = self.reg_filter.filter(
+        M13 = reg_filter.filter(
             xr.dot(Mi[0], Mi[2], dim=self.contraction_dims, optimize=True)
         )
-        M22 = self.reg_filter.filter(
+        M22 = reg_filter.filter(
             xr.dot(Mi[1], Mi[1], dim=self.contraction_dims, optimize=True)
         )
-        M23 = self.reg_filter.filter(
+        M23 = reg_filter.filter(
             xr.dot(Mi[1], Mi[2], dim=self.contraction_dims, optimize=True)
         )
-        M33 = self.reg_filter.filter(
+        M33 = reg_filter.filter(
             xr.dot(Mi[2], Mi[2], dim=self.contraction_dims, optimize=True)
         )
 
@@ -213,23 +214,25 @@ class LillyMinimisation3Model:
 
 @dataclass(frozen=True)
 class LillyMinimisationNModel:
-    """Lilly Minimisation (least square error) for an N-coefficient model using
+    r"""Lilly Minimisation (least square error) for an N-coefficient model using
        the Lilly identity as :math:`$L = \sum_i^N c_i M_i$`.
 
     :param contraction_dims: labels of dimensions to be contracted to form :math:`L M_i `and :math:`M_i M_j` products.
-    :param filter_regularize: Filter used to regularise the tensor products :math:`L M_i`
     :param coeff_dim: label of dimension along which to concatenate the arrays :math:`c_i`
     """
 
-    reg_filter: Filter
     contraction_dims: Sequence[str]
     coeff_dim: str
 
-    def compute(self, L: xr.DataArray, Mi: Sequence[xr.DataArray]) -> xr.DataArray:
-        """Solve the system  :math:`$\overline{L \cdot M_i} = \sum_i c_j \overline{M_i \cdot \M_j}$`
+    def compute(
+        self, L: xr.DataArray, Mi: Sequence[xr.DataArray], reg_filter: Filter
+    ) -> xr.DataArray:
+        r"""Solve the system  :math:`$\overline{L \cdot M_i} = \sum_i c_j \overline{M_i \cdot \M_j}$`
         using np.linalg.SVD, where :math:`L \cdot M_i` and :math:`M_i \cdot M_j` are scalar fields
+
         :param L: LHS tensor
         :param M: a sequence of RHS tensors
+        :param reg_filter: Filter used to regularize the contracted tensor products.
         """
         assert all(t in L.dims for t in self.contraction_dims)
         for M in Mi:
@@ -238,11 +241,9 @@ class LillyMinimisationNModel:
         # consider memory consumption for M
         M = xr.concat(Mi, dim=self.coeff_dim)
         # Filtered Leonard contractions
-        LM = self.reg_filter.filter(
-            xr.dot(L, M, dim=self.contraction_dims, optimize=True)
-        )
+        LM = reg_filter.filter(xr.dot(L, M, dim=self.contraction_dims, optimize=True))
         # Filtered Model-Leonard contractions
-        MM = self.reg_filter.filter(
+        MM = reg_filter.filter(
             xr.dot(
                 M,
                 M.rename({self.coeff_dim: self.coeff_dim + "_dummy"}),

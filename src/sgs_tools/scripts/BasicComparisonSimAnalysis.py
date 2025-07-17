@@ -1,13 +1,14 @@
 import json
 from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
 from pathlib import Path
-from typing import Any, Callable, Collection, Dict, Iterable, Mapping
+from typing import Any, Dict, Iterable, Mapping, Sequence
 
 import matplotlib.pyplot as plt
 import xarray as xr
 from matplotlib.figure import Figure
-from numpy import arange, array, inf, ndarray
+from numpy import arange, array, inf, linspace, ndarray
 from pint import UnitRegistry  # type: ignore
+from sgs_tools.diagnostics.directional_profile import directional_profile
 from sgs_tools.io.um import data_ingest_UM
 from sgs_tools.physics.fields import Reynolds_fluct_stress, vertical_heat_flux
 from sgs_tools.plotting.collection_plots import (
@@ -82,10 +83,8 @@ prof_fields = (
 
 cloud_fields = ("q_l", "q_i", "q_g")
 
-verbose = False
 
-
-def parse_args() -> dict[str, Any]:
+def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
     parser = ArgumentParser(
         description="""Create (and optionally save) standard diagnostic plots for
                     a dry atmospheric boundary layer UM simulation
@@ -170,7 +169,7 @@ def parse_args() -> dict[str, Any]:
     add_dask_group(parser)
 
     # parse arguments into a dictionary
-    args = vars(parser.parse_args())
+    args = vars(parser.parse_args(arguments))
 
     # check input args
     if len(args["h_resolution"]) == 1:
@@ -185,10 +184,13 @@ def parse_args() -> dict[str, Any]:
 
     # parse plotting style
     if args["plot_style_file"] is None:
-        plot_styles = [default_plotting_style] * len(args["input_files"])
+        plot_styles = []
         colors = plt.rcParams["axes.prop_cycle"].by_key()["color"]
-        for i, _ in enumerate(plot_styles):
+        linestyles = ["-", "--", ":", "-."]
+        for i in range(len(args["input_files"])):
+            plot_styles.append(default_plotting_style.copy())
             plot_styles[i]["color"] = colors[i % len(colors)]
+            plot_styles[i]["linestyle"] = linestyles[i % len(linestyles)]
             plot_styles[i]["label"] = f"sim{i}"
     else:
         with open(args["plot_style_file"]) as f:
@@ -245,10 +247,11 @@ def preprocess_dataset(
     # take time slice
     times: ndarray
     if args["times"].size == 0:
-        times = arange(0, ds["t"].max(), 60)
+        n = max(1, int((ds["t"].max() - ds["t"].min()) // 60))
+        times = linspace(ds["t"].min().item(), ds["t"].max().item(), n)
     else:
         times = args["times"]
-    ds = ds.sel({"t": times}, method="nearest").drop_duplicates(dim="t")
+        ds = ds.sel({"t": times}, method="nearest").drop_duplicates(dim="t")
 
     # drop top level to align tke to z_theta
     if "thlev_bl_zsea_theta" in ds:
@@ -321,12 +324,12 @@ def add_offline_fields(
                     "RdBu_r",
                 )
 
-        ds[f"tke"] = 0.5 * (
+        ds["tke"] = 0.5 * (
             tau.isel(c1=0, c2=0) + tau.isel(c1=1, c2=1) + tau.isel(c1=2, c2=2)
         )
-        ds[f"tke"].attrs.update({"units": "m^2 s-2", "long_name": r"$0.5 (u'_i u'_i)$"})
-        offline_field_map[f"tke"] = field_plot_kwargs(
-            ds[f"tke"].attrs["long_name"],
+        ds["tke"].attrs.update({"units": "m^2 s-2", "long_name": r"$0.5 (u'_i u'_i)$"})
+        offline_field_map["tke"] = field_plot_kwargs(
+            ds["tke"].attrs["long_name"],
             "t",
             "z_theta",
             ("x_centre", "y_centre"),
@@ -354,7 +357,7 @@ def add_offline_fields(
             ds["q_t"] += f
             ds["q_t"].attrs.update({"long_name": "$q_t$"})
         offline_field_map["q_t"] = field_plot_kwargs(
-            ds[f"q_t"].attrs["long_name"],
+            ds["q_t"].attrs["long_name"],
             "t",
             "z_theta",
             ("x_centre", "y_centre"),
@@ -367,30 +370,12 @@ def add_offline_fields(
     return ds, offline_field_map
 
 
-def vert_profile_reduction(
-    da: xr.DataArray,
-    reduction: Callable | str,
-    reduction_dims: Collection[str],
-) -> xr.DataArray:
-    if reduction == "mean":
-        data = da.mean(reduction_dims).squeeze()
-    elif reduction == "var":
-        data = da.var(reduction_dims).squeeze()
-    elif reduction == "std":
-        data = da.std(reduction_dims).squeeze()
-    elif reduction == "median":
-        data = da.median(reduction_dims).squeeze()
-    else:
-        assert callable(reduction)
-        data = reduction(da, reduction_dims).squeeze()
-    return data
-
-
 def plot_horiz_slices(
     ds_collection: Mapping[str, xr.Dataset],
     fields: Iterable[str],
     zlevels: Iterable[float],
     field_plot_map,
+    verbose: bool = False,
 ) -> Dict[float, Dict[str, Figure]]:
     hor_slice: Dict[float, Dict[str, Figure]] = {}
     for z in zlevels:
@@ -422,21 +407,35 @@ def plot_vert_profiles(
     fields: Iterable[str],
     reductions: Iterable[str],
     plot_map,
+    verbose: bool = False,
 ) -> Dict[str, Dict[str, Figure]]:
     vert_prof: Dict[str, Dict[str, Figure]] = {}
+    red_coords = set(coord for f in fields for coord in field_plot_map[f].hcoords)
+    dred_collection = {}
+    for sim in ds_collection:
+        local_flist = [f for f in fields if f in ds_collection[sim]]
+        ds = ds_collection[sim][local_flist]
+        local_red_coords = [c for c in red_coords if c in ds.dims]
+        if ds:
+            dred_collection[sim] = directional_profile(
+                ds,
+                local_red_coords,
+                list(reductions),
+            )
     for reduction in reductions:
         vert_prof[reduction] = {}
         for field in fields:
-            da_collection = {}
             if verbose:
                 print(f"Plotting {reduction} of {field}")
-            for k, ds in ds_collection.items():
-                try:
-                    da_collection[k] = vert_profile_reduction(
-                        ds[field], reduction, field_plot_map[field].hcoords
+            da_collection = {}
+            for s in dred_collection:
+                if field in dred_collection[s]:
+                    da_collection[s] = dred_collection[s][field].sel(
+                        statistic=reduction
                     )
-                except:
-                    print(f"Skip missing field {field} from sim {k}")
+                else:
+                    if verbose:
+                        print(f"Skip missing field {field} from sim {s}")
             if da_collection:
                 q = plot_vertical_prof_time_slice_compare_sims_slice(
                     da_collection,
@@ -464,25 +463,31 @@ def plot_clouds(
     for ax, k in zip(axes, ds_collection):
         if "q_t" in ds_collection[k]:
             data = ds_collection[k]["q_t"].mean(field_plot_map["q_t"].hcoords) * 1000
-            data.plot.contourf(
-                ax=ax,
-                y=field_plot_map["q_t"].zcoord,
-                x=field_plot_map["q_t"].tcoord,
-                levels=clevels,
-                robust=True,
-                cmap=field_plot_map["q_t"].cmap,
-                extend="max",
-                add_colorbar=True,
-            )
-            ax.text(
-                0.01,
-                0.99,
-                collection_plot_map["label_map"][k],
-                ha="left",
-                va="top",
-                transform=ax.transAxes,
-                fontsize=24,
-            )
+            if len(field_plot_map["q_t"].tcoord) > 1:
+                data.plot.contourf(
+                    ax=ax,
+                    y=field_plot_map["q_t"].zcoord,
+                    x=field_plot_map["q_t"].tcoord,
+                    levels=clevels,
+                    robust=True,
+                    cmap=field_plot_map["q_t"].cmap,
+                    extend="max",
+                    add_colorbar=True,
+                )
+                ax.text(
+                    0.01,
+                    0.99,
+                    collection_plot_map["label_map"][k],
+                    ha="left",
+                    va="top",
+                    transform=ax.transAxes,
+                    fontsize=24,
+                )
+            else:
+                data.plot(
+                    ax=ax,
+                    y=field_plot_map["q_t"].zcoord,
+                )  # type: ignore
             # ax.tick_params(axis="x", labelsize=16)
             # ax.tick_params(axis="y", labelsize=16)
             empty = False
@@ -509,6 +514,7 @@ def plot(
                 slice_fields,
                 args["hor_slice_levels"],
                 field_plot_map,
+                args["verbose"],
             )
         except KeyboardInterrupt:
             print("Detected Keyboard interrup, proceeding with vertical profiles")
@@ -528,13 +534,13 @@ def plot(
         plot_map["marker_map"][key] = args["plot_map"][i]["marker"]
         plot_map["label_map"][key] = args["plot_map"][i]["label"]
 
-    reductions = ("mean", "var")
+    reductions = ["mean", "var"]
     with timer("Plot vertical profiles", "s"):
         try:
             if args["skip_vert_profiles"]:
                 prof_fields = []
             vert_prof = plot_vert_profiles(
-                ds_collection, prof_fields, reductions, plot_map
+                ds_collection, prof_fields, reductions, plot_map, args["verbose"]
             )
         except KeyboardInterrupt:
             print("Detected Keyboard interrup, proceeding with cloud plot.")
@@ -580,7 +586,6 @@ def io(args) -> tuple[Dict[str, xr.Dataset], Dict[str, field_plot_kwargs]]:
         for f, res, plot_map in zip(
             args["input_files"], args["h_resolution"], args["plot_map"]
         ):
-            print(f'{plot_map["label"]}: {f}')
             ds = data_ingest_UM(
                 f,
                 res,
@@ -606,17 +611,16 @@ def io(args) -> tuple[Dict[str, xr.Dataset], Dict[str, field_plot_kwargs]]:
     return ds_collection, field_plot_map
 
 
-def main():
-    with timer("Total execution time", "min"):
-        with timer("Arguments", "ms"):
-            args = parse_args()
-        verbose = args["verbose"]
-        ds_collection, field_plot_map = io(args)
+def main(args: Dict[str, Any]) -> None:
+    ds_collection, field_plot_map = io(args)
 
-        # make plots
-        with timer("Make plots", "s"):
-            plot(ds_collection, args, slice_fields, prof_fields, field_plot_map)
+    # make plots
+    with timer("Make plots", "s"):
+        plot(ds_collection, args, slice_fields, prof_fields, field_plot_map)
 
 
 if __name__ == "__main__":
-    main()
+    with timer("Arguments", "ms"):
+        args = parse_args()
+    with timer("Total execution time", "min"):
+        main(args)

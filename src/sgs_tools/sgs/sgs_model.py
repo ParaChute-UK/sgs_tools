@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Any, Protocol, Sequence
+from typing import Protocol, Sequence
 
 import xarray as xr
 

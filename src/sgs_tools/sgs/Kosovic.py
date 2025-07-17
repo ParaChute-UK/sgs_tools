@@ -8,17 +8,22 @@ from ..geometry.tensor_algebra import (
     symmetrise,
     traceless,
 )
-from .Smagorinsky import SmagorinskyVelocityModel
+from .dynamic_coefficient import (
+    LillyMinimisation2Model,
+    LillyMinimisation3Model,
+    Minimisation,
+)
 from .dynamic_sgs_model import LeonardVelocityTensor, LinCombDynamicModel
 from .filter import Filter
 from .sgs_model import LinCombSGSModel
+from .Smagorinsky import SmagorinskyVelocityModel
 from .util import _assert_coord_dx
 
 
 @dataclass(frozen=True)
 class SSquaredVelocityModel:
-    """Kosovic JFM 1997, 336 / Speziale 1991 Ann Rev Fluid Mech 23
-       compoment :math:`$\\tau = (c_s \Delta) ^2 \mathrm{Traceless}[\overline{Sik}\overline{Skj}]$`
+    r"""Kosovic JFM 1997, 336 / Speziale 1991 Ann Rev Fluid Mech 23
+       compoment :math:` \\tau = (c_s \Delta) ^2 \mathrm{Traceless}[\overline{Sik}\overline{Skj}]`
 
     :ivar strain: grid-scale rate-of-strain
     :ivar cs: Smagorinsky coefficient
@@ -32,8 +37,8 @@ class SSquaredVelocityModel:
     tensor_dims: tuple[str, str]
 
     def sgs_tensor(self, filter: Filter) -> xr.DataArray:
-        """compute model for SGS tensor
-           :math:`$\\tau = (c_s \Delta) ^2 \overline{Sik}\overline{Skj}$`
+        r"""compute model for SGS tensor
+           :math:`\\tau = (c_s \Delta) ^2 \overline{Sik}\overline{Skj}`
            for a given `filter` (which can be trivial, i.e. ``IdentityFilter``)
 
         :param filter: Filter used to separate "large" and "small" scales
@@ -54,8 +59,8 @@ class SSquaredVelocityModel:
 
 @dataclass(frozen=True)
 class SOmegaVelocityModel:
-    """Kosovic JFM 1997, 336 / Speziale 1991 Ann Rev Fluid Mech 23
-       component :math:`$\\tau = (c_s \Delta) ^2 \mathrm{Sym}[\overline{S_{ik}}\overline{\Omega_{kj}}]$`
+    r"""Kosovic JFM 1997, 336 / Speziale 1991 Ann Rev Fluid Mech 23
+       component :math:`\\tau = (c_s \Delta) ^2 \mathrm{Sym}[\overline{S_{ik}}\overline{\Omega_{kj}}]`
 
     :ivar strain: grid-scale rate-of-strain
     :ivar rot: grid-scale rate-of-rotation
@@ -71,7 +76,7 @@ class SOmegaVelocityModel:
     tensor_dims: tuple[str, str]
 
     def sgs_tensor(self, filter: Filter) -> xr.DataArray:
-        """compute model for SGS tensor
+        r"""compute model for SGS tensor
             :math:`$\\tau = (c_s \Delta) ^2 \mathrm{Sym}[\overline{S_{ik}}\overline{\Omega_{kj}}]$`
             for a given `filter` (which can be trivial, i.e. ``IdentityFilter``)
 
@@ -102,6 +107,9 @@ def DynamicKosovicModel2(
     res: float,
     compoment_coeff: Sequence[float],
     tensor_dims: tuple[str, str] = ("c1", "c2"),
+    minimisation: Minimisation = LillyMinimisation2Model(
+        contraction_dims=["c1", "c2"], coeff_dim="cdim"
+    ),
 ) -> LinCombDynamicModel:
     """Dynamic version of the model by
     Kosovic 1997 JFM vol. 336, pp. 151–182 model without the S-Omega term
@@ -115,7 +123,8 @@ def DynamicKosovicModel2(
     """
     static_model = LinCombSGSModel(
         [
-            SmagorinskyVelocityModel(strain=sij,
+            SmagorinskyVelocityModel(
+                strain=sij,
                 cs=compoment_coeff[0],
                 dx=res,
                 tensor_dims=tensor_dims,
@@ -125,11 +134,11 @@ def DynamicKosovicModel2(
                 cs=compoment_coeff[1],
                 dx=res,
                 tensor_dims=tensor_dims,
-            )
+            ),
         ]
     )
     leonard = LeonardVelocityTensor(vel, tensor_dims)
-    return LinCombDynamicModel(static_model, leonard)
+    return LinCombDynamicModel(static_model, leonard, minimisation)
 
 
 def DynamicKosovicModel3(
@@ -139,9 +148,12 @@ def DynamicKosovicModel3(
     res: float,
     compoment_coeff: Sequence[float],
     tensor_dims: tuple[str, str] = ("c1", "c2"),
+    minimisation: Minimisation = LillyMinimisation3Model(
+        contraction_dims=["c1", "c2"], coeff_dim="cdim"
+    ),
 ) -> LinCombDynamicModel:
-    """Dynamic version of the model by
-    Kosovic 1997 JFM vol. 336, pp. 151–182 full model
+    r"""Dynamic version of the model by
+    Kosovic 1997 JFM vol. 336, pp. 151–182 model without the S-Omega term
 
     :param sij: grid-scale rate-of-strain tensor
     :param omegaij: grid-scale rate-of-rotation tensor
@@ -153,7 +165,8 @@ def DynamicKosovicModel3(
     """
     static_model = LinCombSGSModel(
         [
-            SmagorinskyVelocityModel(strain=sij,
+            SmagorinskyVelocityModel(
+                strain=sij,
                 cs=compoment_coeff[0],
                 dx=res,
                 tensor_dims=tensor_dims,
@@ -174,4 +187,4 @@ def DynamicKosovicModel3(
         ]
     )
     leonard = LeonardVelocityTensor(vel, tensor_dims)
-    return LinCombDynamicModel(static_model, leonard)
+    return LinCombDynamicModel(static_model, leonard, minimisation)

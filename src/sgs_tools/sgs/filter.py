@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Hashable
+from typing import Hashable, Sequence
 
 import dask.array as da
 import numpy as np
@@ -55,7 +55,14 @@ class Filter:
     """
 
     kernel: xr.DataArray
-    filter_dims: list[Hashable]
+    filter_dims: Sequence[Hashable]
+
+    def scales(self) -> tuple[int, ...]:
+        return tuple(self.kernel.shape)
+
+    def scale(self) -> float:
+        shape = self.scales()
+        return np.prod(shape) ** (1 / len(shape))
 
     def _filter_kernel_map(self) -> dict[Hashable, str]:
         """matches the dimesions of the `kernel` against `self.filter_dims`"""
@@ -71,7 +78,7 @@ class Filter:
         return Filter(self.kernel, dims)
 
     def filter(self, field: xr.DataArray) -> xr.DataArray:
-        """filter field
+        """filterer field
 
         :param field: array to be filtered; must contain all of `filter_dims`
         """
@@ -83,7 +90,12 @@ class Filter:
             assert isinstance(axnum, int)  # appease xarray typing
             dic_roll[d] = self.kernel.shape[axnum]
 
-        return field.rolling(dic_roll).construct(dic_dims).dot(self.kernel)
+        filtered = field.rolling(dic_roll).construct(dic_dims).dot(self.kernel)
+        # arr.rolling().construct.() blows up the underlying chunksizes -- restore
+        filtered = filtered.chunk(
+            {k: field.chunks[i] for i, k in enumerate(field.dims)}  # type: ignore
+        )
+        return filtered
 
 
 @dataclass(frozen=True)

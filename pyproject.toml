@@ -10,7 +10,7 @@ authors = [
     {name = "Dimtar Vlaykov", email = "d.vlaykov@exeter.ac.uk"},
 ]
 
-#urls = {homepage = "https://bitbucket.org/git/dvlaykov/pymusic/"}
+urls = {source = "https://github.com/dvlaykov/sgs_tools.git"}
 
 classifiers = [
     "Development Status :: 2 - Pre-Alpha",
@@ -23,7 +23,12 @@ requires-python = ">=3.11"
 dependencies = [
     "matplotlib>=3.6",
     "xarray[io,accel,parallel]>=2023.9",
-    "f90nml"
+    "xrft",
+    "xarray-einstats",
+    "f90nml",
+    "netcdf4",
+    "h5netcdf",
+    "pint"
 ]
 
 [project.optional-dependencies]
@@ -32,7 +37,6 @@ dev = [
     "mypy",
     "pytest",
     "ruff",
-    "pint"
 ]
 doc = [
     "sphinx",
@@ -42,7 +46,7 @@ doc = [
     "pydata-sphinx-theme"
 ]
 [project.scripts]
-cs_dynamic = "sgs_tools.scripts.CS_calculation:main"
+cs_dynamic = "sgs_tools.scripts.CS_calculation_genmodel:main"
 sim_comparison = "sgs_tools.scripts.BasicComparisonSimAnalysis:main"
 ref_comparison = "sgs_tools.scripts.ReferenceComparisonSimAnalysis:main"
 

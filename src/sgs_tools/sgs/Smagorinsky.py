@@ -3,6 +3,7 @@ from dataclasses import dataclass
 import xarray as xr  # only used for type hints
 
 from ..geometry.tensor_algebra import Frobenius_norm
+from .dynamic_coefficient import Minimisation
 from .dynamic_sgs_model import DynamicModel, LeonardThetaTensor, LeonardVelocityTensor
 from .filter import Filter
 from .util import _assert_coord_dx
@@ -23,7 +24,7 @@ class SmagorinskyVelocityModel:
     tensor_dims: tuple[str, str]
 
     def sgs_tensor(self, filter: Filter) -> xr.DataArray:
-        """compute model for SGS tensor
+        r"""compute model for SGS tensor
             :math:`$\\tau = (c_s \Delta) ^2 |\overline{Sij}| \overline{Sij}$`
             for a given `filter` (which can be trivial, i.e. ``IdentityFilter``)
 
@@ -57,7 +58,7 @@ class SmagorinskyHeatModel:
     tensor_dims: tuple[str, str]
 
     def sgs_tensor(self, filter):
-        """compute model for SGS tensor
+        r"""compute model for SGS tensor
             :math:`$\\tau =  c_\\theta \\Delta^2 |\overline{Sij}| \overline{\\nabla \\theta} $`
             for a given filter (which can be trivial, i.e. IdentityFilter)
 
@@ -76,14 +77,17 @@ class SmagorinskyHeatModel:
 
 
 def DynamicSmagorinskyVelocityModel(
-    smag_vel: SmagorinskyVelocityModel, vel: xr.DataArray,
+    smag_vel: SmagorinskyVelocityModel, vel: xr.DataArray, minimisation: Minimisation
 ) -> DynamicModel:
     leonard = LeonardVelocityTensor(vel, smag_vel.tensor_dims)
-    return DynamicModel(smag_vel, leonard)
+    return DynamicModel(smag_vel, leonard, minimisation)
 
 
 def DynamicSmagorinskyHeatModel(
-    smag_theta: SmagorinskyHeatModel, vel: xr.DataArray, theta: xr.DataArray,
+    smag_theta: SmagorinskyHeatModel,
+    vel: xr.DataArray,
+    theta: xr.DataArray,
+    minimisation: Minimisation,
 ) -> DynamicModel:
     leonard = LeonardThetaTensor(vel, theta, smag_theta.tensor_dims)
-    return DynamicModel(smag_theta, leonard)
+    return DynamicModel(smag_theta, leonard, minimisation)

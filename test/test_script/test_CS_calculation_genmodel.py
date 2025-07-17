@@ -39,17 +39,17 @@ def test_main_full_pipeline(test_args):
     # check test output directory is clean, so we can safely wipe it on exit
     tmp_path = Path(test_args[2])
     tmp_path.mkdir(exist_ok=False, parents=False)
-
-    # parse clargs
-    args = cs_gen.parse_args(test_args)
-    # execute main
-    cs_gen.main(args)
-    # Assert outputs exists
-    assert len(list(args["output_path"].glob("*.nc"))) > 0
-    # execute plotting
-    cs_gen.plot(args)
-    assert len(list(args["plot_path"].glob("*.pdf"))) > 0
-
-    # Cleanup
-    if tmp_path.exists():
-        shutil.rmtree(tmp_path)
+    try:
+        # parse clargs
+        args = cs_gen.parse_args(test_args)
+        # execute main
+        cs_gen.main(args)
+        # Assert outputs exists
+        assert len(list(args["output_path"].glob("*.nc"))) > 0
+        # execute plotting
+        cs_gen.plot(args)
+        assert len(list(args["plot_path"].glob("*.pdf"))) > 0
+    finally:
+        # Cleanup
+        if tmp_path.exists():
+            shutil.rmtree(tmp_path)

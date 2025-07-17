@@ -4,6 +4,7 @@ import xarray as xr
 from sgs_tools.geometry.tensor_algebra import (
     Frobenius_norm,
     antisymmetrise,
+    matrix_prod,
     symmetrise,
     tensor_self_outer_product,
     trace,
@@ -127,6 +128,32 @@ def test_antisymmetrise_with_name(sample_tensor):
     assert result.name == "antisymmetric_tensor"
 
 
+def test_matrix_prod():
+    # Create sample data
+    # First test case: 2D matrix multiplication
+    data1 = np.array([[1, 2], [3, 4]])
+    data2 = np.array([[5, 6], [7, 8]])
+
+    tensor1 = xr.DataArray(
+        data1, dims=["row", "col"], coords={"row": [0, 1], "col": [0, 1]}
+    )
+
+    tensor2 = xr.DataArray(
+        data2, dims=["height", "width"], coords={"height": [0, 1], "width": [0, 1]}
+    )
+
+    # Expected result for left matrix multiplication
+    expected = np.matmul(data1, data2)
+    result = matrix_prod(tensor1, tensor2, "col", "height")
+    np.testing.assert_array_equal(result.values, expected)
+    assert result.dims == ("row", "width")
+
+    # Expected result for left matrix multiplication
+    expected = np.matmul(data2, data1)
+    result = matrix_prod(tensor1, tensor2, "row", "width")
+    np.testing.assert_array_equal(result.values.T, expected)
+    assert result.dims == ("col", "height")
+
 class TestEdgeCases:
     def test_tensor_self_outer_product_invalid_dims(self):
         # Test when new_dim already exists
@@ -165,3 +192,17 @@ class TestEdgeCases:
         )
         with pytest.raises((ValueError, AssertionError)):
             symmetrise(tensor)
+
+    def test_matrix_prod_errors(self):
+        # Test error cases
+        data1 = np.array([[1, 2], [3, 4]])
+        tensor1 = xr.DataArray(data1, dims=["row", "col"])
+
+        # Test non-existent dimension
+        with pytest.raises(AssertionError):
+            matrix_prod(tensor1, tensor1, "nonexistent", "col")
+
+        # Test with 'dummy' in dimensions
+        tensor_dummy = xr.DataArray(data1, dims=["dummy", "col"])
+        with pytest.raises(AssertionError):
+            matrix_prod(tensor_dummy, tensor1, "dummy", "col")

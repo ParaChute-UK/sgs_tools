@@ -4,10 +4,7 @@ from typing import Sequence
 
 import xarray as xr
 
-from ..geometry.tensor_algebra import (
-    symmetrise,
-    traceless,
-)
+from ..geometry.tensor_algebra import matrix_prod, symmetrise, traceless
 from .dynamic_coefficient import (
     LillyMinimisation2Model,
     LillyMinimisation3Model,
@@ -49,9 +46,7 @@ class SSquaredVelocityModel:
         _assert_coord_dx(filter.filter_dims, self.strain, self.dx)
 
         sij = filter.filter(self.strain)
-        sleft = sij.rename({self.tensor_dims[1]: "dummy1"})
-        sright = sij.rename({self.tensor_dims[0]: "dummy1"})
-        s_prod = traceless(xr.dot(sleft, sright, dim="dummy1", optimize=True))
+        s_prod = traceless(matrix_prod(sij, sij, *self.tensor_dims))
 
         tau = (self.cs * self.dx) ** 2 * s_prod
         return tau
@@ -92,9 +87,9 @@ class SOmegaVelocityModel:
           If false will produce trace-full result"""
         )
 
-        sij = filter.filter(self.strain).rename({self.tensor_dims[1]: "dummy1"})
-        rotij = filter.filter(self.rot).rename({self.tensor_dims[0]: "dummy1"})
-        s_prod = symmetrise(xr.dot(sij, rotij, dim="dummy1", optimize=True))
+        sij = filter.filter(self.strain)
+        rotij = filter.filter(self.rot)
+        s_prod = symmetrise(matrix_prod(sij, rotij, *self.tensor_dims))
         # assumes that self.rot is anti-symmetric, and self.strain is symmetric
         # so we don't need to make the product traceless explicitly
         tau = (self.cs * self.dx) ** 2 * s_prod

@@ -138,6 +138,26 @@ def antisymmetrise(
     return omij
 
 
+def matrix_prod(
+    tensor1: xr.DataArray, tensor2: xr.DataArray, dim1: str, dim2: str
+) -> xr.DataArray:
+    """matrix product of two tensors matching dimension1 and dimension2
+
+    :param tensor1: first tensor
+    :param tensor2: second tensor
+    :param dim1: dimension of tensor1 along which to take the product
+    :param dim2: dimension of tensor2 along which to take the product
+    :return: :math: `sum_{dim1=dim2} tensor1{...dim1} * tensor2{...dim2...}`
+    """
+    assert dim1 in tensor1.dims
+    assert dim2 in tensor2.dims
+    assert "dummy" not in tensor1.dims and "dummy" not in tensor2.dims
+
+    left = tensor1.rename({dim1: "dummy1"})
+    right = tensor2.rename({dim2: "dummy1"})
+    return xr.dot(left, right, dim="dummy1", optimize=True)
+
+
 def anisotropy_renorm(
     tensor: T_Xarray, tensor_dims: Sequence[str] = ("c1", "c2")
 ) -> T_Xarray:

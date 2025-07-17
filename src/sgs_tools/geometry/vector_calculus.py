@@ -1,8 +1,9 @@
 import numpy as np
 import xarray as xr
 
-
 # Vector calculus
+
+
 def grad_scalar(
     sca: xr.DataArray, space_dims: list[str], new_dim_name: str = "c1", name=None
 ) -> xr.DataArray:

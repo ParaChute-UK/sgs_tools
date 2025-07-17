@@ -1,17 +1,12 @@
 from dataclasses import dataclass
-from typing import Hashable
 
 import xarray as xr  # only used for type hints
 
 from ..geometry.tensor_algebra import Frobenius_norm
+from .dynamic_coefficient import Minimisation
 from .dynamic_sgs_model import DynamicModel, LeonardThetaTensor, LeonardVelocityTensor
 from .filter import Filter
-
-
-# check that arr is uniform along `filter_dims` with spacing of `dx`
-def _assert_coord_dx(filter_dims: list[Hashable], arr: xr.DataArray, dx: float) -> None:
-    for c in filter_dims:
-        assert (arr[c].diff(dim=c) == dx).all(), f"Not uniform dimension {c}: {arr[c]}"
+from .util import _assert_coord_dx
 
 
 @dataclass(frozen=True)
@@ -87,14 +82,14 @@ class SmagorinskyHeatModel:
 
 
 def DynamicSmagorinskyVelocityModel(
-    smag_vel: SmagorinskyVelocityModel,
+    smag_vel: SmagorinskyVelocityModel, minimisation: Minimisation
 ) -> DynamicModel:
     leonard = LeonardVelocityTensor(smag_vel.vel, smag_vel.tensor_dims)
-    return DynamicModel(smag_vel, leonard)
+    return DynamicModel(smag_vel, leonard, minimisation)
 
 
 def DynamicSmagorinskyHeatModel(
-    smag_theta: SmagorinskyHeatModel, theta: xr.DataArray
+    smag_theta: SmagorinskyHeatModel, theta: xr.DataArray, minimisation: Minimisation
 ) -> DynamicModel:
     leonard = LeonardThetaTensor(smag_theta.vel, theta, smag_theta.tensor_dims)
-    return DynamicModel(smag_theta, leonard)
+    return DynamicModel(smag_theta, leonard, minimisation)

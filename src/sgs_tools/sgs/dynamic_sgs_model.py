@@ -84,45 +84,54 @@ def M_Germano_tensor(sgs_model: SGSModel, filter: Filter) -> xr.DataArray:
     return M
 
 
+class DynamicModelProtcol(Protocol):
+    """compute the Leonard tensor for a large-scale equation
+
+    * :meth:`compute`: returns the SGS tensor for a given filter
+    """
+
+    def compute_coeff(self, test_filter: Filter, reg_filter: Filter) -> xr.DataArray:
+        """ """
+
+    def sgs_tensor(self, test_filter: Filter, reg_filter: Filter) -> xr.DataArray:
+        """ """
+
+
 @dataclass(frozen=True)
 class DynamicModel:
     static_model: SGSModel
     leonard: LeonardTensor
+    minimisation: Minimisation
 
-    def compute_coeff(
-        self, test_filter: Filter, minimisation: Minimisation
-    ) -> xr.DataArray:
+    def compute_coeff(self, test_filter: Filter, reg_filter: Filter) -> xr.DataArray:
         L = self.leonard.compute(test_filter)
         M = M_Germano_tensor(self.static_model, test_filter)
-        return minimisation.compute(L, [M])
+        return self.minimisation.compute(L, [M], reg_filter)
 
-    def sgs_tensor(self):
-        return self.compute_coeff() * self.static_model.sgs_tensor(
-            self.minimisation.test_filter
-        )
+    def sgs_tensor(self, test_filter: Filter, reg_filter: Filter) -> xr.DataArray:
+        return self.compute_coeff(
+            test_filter, reg_filter
+        ) * self.static_model.sgs_tensor(test_filter)
 
 
 @dataclass(frozen=True)
 class LinCombDynamicModel:
     static_model: LinCombSGSModel
     leonard: LeonardTensor
+    minimisation: Minimisation
 
-    def compute_coeff(
-        self, test_filter: Filter, minimisation: Minimisation
-    ) -> xr.DataArray:
+    def compute_coeff(self, test_filter: Filter, reg_filter: Filter) -> xr.DataArray:
         L = self.leonard.compute(test_filter)
         M = [
             M_Germano_tensor(m, test_filter) for m in self.static_model.model_components
         ]
-        return minimisation.compute(L, M)
+        return self.minimisation.compute(L, M, reg_filter)
 
-    def sgs_tensor(
-        self, test_filter: Filter, minimisation: Minimisation
-    ) -> xr.DataArray:
+    def sgs_tensor(self, test_filter: Filter, reg_filter: Filter) -> xr.DataArray:
         tau_list = self.static_model.sgs_tensor_list(test_filter)
-        coeff = self.compute_coeff(test_filter, minimisation)
-        # ensure label alignment between static_model and minimisation
-        cdim = minimisation.coeff_dim
+        coeff = self.compute_coeff(test_filter, reg_filter)
+        # ensure alignment of coefficient index label between static_model and minimisation
+        cdim = self.minimisation.coeff_dim
         if cdim in tau_list[0].dims:
             coeff = coeff.rename({cdim: cdim + "_dummy"})
             cdim = cdim + "_dummy"

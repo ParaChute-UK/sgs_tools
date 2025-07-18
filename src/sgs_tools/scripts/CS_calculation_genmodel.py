@@ -21,7 +21,7 @@ from sgs_tools.scripts.arg_parsers import (
     add_plotting_group,
 )
 from sgs_tools.sgs.CaratiCabot import DynamicCaratiCabotModel2, DynamicCaratiCabotModel3
-from sgs_tools.sgs.dynamic_coefficient import (
+from sgs_tools.sgs.dynamic_minimisation import (
     LillyMinimisation1Model,
     LillyMinimisation2Model,
     LillyMinimisation3Model,

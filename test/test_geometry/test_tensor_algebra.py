@@ -154,6 +154,7 @@ def test_matrix_prod():
     np.testing.assert_array_equal(result.values.T, expected)
     assert result.dims == ("col", "height")
 
+
 class TestEdgeCases:
     def test_tensor_self_outer_product_invalid_dims(self):
         # Test when new_dim already exists

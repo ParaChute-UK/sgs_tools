@@ -10,7 +10,7 @@ from ..geometry.tensor_algebra import (
     tensor_self_outer_product,
     traceless,
 )
-from .dynamic_coefficient import (
+from .dynamic_minimisation import (
     LillyMinimisation2Model,
     LillyMinimisation3Model,
     Minimisation,

@@ -4,7 +4,7 @@ from typing import Protocol
 import xarray as xr
 
 from ..geometry.tensor_algebra import tensor_self_outer_product
-from .dynamic_coefficient import Minimisation
+from .dynamic_minimisation import Minimisation
 from .filter import Filter, IdentityFilter
 from .sgs_model import LinCombSGSModel, SGSModel
 

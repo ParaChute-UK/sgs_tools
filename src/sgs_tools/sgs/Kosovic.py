@@ -5,7 +5,7 @@ from typing import Sequence
 import xarray as xr
 
 from ..geometry.tensor_algebra import matrix_prod, symmetrise, traceless
-from .dynamic_coefficient import (
+from .dynamic_minimisation import (
     LillyMinimisation2Model,
     LillyMinimisation3Model,
     Minimisation,

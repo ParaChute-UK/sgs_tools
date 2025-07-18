@@ -1,6 +1,6 @@
 import numpy as np
 import xarray as xr  # only used for type hints
-from sgs_tools.sgs.dynamic_coefficient import (
+from sgs_tools.sgs.dynamic_minimisation import (
     LillyMinimisation1Model,
     LillyMinimisation2Model,
     LillyMinimisation3Model,

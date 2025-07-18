@@ -3,7 +3,7 @@ from dataclasses import dataclass
 import xarray as xr  # only used for type hints
 
 from ..geometry.tensor_algebra import Frobenius_norm
-from .dynamic_coefficient import Minimisation
+from .dynamic_minimisation import Minimisation
 from .dynamic_sgs_model import DynamicModel, LeonardThetaTensor, LeonardVelocityTensor
 from .filter import Filter
 from .util import _assert_coord_dx

@@ -3,7 +3,7 @@ requires = ["setuptools>=61", "setuptools_scm>=8"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "SGS_tools"
+name = "sgs_tools"
 dynamic = ["version"]
 description = "Python tools for sub-grid scale fluid analyis"
 authors = [

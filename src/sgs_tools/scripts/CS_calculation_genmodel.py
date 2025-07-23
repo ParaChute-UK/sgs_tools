@@ -475,7 +475,7 @@ def plot(args: dict[str, Any]) -> None:
         plt.show()
 
 
-def main(args: Dict[str, Any]) -> None:
+def run(args: Dict[str, Any]) -> None:
     # read and pre-process simulation
     # read UM stasth files: data
     with timer("Read Dataset", "s"):
@@ -539,11 +539,11 @@ def main(args: Dict[str, Any]) -> None:
                 )
 
 
-if __name__ == "__main__":
+def main():
     args = parse_args()
     print(args)
     with timer("Total execution time", "min"):
-        main(args)
+        run(args)
 
     # plot
     if args["plot_show"] or args["plot_path"] is not None:
@@ -552,3 +552,7 @@ if __name__ == "__main__":
             plot(args)
         # except:
         #   print("Failed in generating plots")
+
+
+if __name__ == "__main__":
+    main()

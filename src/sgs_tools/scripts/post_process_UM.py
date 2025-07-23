@@ -468,7 +468,7 @@ def choose_filter_set(
     return filter_dic
 
 
-def main(args: Dict[str, Any]) -> None:
+def run(args: Dict[str, Any]) -> None:
     spectra_fields_list = set(
         [f for fl in args["cross_spectra_fields"] for f in fl]
         + args["power_spectra_fields"]
@@ -595,7 +595,11 @@ def main(args: Dict[str, Any]) -> None:
                             writer.write(evals, output_path)
 
 
-if __name__ == "__main__":
+def main() -> None:
     args = parse_args()
     with timer("Total execution time", "min"):
-        main(args)
+        run(args)
+
+
+if __name__ == "__main__":
+    main()

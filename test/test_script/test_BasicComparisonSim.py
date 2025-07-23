@@ -25,13 +25,15 @@ def test_main_full_pipeline(test_args):
     tmp_path = Path(test_args[4])
     tmp_path.mkdir(exist_ok=False, parents=False)
 
-    # parse clargs
-    args = comp.parse_args(test_args)
-    # execute main
-    comp.main(args)
-    # Assert outputs exists
-    assert len(list(args["plot_path"].glob("*.png"))) > 0
+    try:
+        # parse clargs
+        args = comp.parse_args(test_args)
+        # execute main
+        comp.run(args)
+        # Assert outputs exists
+        assert len(list(args["plot_path"].glob("*.png"))) > 0
 
-    # Cleanup
-    if tmp_path.exists():
-        shutil.rmtree(tmp_path)
+    finally:
+        # Cleanup
+        if tmp_path.exists():
+            shutil.rmtree(tmp_path)

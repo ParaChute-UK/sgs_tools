@@ -611,7 +611,7 @@ def io(args) -> tuple[Dict[str, xr.Dataset], Dict[str, field_plot_kwargs]]:
     return ds_collection, field_plot_map
 
 
-def main(args: Dict[str, Any]) -> None:
+def run(args: Dict[str, Any]) -> None:
     ds_collection, field_plot_map = io(args)
 
     # make plots
@@ -619,8 +619,12 @@ def main(args: Dict[str, Any]) -> None:
         plot(ds_collection, args, slice_fields, prof_fields, field_plot_map)
 
 
-if __name__ == "__main__":
+def main():
     with timer("Arguments", "ms"):
         args = parse_args()
     with timer("Total execution time", "min"):
-        main(args)
+        run(args)
+
+
+if __name__ == "__main__":
+    main()

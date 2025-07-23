@@ -8,6 +8,7 @@ import xarray as xr
 from matplotlib.figure import Figure
 from numpy import arange, array, inf, linspace, ndarray
 from pint import UnitRegistry  # type: ignore
+
 from sgs_tools.diagnostics.directional_profile import directional_profile
 from sgs_tools.io.um import data_ingest_UM
 from sgs_tools.physics.fields import Reynolds_fluct_stress, vertical_heat_flux
@@ -178,9 +179,9 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
         assert len(args["h_resolution"]) == len(args["input_files"])
 
     # initial validation
-    assert (
-        args["plot_show"] or args["plot_path"]
-    ), "require at least one of 'plot_show' or  'plot_path'"
+    assert args["plot_show"] or args["plot_path"], (
+        "require at least one of 'plot_show' or  'plot_path'"
+    )
 
     # parse plotting style
     if args["plot_style_file"] is None:
@@ -213,7 +214,9 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
             args["z_range"][0] <= z <= args["z_range"][1]
             for z in args["hor_slice_levels"]
         ]
-    ), f"hor_slice_levels {args['hor_slice_levels']} aren't contained in z_range {args['z_range']}"
+    ), (
+        f"hor_slice_levels {args['hor_slice_levels']} aren't contained in z_range {args['z_range']}"
+    )
     return args
 
 
@@ -342,9 +345,9 @@ def add_offline_fields(
     # extract cs from mixing length
     try:
         delta_x = ds["x_centre"].diff("x_centre")
-        assert (
-            delta_x[0] == delta_x[1:]
-        ).all(), "non-homogeneous horizontal resolution"
+        assert (delta_x[0] == delta_x[1:]).all(), (
+            "non-homogeneous horizontal resolution"
+        )
         ds["cs"] = ds["csDelta"] / delta_x[0].item()
     except KeyError:
         print("Can't add cs with missing ingredients")

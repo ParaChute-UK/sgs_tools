@@ -2,6 +2,7 @@ import shutil
 from pathlib import Path
 
 import pytest
+
 import sgs_tools.scripts.CS_calculation_genmodel as cs_gen
 
 

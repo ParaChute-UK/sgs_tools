@@ -36,7 +36,3 @@
     * Generalise dynamic coefficient calculations
 
       * Optimize simultaneous calculation at multiple scales or contraction dims
-
-
-
-

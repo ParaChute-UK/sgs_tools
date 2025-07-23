@@ -29,4 +29,3 @@ The docs are generated via [sphinx](https://www.sphinx-doc.org/en/master/) and s
     * Tests rely on the `pytest` package and should go to `test/test_*.py`
     * Formatting is taken care of by `ruff`. Run `make format` to auto-format.
     * Type hints are handled by `mypy`. Run `make mypy` to check for any issues
-

@@ -55,7 +55,7 @@ def plot_vertical_prof_time_slice_compare_sims_slice(
                 )  # type: ignore
             ax.legend()
             ax.set_xlabel(x_lbl, fontsize=14)
-            ax.set_title(f"time: {time.item()/60} h", fontsize=14)
+            ax.set_title(f"time: {time.item() / 60} h", fontsize=14)
     return fig
 
 
@@ -116,7 +116,7 @@ def plot_horizontal_slice_tseries(
                     )  # type: ignore
             # ax.set_xlabel(, fontsize=14)
             ax.set_title(
-                f"{sim_lbl}: z = {data[zcoord].item():g}m, time= {time/60} h",
+                f"{sim_lbl}: z = {data[zcoord].item():g}m, time= {time / 60} h",
                 fontsize=14,
             )
             if j > 0:
@@ -196,5 +196,5 @@ def plot_vertical_prof_time_slice_compare_fields(
                 )
         ax.legend()
         ax.set_xlabel("", fontsize=14)
-        ax.set_title(f"time: {time/60} h", fontsize=14)
+        ax.set_title(f"time: {time / 60} h", fontsize=14)
     return fig

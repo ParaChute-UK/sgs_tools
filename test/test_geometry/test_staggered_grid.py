@@ -1,6 +1,7 @@
 import numpy as np
 import pytest
 import xarray as xr
+
 from sgs_tools.geometry.grid import CoordScalar, UniformCartesianGrid
 from sgs_tools.geometry.staggered_grid import (
     compose_vector_components_on_grid,

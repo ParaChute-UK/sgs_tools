@@ -37,6 +37,7 @@ dev = [
     "mypy",
     "pytest",
     "ruff",
+    "pre-commit"
 ]
 doc = [
     "sphinx",

@@ -34,10 +34,11 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
     "tox",
-    "mypy",
-    "pytest",
-    "ruff",
-    "pre-commit"
+    "mypy~=1.17.0",
+    "pytest~=7.2",
+    "pytest-cov~=4.0",
+    "ruff~=0.12.4",
+    "pre-commit~=3.4.0"
 ]
 doc = [
     "sphinx",

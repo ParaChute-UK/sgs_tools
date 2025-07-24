@@ -31,4 +31,5 @@ repos:
     hooks:
       - id: mypy
         # type check
+        # missing --install-types --non-interactive becuase of pre-commit
         args: ["--ignore-missing-imports"]

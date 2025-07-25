@@ -1,0 +1,35 @@
+ci:
+  autoupdate_branch: 'devel'
+  autofix_prs: true
+  skip: []
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-added-large-files
+
+  - repo: https://github.com/charliermarsh/ruff-pre-commit
+    rev: v0.12.5
+    hooks:
+      - id: ruff
+        name: ruff-import-sorter
+        args: ["check", "--fix", "--select", "I"]
+        types_or: [ python, pyi ]
+      - id: ruff-format
+        # formatter
+        types_or: [ python, pyi ]
+      - id: ruff-check
+        # linter
+        types_or: [ python, pyi ]
+
+
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.17.0
+    hooks:
+      - id: mypy
+        # type check
+        # missing --install-types --non-interactive becuase of pre-commit
+        args: ["--ignore-missing-imports"]

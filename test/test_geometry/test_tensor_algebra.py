@@ -1,8 +1,10 @@
 import numpy as np
 import pytest
 import xarray as xr
+
 from sgs_tools.geometry.tensor_algebra import (
     Frobenius_norm,
+    antisymmetrise,
     symmetrise,
     tensor_self_outer_product,
     trace,
@@ -105,6 +107,25 @@ def test_symmetrise(sample_tensor):
 def test_symmetrise_with_name(sample_tensor):
     result = symmetrise(sample_tensor, name="symmetric_tensor")
     assert result.name == "symmetric_tensor"
+
+
+def test_antisymmetrise(sample_tensor):
+    result = antisymmetrise(sample_tensor)
+
+    assert isinstance(result, xr.DataArray)
+    assert set(result.dims) == {"c1", "c2"}
+
+    # Verify symmetry: a_ij = a_ji
+    np.testing.assert_array_equal(result.values, -result.values.T)
+
+    # Manual verification for one element
+    expected_12 = 0.5 * (sample_tensor.values[0, 1] - sample_tensor.values[1, 0])
+    np.testing.assert_almost_equal(result.values[0, 1], expected_12)
+
+
+def test_antisymmetrise_with_name(sample_tensor):
+    result = antisymmetrise(sample_tensor, name="antisymmetric_tensor")
+    assert result.name == "antisymmetric_tensor"
 
 
 class TestEdgeCases:

@@ -4,6 +4,7 @@ from typing import Any
 
 import f90nml  # type: ignore
 from numpy import linspace
+
 from sgs_tools.util.path_utils import add_extension
 
 
@@ -32,10 +33,10 @@ def parser() -> dict[str, Any]:
 
     args = vars(parser.parse_args())
 
-    assert args["n_z_rho"] > 0, f'Need a positive n_z, got {args["n_z_rho"]}'
-    assert (
-        args["z_top_of_model"] > 0
-    ), f'Need a positive z_top_of_model, got {args["z_top_of_model"]}'
+    assert args["n_z_rho"] > 0, f"Need a positive n_z, got {args['n_z_rho']}"
+    assert args["z_top_of_model"] > 0, (
+        f"Need a positive z_top_of_model, got {args['z_top_of_model']}"
+    )
 
     args["output_file"] = add_extension(args["output_file"], ".nml")
     return args

@@ -2,6 +2,7 @@ from typing import Dict, Hashable
 
 import xarray as xr
 import xarray_einstats
+
 from sgs_tools.geometry.tensor_algebra import anisotropy_renorm
 from sgs_tools.sgs.coarse_grain import CoarseGrain
 from sgs_tools.sgs.filter import Filter
@@ -41,7 +42,7 @@ def anisotropy_analysis(
         # (v.v==0 or gradv.gradv == 0), so fill with zeroes
         # Note -- this expect symmetric matrices and take the Lower triangular part
         eigen_values = xarray_einstats.linalg.eigvalsh(
-            ani_tensors.fillna(0),
+            ani_tensors.fillna(0),  # type: ignore
             tensor_dims,
             dask="parallelized",
         )
@@ -55,4 +56,4 @@ def anisotropy_analysis(
         # triggers async computation now
         # evals = xr.merge(eigen_values).persist()
         evals = eigen_values.persist()
-    return evals
+    return evals  # type: ignore

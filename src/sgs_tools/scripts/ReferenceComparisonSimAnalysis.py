@@ -3,10 +3,15 @@ from pathlib import Path
 from typing import Any
 
 from numpy import array, inf
-from sgs_tools.scripts.arg_parsers import add_dask_group, add_plotting_group
-from sgs_tools.util.timer import timer
 
-from .BasicComparisonSimAnalysis import io, plot, prof_fields, slice_fields
+from sgs_tools.scripts.arg_parsers import add_dask_group, add_plotting_group
+from sgs_tools.scripts.BasicComparisonSimAnalysis import (
+    io,
+    plot,
+    prof_fields,
+    slice_fields,
+)
+from sgs_tools.util.timer import timer
 
 plotting_styles = [
     {
@@ -115,9 +120,9 @@ def parse_args() -> dict[str, Any]:
     args["h_resolution"] = [args["h_resolution"][0], args["h_resolution"][0]]
 
     # initial validation
-    assert (
-        args["plot_show"] or args["plot_path"]
-    ), "require at least one of 'plot_show' or  'plot_path'"
+    assert args["plot_show"] or args["plot_path"], (
+        "require at least one of 'plot_show' or  'plot_path'"
+    )
 
     # add a hardcoded plotting style
     args["plot_map"] = plotting_styles

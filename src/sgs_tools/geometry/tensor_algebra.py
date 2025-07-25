@@ -5,8 +5,9 @@ import numpy as np
 import xarray as xr
 from xarray.core.types import T_Xarray
 
-
 # Vector algebra
+
+
 def tensor_self_outer_product(
     arr: xr.DataArray, vec_dim="c1", new_dim="c2"
 ) -> xr.DataArray:
@@ -22,7 +23,7 @@ def tensor_self_outer_product(
 
 
 def trace(tensor: T_Xarray, dims: Sequence[str] = ("c1", "c2"), name=None) -> T_Xarray:
-    """trace along 2 dimesions.
+    r"""trace along 2 dimesions.
 
     :param tensor: tensor input
     :param dims: dimensions with respect to which to take the trace.
@@ -42,21 +43,34 @@ def trace(tensor: T_Xarray, dims: Sequence[str] = ("c1", "c2"), name=None) -> T_
 
 
 # Make a tensor Traceless along 2 dimensions
-def traceless(tensor: T_Xarray, dims: Sequence[str] = ("c1", "c2")) -> T_Xarray:
+
+
+def traceless(tensor: xr.DataArray, dims: Sequence[str] = ("c1", "c2")) -> xr.DataArray:
     r"""returns a traceless version of `tensor`.
     **NB** \: bug/unexpected behaviour when nan in trace
 
     :param tensor: tensor input
     :param dims: dimensions with respect to which to take the trace.
     """
-    # compute trace along dims
-    trace_normed = trace(tensor, dims) / tensor[dims[1]].size
+    d1, d2 = dims
+    # Check tensor is square in dims
+    assert np.allclose(tensor[d1].values, tensor[d2].values), "Coordinates must match"
 
-    # copy input for modification
-    traceless = tensor.copy()
+    dim_size = tensor.sizes[d1]
+    # compute trace along dims
+    trace_normed = trace(tensor, dims) / dim_size
+
+    # create masked array for lazy computation
+    identity_dask = da.eye(
+        dim_size,
+        chunks=-1,
+    )
+    diag_mask = xr.DataArray(
+        identity_dask, dims=dims, coords={d1: tensor.coords[d1], d2: tensor.coords[d2]}
+    )
+
     # remove trace from diagonal
-    for i in tensor[dims[0]]:
-        traceless.loc[{dims[0]: i.item(), dims[1]: i.item()}] -= trace_normed
+    traceless = tensor - trace_normed * diag_mask
     return traceless
 
 
@@ -86,7 +100,9 @@ def symmetrise(
     :param name: name of symmetrized tensor.
     """
     for c in dims[1:]:
-        assert np.allclose(tensor[dims[0]].values, tensor[c].values)
+        assert np.allclose(tensor[dims[0]].values, tensor[c].values), (
+            "Coordinates must match"
+        )
         # xr.align(tensor[dims[0]], tensor[c], join="exact")
 
     transpose_map = dict(zip(dims, dims[::-1]))
@@ -94,6 +110,32 @@ def symmetrise(
     if name is not None:
         sij.name = name
     return sij
+
+
+def antisymmetrise(
+    tensor: xr.DataArray, dims: Sequence[str] = ["c1", "c2"], name=None
+) -> xr.DataArray:
+    """:math:`0.5 (a - a^T)`.
+
+    :param tensor: tensor input
+    :param dims: dimensions with respect to which to take the transpose.
+        Can be any length and the transpose means that the order is reversed.
+        so ``[c1, c2, c3]`` will transpose to ``[c3, c2, c1]``.
+        All coordinates of `dims` must match.
+        Note that no checks are performed whether `dims` are dimensions of `tensor` or
+        whether `tensor` is square with respect to the transposed dimensions.
+    :param name: name of anti-symmetrized tensor.
+    """
+    for c in dims[1:]:
+        assert np.allclose(tensor[dims[0]].values, tensor[c].values), (
+            "Coordinates must match"
+        )
+
+    transpose_map = dict(zip(dims, dims[::-1]))
+    omij = 0.5 * (tensor - tensor.rename(transpose_map))
+    if name is not None:
+        omij.name = name
+    return omij
 
 
 def anisotropy_renorm(
@@ -108,11 +150,10 @@ def anisotropy_renorm(
 
     # paramater checks are taken care of in the trace call
     tr = trace(tensor, dims=tuple(tensor_dims))
-    d1, d2 = tensor_dims
 
     # create masked array for lazy computation
     identity_dask = da.eye(
-        tensor.sizes[d1],
+        tensor.sizes[tensor_dims[0]],
         chunks=-1,
     )
     diag_mask = xr.DataArray(

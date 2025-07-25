@@ -3,8 +3,6 @@ from pathlib import Path
 
 import xarray as xr
 
-from ..util.timer import timer
-
 
 @dataclass
 class NetCDFWriter:
@@ -21,5 +19,6 @@ class NetCDFWriter:
             filename,
             mode="w",
             compute=True,
-            engine="h5netcdf",
+            engine="netcdf4",
+            auto_complex=True,
         )

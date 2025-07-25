@@ -32,7 +32,8 @@ def plot_vertical_prof_time_slice_compare_sims_slice(
         assert len(da_collection[k].dims) == 2, f"Too many dimensions in dataarray {k}"
 
     # num_sims = len(da_collection)
-    fig, axes = plt.subplots(1, len(times), figsize=(6 * len(times), 4), sharey=False)
+    fig, _ = plt.subplots(1, len(times), figsize=(6 * len(times), 4), sharey=False)
+    axes = fig.axes
     for time, ax in zip(times, axes):
         for k, da in da_collection.items():
             if with_markers:
@@ -54,7 +55,7 @@ def plot_vertical_prof_time_slice_compare_sims_slice(
                 )  # type: ignore
             ax.legend()
             ax.set_xlabel(x_lbl, fontsize=14)
-            ax.set_title(f"time: {time.item()/60} h", fontsize=14)
+            ax.set_title(f"time: {time.item() / 60} h", fontsize=14)
     return fig
 
 
@@ -115,7 +116,7 @@ def plot_horizontal_slice_tseries(
                     )  # type: ignore
             # ax.set_xlabel(, fontsize=14)
             ax.set_title(
-                f"{sim_lbl}: z = {data[zcoord].item():g}m, time= {time/60} h",
+                f"{sim_lbl}: z = {data[zcoord].item():g}m, time= {time / 60} h",
                 fontsize=14,
             )
             if j > 0:
@@ -195,5 +196,5 @@ def plot_vertical_prof_time_slice_compare_fields(
                 )
         ax.legend()
         ax.set_xlabel("", fontsize=14)
-        ax.set_title(f"time: {time/60} h", fontsize=14)
+        ax.set_title(f"time: {time / 60} h", fontsize=14)
     return fig

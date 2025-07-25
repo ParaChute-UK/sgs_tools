@@ -4,6 +4,7 @@ from typing import Any, Dict, Sequence
 
 import numpy as np
 import xarray as xr
+
 from sgs_tools.diagnostics.anisotropy import anisotropy_analysis
 from sgs_tools.diagnostics.directional_profile import directional_profile
 from sgs_tools.diagnostics.spectra import spectra_1d_radial
@@ -368,7 +369,7 @@ def post_process_fields(simulation: xr.Dataset) -> xr.Dataset:
             vector_dim="c1",
         )
     else:
-        print("Skipping missing inputs for cs_diag: " "['cs_1', 'cs_2', 'cs_3']")
+        print("Skipping missing inputs for cs_diag: ['cs_1', 'cs_2', 'cs_3']")
         print("Available fields:", sorted(simulation, key=str))
 
     if all([diag in simulation for diag in ["cs_theta_1", "cs_theta_2", "cs_theta_3"]]):
@@ -425,19 +426,19 @@ def choose_filter_set(
     # Box-cart scales
     meter_scales = [int(res / dx) for res in box_meter_scales]
     domain_scales = [int(hminsize * x) for x in box_domain_scales]
-    box_scales = []  # start with something
+    box_scales: list[float] = []
     # only allows scales at least 2 (delta_<x>) apart
     # order of loop determines precedence
-    for x in set(domain_scales + meter_scales + box_delta_scales):
+    for x in set(domain_scales + meter_scales + list(box_delta_scales)):
         if x > 1 and x < hminsize:
             if not box_scales or np.min(np.abs([x - y for y in box_scales])) >= 2:
                 box_scales += [x]
 
     # sort from fast to slow to compute coarse grain(small to large scales)
     box_scales = sorted(box_scales)
-    assert (
-        max(box_scales) <= hminsize
-    ), "Unsupported box_scales greater than domain size."
+    assert max(box_scales) <= hminsize, (
+        "Unsupported box_scales greater than domain size."
+    )
     assert min(box_scales) > 1, "Unsupported box_scales less than 0."
 
     # Coarse-graining filters
@@ -468,7 +469,7 @@ def choose_filter_set(
     return filter_dic
 
 
-def main(args: Dict[str, Any]) -> None:
+def run(args: Dict[str, Any]) -> None:
     spectra_fields_list = set(
         [f for fl in args["cross_spectra_fields"] for f in fl]
         + args["power_spectra_fields"]
@@ -572,7 +573,7 @@ def main(args: Dict[str, Any]) -> None:
                     f"{filt_lbl}:{filt.scales()}", "s", f"{filt_lbl}:{filt.scales()}"
                 ):
                     output_path = (
-                        output_dir / f'{args['aniso_fname_out'].stem}_{filt_lbl}'
+                        output_dir / f"{args['aniso_fname_out'].stem}_{filt_lbl}"
                     ).with_suffix(".nc")
                     # don't over-write but skip existing filters/scales
                     if not writer.overwrite and writer.check_filename(output_path):
@@ -595,7 +596,11 @@ def main(args: Dict[str, Any]) -> None:
                             writer.write(evals, output_path)
 
 
-if __name__ == "__main__":
+def main() -> None:
     args = parse_args()
     with timer("Total execution time", "min"):
-        main(args)
+        run(args)
+
+
+if __name__ == "__main__":
+    main()

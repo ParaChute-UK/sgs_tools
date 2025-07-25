@@ -6,12 +6,11 @@ test:
 doc:
 	cd doc && make html
 
-format:
-	python3 -m tox -e fmt
-
-mypy:
+mypy_check:
 	python3 -m tox -e mypy
-
 
 style_check:
 	python3 -m tox -e style_check
+
+staged_fix:
+	python3 -m tox -e pre_commit

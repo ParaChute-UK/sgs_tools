@@ -44,7 +44,7 @@ class CoarseGrain:
                     pass
                     # new_chunksizes[d] = orig
 
-                return field.chunk(new_chunksizes)
+            return field.chunk(new_chunksizes)
 
     def filter(self, field: xr.DataArray) -> xr.DataArray:
         """coarse grain `field`;

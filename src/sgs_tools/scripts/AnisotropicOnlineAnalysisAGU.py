@@ -8,6 +8,7 @@ import numpy as np
 import xarray as xr
 from numpy import allclose, arange, array, inf, ndarray, sqrt
 from pint import UnitRegistry  # type: ignore
+
 from sgs_tools.io.um import data_ingest_UM
 
 # from sgs_tools.plotting.collection_plots import (
@@ -199,9 +200,9 @@ def parse_args() -> Dict[str, Any]:
         assert len(args["h_resolution"]) == len(args["input_files"])
 
     # initial validation
-    assert (
-        args["plot_show"] or args["plot_path"]
-    ), "require at least one of 'plot_show' or  'plot_path'"
+    assert args["plot_show"] or args["plot_path"], (
+        "require at least one of 'plot_show' or  'plot_path'"
+    )
 
     # parse plotting style
     args["plot_map"] = plotting_styles
@@ -219,7 +220,9 @@ def parse_args() -> Dict[str, Any]:
             args["z_range"][0] <= z <= args["z_range"][1]
             for z in args["hor_slice_levels"]
         ]
-    ), f"hor_slice_levels {args['hor_slice_levels']} aren't contained in z_range {args['z_range']}"
+    ), (
+        f"hor_slice_levels {args['hor_slice_levels']} aren't contained in z_range {args['z_range']}"
+    )
     return args
 
 
@@ -232,9 +235,9 @@ def add_offline_fields(
     # extract cs from mixing length
     try:
         delta_x = ds["x_centre"].diff("x_centre")
-        assert (
-            delta_x[0] == delta_x[1:]
-        ).all(), "non-homogeneous horizontal resolution"
+        assert (delta_x[0] == delta_x[1:]).all(), (
+            "non-homogeneous horizontal resolution"
+        )
         ds["cs"] = ds["csDelta"] / delta_x[0].item()
     except KeyError:
         print("Can't add cs with missing ingredients")
@@ -329,7 +332,7 @@ def io(args) -> tuple[Mapping[str, xr.Dataset], Dict[str, field_plot_kwargs]]:
         for f, res, plot_map in zip(
             args["input_files"], args["h_resolution"], args["plot_map"]
         ):
-            print(f'{plot_map["label"]}: {f}')
+            print(f"{plot_map['label']}: {f}")
             ds = data_ingest_UM(
                 f,
                 res,
@@ -431,7 +434,7 @@ def plot1(ds_diag: xr.Dataset, ds_iso: xr.Dataset, ds_smag: xr.Dataset, plot_map
                 )  # type: ignore
         ax.legend()
         ax.set_xlabel("Cs", fontsize=14)
-        ax.set_title(f"time: {time.item()/60} h", fontsize=14)
+        ax.set_title(f"time: {time.item() / 60} h", fontsize=14)
         ax.set_xlim(None, 0.5)
     return fig
 

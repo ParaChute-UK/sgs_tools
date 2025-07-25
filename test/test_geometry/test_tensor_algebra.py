@@ -1,6 +1,7 @@
 import numpy as np
 import pytest
 import xarray as xr
+
 from sgs_tools.geometry.tensor_algebra import (
     Frobenius_norm,
     antisymmetrise,

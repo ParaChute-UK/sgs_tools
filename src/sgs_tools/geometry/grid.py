@@ -39,7 +39,7 @@ class UniformCartesianGrid:
     def coords(self, shape: list[int]) -> dict[str, NDArray]:
         coords = {}
         for i in range(len(self.delta)):
-            coords[f"x{i+1}"] = (
+            coords[f"x{i + 1}"] = (
                 np.linspace(0, self.delta[i] * (shape[i] - 1), shape[i])
                 + self.origin[i]
             )

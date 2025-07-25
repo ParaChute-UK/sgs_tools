@@ -42,9 +42,9 @@ def interpolate_to_grid(
         y_dims = [y for y in ds.dims if str(y).startswith("y")]
         z_dims = [z for z in ds.dims if str(z).startswith("z")]
         missing_coords = [dim for dim in target_dims if dim not in ds.coords]
-        assert (
-            len(missing_coords) == 0
-        ), f"missing target coordinages {missing_coords} from input data"
+        assert len(missing_coords) == 0, (
+            f"missing target coordinages {missing_coords} from input data"
+        )
         x_target = [x for x in target_dims if x.startswith("x")]
         y_target = [y for y in target_dims if y.startswith("y")]
         z_target = [z for z in target_dims if z.startswith("z")]
@@ -70,9 +70,9 @@ def interpolate_to_grid(
     else:
         assert coord_map, "Should specify one of target_dims or coord_map"
         missing_dims = [dim for dim in coord_map.keys() if dim not in ds.dims]
-        assert (
-            len(missing_dims) == 0
-        ), f"missing input dimensions {missing_dims} from input data"
+        assert len(missing_dims) == 0, (
+            f"missing input dimensions {missing_dims} from input data"
+        )
 
     # rename any possible dimensions that will clash with coord-map targets:
     ds_interp = ds

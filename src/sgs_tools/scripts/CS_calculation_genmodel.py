@@ -7,6 +7,8 @@ import numpy as np
 import xarray as xr
 from dask.diagnostics import ProgressBar
 from numpy import inf
+from xarray.core.types import T_Xarray
+
 from sgs_tools.geometry.staggered_grid import (
     compose_vector_components_on_grid,
 )
@@ -38,7 +40,6 @@ from sgs_tools.sgs.Smagorinsky import (
     SmagorinskyVelocityModel,
 )
 from sgs_tools.util.timer import timer
-from xarray.core.types import T_Xarray
 
 # supported models
 vel_models = ["Smag_vel", "Smag_vel_diag", "Carati", "Kosovic"]
@@ -140,9 +141,9 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
     args["sgs_model"] = set(args["sgs_model"])
     # parameter consistency checks
     if args["filter_type"] == "gaussian":
-        assert all(
-            [x in [2, 4] for x in args["filter_scales"]]
-        ), "Gaussian filters only support scales 2 and 4 for now..."
+        assert all([x in [2, 4] for x in args["filter_scales"]]), (
+            "Gaussian filters only support scales 2 and 4 for now..."
+        )
 
     # singleton filter_scales or regularize_filter_scales means broadcast against the other
     if len(args["filter_scales"]) == 1:
@@ -484,13 +485,13 @@ def run(args: Dict[str, Any]) -> None:
     # check scales make sense
     nhoriz = min(simulation["x"].shape[0], simulation["y"].shape[0])
     for scale in args["filter_scales"]:
-        assert scale in range(
-            1, nhoriz
-        ), f"scale {scale} must be less than horizontal number of grid cells {nhoriz}"
+        assert scale in range(1, nhoriz), (
+            f"scale {scale} must be less than horizontal number of grid cells {nhoriz}"
+        )
     for scale in args["regularize_filter_scales"]:
-        assert (
-            scale in range(1, nhoriz)
-        ), f"regularization_scale {scale} must be less than horizontal number of grid cells {nhoriz}"
+        assert scale in range(1, nhoriz), (
+            f"regularization_scale {scale} must be less than horizontal number of grid cells {nhoriz}"
+        )
 
     with timer("Setup filtering operators"):
         test_filters = []

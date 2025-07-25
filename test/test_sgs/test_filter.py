@@ -1,6 +1,7 @@
 import numpy as np
 import pytest
 import xarray as xr
+
 from sgs_tools.sgs.coarse_grain import CoarseGrain
 
 

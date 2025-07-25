@@ -100,9 +100,9 @@ def symmetrise(
     :param name: name of symmetrized tensor.
     """
     for c in dims[1:]:
-        assert np.allclose(
-            tensor[dims[0]].values, tensor[c].values
-        ), "Coordinates must match"
+        assert np.allclose(tensor[dims[0]].values, tensor[c].values), (
+            "Coordinates must match"
+        )
         # xr.align(tensor[dims[0]], tensor[c], join="exact")
 
     transpose_map = dict(zip(dims, dims[::-1]))
@@ -127,9 +127,9 @@ def antisymmetrise(
     :param name: name of anti-symmetrized tensor.
     """
     for c in dims[1:]:
-        assert np.allclose(
-            tensor[dims[0]].values, tensor[c].values
-        ), "Coordinates must match"
+        assert np.allclose(tensor[dims[0]].values, tensor[c].values), (
+            "Coordinates must match"
+        )
 
     transpose_map = dict(zip(dims, dims[::-1]))
     omij = 0.5 * (tensor - tensor.rename(transpose_map))

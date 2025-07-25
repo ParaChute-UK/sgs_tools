@@ -1,5 +1,6 @@
 import numpy as np
 import xarray as xr  # only used for type hints
+
 from sgs_tools.sgs.dynamic_coefficient import (
     LillyMinimisation1Model,
     LillyMinimisation2Model,
@@ -51,12 +52,12 @@ def test_LinComb2ModelLillyMinimisation():
             L = scale1 * arr + scale2 * arr**2
             M = [arr, arr**2]
             coeff = min.compute(L, M, id)
-            assert np.allclose(
-                scale1, coeff.isel(cdim=0)
-            ), f"scales: {scale1}, {scale2}, coeff mean: {np.mean(coeff.isel(cdim=0))}, std: {np.std(coeff.isel(cdim=0))}"
-            assert np.allclose(
-                scale2, coeff.isel(cdim=1)
-            ), f"scales: {scale2}, {scale2}, coeff mean: {np.mean(coeff.isel(cdim=1))}, std: {np.std(coeff.isel(cdim=1))}"
+            assert np.allclose(scale1, coeff.isel(cdim=0)), (
+                f"scales: {scale1}, {scale2}, coeff mean: {np.mean(coeff.isel(cdim=0))}, std: {np.std(coeff.isel(cdim=0))}"
+            )
+            assert np.allclose(scale2, coeff.isel(cdim=1)), (
+                f"scales: {scale2}, {scale2}, coeff mean: {np.mean(coeff.isel(cdim=1))}, std: {np.std(coeff.isel(cdim=1))}"
+            )
 
 
 def LinComb3ModelLillyMinimisation():
@@ -72,15 +73,15 @@ def LinComb3ModelLillyMinimisation():
             L = scale1 * arr + scale2 * arr**2 + scale3 * arr**3
             M = [arr, arr**2, arr**3]
             coeff = min.compute(L, M, id)
-            assert np.allclose(
-                scale1, coeff.isel(cdim=0)
-            ), f"scale1: {scale1}, coeff mean: {np.mean(coeff.isel(cdim=0))}, std: {np.std(coeff.isel(cdim=0))}"
-            assert np.allclose(
-                scale2, coeff.isel(cdim=1)
-            ), f"scale1: {scale2}, coeff mean: {np.mean(coeff.isel(cdim=1))}, std: {np.std(coeff.isel(cdim=1))}"
-            assert np.allclose(
-                scale3, coeff.isel(cdim=2)
-            ), f"scale1: {scale3}, coeff mean: {np.mean(coeff.isel(cdim=2))}, std: {np.std(coeff.isel(cdim=2))}"
+            assert np.allclose(scale1, coeff.isel(cdim=0)), (
+                f"scale1: {scale1}, coeff mean: {np.mean(coeff.isel(cdim=0))}, std: {np.std(coeff.isel(cdim=0))}"
+            )
+            assert np.allclose(scale2, coeff.isel(cdim=1)), (
+                f"scale1: {scale2}, coeff mean: {np.mean(coeff.isel(cdim=1))}, std: {np.std(coeff.isel(cdim=1))}"
+            )
+            assert np.allclose(scale3, coeff.isel(cdim=2)), (
+                f"scale1: {scale3}, coeff mean: {np.mean(coeff.isel(cdim=2))}, std: {np.std(coeff.isel(cdim=2))}"
+            )
 
 
 def test_LinCombModelLillyMinimisation():

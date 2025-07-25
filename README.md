@@ -22,11 +22,35 @@ The docs are generated via [sphinx](https://www.sphinx-doc.org/en/master/) and s
     ```pip install --editable <location-of-repository>[dev]```
 
 ### Contribute
-  * Please add any issues, feature requests and pull requests directly to the
-    [GitHub repository](https://github.com/dvlaykov/sgs_tools) -- all are very welcome.
-  * Testing, formatting and static types are handled through `tox` and for the whole repo you can run `make test` to check formatting type hints and run the tests and their coverage.
 
-    * Tests rely on the `pytest` package and should go to `test/test_*.py`
-    * Formatting is taken care of by `ruff`. Run `make format` to auto-format.
-    * Type hints are handled by `mypy`. Run `make mypy` to check for any issues
+  * We welcome, issues, feature requests, PRs, etc. directly on
+    [GitHub](https://github.com/dvlaykov/sgs_tools).
 
+#### 🧪 Testing & Formatting
+
+  Testing is managed via [tox](https://tox.wiki/en/4.28.1/) and a set of convenience `make` targets defined in the `Makefile`.
+
+  *	To run all checks (formatting, linting, type checks, tests, and coverage) across the repo:
+
+  ``` console
+  make test
+  ```
+  or
+
+  ``` console
+  tox
+  ```
+
+See `Makefile` or `tox.ini` for more grannular options.
+
+
+#### 🔧 Tooling Overview
+
+- **Unit/Integration Tests**: [`pytest`](https://docs.pytest.org/)
+  - Will look for tests as `tests/test_*.py`
+- **Code Style**:
+  - [`ruff`](https://github.com/charliermarsh/ruff): formatting and linting
+  - [`mypy`](http://mypy-lang.org/): static type checking
+  - [`pre-commit`](https://pre-commit.com/): wraps up the other two and cleans-up staged files before commit and for PRs to `devel`.
+
+> 💡 Run `pre-commit install` once to activate Git hooks in your local repo.

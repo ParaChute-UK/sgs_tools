@@ -2,6 +2,7 @@ import shutil
 from pathlib import Path
 
 import pytest
+
 import sgs_tools.scripts.post_process_UM as pp_um
 
 
@@ -57,16 +58,17 @@ def test_args():
 def test_main_full_pipeline(test_args):
     tmp_path = Path(test_args[2])
     tmp_path.mkdir(exist_ok=False, parents=False)
+    try:
+        # Execute
+        args = pp_um.parse_args(test_args)
+        pp_um.run(args)
 
-    # Execute
-    args = pp_um.parse_args(test_args)
-    pp_um.main(args)
+        # Assert outputs exist
+        assert (tmp_path / args["vprofile_fname_out"]).exists()
+        assert (tmp_path / args["hspectra_fname_out"]).exists()
+        assert len(list(tmp_path.glob(f"{args['aniso_fname_out'].stem}*.nc"))) > 0
 
-    # Assert outputs exist
-    assert (tmp_path / args["vprofile_fname_out"]).exists()
-    assert (tmp_path / args["hspectra_fname_out"]).exists()
-    assert len(list(tmp_path.glob(f'{args["aniso_fname_out"].stem}*.nc'))) > 0
-
-    # Cleanup
-    if tmp_path.exists():
-        shutil.rmtree(tmp_path)
+    finally:
+        # Cleanup
+        if tmp_path.exists():
+            shutil.rmtree(tmp_path)

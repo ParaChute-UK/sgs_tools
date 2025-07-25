@@ -50,6 +50,3 @@ doc/_build/
 .tox/
 .ruff_cache
 .coverage
-
-
-

@@ -119,7 +119,7 @@ def radial_spectrum(
 
     else:
         raise ValueError(
-            f"Unrecognised scaling {scaling}. " "Choose from 'spectrum', 'density'."
+            f"Unrecognised scaling {scaling}. Choose from 'spectrum', 'density'."
         )
     return iso_ps
 
@@ -152,9 +152,9 @@ def spectra_1d_radial(
             d for d in simulation.coords if d != x and x in simulation[d].dims
         ]
     sim = simulation.drop_vars(extra_coords, errors="ignore")
-    assert (
-        "r" not in hdims
-    ), "'r' dimension found in hdims, but it is reserved for radial spectra"
+    assert "r" not in hdims, (
+        "'r' dimension found in hdims, but it is reserved for radial spectra"
+    )
 
     # power spectra
     for field in power_spectra_fields:

@@ -82,9 +82,9 @@ def vertical_heat_flux(
     :param hor_axes: labels of horizontal dimensions
         (w.r.t which to compute the fluctuations)
     """
-    assert set(vert_vel.dims) == set(
-        pot_temperature.dims
-    ), "Mismatched dimensions of vert_vel and pot_temperature"
+    assert set(vert_vel.dims) == set(pot_temperature.dims), (
+        "Mismatched dimensions of vert_vel and pot_temperature"
+    )
     w, theta = xr.align(
         vert_vel, pot_temperature, join="exact"
     )  # assert matching coordinates

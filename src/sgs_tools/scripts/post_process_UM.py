@@ -4,6 +4,7 @@ from typing import Any, Dict, Sequence
 
 import numpy as np
 import xarray as xr
+
 from sgs_tools.diagnostics.anisotropy import anisotropy_analysis
 from sgs_tools.diagnostics.directional_profile import directional_profile
 from sgs_tools.diagnostics.spectra import spectra_1d_radial
@@ -368,7 +369,7 @@ def post_process_fields(simulation: xr.Dataset) -> xr.Dataset:
             vector_dim="c1",
         )
     else:
-        print("Skipping missing inputs for cs_diag: " "['cs_1', 'cs_2', 'cs_3']")
+        print("Skipping missing inputs for cs_diag: ['cs_1', 'cs_2', 'cs_3']")
         print("Available fields:", sorted(simulation, key=str))
 
     if all([diag in simulation for diag in ["cs_theta_1", "cs_theta_2", "cs_theta_3"]]):
@@ -435,9 +436,9 @@ def choose_filter_set(
 
     # sort from fast to slow to compute coarse grain(small to large scales)
     box_scales = sorted(box_scales)
-    assert (
-        max(box_scales) <= hminsize
-    ), "Unsupported box_scales greater than domain size."
+    assert max(box_scales) <= hminsize, (
+        "Unsupported box_scales greater than domain size."
+    )
     assert min(box_scales) > 1, "Unsupported box_scales less than 0."
 
     # Coarse-graining filters
@@ -468,7 +469,7 @@ def choose_filter_set(
     return filter_dic
 
 
-def main(args: Dict[str, Any]) -> None:
+def run(args: Dict[str, Any]) -> None:
     spectra_fields_list = set(
         [f for fl in args["cross_spectra_fields"] for f in fl]
         + args["power_spectra_fields"]
@@ -595,7 +596,11 @@ def main(args: Dict[str, Any]) -> None:
                             writer.write(evals, output_path)
 
 
-if __name__ == "__main__":
+def main() -> None:
     args = parse_args()
     with timer("Total execution time", "min"):
-        main(args)
+        run(args)
+
+
+if __name__ == "__main__":
+    main()

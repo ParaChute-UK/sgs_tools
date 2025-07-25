@@ -2,6 +2,7 @@ import numpy as np
 import pytest
 import xarray as xr
 import xrft
+
 from sgs_tools.diagnostics.spectra import radial_spectrum
 
 

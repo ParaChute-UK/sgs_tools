@@ -1,16 +1,17 @@
-.PHONY: test doc format mypy
-
-test:
-	python3 -m tox
+.PHONY: test doc mypy_check style_check
 
 doc:
-	cd doc && make html
+	poetry install --with doc
+	poetry run sphinx-build -b html doc/ documentation
+
+test:
+	tox
 
 mypy_check:
-	python3 -m tox -e mypy
+	tox -e mypy
 
 style_check:
-	python3 -m tox -e style_check
+	tox -e style_check
 
 staged_fix:
-	python3 -m tox -e pre_commit
+	tox -e pre_commit

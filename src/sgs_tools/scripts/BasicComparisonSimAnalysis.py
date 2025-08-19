@@ -88,7 +88,7 @@ cloud_fields = ("q_l", "q_i", "q_g")
 def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
     parser = ArgumentParser(
         description="""Create (and optionally save) standard diagnostic plots for
-                    a dry atmospheric boundary layer UM simulation
+                    an atmospheric boundary layer UM simulation
                     Best-suited to one-parameter suite of simulations,
                     but can handle several varying parameters through plot_style_file
                 """,

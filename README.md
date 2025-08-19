@@ -10,7 +10,7 @@
 
 ## Documentation
 The docs are generated via [sphinx](https://www.sphinx-doc.org/en/master/) and several sphinx addons.
-1. To automatically get all the dependencies, reinstall the package adding `  'sgs_tools[doc]' ` to the end of the install command.
+1. To automatically get all the dependencies, reinstall the package adding `  '[doc]' ` to the end of the install command.
 1. To generate the docs run `make doc` from the top level in the repository. This will generate an html version of the documentation.
 3. The resulting docs can be accessed from `<repo_directory>/doc/_build/html/index.html`
 

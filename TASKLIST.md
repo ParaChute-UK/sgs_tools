@@ -13,7 +13,7 @@
 
   * IO
     * ~~ UM ~~
-    * MONC
+    * ~~ MONC ~~
     * PTerodaCTILES ??
     * ??
 
@@ -26,13 +26,13 @@
     * Integrate  SGS Fluxes analysis from P. Burns
 
   * Analysis tools
-    * Add spectra calculation
+    * ~~ Add spectra calculation ~~
     * Add Histograms/PDFs and violin calculators
     * Add tensor invariant calculators
     * Add quadrant analysis support
 
   * SGS
-    * Add a mixed and nonlinear model extensions
+    * Add a ~~ mixed ~~ and nonlinear model extensions
     * Generalise dynamic coefficient calculations
 
-      * Optimize simultaneous calculation at multiple scales or contraction dims
+      * Optimize simultaneous calculation at multiple scales or contraction dims (Fourier filters)

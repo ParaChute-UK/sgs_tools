@@ -29,7 +29,7 @@ jobs:
           git rm -r --ignore-unmatch preview/${{ github.head_ref }}
           git commit -m "Remove preview docs for PR #${{ github.event.pull_request.number }}"
           git push origin gh-pages
-       fi
+        fi
 
   deploy-devel-docs:
     if: ${{ github.event.pull_request.merged }}

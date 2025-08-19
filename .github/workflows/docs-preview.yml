@@ -1,13 +1,13 @@
 name: Docs Preview
 
 on:
-  push:
-    branches-ignore:
-      - main
-      - gh-pages
+  pull_request:
+    branches:
+      - devel
 
 jobs:
   build-deploy:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
 
     steps:
@@ -45,7 +45,7 @@ jobs:
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_dir: documentation
-        destination_dir: preview/${{ github.ref_name }}
+        destination_dir: preview/${{ github.head_ref }}
         keep_files: true
         force_orphan: false
 

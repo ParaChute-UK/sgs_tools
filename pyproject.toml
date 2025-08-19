@@ -1,16 +1,27 @@
 [build-system]
-requires = ["setuptools>=61", "setuptools_scm>=8"]
-build-backend = "setuptools.build_meta"
+requires = ["poetry-core>=1.0.0", "poetry-dynamic-versioning>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
 
-[project]
+[tool.poetry-dynamic-versioning]
+enable = true
+style = "semver"        # or "pep440" depending on your preference
+vcs = "git"
+
+[tool.poetry-dynamic-versioning.substitution]
+files = ["src/sgs_tools/__init__.py"]
+
+[tool.poetry]
 name = "sgs_tools"
-dynamic = ["version"]
+version = "0.0.0" # placeholder replaced dynamically
 description = "Python tools for sub-grid scale fluid analyis"
 authors = [
-    {name = "Dimtar Vlaykov", email = "d.vlaykov@exeter.ac.uk"},
+    "Dimtar Vlaykov <d.vlaykov@exeter.ac.uk>"
 ]
-
-urls = {source = "https://github.com/dvlaykov/sgs_tools.git"}
+readme="README.md"
+repository = "https://github.com/dvlaykov/sgs_tools.git"
+packages = [
+{ include = "sgs_tools", from = "src"}
+]
 
 classifiers = [
     "Development Status :: 2 - Pre-Alpha",
@@ -19,39 +30,36 @@ classifiers = [
     "Programming Language :: Python :: 3.11"
 ]
 
-requires-python = ">=3.11"
-dependencies = [
-    "matplotlib>=3.6",
-    "xarray[io,accel,parallel]>=2023.9",
-    "xrft",
-    "xarray-einstats",
-    "f90nml",
-    "netcdf4",
-    "h5netcdf",
-    "pint"
-]
+[tool.poetry.dependencies]
+python = ">=3.11"
+matplotlib = ">=3.6"
+xarray = {version = ">=2023.9", extras = ["io","accel","parallel"]}
+xrft = "*"
+xarray-einstats = "*"
+f90nml = "*"
+netcdf4= "*"
+h5netcdf="*"
+pint = "*"
 
-[project.optional-dependencies]
-dev = [
-    "tox",
-    "mypy~=1.17.0",
-    "pytest~=7.2",
-    "pytest-cov~=4.0",
-    "ruff~=0.12.4",
-    "pre-commit~=3.4.0"
-]
-doc = [
-    "sphinx",
-    "sphinx_autodoc_typehints",
-    "sphinx_argparse_cli",
-    "sphinx-mdinclude",
-    "pydata-sphinx-theme"
-]
-[project.scripts]
+[tool.poetry.group.dev.dependencies]
+tox = "*"
+mypy  = "~=1.17.0"
+pytest = "~=7.2"
+pytest-cov = "~=4.0"
+ruff  = "0.12.5"
+pre-commit="~=3.4.0"
+
+
+
+[tool.poetry.group.doc.dependencies]
+    sphinx  = "*"
+    sphinx_autodoc_typehints = "*"
+    sphinx_argparse_cli = "*"
+    sphinx-mdinclude = "*"
+    pydata-sphinx-theme = "*"
+
+[tool.poetry.scripts]
 cs_dynamic = "sgs_tools.scripts.CS_calculation_genmodel:main"
 sim_comparison = "sgs_tools.scripts.BasicComparisonSimAnalysis:main"
 ref_comparison = "sgs_tools.scripts.ReferenceComparisonSimAnalysis:main"
-
 um_levels = "sgs_tools.scripts.make_UM_level_sets:main"
-
-[tool.setuptools_scm]

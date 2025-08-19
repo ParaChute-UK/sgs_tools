@@ -31,4 +31,3 @@ jobs:
           git commit -m "Remove preview docs for PR #${{ github.event.pull_request.number }}"
           git push origin gh-pages
        fi
-

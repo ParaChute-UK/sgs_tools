@@ -48,4 +48,3 @@ jobs:
         destination_dir: preview/${{ github.head_ref }}
         keep_files: true
         force_orphan: false
-

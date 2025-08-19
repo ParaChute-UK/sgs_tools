@@ -2,10 +2,10 @@ Scripts:
 ========
 
 .. sphinx_argparse_cli::
-  :module: sgs_tools.scripts.CS_calculation
-  :func: parser
+  :module: sgs_tools.scripts.CS_calculation_genmodel
+  :func: parse_args
   :hook:
-  :prog: CS_calculation.py
+  :prog: CS_calculation_genmodel.py
   :group_title_prefix:
 
 

@@ -1,4 +1,4 @@
-name: Deploy Docs from Devel
+name: Docs Update
 
 on:
   pull_request:

@@ -30,6 +30,7 @@ Install the package with documentation extras:
    Or, if you're using Poetry:
    ```bash
    poetry install --with doc
+   ```
 
 The resulting documentaion can be accessed from `<repo_directory>/documentation/html/index.html`.
 
@@ -53,7 +54,7 @@ We welcome contributions of all kinds — bug reports, feature requests, documen
 The dev tools are managed using [Poetry](https://python-poetry.org/docs/).
 
 > If you're unfamiliar with [Poetry](https://python-poetry.org/docs/), it's a Python packaging and publishing tool for dependency management and development workflows.
-You can still use `pip` for basic installs, but we recommend Poetry for contributing to this project.
+You can still use `pip` for user installations, but we recommend Poetry for contributing to this project.
 
 
 ### Setup
@@ -106,7 +107,7 @@ You can still use `pip` for basic installs, but we recommend Poetry for contribu
   tox pre_commit
   ```
 
-  See the `Makefile` or `tox.ini` for grannular options.
+  See the `Makefile` or `tox.ini` for more grannular options.
 
 ### 🔧 Tooling Overview
 - **Virtual environment for testing**: [`tox`](https://tox.wiki/en/4.28.1/)

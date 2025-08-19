@@ -1,4 +1,4 @@
-.PHONY: test doc mypy_check style_check
+.PHONY: doc test mypy_check style_check pre_commit
 
 doc:
 	poetry install --with doc
@@ -13,5 +13,5 @@ mypy_check:
 style_check:
 	tox -e style_check
 
-staged_fix:
+pre_commit:
 	tox -e pre_commit

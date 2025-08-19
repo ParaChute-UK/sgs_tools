@@ -116,4 +116,3 @@ You can still use `pip` for basic installs, but we recommend Poetry for contribu
   - [`ruff`](https://github.com/charliermarsh/ruff): formatting and linting
   - [`mypy`](http://mypy-lang.org/): static type checking
   - [`pre-commit`](https://pre-commit.com/): wraps up `ruff` and `mypy` and cleans-up staged files before commit. Automatically used in PRs to `devel`.
-

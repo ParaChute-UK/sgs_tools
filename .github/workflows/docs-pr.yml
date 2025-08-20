@@ -84,4 +84,4 @@ jobs:
 
   update-index:
     needs: [deploy-devel-docs, cleanup-preview-docs]
-    uses: ./.github/workflows/update_doc_idx.yml
+    uses: ./.github/workflows/docs-regen-idx.yml

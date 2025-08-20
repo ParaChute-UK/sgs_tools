@@ -1,0 +1,28 @@
+name: Update Pages Index
+on:
+  workflow_call:
+
+jobs:
+  update-index:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          ref: gh-pages
+
+      - name: Generate index.html
+        run: |
+          echo "<html><body><h1>Docs Index</h1><ul>" > index.html
+          for dir in $(ls -d */ || true); do
+            echo "<li><a href=\"$dir\">$dir</a></li>" >> index.html
+          done
+          echo "</ul></body></html>" >> index.html
+
+      - name: Deploy index.html
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: .
+          keep_files: true
+          force_orphan: false

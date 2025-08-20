@@ -48,3 +48,6 @@ jobs:
         destination_dir: preview/${{ github.head_ref }}
         keep_files: true
         force_orphan: false
+
+  update-index:
+    uses: ./.github/workflows/update-index.yml

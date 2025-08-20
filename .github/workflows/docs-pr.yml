@@ -6,17 +6,13 @@ on:
     branches:
       - devel
 
-  push:
-     branches:
-       - doc_deploy
-
   workflow_dispatch:
 
 jobs:
   deploy-devel-docs:
-    #  if: |
-    #  github.event_name == 'workflow_dispatch' ||
-    #  (github.event_name == 'pull_request' && github.event.pull_request.merged)
+    if: |
+     github.event_name == 'workflow_dispatch' ||
+     (github.event_name == 'pull_request' && github.event.pull_request.merged)
     runs-on: ubuntu-latest
 
     steps:

@@ -54,7 +54,7 @@ jobs:
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_dir: documentation
-        destination_dir: ${{ github.event.pull_request.base.ref }}
+        destination_dir: ${{ github.event.pull_request.base.ref || github.ref_name }}
         keep_files: true
         force_orphan: false
 

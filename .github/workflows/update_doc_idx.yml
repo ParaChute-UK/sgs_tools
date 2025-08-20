@@ -15,9 +15,20 @@ jobs:
         run: |
           echo "<html><head><title>Documentation Index</title></head><body>" > index.html
           echo "<h1>Documentation Index</h1>" >> index.html
+
+          # Check if devel exists and link it
+          if [ -d "devel" ]; then
+            timestamp=$(stat -c %Y devel)
+            mod_date=$(date -d "@$timestamp" "+%Y-%m-%d %H:%M:%S")
+            echo "<p><strong>Current:</strong> <a href=\"devel/\">devel</a> <em>($mod_date)</em></p>" >> index.html
+          else
+            echo "<p><strong>Current:</strong> <em>Error! devel branch not found</em></p>" >> index.html
+          fi
+
+          # Table of feature branches
           echo "<table border='1' cellpadding='5' cellspacing='0'>" >> index.html
-          echo "<tr><th>Branch</th><th>Last Modified</th></tr>" >> index.html
-          find . -mindepth 1 -maxdepth 1 -type d -exec stat --format '%Y %n' {} \; \
+          echo "<tr><th>Feature Branch</th><th>Last Modified</th></tr>" >> index.html
+          find . -mindepth 1 -maxdepth 1 -type d ! -name '.*' ! -name 'devel' -exec stat --format '%Y %n' {} \; \
             | sort -r \
             | awk '{
                 cmd = "date -d @" $1 " +\"%Y-%m-%d %H:%M:%S\""

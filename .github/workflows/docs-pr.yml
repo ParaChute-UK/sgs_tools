@@ -58,7 +58,7 @@ jobs:
         keep_files: true
         force_orphan: false
 
-  cleanup-preview:
+  cleanup-preview-docs:
     runs-on: ubuntu-latest
     needs: deploy-devel-docs
 
@@ -84,4 +84,5 @@ jobs:
         fi
 
   update-index:
+    needs: [deploy-devel-docs, cleanup-preview-docs]
     uses: ./.github/workflows/update_doc_idx.yml

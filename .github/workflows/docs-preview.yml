@@ -6,7 +6,7 @@ on:
       - devel
 
 jobs:
-  build-deploy:
+  build-deploy-doc-preview:
     if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
 
@@ -50,4 +50,5 @@ jobs:
         force_orphan: false
 
   update-index:
+    needs: build-deploy-doc-preview
     uses: ./.github/workflows/update_doc_idx.yml

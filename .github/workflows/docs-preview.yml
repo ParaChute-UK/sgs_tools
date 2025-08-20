@@ -1,0 +1,54 @@
+name: Docs Preview
+
+on:
+  pull_request:
+    branches:
+      - devel
+
+jobs:
+  build-deploy-doc-preview:
+    if: ${{ !github.event.pull_request.draft }}
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout source
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install Poetry
+      uses: abatilo/actions-poetry@v4.0.0
+
+    - name: Cache Poetry dependencies
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.cache/pypoetry
+          ~/.cache/pip
+        key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-poetry-
+
+    - name: Install doc dependencies
+      run: poetry install --with doc
+
+    - name: Build Sphinx docs
+      run: |
+        poetry run sphinx-build -b html doc/ documentation
+        touch documentation/.nojekyll
+
+    - name: Deploy to gh-pages/preview
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: documentation
+        destination_dir: preview/${{ github.head_ref }}
+        keep_files: true
+        force_orphan: false
+
+  update-index:
+    needs: build-deploy-doc-preview
+    uses: ./.github/workflows/update_doc_idx.yml

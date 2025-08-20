@@ -6,6 +6,10 @@ on:
     branches:
       - devel
 
+  push:
+     branches:
+       - doc_deploy
+
   workflow_dispatch:
 
 jobs:

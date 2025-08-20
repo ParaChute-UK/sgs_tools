@@ -13,34 +13,11 @@ on:
   workflow_dispatch:
 
 jobs:
-  cleanup-preview:
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: Checkout gh-pages branch
-      uses: actions/checkout@v3
-      with:
-        ref: gh-pages
-        fetch-depth: 0
-
-    - name: Configure Git
-      run: |
-        git config user.name "github-actions[bot]"
-        git config user.email "github-actions[bot]@users.noreply.github.com"
-
-    - name: Remove preview directory
-      run: |
-        if [ -d "preview/${{ github.head_ref }}" ]; then
-          rm -rf preview/${{ github.head_ref }}
-          git rm -r --ignore-unmatch preview/${{ github.head_ref }}
-          git commit -m "Remove preview docs for PR #${{ github.event.pull_request.number }}"
-          git push origin gh-pages
-        fi
-
   deploy-devel-docs:
-    if: ${{ github.event.pull_request.merged }}
+    #  if: |
+    #  github.event_name == 'workflow_dispatch' ||
+    #  (github.event_name == 'pull_request' && github.event.pull_request.merged)
     runs-on: ubuntu-latest
-    needs: cleanup-preview
 
     steps:
     - name: Checkout devel branch
@@ -82,3 +59,28 @@ jobs:
         destination_dir: ${{ github.event.pull_request.base.ref }}
         keep_files: true
         force_orphan: false
+
+  cleanup-preview:
+    runs-on: ubuntu-latest
+    needs: deploy-devel-docs
+
+    steps:
+    - name: Checkout gh-pages branch
+      uses: actions/checkout@v3
+      with:
+        ref: gh-pages
+        fetch-depth: 0
+
+    - name: Configure Git
+      run: |
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+
+    - name: Remove preview directory
+      run: |
+        if [ -d "preview/${{ github.head_ref }}" ]; then
+          rm -rf preview/${{ github.head_ref }}
+          git rm -r --ignore-unmatch preview/${{ github.head_ref }}
+          git commit -m "Remove preview docs for PR #${{ github.event.pull_request.number }}"
+          git push origin gh-pages
+        fi

@@ -13,11 +13,21 @@ jobs:
 
       - name: Generate index.html
         run: |
-          echo "<html><body><h1>Docs Index</h1><ul>" > index.html
-          for dir in $(ls -d */ || true); do
-            echo "<li><a href=\"$dir\">$dir</a></li>" >> index.html
-          done
-          echo "</ul></body></html>" >> index.html
+          echo "<html><head><title>Documentation Index</title></head><body>" > index.html
+          echo "<h1>Documentation Index</h1>" >> index.html
+          echo "<table border='1' cellpadding='5' cellspacing='0'>" >> index.html
+          echo "<tr><th>Branch</th><th>Last Modified</th></tr>" >> index.html
+          find . -mindepth 1 -maxdepth 1 -type d -exec stat --format '%Y %n' {} \; \
+            | sort -r \
+            | awk '{
+                cmd = "date -d @" $1 " +\"%Y-%m-%d %H:%M:%S\""
+                cmd | getline mod_date
+                close(cmd)
+                dir = substr($0, index($0,$2))
+                gsub("./", "", dir)
+                print "<tr><td><a href=\"" dir "/\">" dir "</a></td><td>" mod_date "</td></tr>"
+              }' >> index.html
+          echo "</table></body></html>" >> index.html
 
       - name: Deploy index.html
         uses: peaceiris/actions-gh-pages@v3

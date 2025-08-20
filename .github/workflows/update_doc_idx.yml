@@ -28,7 +28,11 @@ jobs:
           # Table of feature branches
           echo "<table border='1' cellpadding='5' cellspacing='0'>" >> index.html
           echo "<tr><th>Feature Branch</th><th>Last Modified</th></tr>" >> index.html
-          find . -mindepth 1 -maxdepth 1 -type d ! -name '.*' ! -name 'devel' -exec stat --format '%Y %n' {} \; \
+
+          find . -mindepth 1 -maxdepth 1 -type d \
+              ! -name '.*' \
+              ! -name 'devel' \
+              -exec stat --format '%Y %n' {} \; \
             | sort -r \
             | awk '{
                 cmd = "date -d @" $1 " +\"%Y-%m-%d %H:%M:%S\""

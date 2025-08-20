@@ -50,4 +50,4 @@ jobs:
         force_orphan: false
 
   update-index:
-    uses: ./.github/workflows/update-index.yml
+    uses: ./.github/workflows/update_doc_idx.yml

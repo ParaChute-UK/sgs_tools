@@ -12,6 +12,7 @@
    simple_flow
    sgs
    scripts
+   devlog
 
 ==================
 Indices and tables
@@ -20,5 +21,3 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-
-.. mdinclude:: ../TASKLIST.md

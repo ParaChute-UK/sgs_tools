@@ -1,10 +1,10 @@
-# Changelog
+## Changelog
 
 All notable changes to this project are documented in this file.
 
-## [0.1.0] - 2025-08-20
+### [0.1.0] - 2025-08-20
 
-### Added
+#### Added
   - Auto-deployment of docs on GitHub pages (#28, #30)
   - packaging manager setuptools -> poetry (#27)
   - Apache 2.0 license (#24)
@@ -12,14 +12,14 @@ All notable changes to this project are documented in this file.
   - Extra diagnostics tools: (anistropy, spectra, profiles) with a CLI entrypoint (#9, #15)
   - New SGS models and upgraded CS calculation script (#4)
 
-### Changes and Fixes
+#### Changes and Fixes
   - temporary IO depependency change to netcdf4+h5netcdf (#16)
   - Refactor core modules, use Protocol, improve dynamic model logic (#5, #9, #15)
   - CLI entry points upgrades for CS generation and analysis (#2, #3, #4, #9)
   - Improved test coverage
   - Partial update of Readme and Docs
 
-## [0.0.1]
+### [0.0.1]
   - dynamic version
   - fixes to packaging and dependencies
   - upgrade IO support to xarray 2023.9

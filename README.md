@@ -20,20 +20,27 @@ Python tools for sub-grid scale (SGS) fluid dynamics.
 **NB:** Requires Python **>=3.11**. Installation on older versions will fail with possibly unclear error messages.
 
 ## 📚 Documentation
-The docs are generated via [sphinx](https://www.sphinx-doc.org/en/master/) and several sphinx addons.
+The documentation is hosted [here](https://dvlaykov.github.io/sgs_tools/).
+(It is updated via GitHub Actions, so may be a few minutes behind the latest PR merge.)
 
 To build the documentation locally:
 
-Install the package with documentation extras:
-   ```console
-   pip install git+https://github.com/dvlaykov/sgs_tools.git@devel#egg=sgs_tools[doc]
-   ```
-   Or, if you're using Poetry:
-   ```console
-   poetry install --with doc
-   ```
 
-The resulting documentaion can be accessed from `<repo_directory>/documentation/html/index.html`.
+  1. Install the package with documentation extras ([sphinx](https://www.sphinx-doc.org/en/master/) and addons)
+       ```console
+         pip install git+https://github.com/dvlaykov/sgs_tools.git@devel#egg=sgs_tools[doc]
+       ```
+     Or, if you're using Poetry
+       ```console
+          poetry install --with doc
+       ```
+
+  2. Generate
+        ```console
+        make doc
+        ```
+
+  3. The rendered documentation can be accessed from `<repo_directory>/documentation/index.html`.
 
 
 ## 🤝Contributing

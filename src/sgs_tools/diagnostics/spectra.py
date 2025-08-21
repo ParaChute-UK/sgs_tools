@@ -16,34 +16,37 @@ def radial_spectrum(
     prefix="freq_",
 ) -> xr.DataArray:
     r"""Isotropize a 2D power spectrum or cross spectrum
-    by taking an "azimuthal" average over the specified dimensions.
+    by taking an "spherical" average over the specified dimensions.
 
     .. math::
-        \text{iso}_{ps}[kr^*] = \sum_{k: |k| = kr} |\mathbb{F}(da')|^2 * w
-        kr^* = \langle k \rangle_{k \in [kr_0, kr_1]}
+        \mathbb{F}_\text{iso}(k_r) &= \sum_{k_r: |k_r| \in [kr_0, kr_1]} |\mathbb{F}(\mathbf{k})|^2 * w(\mathbf{k})  \\
+        k_r &= \langle k \rangle_{|k| \in [kr_0, kr_1]}
 
-    where :math:`kr` is the radial wavenumber. and :math:`w` are defined implicitly through the scaling. Always
-        :math:`\sum ps = \sum iso_ps * iso_ps[prefix+'dA']`
-        This satisfies Parseval if that :math:`\sum ps = \sum real\_data**2 * dx * dy`.
+    where :math:`kr` is the radial wavenumber and the weights :math:`w` are defined implicitly through the scaling.
+    Always :math:`\sum_\mathbf{k} |\mathbb{F}(\mathbf{k})|^2 = \sum \mathbb{F}_\text{iso}(k_r) *  w(k_r)`.
+    This satisfies Parseval assuming :math:`\sum_\mathbf{k} |\mathbb{F}(\mathbf{k})|^2 = \sum real\_data^2 * dx * dy`.
 
-    Parameters
-    ----------
-    ps : `xarray.DataArray`
+    :param ps: `xarray.DataArray`
         The power spectrum or cross spectrum to be isotropized.
-    fftdim : list
+    :param fftdim: list
         The fft dimensions overwhich the isotropization must be performed.
-    radial_bin_width : int
+    :param radial_bin_width: int
         Width of radial bins in units of inverse length (or whatever the 2d power spectrum is in)
-    truncate : bool, optional
+    :param truncate: bool, optional
         If True, the spectrum will be truncated for wavenumbers larger than min(max(ps[fftdim].size)).
-    bin_anchor: str, optional
-        Where to place the radial wavenumber within the bin. Choices {'left', 'right', 'centre', 'com'}. Default: 'mean'
-        if 'com' : compute as the centre-of-mass radius: :math: `\sum (ps * k_r) / \sum (ps)` before rescaling.
-    scaling: str, optional, default: density
-        Rescale the power spectrum to satisfy :math:`\sum ps = \sum iso_ps * iso_ps[prefix+'dA']`
-        * `density`: set :math: `iso_ps[prefix+'dA'](k_r) = \pi * (k_r^{top}^2 - k_r^{bottom}^2)`, where :math:`k_r^{top}` and :math:`k_r^{bottom}` are the bin edges.
-        * `spectrum`: set :math: `iso_ps[prefix+'dA'](k_r) = 1`
+    :param bin_anchor: str, optional
+        Where to place the radial wavenumber within the bin. Choices {'left', 'right', 'centre', 'com'}.
+        If `com` : compute as the centre-of-mass radius : :math:`k_r = \sum_{|k| \in [kr_0, kr_1]} (\mathbb{F} * |\mathbf{k}|) /  \mathbb{F}_\text{iso}(k_r)` before rescaling.
+        Default: `com`.
+    :param scaling: str, optional
+        Rescale the power spectrum to satisfy :math:`\sum ps = \sum \mathbb{F}_\text{iso} * w(k_r)`
 
+        * `density`: set :math:`w(k_r) = \pi * ((k_r^{top})^2 - (k_r^{bottom})^2)`, where :math:`k_r^{top}` and :math:`k_r^{bottom}` are the bin edges.
+
+        * `spectrum`: set :math:`w(k_r) = 1`
+
+    :return: an `xarray.DataArray` with the isotropic spectrum
+        coordinates for the radial wavenumber ( `prefix` r), bin width ( `prefix` dr) and corresponding weigths ( `prefix` dA), i.e. :math:`w(k_r)`.
     """
     # name of new spectral dimension
     dim_name = prefix + "r"
@@ -133,16 +136,26 @@ def spectra_1d_radial(
     radial_truncation: bool = False,
     fillnan: float = 0.0,
 ) -> xr.Dataset:
-    """
-    :param: simulation: xarray Dataset of multidimensional fields. must contain the set of `power_spectra_fields` and `cross_spectra_fields`
-    :param: hdims:  horizonal dimensions along which to compute linear spectra. The radial spectrum is computed along the Euclidean radius along vector spanned by these dimensions.
-    :param: power_spectra_fields: sequence of fields whose power spectrum to compute
-    :param: cross_spectra_fields: sequence of tuples of fields whose cross-spectrum to compute
-    :param: radial_smooth_factor: smoothing factor for radial spectral bins. If 2 will have radial bin widht is 2*linear wavenumber.
-    :param: radial_truncation: switch to include/exclude aliased wavenumber beyond the max. 1d freqeuncy in the radial spectrum. If **True** the result won't respect Parseval exactly.
-    :param: fillnan: value to fill nans with in order to compute spectrum of dirty date. If set to a nan value (e.g. np.nan) will produce nan spectra globally.  Defaults to 0.
+    r"""
+    Compute a 1d directional and radial power and cross spectra of all fields in the `simultation` Dataset.
+    Notes: resulting spectral cooordinates are in units of inverse length, not radians/length.
+
+    :param simulation: xarray Dataset of multidimensional fields. must contain the set of `power_spectra_fields` and `cross_spectra_fields`
+
+    :param hdims:  horizonal dimensions along which to compute linear spectra. The radial spectrum is computed along the Euclidean radius along vector spanned by these dimensions.
+
+    :param power_spectra_fields: sequence of fields whose power spectrum to compute
+
+    :param cross_spectra_fields: sequence of tuples of fields whose cross-spectrum to compute
+
+    :param radial_smooth_factor: smoothing factor for radial spectral bins. If 2 will have radial bin widht is 2*linear wavenumber.
+
+    :param radial_truncation: switch to include/exclude aliased wavenumber beyond the max. 1d freqeuncy in the radial spectrum. If **True** the result won't respect Parseval exactly.
+
+    :param fillnan: value to fill nans with in order to compute spectrum of dirty date. If set to a nan value (e.g. np.nan) will produce nan spectra globally.  Defaults to 0.
+
     :return: an xarray Dataset with the requested 1d and radial power and co-spectra. The number of physical-space grid size and cell size along hdims is included in the attributes along with the fourier normalization convention.
-      Notes: resulting spectral cooordinates are in units of inverse length, not radians/length.
+
     """
     spec = {}
     extra_coords = []

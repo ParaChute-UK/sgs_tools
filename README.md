@@ -9,15 +9,16 @@ Python tools for sub-grid scale (SGS) fluid dynamics.
 
 ## 🚀 Install
 
-### Development Version (from GitHub `devel` branch)
+> **Requires Python >=3.11**. Installation on older versions will fail with possibly unclear error messages.
 
-  To install the latest development version:
+### Development Version
+  To install the latest development version (from GitHub `devel` branch):
 
   ```console
   pip install git+https://github.com/dvlaykov/sgs_tools.git@devel
   ```
 
-**NB:** Requires Python **>=3.11**. Installation on older versions will fail with possibly unclear error messages.
+
 
 ## 📚 Documentation
 The documentation is hosted [here](https://dvlaykov.github.io/sgs_tools/).
@@ -67,53 +68,50 @@ You can still use `pip` for user installations, but we recommend Poetry for cont
 
 ### Setup
   1. Clone the repository
-  ```console
-  git clone https://github.com/dvlaykov/sgs_tools.git
-  cd sgs_tools
-  ```
-
+      ```console
+      git clone https://github.com/dvlaykov/sgs_tools.git
+      cd sgs_tools
+      ```
   2. Create and activate a virtual environment in the preferred way (venv, conda, ...) [Optional, Recommended]
 
   3. [Install Poetry](https://python-poetry.org/docs/#installation) (if not already installed), e.g.
-  ```console
-  curl -sSL https://install.python-poetry.org | python3 -
-  ```
+      ```console
+      curl -sSL https://install.python-poetry.org | python3 -
+      ```
 
   4. Install all dependencies including dev tools:
-  ```console
-  poetry install --with dev
-  ```
+      ```console
+      poetry install --with dev
+      ```
 
-  > This adds dev tools like `tox`, `pytest`, `ruff`, `mypy`, and `pre-commit` to the dependencies.
+      > This adds dev tools like `tox`, `pytest`, `ruff`, `mypy`, and `pre-commit` to the dependencies.
 
   5. Activate Git hooks to help clean up formatting etc. on commit (this may slow down the commit somewhat).
-  ```console
-  pre-commit install
-  ```
+      ```console
+      pre-commit install
+      ```
 
 ### Testing & Style
 
   Testing and code style is managed via [tox](https://tox.wiki/en/4.28.1/) or a convenience `make` targets defined in the `Makefile`.
 
   *	Run all checks (formatting, linting, type checks, tests, and coverage) across the repo with
-
-  ``` console
-  make test
-  ```
+      ``` console
+      make test
+      ```
   or
-
-  ``` console
-  tox
-  ```
+      ``` console
+      tox
+      ```
 
   * Apply standard formatting fixes and checks (that would be applied anyway for PRs) with
-  ``` console
-  make pre_commit
-  ```
+      ``` console
+      make pre_commit
+      ```
   or
-  ``` console
-  tox pre_commit
-  ```
+      ``` console
+      tox pre_commit
+      ```
 
   See the `Makefile` or `tox.ini` for more grannular options.
 

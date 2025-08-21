@@ -12,11 +12,11 @@ from .sgs_model import LinCombSGSModel, SGSModel
 class LeonardTensor(Protocol):
     """compute the Leonard tensor for a large-scale equation
 
-    * :meth:`compute`: returns the SGS tensor for a given filter
+    :meth:`compute`: returns the Leonard tensor for a given filter
     """
 
     def compute(self, filter: Filter) -> xr.DataArray:
-        """compute the Leonard tensor given a test filter"""
+        """"""
 
 
 @dataclass(frozen=True)
@@ -24,8 +24,7 @@ class LeonardVelocityTensor:
     """Leonard tensor for the velocity
 
     :ivar vel: grid-scale/base velocity field
-    :param contraction_dims: labels of dimensions
-                             to form the :math: v_i v_j ` tensor
+    :ivar tensor_dims: tensor dimensions
     """
 
     vel: xr.DataArray
@@ -71,9 +70,11 @@ class LeonardThetaTensor:
 
 def M_Germano_tensor(sgs_model: SGSModel, filter: Filter) -> xr.DataArray:
     r"""compute the Mij Germano model tensor as
-    (<tau(at grid)> - alpha^2 tau(at filter))
-    where (delta * alpha) is the area/volume spanned by the filter kernel
+    :math:`(<\tau(\matrhm{at grid})> - \alpha^2 \tau(\mathrm{at filter}))`,
+    where :math:`\Delta * \alpha` is the area/volume spanned by the filter kernel
+    and :math:`\Delta` is the filter scale.
 
+    :param sgs_model: SGS model used to compute the SGS tensor.
     :param filter: Filter used to separate "large" and "small" scales
     """
     id = IdentityFilter(xr.DataArray(), filter.filter_dims)
@@ -87,7 +88,8 @@ def M_Germano_tensor(sgs_model: SGSModel, filter: Filter) -> xr.DataArray:
 class DynamicModelProtcol(Protocol):
     """compute the Leonard tensor for a large-scale equation
 
-    * :meth:`compute`: returns the SGS tensor for a given filter
+    :meth compute_coeff : returns the SGS tensor for a given filter
+    :meth sgs_tensor: returns the SGS tensor for a given test and regularisation filter
     """
 
     def compute_coeff(self, test_filter: Filter, reg_filter: Filter) -> xr.DataArray:
@@ -99,16 +101,37 @@ class DynamicModelProtcol(Protocol):
 
 @dataclass(frozen=True)
 class DynamicModel:
+    r"""Dynamic model for SGS model
+
+    :ivar static_model: Static SGS model
+    :ivar leonard: Leonard tensor for the large-scale equation
+    :ivar minimisation: Minimisation method to compute coefficients
+    :meth compute_coeff: computes the amplitude coefficients for the SGS model
+    :meth sgs_tensor: computes the SGS tensor for a given test and regularisation filters
+    """
+
     static_model: SGSModel
     leonard: LeonardTensor
     minimisation: Minimisation
 
     def compute_coeff(self, test_filter: Filter, reg_filter: Filter) -> xr.DataArray:
+        """compute the amplitude coefficient for the SGS model
+
+        :param test_filter: Filter used to separate "large" and "small" scales
+        :param reg_filter: Filter used for regularisation
+        """
+
         L = self.leonard.compute(test_filter)
         M = M_Germano_tensor(self.static_model, test_filter)
         return self.minimisation.compute(L, [M], reg_filter)
 
     def sgs_tensor(self, test_filter: Filter, reg_filter: Filter) -> xr.DataArray:
+        """compute the SGS tensor for a given test and regularisation filter
+
+        :param test_filter: Filter used to separate "large" and "small" scales
+        :param reg_filter: Filter used for regularisation
+        """
+
         return self.compute_coeff(
             test_filter, reg_filter
         ) * self.static_model.sgs_tensor(test_filter)
@@ -116,11 +139,26 @@ class DynamicModel:
 
 @dataclass(frozen=True)
 class LinCombDynamicModel:
+    """Dynamic model for linear combination SGS model
+
+    :ivar static_model: Static linear combination SGS model
+    :ivar leonard: Leonard tensor for the large-scale equation
+    :ivar minimisation: Minimisation method to compute coefficients
+    :meth compute_coeff: computes the coefficients for the SGS model
+    :meth sgs_tensor: computes the SGS tensor for a given test and regularisation filter
+    """
+
     static_model: LinCombSGSModel
     leonard: LeonardTensor
     minimisation: Minimisation
 
     def compute_coeff(self, test_filter: Filter, reg_filter: Filter) -> xr.DataArray:
+        """compute the coefficients for the SGS model
+
+        :param test_filter: Filter used to separate "large" and "small" scales
+        :param reg_filter: Filter used for regularisation
+        """
+
         L = self.leonard.compute(test_filter)
         M = [
             M_Germano_tensor(m, test_filter) for m in self.static_model.model_components
@@ -128,6 +166,12 @@ class LinCombDynamicModel:
         return self.minimisation.compute(L, M, reg_filter)
 
     def sgs_tensor(self, test_filter: Filter, reg_filter: Filter) -> xr.DataArray:
+        """compute the SGS tensor for a given test and regularisation filter
+
+        :param test_filter: Filter used to separate "large" and "small" scales
+        :param reg_filter: Filter used for regularisation
+        """
+
         tau_list = self.static_model.sgs_tensor_list(test_filter)
         coeff = self.compute_coeff(test_filter, reg_filter)
         # ensure alignment of coefficient index label between static_model and minimisation

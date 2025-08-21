@@ -26,19 +26,19 @@ def radial_spectrum(
     Always :math:`\sum_\mathbf{k} |\mathbb{F}(\mathbf{k})|^2 = \sum \mathbb{F}_\text{iso}(k_r) *  w(k_r)`.
     This satisfies Parseval assuming :math:`\sum_\mathbf{k} |\mathbb{F}(\mathbf{k})|^2 = \sum real\_data^2 * dx * dy`.
 
-    :param ps: `xarray.DataArray`
+    :param ps:
         The power spectrum or cross spectrum to be isotropized.
-    :param fftdim: list
+    :param fftdim:
         The fft dimensions overwhich the isotropization must be performed.
-    :param radial_bin_width: int
+    :param radial_bin_width:
         Width of radial bins in units of inverse length (or whatever the 2d power spectrum is in)
-    :param truncate: bool, optional
+    :param truncate:
         If True, the spectrum will be truncated for wavenumbers larger than min(max(ps[fftdim].size)).
-    :param bin_anchor: str, optional
+    :param bin_anchor:
         Where to place the radial wavenumber within the bin. Choices {'left', 'right', 'centre', 'com'}.
         If `com` : compute as the centre-of-mass radius : :math:`k_r = \sum_{|k| \in [kr_0, kr_1]} (\mathbb{F} * |\mathbf{k}|) /  \mathbb{F}_\text{iso}(k_r)` before rescaling.
         Default: `com`.
-    :param scaling: str, optional
+    :param scaling:
         Rescale the power spectrum to satisfy :math:`\sum ps = \sum \mathbb{F}_\text{iso} * w(k_r)`
 
         * `density`: set :math:`w(k_r) = \pi * ((k_r^{top})^2 - (k_r^{bottom})^2)`, where :math:`k_r^{top}` and :math:`k_r^{bottom}` are the bin edges.

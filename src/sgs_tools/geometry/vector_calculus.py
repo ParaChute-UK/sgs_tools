@@ -12,6 +12,7 @@ def grad_scalar(
     :param sca: input scalar, with spatial coordinates `space_dims`
     :param space_dims: labels for the spatial dimensions (to be differentiated against)
     :param new_dim_name: the name of the new dimension (of the differential direction)
+    :param name: name for output dataarray. If None, the name of the input scalar is used.
     :return: gradient (assuming cartesian geometry)
     """
 
@@ -34,6 +35,7 @@ def grad_vector(
     :param vec: input vector, with spatial coordinates `space_dims`
     :param space_dims: labels for the spatial dimensions (to be differentiated against)
     :param new_dim_name: the name of the new dimension (of the differential direction)
+    :param name: name for output dataarray. If None, the name of the input vector is used.
     :return: gradient (assuming cartesian geometry)
     """
 
@@ -56,6 +58,7 @@ def grad_vector_lin(
     :param vec: input vector, with spatial coordinates `space_dims`
     :param space_dims: labels for the spatial dimensions (to be differentiated against)
     :param new_dim_name: the name of the new dimension (of the differential direction)
+    :param name: name for output dataarray. If None, the name of the input vector is used.
     :return: gradient (assuming cartesian geometry)
     """
     gradvec = []

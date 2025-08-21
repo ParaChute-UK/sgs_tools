@@ -15,6 +15,8 @@ base_fields_dict = {
     #'TEMPERATURE_ON_THETA_LEVELS' : 'T',
     # 'PRESSURE_AT_THETA_LEVELS_AFTER_TS' : 'P'
 }
+""
+
 Water_dict = {
     "CLD_LIQ_MIXING_RATIO__mcl__AFTER_TS": "q_l",
     "CLD_ICE_MIXING_RATIO__mcf__AFTER_TS": "q_i",
@@ -22,6 +24,8 @@ Water_dict = {
     "GRAUPEL_MIXING_RATIO__mg__AFTER_TS": "q_g",
     "SPECIFIC_HUMIDITY_AFTER_TIMESTEP": "q_v",
 }
+""
+
 Smagorinsky_dict = {
     "SMAG__S__SHEAR_TERM_": "s_smag",
     "SMAG__VISC_M": "smag_visc_m",
@@ -32,12 +36,16 @@ Smagorinsky_dict = {
     "TURBULENT_KINETIC_ENERGY": "tke",
     "GRADIENT_RICHARDSON_NUMBER": "Richardson",
 }
+""
+
 dynamic_SGS_dict = {
     "CS_SQUARED_AT_2_DELTA": "cs2d",
     "CS_SQUARED_AT_4_DELTA": "cs4d",
     "CS_THETA_AT_SCALE_2DELTA": "cs_theta_2d",
     "CS_THETA_AT_SCALE_4DELTA": "cs_theta_4d",
 }
+""
+
 dynamic_anisotropic_SGS_dict = {
     "RHOKM_DIFF_COEFF___LOCAL_SCHEME": "smag_visc_m_vert",
     "RHOKH_DIFF_COEFF___LOCAL_SCHEME": "smag_visc_h_vert",
@@ -48,6 +56,7 @@ dynamic_anisotropic_SGS_dict = {
     "CS_THETA_2": "cs_theta_2",
     "CS_THETA_3": "cs_theta_3",
 }
+""
 
 dynamic_SGS_diag_dict = {
     "LijMij_CONT_TENSORS": "lm",
@@ -78,6 +87,8 @@ dynamic_SGS_diag_dict = {
     "Tdecorr_heat": "Tdecorr_heat",
     "Richardson": "Richardson_diag",
 }
+""
+
 field_names_dict = (
     base_fields_dict
     | Water_dict
@@ -86,7 +97,6 @@ field_names_dict = (
     | dynamic_SGS_diag_dict
     | dynamic_anisotropic_SGS_dict
 )
-"Variable names map"
 
 
 # IO
@@ -114,12 +124,10 @@ def read_stash_files(fname_pattern: Path, chunks: Any = "auto") -> xr.Dataset:
 # Pre-process input UM arrays
 def rename_variables(ds: xr.Dataset) -> xr.Dataset:
     """rename STASH variables:
-
-       * varaibles take their `long_name` with special characters replaced by '_'. The stash code is retained as attribute for back-searches;
-
-       * spacial coordinates/dimesions to ``z_{theta|rho}`` and ``{x|y}_{face|centre}``
-
-       * time becomes ``t`` and ``t_0``
+       UM STASH varaibles adopt their `long_name` with special characters replaced by '_'.
+       The stash code is retained as an attribute for back-searches.
+       Spacial coordinates/dimesions are renamed to ``z_{theta|rho}`` and ``{x|y}_{face|centre}``.
+       Time coordinate becomes ``t`` and ``t_0``.
 
     :param ds: input dataset
     :return: dataset with renamed variables
@@ -184,7 +192,7 @@ def rename_variables(ds: xr.Dataset) -> xr.Dataset:
 
 
 def standardize_varnames(ds: xr.Dataset) -> xr.Dataset:
-    """rename variables in `ds` using ``field_names_dict``
+    """rename variables in ``ds`` using ``field_names_dict``
 
     :param ds: input dataset
     :return: dataset with renamed variables
@@ -210,7 +218,7 @@ def restrict_ds(ds: xr.Dataset, fields: Iterable[str]) -> xr.Dataset:
 def unify_coords(ds: xr.Dataset, res: float) -> xr.Dataset:
     """unify coordinate names
 
-    implement correct x-spacing using res, assume res is given in meters
+    implement correct x-spacing using ``res``, assume ``res`` is given in the correct units
     rename coordinates with reference to a logically-cartesian grid
 
     :param ds: input dataset
@@ -324,7 +332,7 @@ def data_ingest_UM_on_single_grid(
     res: float,
     requested_fields: list[str] = ["u", "v", "w", "theta"],
 ) -> xr.Dataset:
-    """read and pre-process UM data
+    """read pre-process UM data and interpolate to a cell-centred grid
 
     :param fname_pattern: UM NetCDF diagnostic file(s) to read. will be interpreted as a glob pattern. (should belong to the same simulation)
     :param res: horizontal resolution (will use to overwrite horizontal coordinates). **NB** works for ideal simulations

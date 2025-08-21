@@ -33,7 +33,8 @@ plotting_styles = [
 
 def parse_args() -> dict[str, Any]:
     parser = ArgumentParser(
-        description="""Create (and optionally save) standard diagnostic plots for
+        description="""
+                    Create (and optionally save) standard diagnostic plots for
                     a dry atmospheric boundary layer UM simulation
                     Best-suited to one-parameter suite of simulations,
                     but can handle several varying parameters through plot_style_file
@@ -45,7 +46,8 @@ def parse_args() -> dict[str, Any]:
     fname.add_argument(
         "target",
         type=Path,
-        help=""" Location of target simulation outputs -- UM NetCDF diagnostic files.
+        help="""
+            Location of target simulation outputs -- UM NetCDF diagnostic files.
             Recognizes glob patterns and walks directory trees, e.g. './my_file_p[br]*nc'
             Can have multiple files, but only one glob pattern.
             (All files in a glob pattern should belong to the simulation). """,
@@ -54,7 +56,8 @@ def parse_args() -> dict[str, Any]:
     fname.add_argument(
         "reference",
         type=Path,
-        help=""" Location of reference simulation outputs -- UM NetCDF diagnostic files.
+        help="""
+            Location of reference simulation outputs -- UM NetCDF diagnostic files.
             Recognizes glob patterns and walks directory trees, e.g. './my_file_p[br]*nc'
             Can have multiple files, but only one glob pattern.
             (All files in a glob pattern should belong to the simulation). """,
@@ -64,7 +67,8 @@ def parse_args() -> dict[str, Any]:
         "h_resolution",
         type=float,
         nargs=1,
-        help="""horizontal resolution (will use to overwrite horizontal coordinates).
+        help="""
+                horizontal resolution (will use to overwrite horizontal coordinates).
                 must apply to both reference and target.
                 **NB** works for ideal simulations""",
     )
@@ -74,7 +78,8 @@ def parse_args() -> dict[str, Any]:
         type=float,
         nargs="*",
         default=[],
-        help="""times at which to perform the analysis;
+        help="""
+              times at which to perform the analysis;
               in code coordinates; will find nearest available match.
               default (which is empty) means the full data range
              """,

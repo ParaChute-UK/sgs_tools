@@ -57,6 +57,8 @@ pre-commit="~=3.4.0"
     sphinx_argparse_cli = "*"
     sphinx-mdinclude = "*"
     pydata-sphinx-theme = "*"
+    sphinx_copybutton = "*"
+
 
 [tool.poetry.scripts]
 cs_dynamic = "sgs_tools.scripts.CS_calculation_genmodel:main"

@@ -3102,6 +3102,25 @@ docs = ["furo (>=2024.8.6)"]
 testing = ["covdefaults (>=2.3)", "coverage (>=7.6.12)", "defusedxml (>=0.7.1)", "diff-cover (>=9.2.3)", "pytest (>=8.3.4)", "pytest-cov (>=6)", "sphobjinv (>=2.3.1.2)", "typing-extensions (>=4.12.2)"]
 
 [[package]]
+name = "sphinx-copybutton"
+version = "0.5.2"
+description = "Add a copy button to each of your code cells."
+optional = false
+python-versions = ">=3.7"
+groups = ["doc"]
+files = [
+    {file = "sphinx-copybutton-0.5.2.tar.gz", hash = "sha256:4cf17c82fb9646d1bc9ca92ac280813a3b605d8c421225fd9913154103ee1fbd"},
+    {file = "sphinx_copybutton-0.5.2-py3-none-any.whl", hash = "sha256:fb543fd386d917746c9a2c50360c7905b605726b9355cd26e9974857afeae06e"},
+]
+
+[package.dependencies]
+sphinx = ">=1.8"
+
+[package.extras]
+code-style = ["pre-commit (==2.12.1)"]
+rtd = ["ipython", "myst-nb", "sphinx", "sphinx-book-theme", "sphinx-examples"]
+
+[[package]]
 name = "sphinx-mdinclude"
 version = "0.6.2"
 description = "Markdown extension for Sphinx"
@@ -3557,4 +3576,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.11"
-content-hash = "21ff8ab0e1d4a4299a38ca779551a149c79b078b36570b221d78ccbb0f5e43b7"
+content-hash = "f26190183eac476004dd9110a5b6deb72d9bd65b1ca271514149998909019cc4"

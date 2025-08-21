@@ -36,6 +36,7 @@ extensions = [
     "sphinx_mdinclude",
     "sphinx.ext.viewcode",
     "sphinx_argparse_cli",
+    "sphinx_copybutton",
 ]
 
 

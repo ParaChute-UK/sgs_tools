@@ -31,7 +31,7 @@ master_doc = "index"
 # ones.
 extensions = [
     "sphinx.ext.autodoc",
-    "sphinx.ext.imgmath",
+    "sphinx.ext.mathjax",
     "sphinx_autodoc_typehints",
     "sphinx_mdinclude",
     "sphinx.ext.viewcode",

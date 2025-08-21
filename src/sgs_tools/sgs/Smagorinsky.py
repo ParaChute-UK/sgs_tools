@@ -27,7 +27,7 @@ class SmagorinskyVelocityModel:
 
     def sgs_tensor(self, filter: Filter) -> xr.DataArray:
         r"""compute model for SGS tensor
-            :math:`$\\tau = (c_s \Delta) ^2 |\overline{Sij}| \overline{Sij}$`
+            :math:`\tau = (c_s \Delta) ^2 |\overline{Sij}| \overline{Sij}`
             for a given `filter` (which can be trivial, i.e. ``IdentityFilter``)
 
         :param filter: Filter used to separate "large" and "small" scales
@@ -64,7 +64,7 @@ class SmagorinskyHeatModel:
 
     def sgs_tensor(self, filter):
         r"""compute model for SGS tensor
-            :math:`$\\tau =  c_\\theta \\Delta^2 |\overline{Sij}| \overline{\\nabla \\theta} $`
+            :math:`\tau =  c_\theta \Delta^2 |\overline{Sij}| \overline{\nabla \theta}`
             for a given filter (which can be trivial, i.e. IdentityFilter)
 
         :param filter: Filter used to separate "large" and "small" scales

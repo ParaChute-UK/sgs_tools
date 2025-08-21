@@ -25,7 +25,7 @@ class LeonardVelocityTensor:
 
     :ivar vel: grid-scale/base velocity field
     :param contraction_dims: labels of dimensions
-                             to form the :math:$v_i v_j$` tensor
+                             to form the :math: v_i v_j ` tensor
     """
 
     vel: xr.DataArray
@@ -34,7 +34,7 @@ class LeonardVelocityTensor:
     def compute(self, filter: Filter) -> xr.DataArray:
         r"""compute the Leonard tensor as
             :math:`\overline{v_i v_j} - \overline{v_i} \overline{v_j}`,
-            where :math:`\overline{\\ast}` means filtering
+            where :math:`\overline{\ast}` means filtering
 
         :param filter: Filter used to separate "large" and "small" scales
         """
@@ -46,7 +46,7 @@ class LeonardVelocityTensor:
 
 @dataclass(frozen=True)
 class LeonardThetaTensor:
-    r"""Leonard tensor for the (potential) temperature :math:`$\theta$`
+    r"""Leonard tensor for the (potential) temperature :math:`\theta`
 
     :ivar vel: grid-scale/base velocity field
     :ivar theta: grid-scale/base temperature field
@@ -58,8 +58,8 @@ class LeonardThetaTensor:
 
     def compute(self, filter: Filter) -> xr.DataArray:
         r"""compute the Leonard tensor as
-            :math:`\overline{v_i \\theta} - \overline{v_i} \overline{\\theta}`,
-            where :math:`\overline{\\ast}` means filtering
+            :math:`\overline{v_i \theta} - \overline{v_i} \overline{\theta}`,
+            where :math:`\overline{\ast}` means filtering
 
         :param filter: Filter used to separate "large" and "small" scales
         """

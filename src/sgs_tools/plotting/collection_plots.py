@@ -14,7 +14,8 @@ def plot_vertical_prof_time_slice_compare_sims_slice(
     with_markers=False,
 ):
     """plot a row of plots with a different time in each panel.
-    Compare simulations from `da_collection` in each panel.
+       Compare simulations from `da_collection` in each panel.
+
     :param da_collection: a dictionary of 2d xr.DataArrays to be plotted. will use the keys
                           to pick plotting style from plot_kwargs.
     :param plot_kwargs: a dictionary of plotting style parameters for each simulation.
@@ -67,8 +68,8 @@ def plot_horizontal_slice_tseries(
     zcoord: str,
 ):
     """plot a grid of horizontal slices in each panel
-     each row corresponds to a different simulation
-     each column corresponds to a different time.
+        each row corresponds to a different simulation
+        each column corresponds to a different time.
 
     :param da_collection: a dictionary of 3d xr.DataArrays to be plotted. One of the dimensions must be `tcoord`
     :param tcoord: name of time coordinate -- will generate one column per time index

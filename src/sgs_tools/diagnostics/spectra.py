@@ -15,8 +15,7 @@ def radial_spectrum(
     scaling: str = "spectrum",
     prefix="freq_",
 ) -> xr.DataArray:
-    r"""
-    Isotropize a 2D power spectrum or cross spectrum
+    r"""Isotropize a 2D power spectrum or cross spectrum
     by taking an "azimuthal" average over the specified dimensions.
 
     .. math::
@@ -44,6 +43,7 @@ def radial_spectrum(
         Rescale the power spectrum to satisfy :math:`\sum ps = \sum iso_ps * iso_ps[prefix+'dA']`
         * `density`: set :math: `iso_ps[prefix+'dA'](k_r) = \pi * (k_r^{top}^2 - k_r^{bottom}^2)`, where :math:`k_r^{top}` and :math:`k_r^{bottom}` are the bin edges.
         * `spectrum`: set :math: `iso_ps[prefix+'dA'](k_r) = 1`
+
     """
     # name of new spectral dimension
     dim_name = prefix + "r"
@@ -142,8 +142,7 @@ def spectra_1d_radial(
     :param: radial_truncation: switch to include/exclude aliased wavenumber beyond the max. 1d freqeuncy in the radial spectrum. If **True** the result won't respect Parseval exactly.
     :param: fillnan: value to fill nans with in order to compute spectrum of dirty date. If set to a nan value (e.g. np.nan) will produce nan spectra globally.  Defaults to 0.
     :return: an xarray Dataset with the requested 1d and radial power and co-spectra. The number of physical-space grid size and cell size along hdims is included in the attributes along with the fourier normalization convention.
-    Notes: resulting spectral cooordinates are in units of inverse length, not radians/length.
-
+      Notes: resulting spectral cooordinates are in units of inverse length, not radians/length.
     """
     spec = {}
     extra_coords = []

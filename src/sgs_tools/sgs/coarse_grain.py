@@ -9,12 +9,12 @@ import xarray as xr
 
 @dataclass(frozen=True)
 class CoarseGrain:
-    """Coarse-graining filter class with kernel along dimensions
+    r"""Coarse-graining filter class with kernel along dimensions
     the dimensions of kernel and filter_dims are matched one-to-one as given
 
-        :ivar kernel: filter kernel
+    :ivar kernel: filter kernel
     :ivar filter_dims: dimensions along which to perform filtering;
-        will be paired with dimensions of the kernel.
+      will be paired with dimensions of the kernel.
     """
 
     window: Dict[str, int]

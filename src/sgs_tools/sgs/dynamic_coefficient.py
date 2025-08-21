@@ -40,8 +40,8 @@ class Minimisation(Protocol):
 @dataclass(frozen=True)
 class LillyMinimisation1Model:
     r"""Lilly Minimisation (least square error) for a 1-global-coefficient model using
-       the Lilly identity as :math:`$\overline{L \cdot M} / \overline{M \cdot M}$`.
-       where :math:`$\cdot$`means  tensor contraction, :math:`$\overline{*}$` means regularisation filtering
+       the Lilly identity as :math:`\overline{L \cdot M} / \overline{M \cdot M}`.
+       where :math:`\cdot`means  tensor contraction, :math:`\overline{*}` means regularisation filtering
 
     :param contraction_dims: labels of dimensions to be contracted to form :math:`L M_i `and :math:`M_i M_j` products.
     :param coeff_dim: label of dimension along which to concatenate the arrays :math:`c_i`
@@ -53,8 +53,8 @@ class LillyMinimisation1Model:
     def compute(
         self, L: xr.DataArray, Mi: Sequence[xr.DataArray], reg_filter: Filter
     ) -> xr.DataArray:
-        r"""Compute :math:`$\overline{L\cdot M} / \overline{M \cdot M}$`.
-        where :math:`$\overline{*}$` means regularisation filtering
+        r"""Compute :math:`\overline{L\cdot M} / \overline{M \cdot M}`.
+        where :math:`\overline{*}` means regularisation filtering
 
         :param L: LHS tensor
         :param M: a sequence of *1* RHS tensors
@@ -76,7 +76,7 @@ class LillyMinimisation1Model:
 @dataclass(frozen=True)
 class LillyMinimisation2Model:
     r"""Lilly Minimisation (least square error) for a 2-coefficient model using
-       the Lilly identity as :math:`$L = \sum_i^2 c_i M_i$`.
+       the Lilly identity as :math:`L = \sum_i^2 c_i M_i`.
 
     :param contraction_dims: labels of dimensions to be contracted to form :math:`L M_i `and :math:`M_i M_j` products.
     :param coeff_dim: label of dimension along which to concatenate the arrays :math:`c_i`
@@ -88,8 +88,8 @@ class LillyMinimisation2Model:
     def compute(
         self, L: xr.DataArray, Mi: Sequence[xr.DataArray], reg_filter: Filter
     ) -> xr.DataArray:
-        r"""Compute dynamic coefficients of a 2-component models using Germano identity as :math:`$L = C1 M1 + C2 M2$`.
-           using regularized least-square minimisation (inverting the :math:`$\overline{M_i M_j}$` matrix analytically)
+        r"""Compute dynamic coefficients of a 2-component models using Germano identity as :math:`L = C1 M1 + C2 M2`.
+           using regularized least-square minimisation (inverting the :math:`\overline{M_i M_j}` matrix analytically)
 
         :param L: LHS tensor
         :param M: a sequence of *2* RHS tensors
@@ -133,7 +133,7 @@ class LillyMinimisation2Model:
 @dataclass(frozen=True)
 class LillyMinimisation3Model:
     r"""Lilly Minimisation (least square error) for a 3-coefficient model using
-       the Lilly identity as :math:`$L = \sum_i^3 c_i M_i$`.
+       the Lilly identity as :math:`L = \sum_i^3 c_i M_i`.
 
     :param contraction_dims: labels of dimensions to be contracted to form :math:`L M_i `and :math:`M_i M_j` products.
     :param coeff_dim: label of dimension along which to concatenate the arrays :math:`c_i`
@@ -145,7 +145,7 @@ class LillyMinimisation3Model:
     def compute(
         self, L: xr.DataArray, Mi: Sequence[xr.DataArray], reg_filter: Filter
     ) -> xr.DataArray:
-        r"""Compute dynamic coefficients of a 3-component models using Germano identity as :math:`$L = C1 M1 + C2 M2 + C3 M3$`.
+        r"""Compute dynamic coefficients of a 3-component models using Germano identity as :math:`L = C1 M1 + C2 M2 + C3 M3`.
         using regularized least-square minimisation (inverting the {M_i M_j} matrix explicitly)
 
         :param L: LHS tensor
@@ -215,7 +215,7 @@ class LillyMinimisation3Model:
 @dataclass(frozen=True)
 class LillyMinimisationNModel:
     r"""Lilly Minimisation (least square error) for an N-coefficient model using
-       the Lilly identity as :math:`$L = \sum_i^N c_i M_i$`.
+       the Lilly identity as :math:`L = \sum_i^N c_i M_i`.
 
     :param contraction_dims: labels of dimensions to be contracted to form :math:`L M_i `and :math:`M_i M_j` products.
     :param coeff_dim: label of dimension along which to concatenate the arrays :math:`c_i`
@@ -227,7 +227,7 @@ class LillyMinimisationNModel:
     def compute(
         self, L: xr.DataArray, Mi: Sequence[xr.DataArray], reg_filter: Filter
     ) -> xr.DataArray:
-        r"""Solve the system  :math:`$\overline{L \cdot M_i} = \sum_i c_j \overline{M_i \cdot \M_j}$`
+        r"""Solve the system  :math:`\overline{L \cdot M_i} = \sum_i c_j \overline{M_i \cdot \M_j}`
         using np.linalg.SVD, where :math:`L \cdot M_i` and :math:`M_i \cdot M_j` are scalar fields
 
         :param L: LHS tensor

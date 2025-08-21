@@ -1,4 +1,4 @@
-Development Log:
+Development Log
 ==============================================================
 
 .. mdinclude:: ../TASKLIST.md

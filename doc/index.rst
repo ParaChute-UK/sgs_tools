@@ -9,9 +9,11 @@
    io
    geometry
    physics
-   simple_flow
    sgs
+   diagnostics
+   simple_flow
    scripts
+   plotting
    devlog
 
 ==================

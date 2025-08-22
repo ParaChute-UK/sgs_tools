@@ -24,7 +24,7 @@ def interpolate_to_grid(
     """Spatial interpolation to a target_grid
 
     :param ds: input data array or dataset. Needs to have dimensions with coordinates
-        that are labelled 'x*', 'y*', 'z*' etc. or
+        that are labelled ``x*``, ``y*``, ``z*`` etc. or
 
     :param target_dims: list of dimension names  to interpolate to, in the order xdim, ydim, zdim.
         They must exist in ds as DataArry/coordinates
@@ -108,6 +108,7 @@ def compose_vector_components_on_grid(
     drop_coords: bool = True,
 ) -> xr.DataArray:
     """turn a list of arrays into a vector field
+
     :param components: list of vector components
     :param target_dims: if target_dims is given, it will interpolate onto it first, otherwise all componets must have the same dimesions and coordinates
     :param vector_dim: label of dimension indexing vector components
@@ -155,14 +156,15 @@ def diff_lin_on_grid(
         |             |                 |            |
         + ------ c_centre(i) ---------- + ----- c_centre(i+1)
 
-    where `c_{face|center}` is any dimension
+    where ``c_{face|center}`` is any dimension
+
     :param ds: input array to be differentiated
     :param dim: dimension along which to differentiate
     :param periodic_field: boundary condition treatment; if `False` will
-    fill boundary values with NaN. Note that only 1 boundary is undefined\:
-    upper boundary for face-coordinates, and lower boundary for centre-coordinates.
+      fill boundary values with NaN. Note that only 1 boundary is undefined\:
+      upper boundary for face-coordinates, and lower boundary for centre-coordinates.
     :return: the derivative on the grid with offset staggering in the differentiated dimension
-    face -> centre and v.v.
+      face -> centre and v.v.
     """
 
     def delta(coord, shift):
@@ -212,6 +214,7 @@ def grad_on_cart_grid(
     periodic_field: list[bool] = [False, False, False],
 ) -> xr.Dataset:
     """differentiate a scalar with respect to given space dims on staggered grid
+
     :param ds: input array to be differentiated
     :param space_dims: labels for the spatial dimensions (to be differentiated against)
     :param periodic_field: boundary condition treatment; passed to :meth:`diff_lin_on_grid`
@@ -238,10 +241,11 @@ def grad_vec_on_grid(
     name: str | None = None,
 ) -> xr.DataArray:
     """computes gradient of a vector described onto target dimensions
-    ds: should be a dataset which only contains the components of the vector in sorted order and target coordinates.
-    target_dims: the dimensions to compute the derivative on (must be coordinates in input dataset)
-    new_dim_name: the names of the new dimensions: [vector component, differential component]
-    name : name for output dataarray (optional)
+
+    :param ds: should be a dataset which only contains the components of the vector in sorted order and target coordinates.
+    :param target_dims: the dimensions to compute the derivative on (must be coordinates in input dataset)
+    :param new_dim_name: the names of the new dimensions: [vector component, differential component]
+    :param name: name for output dataarray (optional)
     """
     # unpack new_dim_name
     vec_name, d_name = new_dim_name

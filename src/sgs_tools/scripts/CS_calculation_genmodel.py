@@ -68,9 +68,10 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
     fname.add_argument(
         "output_path",
         type=Path,
-        help="""Output directory, where to write netcdf output files.
-                Will create/overwrite existing file and
-                create any missing intermediate directories""",
+        help="""
+        Output directory, where to write netcdf output files.
+        Will create/overwrite existing file and
+        create any missing intermediate directories""",
     )
     fname.add_argument(
         "--input_format", type=str, choices=["um", "monc", "sgs"], default="um"

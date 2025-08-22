@@ -87,7 +87,8 @@ cloud_fields = ("q_l", "q_i", "q_g")
 
 def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
     parser = ArgumentParser(
-        description="""Create (and optionally save) standard diagnostic plots for
+        description="""
+                    Create (and optionally save) standard diagnostic plots for
                     a dry atmospheric boundary layer UM simulation
                     Best-suited to one-parameter suite of simulations,
                     but can handle several varying parameters through plot_style_file
@@ -100,7 +101,8 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
         "input_files",
         type=Path,
         nargs="+",
-        help=""" Location of a set simulation outputs -- UM NetCDF diagnostic files.
+        help="""
+            Location of a set simulation outputs -- UM NetCDF diagnostic files.
             Recognizes glob patterns and walks directory trees, e.g. './my_file_p[br]*nc'
             Can have multiple files per simulation, but only one glob pattern per simulation.
             (All files in a glob pattern should belong to the same simulation). """,
@@ -110,7 +112,8 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
         "h_resolution",
         type=float,
         nargs="+",
-        help="""horizontal resolution (will use to overwrite horizontal coordinates).
+        help="""
+                horizontal resolution (will use to overwrite horizontal coordinates).
                 If a single resolution is given, assume it applies to all input files.
                 Else, must give as many resolutions as inpu_file glob patterns.
               **NB** works for ideal simulations""",
@@ -121,7 +124,8 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
         type=float,
         nargs="*",
         default=[],
-        help="""times at which to perform the analysis;
+        help="""
+              times at which to perform the analysis;
               in code coordinates; will find nearest available match.
               default (which is empty) means the full data range at 1h intervals.
              """,
@@ -140,7 +144,8 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
         "--plot_style_file",
         type=Path,
         default=None,
-        help="""Configuration file describing a list of plot style and decorations to matched sequentially to each simulation.
+        help="""
+                Configuration file describing a list of plot style and decorations to matched sequentially to each simulation.
                 See plot_config_template.json for a template.
                 If absent, will use ``default_plotting_style`` and cycle through different colors.
             """,
@@ -151,7 +156,8 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
         type=float,
         nargs="*",
         default=[],
-        help="""Vertical height at which to plot horizontal slices.
+        help="""
+                Vertical height at which to plot horizontal slices.
                 If not given will omit these plots.
             """,
     )
@@ -225,6 +231,7 @@ def preprocess_dataset(
 ) -> tuple[xr.Dataset, Dict[str, field_plot_kwargs]]:
     """preprocess data:
        fix coordinates, take time/z constraints, add offline fields
+
     :param ds: xarray dataset to be modified:
     :param args: ArgumentParser from which to extract parametes;
                  Will replace with kwards, once the dust is settled!

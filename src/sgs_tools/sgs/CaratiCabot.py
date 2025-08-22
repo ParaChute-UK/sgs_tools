@@ -20,7 +20,7 @@ from .util import _assert_coord_dx
 def s_parallel(
     s: xr.DataArray, n: xr.DataArray, tensor_dims: tuple[str, str]
 ) -> xr.DataArray:
-    r"""Project of s in the n-direction: :math: `$(n_i (s.n)_j + (s.n)_i n_j - 2/3 \delta_ij (n.s.n) )$`"""
+    r"""Projection of s in the n-direction: :math:`s^{\parallel}=(n_i (s.n)_j + (s.n)_i n_j - \frac{2}{3} \delta_{ij} (n.s.n) )`"""
     assert len(n.dims) == 1
     assert len(tensor_dims) == 2
     assert n.dims[0] in tensor_dims
@@ -35,13 +35,14 @@ def s_parallel(
 def s_perpendicular(
     s: xr.DataArray, n: xr.DataArray, tensor_dims: tuple[str, str]
 ) -> xr.DataArray:
+    r"""Projection of s perpendicular to the n-direction: :math:`s - s^{\parallel}`"""
     return s - s_parallel(s, n, tensor_dims)
 
 
 @dataclass(frozen=True)
 class SparallelVelocityModel:
     r"""Carati & Cabot Proceedings of the 1996 Summer Program -- Center for Turbulence Research
-    S_parallel component = |S| Traceless[Symmetric[(S.n)n]]
+    S_parallel component = :math:`|S| Traceless[Symmetric[(S.n)n]]`
 
     :ivar strain: grid-scale rate-of-strain
     :ivar cs: Smagorinsky coefficient
@@ -58,7 +59,7 @@ class SparallelVelocityModel:
 
     def sgs_tensor(self, filter: Filter) -> xr.DataArray:
         r"""compute model for SGS tensor
-            :math:`\\tau = |S| Traceless[Symmetric[(S.n)n]]`
+            :math:`\tau = |S| Traceless[Symmetric[(S.n)n]]`
 
         :param filter: Filter used to separate "large" and "small" scales
         """
@@ -85,7 +86,7 @@ class SparallelVelocityModel:
 @dataclass(frozen=True)
 class SperpVelocityModel:
     r"""Carati & Cabot Proceedings of the 1996 Summer Program -- Center for Turbulence Research
-    S_perp component = |S| Traceless(S - (S.n + n.S))
+    :math:`S_{\textrm{perp component}} = |S| Traceless(S - (S.n + n.S))`
 
     :ivar strain: grid-scale rate-of-strain
     :ivar cs: Smagorinsky coefficient
@@ -102,7 +103,7 @@ class SperpVelocityModel:
 
     def sgs_tensor(self, filter: Filter) -> xr.DataArray:
         r"""compute model for SGS tensor
-            :math:`\\tau = |S| Traceless(S - (S.n + n.S))`
+            :math:`\tau = |S| Traceless(S - (S.n + n.S))`
             for a given `filter` (which can be trivial, i.e. ``IdentityFilter``)
 
         :param filter: Filter used to separate "large" and "small" scales
@@ -131,7 +132,7 @@ class SperpVelocityModel:
 @dataclass(frozen=True)
 class NVelocityModel:
     r"""Carati & Cabot Proceedings of the 1996 Summer Program -- Center for Turbulence Research
-       N component = |S|(n.s.n) Traceless(n * n)
+    :math:`N component = |S|(n.s.n) Traceless(n * n)`
 
     :ivar strain: grid-scale rate-of-strain
     :ivar cs: Smagorinsky coefficient
@@ -148,7 +149,7 @@ class NVelocityModel:
 
     def sgs_tensor(self, filter: Filter) -> xr.DataArray:
         r"""compute model for SGS tensor
-            :math:`$\\tau = (c_s \Delta) ^2 |\overline{Sij}| \overline{Sik Nkj}$`
+            :math:`\tau = (c_s \Delta) ^2 |\overline{S_{ij}}| \overline{S_{ik} N_{kj}}`
             for a given `filter` (which can be trivial, i.e. ``IdentityFilter``)
 
         :param filter: Filter used to separate "large" and "small" scales

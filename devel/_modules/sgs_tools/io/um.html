@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>sgs_tools.io.um &#8212; SGS_tools  documentation</title>
+    <title>sgs_tools.io.um &#8212; SGS_tools 0.0.0 documentation</title>
   
   
   
@@ -31,6 +31,7 @@
 
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
   
   <!-- So that users can add custom icons -->
   <script src="../../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
@@ -38,15 +39,17 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../../../_static/documentation_options.js?v=7026087e"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../_static/copybutton.js?v=f281be69"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/sgs_tools/io/um';</script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="" />
+  <meta name="docsearch:version" content="0.0.0" />
   </head>
   
   
@@ -108,7 +111,7 @@
   
   
   
-    <p class="title logo__title">SGS_tools  documentation</p>
+    <p class="title logo__title">SGS_tools 0.0.0 documentation</p>
   
 </a></div>
     
@@ -124,35 +127,35 @@
     
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../../io.html">
-    Input/Output: io
+    IO
   </a>
 </li>
 
 
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../../geometry.html">
-    Geometry: geometry
+    Geometry
   </a>
 </li>
 
 
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../../physics.html">
-    Physical field calculators: physics
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../simple_flow.html">
-    Simple Flow Examples: simple_flows
+    Physical Fields
   </a>
 </li>
 
 
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../../sgs.html">
-    Sub-grid analysis: sgs
+    Sub-grid scales
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../diagnostics.html">
+    Diagnostics
   </a>
 </li>
 
@@ -165,8 +168,29 @@
                 <ul id="pst-nav-more-links" class="dropdown-menu">
                     
 <li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../simple_flow.html">
+    Simple Flow Examples
+  </a>
+</li>
+
+
+<li class=" ">
   <a class="nav-link dropdown-item nav-internal" href="../../../scripts.html">
-    Scripts:
+    Scripts
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../plotting.html">
+    Plotting
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../devlog.html">
+    Development Log
   </a>
 </li>
 
@@ -246,42 +270,63 @@
     
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../../io.html">
-    Input/Output: io
+    IO
   </a>
 </li>
 
 
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../../geometry.html">
-    Geometry: geometry
+    Geometry
   </a>
 </li>
 
 
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../../physics.html">
-    Physical field calculators: physics
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../simple_flow.html">
-    Simple Flow Examples: simple_flows
+    Physical Fields
   </a>
 </li>
 
 
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../../sgs.html">
-    Sub-grid analysis: sgs
+    Sub-grid scales
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../diagnostics.html">
+    Diagnostics
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../simple_flow.html">
+    Simple Flow Examples
   </a>
 </li>
 
 
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../../scripts.html">
-    Scripts:
+    Scripts
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../plotting.html">
+    Plotting
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../devlog.html">
+    Development Log
   </a>
 </li>
 
@@ -380,6 +425,8 @@
     <span class="c1">#&#39;TEMPERATURE_ON_THETA_LEVELS&#39; : &#39;T&#39;,</span>
     <span class="c1"># &#39;PRESSURE_AT_THETA_LEVELS_AFTER_TS&#39; : &#39;P&#39;</span>
 <span class="p">}</span>
+<span class="s2">&quot;&quot;</span>
+
 <span class="n">Water_dict</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;CLD_LIQ_MIXING_RATIO__mcl__AFTER_TS&quot;</span><span class="p">:</span> <span class="s2">&quot;q_l&quot;</span><span class="p">,</span>
     <span class="s2">&quot;CLD_ICE_MIXING_RATIO__mcf__AFTER_TS&quot;</span><span class="p">:</span> <span class="s2">&quot;q_i&quot;</span><span class="p">,</span>
@@ -387,6 +434,8 @@
     <span class="s2">&quot;GRAUPEL_MIXING_RATIO__mg__AFTER_TS&quot;</span><span class="p">:</span> <span class="s2">&quot;q_g&quot;</span><span class="p">,</span>
     <span class="s2">&quot;SPECIFIC_HUMIDITY_AFTER_TIMESTEP&quot;</span><span class="p">:</span> <span class="s2">&quot;q_v&quot;</span><span class="p">,</span>
 <span class="p">}</span>
+<span class="s2">&quot;&quot;</span>
+
 <span class="n">Smagorinsky_dict</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;SMAG__S__SHEAR_TERM_&quot;</span><span class="p">:</span> <span class="s2">&quot;s_smag&quot;</span><span class="p">,</span>
     <span class="s2">&quot;SMAG__VISC_M&quot;</span><span class="p">:</span> <span class="s2">&quot;smag_visc_m&quot;</span><span class="p">,</span>
@@ -397,12 +446,16 @@
     <span class="s2">&quot;TURBULENT_KINETIC_ENERGY&quot;</span><span class="p">:</span> <span class="s2">&quot;tke&quot;</span><span class="p">,</span>
     <span class="s2">&quot;GRADIENT_RICHARDSON_NUMBER&quot;</span><span class="p">:</span> <span class="s2">&quot;Richardson&quot;</span><span class="p">,</span>
 <span class="p">}</span>
+<span class="s2">&quot;&quot;</span>
+
 <span class="n">dynamic_SGS_dict</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;CS_SQUARED_AT_2_DELTA&quot;</span><span class="p">:</span> <span class="s2">&quot;cs2d&quot;</span><span class="p">,</span>
     <span class="s2">&quot;CS_SQUARED_AT_4_DELTA&quot;</span><span class="p">:</span> <span class="s2">&quot;cs4d&quot;</span><span class="p">,</span>
     <span class="s2">&quot;CS_THETA_AT_SCALE_2DELTA&quot;</span><span class="p">:</span> <span class="s2">&quot;cs_theta_2d&quot;</span><span class="p">,</span>
     <span class="s2">&quot;CS_THETA_AT_SCALE_4DELTA&quot;</span><span class="p">:</span> <span class="s2">&quot;cs_theta_4d&quot;</span><span class="p">,</span>
 <span class="p">}</span>
+<span class="s2">&quot;&quot;</span>
+
 <span class="n">dynamic_anisotropic_SGS_dict</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;RHOKM_DIFF_COEFF___LOCAL_SCHEME&quot;</span><span class="p">:</span> <span class="s2">&quot;smag_visc_m_vert&quot;</span><span class="p">,</span>
     <span class="s2">&quot;RHOKH_DIFF_COEFF___LOCAL_SCHEME&quot;</span><span class="p">:</span> <span class="s2">&quot;smag_visc_h_vert&quot;</span><span class="p">,</span>
@@ -413,6 +466,7 @@
     <span class="s2">&quot;CS_THETA_2&quot;</span><span class="p">:</span> <span class="s2">&quot;cs_theta_2&quot;</span><span class="p">,</span>
     <span class="s2">&quot;CS_THETA_3&quot;</span><span class="p">:</span> <span class="s2">&quot;cs_theta_3&quot;</span><span class="p">,</span>
 <span class="p">}</span>
+<span class="s2">&quot;&quot;</span>
 
 <span class="n">dynamic_SGS_diag_dict</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;LijMij_CONT_TENSORS&quot;</span><span class="p">:</span> <span class="s2">&quot;lm&quot;</span><span class="p">,</span>
@@ -443,6 +497,8 @@
     <span class="s2">&quot;Tdecorr_heat&quot;</span><span class="p">:</span> <span class="s2">&quot;Tdecorr_heat&quot;</span><span class="p">,</span>
     <span class="s2">&quot;Richardson&quot;</span><span class="p">:</span> <span class="s2">&quot;Richardson_diag&quot;</span><span class="p">,</span>
 <span class="p">}</span>
+<span class="s2">&quot;&quot;</span>
+
 <span class="n">field_names_dict</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">base_fields_dict</span>
     <span class="o">|</span> <span class="n">Water_dict</span>
@@ -451,7 +507,6 @@
     <span class="o">|</span> <span class="n">dynamic_SGS_diag_dict</span>
     <span class="o">|</span> <span class="n">dynamic_anisotropic_SGS_dict</span>
 <span class="p">)</span>
-<span class="s2">&quot;Variable names map&quot;</span>
 
 
 <span class="c1"># IO</span>
@@ -484,12 +539,10 @@
 <a class="viewcode-back" href="../../../io.html#sgs_tools.io.um.rename_variables">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">rename_variables</span><span class="p">(</span><span class="n">ds</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;rename STASH variables:</span>
-
-<span class="sd">       * varaibles take their `long_name` with special characters replaced by &#39;_&#39;. The stash code is retained as attribute for back-searches;</span>
-
-<span class="sd">       * spacial coordinates/dimesions to ``z_{theta|rho}`` and ``{x|y}_{face|centre}``</span>
-
-<span class="sd">       * time becomes ``t`` and ``t_0``</span>
+<span class="sd">       UM STASH varaibles adopt their `long_name` with special characters replaced by &#39;_&#39;.</span>
+<span class="sd">       The stash code is retained as an attribute for back-searches.</span>
+<span class="sd">       Spacial coordinates/dimesions are renamed to ``z_{theta|rho}`` and ``{x|y}_{face|centre}``.</span>
+<span class="sd">       Time coordinate becomes ``t`` and ``t_0``.</span>
 
 <span class="sd">    :param ds: input dataset</span>
 <span class="sd">    :return: dataset with renamed variables</span>
@@ -557,7 +610,7 @@
 <div class="viewcode-block" id="standardize_varnames">
 <a class="viewcode-back" href="../../../io.html#sgs_tools.io.um.standardize_varnames">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">standardize_varnames</span><span class="p">(</span><span class="n">ds</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;rename variables in `ds` using ``field_names_dict``</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;rename variables in ``ds`` using ``field_names_dict``</span>
 
 <span class="sd">    :param ds: input dataset</span>
 <span class="sd">    :return: dataset with renamed variables</span>
@@ -589,7 +642,7 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">unify_coords</span><span class="p">(</span><span class="n">ds</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">,</span> <span class="n">res</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;unify coordinate names</span>
 
-<span class="sd">    implement correct x-spacing using res, assume res is given in meters</span>
+<span class="sd">    implement correct x-spacing using ``res``, assume ``res`` is given in the correct units</span>
 <span class="sd">    rename coordinates with reference to a logically-cartesian grid</span>
 
 <span class="sd">    :param ds: input dataset</span>
@@ -709,7 +762,7 @@
     <span class="n">res</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">requested_fields</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;u&quot;</span><span class="p">,</span> <span class="s2">&quot;v&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="s2">&quot;theta&quot;</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;read and pre-process UM data</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;read pre-process UM data and interpolate to a cell-centred grid</span>
 
 <span class="sd">    :param fname_pattern: UM NetCDF diagnostic file(s) to read. will be interpreted as a glob pattern. (should belong to the same simulation)</span>
 <span class="sd">    :param res: horizontal resolution (will use to overwrite horizontal coordinates). **NB** works for ideal simulations</span>

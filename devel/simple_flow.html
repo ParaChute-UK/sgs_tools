@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Simple Flow Examples: simple_flows &#8212; SGS_tools  documentation</title>
+    <title>Simple Flow Examples &#8212; SGS_tools 0.0.0 documentation</title>
   
   
   
@@ -32,6 +32,7 @@
 
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="_static/custom.css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
   
   <!-- So that users can add custom icons -->
   <script src="_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
@@ -39,17 +40,19 @@
   <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="_static/documentation_options.js?v=7026087e"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'simple_flow';</script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Sub-grid analysis: sgs" href="sgs.html" />
-    <link rel="prev" title="Physical field calculators: physics" href="physics.html" />
+    <link rel="next" title="Scripts" href="scripts.html" />
+    <link rel="prev" title="Diagnostics" href="diagnostics.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="" />
+  <meta name="docsearch:version" content="0.0.0" />
   </head>
   
   
@@ -111,7 +114,7 @@
   
   
   
-    <p class="title logo__title">SGS_tools  documentation</p>
+    <p class="title logo__title">SGS_tools 0.0.0 documentation</p>
   
 </a></div>
     
@@ -127,35 +130,35 @@
     
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="io.html">
-    Input/Output: io
+    IO
   </a>
 </li>
 
 
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="geometry.html">
-    Geometry: geometry
+    Geometry
   </a>
 </li>
 
 
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="physics.html">
-    Physical field calculators: physics
-  </a>
-</li>
-
-
-<li class="nav-item current active">
-  <a class="nav-link nav-internal" href="#">
-    Simple Flow Examples: simple_flows
+    Physical Fields
   </a>
 </li>
 
 
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="sgs.html">
-    Sub-grid analysis: sgs
+    Sub-grid scales
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="diagnostics.html">
+    Diagnostics
   </a>
 </li>
 
@@ -167,9 +170,30 @@
                 </button>
                 <ul id="pst-nav-more-links" class="dropdown-menu">
                     
+<li class=" current active">
+  <a class="nav-link dropdown-item nav-internal" href="#">
+    Simple Flow Examples
+  </a>
+</li>
+
+
 <li class=" ">
   <a class="nav-link dropdown-item nav-internal" href="scripts.html">
-    Scripts:
+    Scripts
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="plotting.html">
+    Plotting
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="devlog.html">
+    Development Log
   </a>
 </li>
 
@@ -251,42 +275,63 @@
     
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="io.html">
-    Input/Output: io
+    IO
   </a>
 </li>
 
 
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="geometry.html">
-    Geometry: geometry
+    Geometry
   </a>
 </li>
 
 
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="physics.html">
-    Physical field calculators: physics
-  </a>
-</li>
-
-
-<li class="nav-item current active">
-  <a class="nav-link nav-internal" href="#">
-    Simple Flow Examples: simple_flows
+    Physical Fields
   </a>
 </li>
 
 
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="sgs.html">
-    Sub-grid analysis: sgs
+    Sub-grid scales
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="diagnostics.html">
+    Diagnostics
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="#">
+    Simple Flow Examples
   </a>
 </li>
 
 
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="scripts.html">
-    Scripts:
+    Scripts
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="plotting.html">
+    Plotting
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="devlog.html">
+    Development Log
   </a>
 </li>
 
@@ -356,7 +401,7 @@
         <i class="fa-solid fa-home"></i>
       </a>
     </li>
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Simple Flow Examples: <code class="xref py py-mod docutils literal notranslate"><span class="pre">simple_flows</span></code></span></li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Simple Flow Examples</span></li>
   </ul>
 </nav>
 </div>
@@ -373,14 +418,16 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="module-sgs_tools.simple_flows.SimpleShear">
-<span id="simple-flow-examples-simple-flows"></span><h1>Simple Flow Examples: <code class="xref py py-mod docutils literal notranslate"><span class="pre">simple_flows</span></code><a class="headerlink" href="#module-sgs_tools.simple_flows.SimpleShear" title="Link to this heading">#</a></h1>
+  <section id="simple-flow-examples">
+<h1>Simple Flow Examples<a class="headerlink" href="#simple-flow-examples" title="Link to this heading">#</a></h1>
+<section id="module-sgs_tools.simple_flows.SimpleShear">
+<span id="simple-flows"></span><h2><code class="xref py py-mod docutils literal notranslate"><span class="pre">simple_flows</span></code><a class="headerlink" href="#module-sgs_tools.simple_flows.SimpleShear" title="Link to this heading">#</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="sgs_tools.simple_flows.SimpleShear.SimpleShear">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">SimpleShear</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dimensions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">velcomp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">amplitudes</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/simple_flows/SimpleShear.html#SimpleShear"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.simple_flows.SimpleShear.SimpleShear" title="Link to this definition">#</a></dt>
 <dd><dl class="simple">
-<dt>prescribe velocity for a simple shear flow on a general grid</dt><dd><p>roughly: product({<cite>amplitudes`[i] * x[i] for i in `dimensions</cite>})
-where x[i] is the coordinate in the i’th direction</p>
+<dt>prescribe velocity for a simple shear flow on a general grid</dt><dd><p>roughly: product(<code class="docutils literal notranslate"><span class="pre">amplitudes</span> <span class="pre">[i]</span> <span class="pre">*</span> <span class="pre">x[i]</span></code> for i in <code class="docutils literal notranslate"><span class="pre">dimensions</span></code>)
+where <code class="docutils literal notranslate"><span class="pre">x[i]</span></code> is the coordinate in the i’th direction</p>
 </dd>
 </dl>
 <dl class="field-list simple">
@@ -440,6 +487,7 @@ where x[i] is the coordinate in the i’th direction</p>
 </dd></dl>
 
 </section>
+</section>
 
 
                 </article>
@@ -452,20 +500,20 @@ where x[i] is the coordinate in the i’th direction</p>
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="physics.html"
+       href="diagnostics.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Physical field calculators: <code class="xref py py-mod docutils literal notranslate"><span class="pre">physics</span></code></p>
+        <p class="prev-next-title">Diagnostics</p>
       </div>
     </a>
     <a class="right-next"
-       href="sgs.html"
+       href="scripts.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Sub-grid analysis: <code class="xref py py-mod docutils literal notranslate"><span class="pre">sgs</span></code></p>
+        <p class="prev-next-title">Scripts</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -488,12 +536,15 @@ where x[i] is the coordinate in the i’th direction</p>
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.simple_flows.SimpleShear.SimpleShear"><code class="docutils literal notranslate"><span class="pre">SimpleShear</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.simple_flows.SimpleShear.SimpleShear.velocity"><code class="docutils literal notranslate"><span class="pre">SimpleShear.velocity()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-sgs_tools.simple_flows.SimpleShear"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simple_flows</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.simple_flows.SimpleShear.SimpleShear"><code class="docutils literal notranslate"><span class="pre">SimpleShear</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.simple_flows.SimpleShear.SimpleShear.velocity"><code class="docutils literal notranslate"><span class="pre">SimpleShear.velocity()</span></code></a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.simple_flows.SimpleShear.ScalarGradient"><code class="docutils literal notranslate"><span class="pre">ScalarGradient</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.simple_flows.SimpleShear.ScalarGradient.field"><code class="docutils literal notranslate"><span class="pre">ScalarGradient.field()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.simple_flows.SimpleShear.ScalarGradient"><code class="docutils literal notranslate"><span class="pre">ScalarGradient</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.simple_flows.SimpleShear.ScalarGradient.field"><code class="docutils literal notranslate"><span class="pre">ScalarGradient.field()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

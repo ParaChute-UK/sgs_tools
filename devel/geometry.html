@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Geometry: geometry &#8212; SGS_tools  documentation</title>
+    <title>Geometry &#8212; SGS_tools 0.0.0 documentation</title>
   
   
   
@@ -32,6 +32,7 @@
 
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="_static/custom.css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
   
   <!-- So that users can add custom icons -->
   <script src="_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
@@ -39,17 +40,20 @@
   <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="_static/documentation_options.js?v=7026087e"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'geometry';</script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Physical field calculators: physics" href="physics.html" />
-    <link rel="prev" title="Input/Output: io" href="io.html" />
+    <link rel="next" title="Physical Fields" href="physics.html" />
+    <link rel="prev" title="IO" href="io.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="" />
+  <meta name="docsearch:version" content="0.0.0" />
   </head>
   
   
@@ -111,7 +115,7 @@
   
   
   
-    <p class="title logo__title">SGS_tools  documentation</p>
+    <p class="title logo__title">SGS_tools 0.0.0 documentation</p>
   
 </a></div>
     
@@ -127,35 +131,35 @@
     
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="io.html">
-    Input/Output: io
+    IO
   </a>
 </li>
 
 
 <li class="nav-item current active">
   <a class="nav-link nav-internal" href="#">
-    Geometry: geometry
+    Geometry
   </a>
 </li>
 
 
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="physics.html">
-    Physical field calculators: physics
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="simple_flow.html">
-    Simple Flow Examples: simple_flows
+    Physical Fields
   </a>
 </li>
 
 
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="sgs.html">
-    Sub-grid analysis: sgs
+    Sub-grid scales
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="diagnostics.html">
+    Diagnostics
   </a>
 </li>
 
@@ -168,8 +172,29 @@
                 <ul id="pst-nav-more-links" class="dropdown-menu">
                     
 <li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="simple_flow.html">
+    Simple Flow Examples
+  </a>
+</li>
+
+
+<li class=" ">
   <a class="nav-link dropdown-item nav-internal" href="scripts.html">
-    Scripts:
+    Scripts
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="plotting.html">
+    Plotting
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="devlog.html">
+    Development Log
   </a>
 </li>
 
@@ -251,42 +276,63 @@
     
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="io.html">
-    Input/Output: io
+    IO
   </a>
 </li>
 
 
 <li class="nav-item current active">
   <a class="nav-link nav-internal" href="#">
-    Geometry: geometry
+    Geometry
   </a>
 </li>
 
 
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="physics.html">
-    Physical field calculators: physics
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="simple_flow.html">
-    Simple Flow Examples: simple_flows
+    Physical Fields
   </a>
 </li>
 
 
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="sgs.html">
-    Sub-grid analysis: sgs
+    Sub-grid scales
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="diagnostics.html">
+    Diagnostics
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="simple_flow.html">
+    Simple Flow Examples
   </a>
 </li>
 
 
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="scripts.html">
-    Scripts:
+    Scripts
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="plotting.html">
+    Plotting
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="devlog.html">
+    Development Log
   </a>
 </li>
 
@@ -356,7 +402,7 @@
         <i class="fa-solid fa-home"></i>
       </a>
     </li>
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Geometry: <code class="xref py py-mod docutils literal notranslate"><span class="pre">geometry</span></code></span></li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Geometry</span></li>
   </ul>
 </nav>
 </div>
@@ -373,8 +419,11 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="geometry-geometry">
-<h1>Geometry: <code class="xref py py-mod docutils literal notranslate"><span class="pre">geometry</span></code><a class="headerlink" href="#geometry-geometry" title="Link to this heading">#</a></h1>
+  <section id="geometry">
+<h1>Geometry<a class="headerlink" href="#geometry" title="Link to this heading">#</a></h1>
+<section id="id1">
+<h2><code class="xref py py-mod docutils literal notranslate"><span class="pre">geometry</span></code><a class="headerlink" href="#id1" title="Link to this heading">#</a></h2>
+</section>
 <section id="module-sgs_tools.geometry.grid">
 <span id="grid"></span><h2>Grid:<a class="headerlink" href="#module-sgs_tools.geometry.grid" title="Link to this heading">#</a></h2>
 <dl class="py class">
@@ -472,7 +521,7 @@ scaled with a constant amplitude</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>ds</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">TypeVar</span></code>(<code class="docutils literal notranslate"><span class="pre">T_Xarray</span></code>, DataArray, Dataset)</span>) – input data array or dataset. Needs to have dimensions with coordinates
-that are labelled ‘x*’, ‘y*’, ‘z*’ etc. or</p></li>
+that are labelled <code class="docutils literal notranslate"><span class="pre">x*</span></code>, <code class="docutils literal notranslate"><span class="pre">y*</span></code>, <code class="docutils literal notranslate"><span class="pre">z*</span></code> etc. or</p></li>
 <li><p><strong>target_dims</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span>) – list of dimension names  to interpolate to, in the order xdim, ydim, zdim.
 They must exist in ds as DataArry/coordinates</p></li>
 <li><p><strong>coord_map</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code>]</span>) – dictionary of {existing_dimension_in_ds : target_coordinate_as_DataArray}</p></li>
@@ -491,21 +540,20 @@ They must exist in ds as DataArry/coordinates</p></li>
 <dl class="py function">
 <dt class="sig sig-object py" id="sgs_tools.geometry.staggered_grid.compose_vector_components_on_grid">
 <span class="sig-name descname"><span class="pre">compose_vector_components_on_grid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">components</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_dims</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vector_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'c1'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">long_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">drop_coords</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/geometry/staggered_grid.html#compose_vector_components_on_grid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.geometry.staggered_grid.compose_vector_components_on_grid" title="Link to this definition">#</a></dt>
-<dd><p>turn a list of arrays into a vector field
-:type components: <span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code>]</span>
-:param components: list of vector components
-:type target_dims: <span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span>
-:param target_dims: if target_dims is given, it will interpolate onto it first, otherwise all componets must have the same dimesions and coordinates
-:type vector_dim: <span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>
-:param vector_dim: label of dimension indexing vector components
-:type name: <span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>
-:param name: name of new array
-:param lon_name: long_name of new array
-:type drop_coords: <span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></span>
-:param drop_coords: flag picked up by <a class="reference internal" href="#sgs_tools.geometry.staggered_grid.interpolate_to_grid" title="sgs_tools.geometry.staggered_grid.interpolate_to_grid"><code class="xref py py-meth docutils literal notranslate"><span class="pre">interpolate_to_grid()</span></code></a> to exclude spatial coordinates relying on removed dims from output</p>
+<dd><p>turn a list of arrays into a vector field</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code></span></p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>components</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code>]</span>) – list of vector components</p></li>
+<li><p><strong>target_dims</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span>) – if target_dims is given, it will interpolate onto it first, otherwise all componets must have the same dimesions and coordinates</p></li>
+<li><p><strong>vector_dim</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – label of dimension indexing vector components</p></li>
+<li><p><strong>name</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – name of new array</p></li>
+<li><p><strong>lon_name</strong> – long_name of new array</p></li>
+<li><p><strong>drop_coords</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></span>) – flag picked up by <a class="reference internal" href="#sgs_tools.geometry.staggered_grid.interpolate_to_grid" title="sgs_tools.geometry.staggered_grid.interpolate_to_grid"><code class="xref py py-meth docutils literal notranslate"><span class="pre">interpolate_to_grid()</span></code></a> to exclude spatial coordinates relying on removed dims from output</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code></span></p>
 </dd>
 </dl>
 </dd></dl>
@@ -520,33 +568,41 @@ assumes that we have coordinate staggering as:</p>
 <span class="o">+</span> <span class="o">------</span> <span class="n">c_centre</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">----------</span> <span class="o">+</span> <span class="o">-----</span> <span class="n">c_centre</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>where <cite>c_{face|center}</cite> is any dimension
-:type ds: <span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code></span>
-:param ds: input array to be differentiated
-:type dim: <span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>
-:param dim: dimension along which to differentiate
-:type periodic_field: <span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></span>
-:param periodic_field: boundary condition treatment; if <cite>False</cite> will
+<p>where <code class="docutils literal notranslate"><span class="pre">c_{face|center}</span></code> is any dimension</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ds</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code></span>) – input array to be differentiated</p></li>
+<li><p><strong>dim</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – dimension along which to differentiate</p></li>
+<li><p><strong>periodic_field</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></span>) – boundary condition treatment; if <cite>False</cite> will
 fill boundary values with NaN. Note that only 1 boundary is undefined:
-upper boundary for face-coordinates, and lower boundary for centre-coordinates.
-:rtype: <span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code></span>
-:return: the derivative on the grid with offset staggering in the differentiated dimension
+upper boundary for face-coordinates, and lower boundary for centre-coordinates.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the derivative on the grid with offset staggering in the differentiated dimension
 face -&gt; centre and v.v.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="sgs_tools.geometry.staggered_grid.grad_on_cart_grid">
 <span class="sig-name descname"><span class="pre">grad_on_cart_grid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">space_dims</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">periodic_field</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[False,</span> <span class="pre">False,</span> <span class="pre">False]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/geometry/staggered_grid.html#grad_on_cart_grid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.geometry.staggered_grid.grad_on_cart_grid" title="Link to this definition">#</a></dt>
-<dd><p>differentiate a scalar with respect to given space dims on staggered grid
-:type ds: <span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code></span>
-:param ds: input array to be differentiated
-:type space_dims: <span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span>
-:param space_dims: labels for the spatial dimensions (to be differentiated against)
-:type periodic_field: <span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>]</span>
-:param periodic_field: boundary condition treatment; passed to <a class="reference internal" href="#sgs_tools.geometry.staggered_grid.diff_lin_on_grid" title="sgs_tools.geometry.staggered_grid.diff_lin_on_grid"><code class="xref py py-meth docutils literal notranslate"><span class="pre">diff_lin_on_grid()</span></code></a></p>
+<dd><p>differentiate a scalar with respect to given space dims on staggered grid</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></span></p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ds</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code></span>) – input array to be differentiated</p></li>
+<li><p><strong>space_dims</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span>) – labels for the spatial dimensions (to be differentiated against)</p></li>
+<li><p><strong>periodic_field</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>]</span>) – boundary condition treatment; passed to <a class="reference internal" href="#sgs_tools.geometry.staggered_grid.diff_lin_on_grid" title="sgs_tools.geometry.staggered_grid.diff_lin_on_grid"><code class="xref py py-meth docutils literal notranslate"><span class="pre">diff_lin_on_grid()</span></code></a></p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></span></p>
 </dd>
 </dl>
 </dd></dl>
@@ -554,14 +610,18 @@ face -&gt; centre and v.v.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="sgs_tools.geometry.staggered_grid.grad_vec_on_grid">
 <span class="sig-name descname"><span class="pre">grad_vec_on_grid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_dims</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['x_centre',</span> <span class="pre">'y_centre',</span> <span class="pre">'z_centre']</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_dim_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['c1',</span> <span class="pre">'c2']</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/geometry/staggered_grid.html#grad_vec_on_grid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.geometry.staggered_grid.grad_vec_on_grid" title="Link to this definition">#</a></dt>
-<dd><p>computes gradient of a vector described onto target dimensions
-ds: should be a dataset which only contains the components of the vector in sorted order and target coordinates.
-target_dims: the dimensions to compute the derivative on (must be coordinates in input dataset)
-new_dim_name: the names of the new dimensions: [vector component, differential component]
-name : name for output dataarray (optional)</p>
+<dd><p>computes gradient of a vector described onto target dimensions</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code></span></p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ds</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></span>) – should be a dataset which only contains the components of the vector in sorted order and target coordinates.</p></li>
+<li><p><strong>target_dims</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span>) – the dimensions to compute the derivative on (must be coordinates in input dataset)</p></li>
+<li><p><strong>new_dim_name</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span>) – the names of the new dimensions: [vector component, differential component]</p></li>
+<li><p><strong>name</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – name for output dataarray (optional)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code></span></p>
 </dd>
 </dl>
 </dd></dl>
@@ -572,15 +632,15 @@ name : name for output dataarray (optional)</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="sgs_tools.geometry.tensor_algebra.tensor_self_outer_product">
 <span class="sig-name descname"><span class="pre">tensor_self_outer_product</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vec_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'c1'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'c2'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/geometry/tensor_algebra.html#tensor_self_outer_product"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.geometry.tensor_algebra.tensor_self_outer_product" title="Link to this definition">#</a></dt>
-<dd><dl class="simple">
-<dt>tensor product <span class="math">a_i a_j</span> from vector field <cite>arr</cite>.</dt><dd><p>Assumes that <cite>arr</cite> has dimensions <code class="docutils literal notranslate"><span class="pre">c1</span></code> but no dimension <code class="docutils literal notranslate"><span class="pre">c2</span></code></p>
-</dd>
-</dl>
+<dd><p>Tensor product <span class="math notranslate nohighlight">\(a_i a_j\)</span> from vector field <code class="docutils literal notranslate"><span class="pre">arr</span></code>.
+Assumes that <code class="docutils literal notranslate"><span class="pre">arr</span></code> has dimensions <code class="docutils literal notranslate"><span class="pre">vec_dim</span></code> but not dimension <code class="docutils literal notranslate"><span class="pre">new_dim</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>arr</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code></span>) – xarray Dataset with dimension <cite>c1</cite> which will be used for the tensor product</p></li>
-<li><p><strong>returns</strong> – xarray DataArray with the ‘i’ and ‘j’ dimensions sorted to the front.</p></li>
+<li><p><strong>arr</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code></span>) – xarray Dataset with dimension <cite>vec_dim</cite> which will be used for the tensor product</p></li>
+<li><p><strong>vec_dim</strong> – the dimension of the vector field to be used to form the tensor product</p></li>
+<li><p><strong>new_dim</strong> – the name of the new dimension to be created for the tensor product</p></li>
+<li><p><strong>returns</strong> – xarray DataArray with the <code class="docutils literal notranslate"><span class="pre">vec_dim</span></code> and <code class="docutils literal notranslate"><span class="pre">new_dim</span></code> dimensions sorted to the front.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
@@ -600,6 +660,8 @@ name : name for output dataarray (optional)</p>
 <li><p><strong>dims</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span>) – dimensions with respect to which to take the trace.
 The <cite>tensor</cite> must be square with respect to them.
 All coordinates of <cite>dims</cite> must match.</p></li>
+<li><p><strong>name</strong> – name of the new array.
+If <cite>None</cite>, the name of the input tensor is used.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
@@ -611,8 +673,8 @@ All coordinates of <cite>dims</cite> must match.</p></li>
 <dl class="py function">
 <dt class="sig sig-object py" id="sgs_tools.geometry.tensor_algebra.traceless">
 <span class="sig-name descname"><span class="pre">traceless</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dims</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">('c1',</span> <span class="pre">'c2')</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/geometry/tensor_algebra.html#traceless"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.geometry.tensor_algebra.traceless" title="Link to this definition">#</a></dt>
-<dd><p>returns a traceless version of <cite>tensor</cite>.
-<strong>NB</strong> : bug/unexpected behaviour when nan in trace</p>
+<dd><p>returns a traceless version of <cite>tensor</cite>.</p>
+<p><strong>NB</strong> : bug/unexpected behaviour when nan in trace</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -629,7 +691,7 @@ All coordinates of <cite>dims</cite> must match.</p></li>
 <dl class="py function">
 <dt class="sig sig-object py" id="sgs_tools.geometry.tensor_algebra.Frobenius_norm">
 <span class="sig-name descname"><span class="pre">Frobenius_norm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tens_dims</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['c1',</span> <span class="pre">'c2']</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/geometry/tensor_algebra.html#Frobenius_norm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.geometry.tensor_algebra.Frobenius_norm" title="Link to this definition">#</a></dt>
-<dd><p>Frobenius norm of a tensor: <span class="math">|A| = \sqrt{Aij Aij}</span></p>
+<dd><p>Frobenius norm of a tensor: <span class="math notranslate nohighlight">\(|A| = \sqrt{A_{ij} A_{ij}}\)</span></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -646,7 +708,7 @@ All coordinates of <cite>dims</cite> must match.</p></li>
 <dl class="py function">
 <dt class="sig sig-object py" id="sgs_tools.geometry.tensor_algebra.symmetrise">
 <span class="sig-name descname"><span class="pre">symmetrise</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dims</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['c1',</span> <span class="pre">'c2']</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/geometry/tensor_algebra.html#symmetrise"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.geometry.tensor_algebra.symmetrise" title="Link to this definition">#</a></dt>
-<dd><p><span class="math">0.5 (a + a^T)</span>.</p>
+<dd><p><span class="math notranslate nohighlight">\(0.5 (a + a^T)\)</span>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -669,7 +731,7 @@ whether <cite>tensor</cite> is square with respect to the transposed dimensions.
 <dl class="py function">
 <dt class="sig sig-object py" id="sgs_tools.geometry.tensor_algebra.antisymmetrise">
 <span class="sig-name descname"><span class="pre">antisymmetrise</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dims</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['c1',</span> <span class="pre">'c2']</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/geometry/tensor_algebra.html#antisymmetrise"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.geometry.tensor_algebra.antisymmetrise" title="Link to this definition">#</a></dt>
-<dd><p><span class="math">0.5 (a - a^T)</span>.</p>
+<dd><p><span class="math notranslate nohighlight">\(0.5 (a - a^T)\)</span>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -692,12 +754,15 @@ whether <cite>tensor</cite> is square with respect to the transposed dimensions.
 <dl class="py function">
 <dt class="sig sig-object py" id="sgs_tools.geometry.tensor_algebra.anisotropy_renorm">
 <span class="sig-name descname"><span class="pre">anisotropy_renorm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tensor_dims</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">('c1',</span> <span class="pre">'c2')</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/geometry/tensor_algebra.html#anisotropy_renorm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.geometry.tensor_algebra.anisotropy_renorm" title="Link to this definition">#</a></dt>
-<dd><p>compute the anisotropy renormalisation of a 2-rank tesnor
-ie. tensor/trace(tensor) - 1/3 Identity
-must have trace(tensor) != 0 for sensible results</p>
+<dd><p>Compute the anisotropy renormalisation of a 2-rank 3x3 tensor
+i.e. tensor/trace(tensor) - 1/3 Identity.
+Must have trace(tensor) != 0 for sensible results</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>tensor_dims</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span>) – tensor dimensions</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tensor</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">TypeVar</span></code>(<code class="docutils literal notranslate"><span class="pre">T_Xarray</span></code>, DataArray, Dataset)</span>) – tensor input</p></li>
+<li><p><strong>tensor_dims</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span>) – tensor dimensions</p></li>
+</ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">TypeVar</span></code>(<code class="docutils literal notranslate"><span class="pre">T_Xarray</span></code>, DataArray, Dataset)</span></p>
@@ -715,6 +780,7 @@ must have trace(tensor) != 0 for sensible results</p>
 <li><p><strong>sca</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code></span>) – input scalar, with spatial coordinates <cite>space_dims</cite></p></li>
 <li><p><strong>space_dims</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span>) – labels for the spatial dimensions (to be differentiated against)</p></li>
 <li><p><strong>new_dim_name</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – the name of the new dimension (of the differential direction)</p></li>
+<li><p><strong>name</strong> – name for output dataarray. If None, the name of the input scalar is used.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
@@ -736,6 +802,7 @@ must have trace(tensor) != 0 for sensible results</p>
 <li><p><strong>vec</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code></span>) – input vector, with spatial coordinates <cite>space_dims</cite></p></li>
 <li><p><strong>space_dims</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span>) – labels for the spatial dimensions (to be differentiated against)</p></li>
 <li><p><strong>new_dim_name</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – the name of the new dimension (of the differential direction)</p></li>
+<li><p><strong>name</strong> – name for output dataarray. If None, the name of the input vector is used.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
@@ -757,6 +824,7 @@ must have trace(tensor) != 0 for sensible results</p>
 <li><p><strong>vec</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code></span>) – input vector, with spatial coordinates <cite>space_dims</cite></p></li>
 <li><p><strong>space_dims</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span>) – labels for the spatial dimensions (to be differentiated against)</p></li>
 <li><p><strong>new_dim_name</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – the name of the new dimension (of the differential direction)</p></li>
+<li><p><strong>name</strong> – name for output dataarray. If None, the name of the input vector is used.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
@@ -787,7 +855,7 @@ must have trace(tensor) != 0 for sensible results</p>
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Input/Output: <code class="xref py py-mod docutils literal notranslate"><span class="pre">io</span></code></p>
+        <p class="prev-next-title">IO</p>
       </div>
     </a>
     <a class="right-next"
@@ -795,7 +863,7 @@ must have trace(tensor) != 0 for sensible results</p>
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Physical field calculators: <code class="xref py py-mod docutils literal notranslate"><span class="pre">physics</span></code></p>
+        <p class="prev-next-title">Physical Fields</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -818,6 +886,7 @@ must have trace(tensor) != 0 for sensible results</p>
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1"><code class="xref py py-mod docutils literal notranslate"><span class="pre">geometry</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-sgs_tools.geometry.grid">Grid:</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.geometry.grid.Grid"><code class="docutils literal notranslate"><span class="pre">Grid</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.geometry.grid.Grid.mesh"><code class="docutils literal notranslate"><span class="pre">Grid.mesh()</span></code></a></li>

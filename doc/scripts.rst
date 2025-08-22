@@ -1,53 +1,50 @@
 Scripts
 =======
 
------------------------
-Offline Post-Processing
+
+Post-Processing
 -----------------------
 
 .. sphinx_argparse_cli::
    :module: sgs_tools.scripts.CS_calculation_genmodel
    :func: parse_args
    :hook:
-   :prog: cs_dynamic.py
+   :prog: cs_dynamic
    :group_title_prefix:
-
-----------------------
-Online Post-Processing
-----------------------
+   :title: CS_calculation_genmodel.py
 
 .. sphinx_argparse_cli::
    :module: sgs_tools.scripts.post_process_UM
    :func: parse_args
    :hook:
-   :prog: post_process_UM.py
+   :prog: post_process_UM
    :group_title_prefix:
-
-text2
+   :title: post_process_UM.py
 
 .. sphinx_argparse_cli::
    :module: sgs_tools.scripts.BasicComparisonSimAnalysis
    :func: parse_args
    :hook:
-   :prog: BasicComparisonSimAnalysis.py
+   :prog: sim_comparison
    :group_title_prefix:
-
-text1
+   :title: BasicComparisonSimAnalysis.py
 
 .. sphinx_argparse_cli::
    :module: sgs_tools.scripts.ReferenceComparisonSimAnalysis
    :func: parse_args
    :hook:
-   :prog: ReferenceComparisonSimAnalysis.py
+   :prog: ref_comparison
    :group_title_prefix:
+   :title: ReferenceComparisonSimAnalysis.py
 
--------------
-Preprocessing
--------------
+
+Pre-processing
+---------------
 
 .. sphinx_argparse_cli::
    :module: sgs_tools.scripts.make_UM_level_sets
    :func: parser
    :hook:
-   :prog: make_UM_level_sets.py
+   :prog: um_levels
    :group_title_prefix:
+   :title: make_UM_level_sets.py

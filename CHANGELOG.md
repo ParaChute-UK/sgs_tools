@@ -2,7 +2,9 @@
 
 All notable changes to this project are documented in this file.
 
-### [0.1.0] - 2025-08-20
+### [Under development]
+
+### [0.1.0] - 2025-08-22
 
 #### Added
   - Auto-deployment of docs on GitHub pages (#28, #30)

@@ -29,19 +29,19 @@ jobs:
           echo "<table border='1' cellpadding='5' cellspacing='0'>" >> index.html
           echo "<tr><th>Feature Branch</th><th>Last Modified</th></tr>" >> index.html
 
+
+
           find ./preview -mindepth 1 -maxdepth 1 -type d \
               ! -name '.*' \
               ! -name 'devel' \
               -exec stat --format '%Y %n' {} \; \
-            | sort -r \
-            | awk '{
-                cmd = "date -d @" $1 " +\"%Y-%m-%d %H:%M:%S\""
-                cmd | getline mod_date
-                close(cmd)
-                dir = substr($0, index($0,$2))
-                gsub("./preview/", "", dir)
-                print "<tr><td><a href=\"" dir "/\">" dir "</a></td><td>" mod_date "</td></tr>"
-              }' >> index.html
+            | sort -r | while read -r timestamp path; do
+              mod_date=$(date -d @"$timestamp" +"%Y-%m-%d %H:%M:%S")
+              name="${path#./preview/}"
+              link="${path#./}"
+              echo "<tr><td><a href=\"$link/\">$name</a></td><td>$mod_date</td></tr>" >> index.html
+          done
+
           echo "</table></body></html>" >> index.html
 
       - name: Deploy index.html

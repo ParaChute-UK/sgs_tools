@@ -389,14 +389,14 @@
   <section id="sgs-tools">
 <h1>sgs_tools<a class="headerlink" href="#sgs-tools" title="Link to this heading">#</a></h1>
 <p>Python tools for sub-grid scale (SGS) fluid dynamics analysis.</p>
-<section id="rocket-install">
-<h2>🚀 Install<a class="headerlink" href="#rocket-install" title="Link to this heading">#</a></h2>
+<section id="install">
+<h2>🚀 Install<a class="headerlink" href="#install" title="Link to this heading">#</a></h2>
 <blockquote>
 <div><p>⚠️ This package is under active development. Interfaces, features and dependencies may change without notice.
 The <code class="docutils literal notranslate"><span class="pre">devel</span></code> branch is the actively maintained branch containing the latest features and fixes.</p>
 </div></blockquote>
-<section id="building-construction-development-version">
-<h3>🏗️ Development Version<a class="headerlink" href="#building-construction-development-version" title="Link to this heading">#</a></h3>
+<section id="development-version">
+<h3>🏗️ Development Version<a class="headerlink" href="#development-version" title="Link to this heading">#</a></h3>
 <p>To install the latest development version (from GitHub <code class="docutils literal notranslate"><span class="pre">devel</span></code> branch):</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">pip install git+https://github.com/dvlaykov/sgs_tools.git@devel</span>
 </pre></div>
@@ -406,8 +406,8 @@ The <code class="docutils literal notranslate"><span class="pre">devel</span></c
 </div></blockquote>
 </section>
 </section>
-<section id="arrow-forward-usage">
-<h2>▶️ Usage<a class="headerlink" href="#arrow-forward-usage" title="Link to this heading">#</a></h2>
+<section id="usage">
+<h2>▶️ Usage<a class="headerlink" href="#usage" title="Link to this heading">#</a></h2>
 <p>The package can be used both as a Python library and from the command line.</p>
 <p>For example, run one of the included analysis scripts directly, e.g.</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">cs_dynamic --help</span>
@@ -420,8 +420,8 @@ The <code class="docutils literal notranslate"><span class="pre">devel</span></c
 </div>
 <p>See <a class="reference external" href="https://dvlaykov.github.io/sgs_tools/">documentation</a> for available module and functionality and CLI scripts for sample usage.</p>
 </section>
-<section id="books-documentation">
-<h2>📚 Documentation<a class="headerlink" href="#books-documentation" title="Link to this heading">#</a></h2>
+<section id="id1">
+<h2>📚 Documentation<a class="headerlink" href="#id1" title="Link to this heading">#</a></h2>
 <p>The documentation is hosted <a class="reference external" href="https://dvlaykov.github.io/sgs_tools/">here</a>.
 (It is updated via GitHub Actions, so may be a few minutes behind the latest PR merge.)</p>
 <p>To build the documentation locally:</p>
@@ -443,8 +443,8 @@ The <code class="docutils literal notranslate"><span class="pre">devel</span></c
 <li><p>The rendered documentation can be accessed from <code class="docutils literal notranslate"><span class="pre">&lt;repo_directory&gt;/documentation/index.html</span></code>.</p></li>
 </ol>
 </section>
-<section id="handshake-contributing">
-<h2>🤝 Contributing<a class="headerlink" href="#handshake-contributing" title="Link to this heading">#</a></h2>
+<section id="contributing">
+<h2>🤝 Contributing<a class="headerlink" href="#contributing" title="Link to this heading">#</a></h2>
 <p>We welcome contributions of all kinds — bug reports, feature requests, documentation improvements, and pull requests.</p>
 <blockquote>
 <div><p>Open <a class="reference external" href="https://github.com/dvlaykov/sgs_tools">issues</a> for questions, ideas, or feedback. We appreciate your input!</p>
@@ -459,15 +459,15 @@ The <code class="docutils literal notranslate"><span class="pre">devel</span></c
 <li><p>Submit your PR to the <code class="docutils literal notranslate"><span class="pre">devel</span></code> branch</p></li>
 </ul>
 </section>
-<section id="test-tube-development-setup-tooling">
-<h2>🧪 Development Setup &amp; Tooling<a class="headerlink" href="#test-tube-development-setup-tooling" title="Link to this heading">#</a></h2>
+<section id="development-setup-tooling">
+<h2>🧪 Development Setup &amp; Tooling<a class="headerlink" href="#development-setup-tooling" title="Link to this heading">#</a></h2>
 <p>The dev tools are managed using <a class="reference external" href="https://python-poetry.org/docs/">Poetry</a>.</p>
 <blockquote>
 <div><p>If you’re unfamiliar with <a class="reference external" href="https://python-poetry.org/docs/">Poetry</a>, it’s a Python packaging and publishing tool for dependency management and development workflows.
 You can still use <code class="docutils literal notranslate"><span class="pre">pip</span></code> for user installations, but we recommend Poetry for contributing to this project.</p>
 </div></blockquote>
-<section id="lab-coat-setup">
-<h3>🥼 Setup<a class="headerlink" href="#lab-coat-setup" title="Link to this heading">#</a></h3>
+<section id="setup">
+<h3>🥼 Setup<a class="headerlink" href="#setup" title="Link to this heading">#</a></h3>
 <ol class="arabic">
 <li><p>Clone the repository</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">git clone https://github.com/dvlaykov/sgs_tools.git</span>
@@ -496,8 +496,8 @@ You can still use <code class="docutils literal notranslate"><span class="pre">p
 </li>
 </ol>
 </section>
-<section id="microscope-testing-style">
-<h3>🔬 Testing &amp; Style<a class="headerlink" href="#microscope-testing-style" title="Link to this heading">#</a></h3>
+<section id="testing-style">
+<h3>🔬 Testing &amp; Style<a class="headerlink" href="#testing-style" title="Link to this heading">#</a></h3>
 <p>Testing and code style is managed via <a class="reference external" href="https://tox.wiki/en/4.28.1/">tox</a> or a convenience <code class="docutils literal notranslate"><span class="pre">make</span></code> targets defined in the <code class="docutils literal notranslate"><span class="pre">Makefile</span></code>.</p>
 <ul>
 <li><p>Run all checks (formatting, linting, type checks, tests, and coverage) across the repo with</p>
@@ -521,8 +521,8 @@ You can still use <code class="docutils literal notranslate"><span class="pre">p
 </ul>
 <p>See the <code class="docutils literal notranslate"><span class="pre">Makefile</span></code> or <code class="docutils literal notranslate"><span class="pre">tox.ini</span></code> for more grannular options.</p>
 </section>
-<section id="wrench-tooling-overview">
-<h3>🔧 Tooling Overview<a class="headerlink" href="#wrench-tooling-overview" title="Link to this heading">#</a></h3>
+<section id="tooling-overview">
+<h3>🔧 Tooling Overview<a class="headerlink" href="#tooling-overview" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p><strong>Virtual environment for testing</strong>: <span class="raw-html-md"><a href="https://tox.wiki/en/4.28.1/"><code class="docutils literal"><span class="pre">tox</span></code></a></span></p></li>
 <li><p><strong>Unit/Integration Tests</strong>: <span class="raw-html-md"><a href="https://docs.pytest.org/"><code class="docutils literal"><span class="pre">pytest</span></code></a></span></p>
@@ -590,17 +590,17 @@ You can still use <code class="docutils literal notranslate"><span class="pre">p
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#rocket-install">🚀 Install</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#building-construction-development-version">🏗️ Development Version</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#install">🚀 Install</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#development-version">🏗️ Development Version</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#arrow-forward-usage">▶️ Usage</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#books-documentation">📚 Documentation</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#handshake-contributing">🤝 Contributing</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#test-tube-development-setup-tooling">🧪 Development Setup &amp; Tooling</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#lab-coat-setup">🥼 Setup</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#microscope-testing-style">🔬 Testing &amp; Style</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#wrench-tooling-overview">🔧 Tooling Overview</a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#usage">▶️ Usage</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">📚 Documentation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#contributing">🤝 Contributing</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#development-setup-tooling">🧪 Development Setup &amp; Tooling</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">🥼 Setup</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#testing-style">🔬 Testing &amp; Style</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#tooling-overview">🔧 Tooling Overview</a><ul class="nav section-nav flex-column">
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#indices-and-tables">Indices and tables</a></li>
 </ul>
 </li>

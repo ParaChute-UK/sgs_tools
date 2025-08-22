@@ -6,12 +6,12 @@ Python tools for sub-grid scale (SGS) fluid dynamics analysis.
 
 
 
-## |:rocket:| Install
+## 🚀 Install
 
-> |:warning:| This package is under active development. Interfaces, features and dependencies may change without notice.
+> ⚠️ This package is under active development. Interfaces, features and dependencies may change without notice.
 > The `devel` branch is the actively maintained branch containing the latest features and fixes.
 
-### |:building_construction:| Development Version
+### 🏗️ Development Version
 
   To install the latest development version (from GitHub `devel` branch):
 
@@ -24,7 +24,7 @@ Python tools for sub-grid scale (SGS) fluid dynamics analysis.
 
 
 
-## |:arrow_forward:| Usage
+## ▶️ Usage
 
   The package can be used both as a Python library and from the command line.
 
@@ -42,7 +42,7 @@ Python tools for sub-grid scale (SGS) fluid dynamics analysis.
   ```
   See [documentation](https://dvlaykov.github.io/sgs_tools/) for available module and functionality and CLI scripts for sample usage.
 
-## |:books:| Documentation
+## 📚 Documentation
 The documentation is hosted [here](https://dvlaykov.github.io/sgs_tools/).
 (It is updated via GitHub Actions, so may be a few minutes behind the latest PR merge.)
 
@@ -66,7 +66,7 @@ To build the documentation locally:
   3. The rendered documentation can be accessed from `<repo_directory>/documentation/index.html`.
 
 
-## |:handshake:| Contributing
+## 🤝 Contributing
 
 We welcome contributions of all kinds — bug reports, feature requests, documentation improvements, and pull requests.
 
@@ -80,7 +80,7 @@ We welcome contributions of all kinds — bug reports, feature requests, documen
 - Submit your PR to the `devel` branch
 
 
-## |:test_tube:| Development Setup & Tooling
+## 🧪 Development Setup & Tooling
 
 The dev tools are managed using [Poetry](https://python-poetry.org/docs/).
 
@@ -88,7 +88,7 @@ The dev tools are managed using [Poetry](https://python-poetry.org/docs/).
 You can still use `pip` for user installations, but we recommend Poetry for contributing to this project.
 
 
-### |:lab_coat:| Setup
+### 🥼 Setup
   1. Clone the repository
       ```console
       git clone https://github.com/dvlaykov/sgs_tools.git
@@ -113,7 +113,7 @@ You can still use `pip` for user installations, but we recommend Poetry for cont
       pre-commit install
       ```
 
-### |:microscope:| Testing & Style
+### 🔬 Testing & Style
 
   Testing and code style is managed via [tox](https://tox.wiki/en/4.28.1/) or a convenience `make` targets defined in the `Makefile`.
 
@@ -137,7 +137,7 @@ You can still use `pip` for user installations, but we recommend Poetry for cont
 
   See the `Makefile` or `tox.ini` for more grannular options.
 
-### |:wrench:| Tooling Overview
+### 🔧 Tooling Overview
 - **Virtual environment for testing**: [`tox`](https://tox.wiki/en/4.28.1/)
 - **Unit/Integration Tests**: [`pytest`](https://docs.pytest.org/)
   - Will look for tests as `test/test_*.py`

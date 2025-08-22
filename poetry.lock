@@ -3242,6 +3242,21 @@ standalone = ["Sphinx (>=5)"]
 test = ["pytest"]
 
 [[package]]
+name = "sphinxemoji"
+version = "0.3.1"
+description = "An extension to use emoji codes in your Sphinx documentation"
+optional = false
+python-versions = ">=3.9"
+groups = ["doc"]
+files = [
+    {file = "sphinxemoji-0.3.1-py3-none-any.whl", hash = "sha256:dae483695f8d1e90a28a6e9bbccc08d256202afcc1d0fbd33b51b3b4352d439e"},
+    {file = "sphinxemoji-0.3.1.tar.gz", hash = "sha256:23ecff1f1e765393e49083b45386b7da81ced97c9a18a1dfd191460a97da3b11"},
+]
+
+[package.dependencies]
+sphinx = ">=5.0"
+
+[[package]]
 name = "tblib"
 version = "3.1.0"
 description = "Traceback serialization library."
@@ -3576,4 +3591,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.11"
-content-hash = "f26190183eac476004dd9110a5b6deb72d9bd65b1ca271514149998909019cc4"
+content-hash = "d11fb4e3e0fed3c539798241b8c86389ec48b50c0405846f58e4a26f49f451f8"

@@ -40,6 +40,7 @@ extensions = [
     "sphinx.ext.viewcode",
     "sphinx_argparse_cli",
     "sphinx_copybutton",
+    "sphinxemoji.sphinxemoji",
 ]
 
 

@@ -18,7 +18,23 @@ Python tools for sub-grid scale (SGS) fluid dynamics.
   pip install git+https://github.com/dvlaykov/sgs_tools.git@devel
   ```
 
+## Usage
 
+  The package can be used both as a Python library and from the command line.
+
+  For example, run one of the included analysis scripts directly, e.g.
+
+  ```console
+    cs_dynamic --help
+  ```
+
+  In Python, import the usual way
+
+  ```python
+    import sgs_tools
+    print (sgs_tools.__version__)
+  ```
+  See [documentation](https://dvlaykov.github.io/sgs_tools/) for available module and functionality and CLI scripts for sample usage.
 
 ## 📚 Documentation
 The documentation is hosted [here](https://dvlaykov.github.io/sgs_tools/).

@@ -56,4 +56,4 @@ jobs:
 
   update-index:
     needs: build-deploy-doc-preview
-    uses: ./.github/workflows/update_doc_idx.yml
+    uses: ./.github/workflows/docs-regen-idx.yml

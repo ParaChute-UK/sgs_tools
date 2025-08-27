@@ -133,6 +133,17 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
             "Missing required a positive h_resolution for UM datasets"
         )
 
+    # parse negative values in the [t,z]_range
+    if args["t_range"][0] < 0:
+        args["t_range"][0] = -inf
+    if args["t_range"][1] < 0:
+        args["t_range"][1] = inf
+
+    if args["z_range"][0] < 0:
+        args["z_range"][0] = -inf
+    if args["z_range"][1] < 0:
+        args["z_range"][1] = inf
+
     # model parsing:
     if "all" in args["sgs_model"]:
         args["sgs_model"] = set(vel_models + theta_models)
@@ -162,16 +173,6 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
 
     assert len(args["filter_scales"]) == len(args["regularize_filter_scales"])
 
-    # parse negative values in the [t,z]_range
-    if args["t_range"][0] < 0:
-        args["t_range"][0] = -inf
-    if args["t_range"][1] < 0:
-        args["t_range"][1] = inf
-
-    if args["z_range"][0] < 0:
-        args["z_range"][0] = -inf
-    if args["z_range"][1] < 0:
-        args["z_range"][1] = inf
     return args
 
 

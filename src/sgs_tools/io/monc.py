@@ -42,7 +42,7 @@ def data_ingest_MONC_on_single_grid(
     del ds["options_database"]
 
     ds = ds.squeeze()
-    # change variable names
+    # rename to sgs_tools naming convention
     ds = ds.rename(base_field_dict)
 
     # standardize coordinate names

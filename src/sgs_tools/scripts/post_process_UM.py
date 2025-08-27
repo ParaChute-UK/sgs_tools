@@ -93,7 +93,6 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
                 """,
         formatter_class=ArgumentDefaultsHelpFormatter,
     )
-
     add_input_group(parser)
 
     output = parser.add_argument_group("Output datasets on disk")

@@ -246,35 +246,47 @@ def data_slice(
 def gather_model_inputs(simulation: xr.Dataset) -> xr.Dataset:
     # ensure velocity components are co-located
     simple_dims = ["x", "y", "z"]  # coordinates already exist in simulation
-    vel = compose_vector_components_on_grid(
-        [simulation["u"], simulation["v"], simulation["w"]],
-        simple_dims,
-        name="vel",
-        vector_dim="c1",
-    )
+    if "vel" in simulation:
+        vel = simulation["vel"]
+    else:
+        vel = compose_vector_components_on_grid(
+            [simulation["u"], simulation["v"], simulation["w"]],
+            simple_dims,
+            name="vel",
+            vector_dim="c1",
+        )
 
     # compute strain, rotation and potential temperature gradient
-    sij = strain_from_vel(
-        vel,
-        space_dims=simple_dims,
-        vec_dim="c1",
-        new_dim="c2",
-        make_traceless=True,
-    )
+    if "sij" in simulation:
+        sij = simulation["sij"]
+    else:
+        sij = strain_from_vel(
+            vel,
+            space_dims=simple_dims,
+            vec_dim="c1",
+            new_dim="c2",
+            make_traceless=True,
+        )
 
-    omegaij = omega_from_vel(
-        vel,
-        space_dims=simple_dims,
-        vec_dim="c1",
-        new_dim="c2",
-    )
+    if "omegaij" in simulation:
+        omegaij = simulation["omegaij"]
+    else:
+        omegaij = omega_from_vel(
+            vel,
+            space_dims=simple_dims,
+            vec_dim="c1",
+            new_dim="c2",
+        )
 
-    grad_theta = grad_scalar(
-        simulation["theta"],
-        space_dims=simple_dims,
-        new_dim_name="c1",
-        name="grad_theta",
-    )
+    if "grad_theta" in simulation:
+        grad_theta = simulation["grad_theta"]
+    else:
+        grad_theta = grad_scalar(
+            simulation["theta"],
+            space_dims=simple_dims,
+            new_dim_name="c1",
+            name="grad_theta",
+        )
 
     return xr.Dataset(
         {

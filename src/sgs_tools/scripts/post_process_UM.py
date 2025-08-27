@@ -271,7 +271,11 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
     # parse arguments into a dictionary
     args = vars(parser.parse_args(arguments))
 
-    # add any pottentially missing file extension
+    # check io group consistency
+    if args["input_format"] == "um":
+        assert args["h_resolution"] > 0, (
+            "Missing required a positive h_resolution for UM datasets"
+        )
     assert args["output_path"].is_dir()
 
     # parse negative values in the [t,z]_range
@@ -473,7 +477,7 @@ def run(args: Dict[str, Any]) -> None:
 
     simulation = read(
         args["input_files"],
-        "um",
+        args["input_format"],
         list(all_fields),
         resolution=args["h_resolution"],
     )

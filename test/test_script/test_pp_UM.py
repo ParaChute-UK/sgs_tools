@@ -10,8 +10,10 @@ import sgs_tools.scripts.post_process_UM as pp_um
 def test_args():
     return [
         "test/test_script/df667_800m_L63_Slicea_pr.nc",
-        "800",
+        "um",
         "__test_pp_UM",
+        "--h_resolution",
+        "800",
         "--overwrite_existing",
         "--z_chunk_size",
         "10",

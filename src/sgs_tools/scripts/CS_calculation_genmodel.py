@@ -61,8 +61,8 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
         formatter_class=ArgumentDefaultsHelpFormatter,
     )
 
-    fname = add_input_group(parser)
-    fname.add_argument(
+    io = add_input_group(parser)
+    io.add_argument(
         "output_path",
         type=Path,
         help="""
@@ -70,7 +70,7 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
         Will create/overwrite existing file and
         create any missing intermediate directories""",
     )
-    fname.add_argument(
+    io.add_argument(
         "--input_format", type=str, choices=["um", "monc", "sgs"], default="um"
     )
 
@@ -126,6 +126,12 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
 
     # parse arguments into a dictionary
     args = vars(parser.parse_args(arguments))
+
+    # check io group consistency
+    if args["input_format"] == "um":
+        assert args["h_resolution"] > 0, (
+            "Missing required a positive h_resolution for UM datasets"
+        )
 
     # model parsing:
     if "all" in args["sgs_model"]:

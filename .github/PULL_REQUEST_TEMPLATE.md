@@ -23,7 +23,8 @@ Please delete options that are not relevant.
 - [ ] Added or updated unit tests using `pytest`, if applicable.
 - [ ] All tests pass locally (`tox` or `make clean` runs clean).
 - [ ] The CI pipeline passes (e.g., GitHub Actions).
-- [ ] Udated documentation where applicable.
+- [ ] Udated documentation, where applicable.
+- [ ] Updated CHANGELOG, TASKLIST if applicable.
 
 # Additional Notes
 

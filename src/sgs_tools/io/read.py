@@ -11,6 +11,26 @@ from sgs_tools.io.um import data_ingest_UM_on_single_grid
 def read(
     input_files: Path, input_format: str, requested_fields: list[str], **kwargs
 ) -> xr.Dataset:
+    """
+    Read simulation data from input files and return an xarray Dataset.
+
+    :param input_files: Path to the input file(s) containing simulation data.
+    :param input_format: Format of the input data. Supported formats are:
+        ``sgs``, ``um``, ``monc``
+
+    :param requested_fields: List of variable names to extract from the input data.
+    :param kwargs: Additional keyword arguments depending on the input format.
+      The ``um`` format, requires ``resolution`` (float) specifying horizontal grid spacing.
+
+    :return: xarray Dataset containing the requested fields and metadata, including
+      the horizontal resolution stored in ``attrs["h_resolution"]``.
+
+    .. note::
+        - For ``monc`` format, resolution is inferred from metadata and assumed isotropic in x and y
+        - For ``um`` format, resolution must be explicitly provided via `kwargs`.
+
+    """
+
     if input_format == "sgs":
         simulation = data_ingest_SGS(
             input_files,

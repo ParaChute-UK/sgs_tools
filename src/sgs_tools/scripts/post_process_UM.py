@@ -9,6 +9,7 @@ from sgs_tools.diagnostics.anisotropy import anisotropy_analysis
 from sgs_tools.diagnostics.directional_profile import directional_profile
 from sgs_tools.diagnostics.spectra import spectra_1d_radial
 from sgs_tools.io.netcdf_writer import NetCDFWriter
+from sgs_tools.io.read import read
 from sgs_tools.util.timer import timer
 
 v_profile_fields_out = [
@@ -290,25 +291,6 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
     return args
 
 
-def read(
-    fname: Path,
-    resolution: float,
-    requested_fields: list[str],
-    t_range: Sequence[float],
-    z_range: Sequence[float],
-) -> xr.Dataset:
-    from sgs_tools.io.um import data_ingest_UM_on_single_grid
-
-    simulation = data_ingest_UM_on_single_grid(
-        fname,
-        resolution,
-        requested_fields=requested_fields,
-    )
-    simulation = data_slice(simulation, t_range, z_range)
-
-    return simulation
-
-
 def data_slice(
     ds: xr.Dataset, t_range: Sequence[float], z_range: Sequence[float]
 ) -> xr.Dataset:
@@ -491,11 +473,12 @@ def run(args: Dict[str, Any]) -> None:
 
     simulation = read(
         args["input_files"],
-        args["h_resolution"],
+        "um",
         list(all_fields),
-        args["t_range"],
-        args["z_range"],
+        resolution=args["h_resolution"],
     )
+    # slice to the requested sub-domain
+    simulation = data_slice(simulation, args["t_range"], args["z_range"])
     simulation = post_process_fields(simulation)
 
     writer = NetCDFWriter(overwrite=args["overwrite_existing"])

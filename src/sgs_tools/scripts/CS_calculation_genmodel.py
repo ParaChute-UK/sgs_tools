@@ -3,7 +3,6 @@ from pathlib import Path
 from typing import Any, Dict, Sequence
 
 import matplotlib.pyplot as plt
-import numpy as np
 import xarray as xr
 from dask.diagnostics import ProgressBar
 from numpy import inf
@@ -13,9 +12,7 @@ from sgs_tools.geometry.staggered_grid import (
     compose_vector_components_on_grid,
 )
 from sgs_tools.geometry.vector_calculus import grad_scalar
-from sgs_tools.io.monc import data_ingest_MONC_on_single_grid
-from sgs_tools.io.sgs import data_ingest_SGS
-from sgs_tools.io.um import data_ingest_UM_on_single_grid
+from sgs_tools.io.read import read
 from sgs_tools.physics.fields import omega_from_vel, strain_from_vel
 from sgs_tools.scripts.arg_parsers import (
     add_dask_group,
@@ -283,38 +280,28 @@ def gather_model_inputs(simulation: xr.Dataset) -> xr.Dataset:
     )
 
 
-def read(args: dict[str, Any]) -> xr.Dataset:
-    if args["input_format"] == "sgs":
-        # read native SGS_tools  files
-        simulation = data_ingest_SGS(
-            args["input_files"],
-            requested_fields=["vel", "theta", "sij", "omegaij", "theta", "grad_theta"],
-        )
-        simulation = data_slice(simulation, args["t_range"], args["z_range"])
-    else:
-        if args["input_format"] == "um":
-            # read UM stash files
-            simulation = data_ingest_UM_on_single_grid(
-                args["input_files"],
-                args["h_resolution"],
-                requested_fields=["u", "v", "w", "theta"],
-            )
-        elif args["input_format"] == "monc":
-            # read MONC files
-            meta, simulation = data_ingest_MONC_on_single_grid(
-                args["input_files"],
-                requested_fields=["u", "v", "w", "theta"],
-            )
-            # overwrite resolution
-            assert np.isclose(meta["dxx"], meta["dyy"])
-            args["h_resolution"] = meta["dxx"]
-        else:
-            raise ValueError(f"Unsupported input format {args['input_format']}")
+def pre_process(args: dict[str, Any]) -> xr.Dataset:
+    req_fields = {
+        "um": ["u", "v", "w", "theta", "theta"],
+        "monc": ["u", "v", "w", "theta", "theta"],
+        "sgs": ["vel", "theta", "sij", "omegaij", "theta", "grad_theta"],
+    }
+    simulation = read(
+        args["input_files"],
+        args["input_format"],
+        requested_fields=req_fields[args["input_format"]],
+        resolution=args["h_resolution"],
+    )
 
-        with ProgressBar():
+    # overwrite resolution if recorded during read
+    if "h_resolution" in simulation.attrs:
+        args["h_resolution"] = simulation.attrs["h_resolution"]
+
+    with ProgressBar():
+        with timer("Extract grid-based fields", "s"):
+            # slice to the requested sub-domain
             simulation = data_slice(simulation, args["t_range"], args["z_range"])
-            with timer("Extract grid-based fields", "s"):
-                simulation = gather_model_inputs(simulation)
+            simulation = gather_model_inputs(simulation)
     # chunk
     simulation = simulation.chunk(
         chunks={
@@ -481,7 +468,7 @@ def run(args: Dict[str, Any]) -> None:
     # read and pre-process simulation
     # read UM stasth files: data
     with timer("Read Dataset", "s"):
-        simulation = read(args)
+        simulation = pre_process(args)
 
     # check scales make sense
     nhoriz = min(simulation["x"].shape[0], simulation["y"].shape[0])

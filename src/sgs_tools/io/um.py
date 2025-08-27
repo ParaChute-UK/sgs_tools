@@ -209,8 +209,9 @@ def restrict_ds(ds: xr.Dataset, fields: Iterable[str]) -> xr.Dataset:
     :return: dataset with renamed variables
     """
     intersection = [k for k in fields if k in ds]
-    # print ("Missing fields:", {k for k in fields if k not in intersection})
-    return ds[intersection]
+    missing_fields = {k for k in fields if k not in intersection}
+    # print ("Missing fields:", missing_fields)
+    return ds[intersection], missing_fields
 
 
 # unify coordinates and implement correct x-spacing
@@ -320,7 +321,7 @@ def data_ingest_UM(
     simulation = standardize_varnames(simulation)
 
     # restrict to interesting fields and rename to simple names
-    simulation = restrict_ds(simulation, fields=requested_fields)
+    simulation, _ = restrict_ds(simulation, fields=requested_fields)
     assert len(simulation) > 0, "None of the requested fields are available"
     # unify coordinates
     simulation = unify_coords(simulation, res=res)

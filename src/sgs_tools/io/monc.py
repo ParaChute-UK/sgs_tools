@@ -58,7 +58,7 @@ def data_ingest_MONC_on_single_grid(
     )
     del ds["theta"]
     ds = ds.rename({"theta_interp": "theta"})
-    ds = restrict_ds(ds, requested_fields)
+    ds, _ = restrict_ds(ds, requested_fields)
     for coord in ds.coords:
         ds[coord].attrs.update({"units": "m"})
     return metadata, ds

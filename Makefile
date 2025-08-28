@@ -10,6 +10,7 @@ doc:
     pip install .[doc]; \
     sphinx-build -b html doc/ documentation; \
   fi
+	@echo "Documentation generated at $$(pwd)/documentation/index.html"
 
 test:
 	tox

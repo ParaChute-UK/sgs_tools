@@ -20,11 +20,12 @@ Please delete options that are not relevant.
 
 ## Checklist
 
-- [ ] Added or updated unit tests using `pytest`, if applicable.
+- [ ] Added or updated unit tests, if applicable.
 - [ ] All tests pass locally (`tox` or `make clean` runs clean).
 - [ ] The CI pipeline passes (e.g., GitHub Actions).
 - [ ] Udated documentation, where applicable.
 - [ ] Updated CHANGELOG, TASKLIST if applicable.
+- [ ] Updated package dependencies, poetry.lock, pre_commit, etc., if applicable.
 
 # Additional Notes
 

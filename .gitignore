@@ -44,7 +44,7 @@ MANIFEST
 dmypy.json
 
 # Sphinx documentation
-doc/_build/
+documentation/
 
 #testing
 .tox/

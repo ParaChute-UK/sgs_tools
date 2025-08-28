@@ -14,7 +14,7 @@ def data_ingest_SGS(
     """read and pre-process local-convention (sgs_tools) NetCDF data
 
     :param fname_pattern: NetCDF diagnostic file to read. can be a glob pattern. (should belong to the same simulation)
-    :param  requested_fields: list of fields to read and pre-process using sgs_tools naming convention. Defaults to ['u', 'v', 'w', 'theta']
+    :param  requested_fields: list of fields to read and pre-process using sgs_tools naming convention.
     :param chunks: chunking for data
     """
     fname = list(

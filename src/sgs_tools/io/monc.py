@@ -20,7 +20,7 @@ def data_ingest_MONC_on_single_grid(
     """read and pre-process MONC data
 
     :param fname_pattern: MONC NetCDF diagnostic file to read. can be a glob pattern. (should belong to the same simulation)
-    :param  requested_fields: list of fields to read and pre-process using sgs_tools naming convention. Defaults to ['u', 'v', 'w', 'theta']
+    :param  requested_fields: list of fields to read and pre-process using sgs_tools naming convention.
     """
     fname = list(
         Path(fname_pattern.root).glob(

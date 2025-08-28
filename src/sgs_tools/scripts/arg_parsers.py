@@ -7,8 +7,11 @@ def add_input_group(parser: ArgumentParser) -> _ArgumentGroup:
     fname.add_argument(
         "input_files",
         type=Path,
-        help=""" location of UM NetCDF diagnostic file(s). Recognizes glob patterns and walks directory trees, e.g. './my_file_p[br]*nc'
-              (All files in the pattern should belong to the same simulation). """,
+        help="""
+        location of UM NetCDF diagnostic file(s).
+        Recognizes glob patterns and walks directory trees, e.g. './my_file_p[br]*nc'
+        (All files in the pattern should belong to the same simulation).
+        """,
     )
 
     fname.add_argument(

@@ -99,8 +99,9 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
     output.add_argument(
         "output_path",
         type=Path,
-        help="""output directory, where to store post-processed results
-                will create any missing intermediate directories""",
+        help="""
+        output directory, where to store post-processed results
+        will create any missing intermediate directories""",
     )
     output.add_argument(
         "--overwrite_existing",
@@ -175,7 +176,8 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
         nargs="+",
         default=cross_spectra_fields,
         type=tuple_from_comma_str,
-        help="""Fields whose cross spectra to compute.
+        help="""
+        Fields whose cross spectra to compute.
         Use spaces to between cross spectra and commas between fields in each cross-spectrim, e.g.
         u,v v,w""",
     )
@@ -190,7 +192,8 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
     spectra.add_argument(
         "--radial_truncation",
         action="store_true",
-        help="""Truncation of radial horizontal spectrum.
+        help="""
+        Truncation of radial horizontal spectrum.
         If True will disregard wavenumbers above the maximum linear wavenumber.
         """,
     )
@@ -215,7 +218,8 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
         nargs="+",
         default=box_domain_scales,
         type=float,
-        help="""Anisotropy box filter and coarse-graining scales in fraction of the horizontal domain size.
+        help="""
+        Anisotropy box filter and coarse-graining scales in fraction of the horizontal domain size.
         Will round to nearest integer number of horizontal grid cells.
         Will combine all box scales and ignore entries which are less than `2 delta` apart.
         """,
@@ -226,7 +230,8 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
         nargs="+",
         default=box_meter_scales,
         type=float,
-        help="""Anisotropy box filter and coarse-graining scales in meters.
+        help="""
+        Anisotropy box filter and coarse-graining scales in meters.
         Will round to nearest integer number of horizontal grid cells.
         Will combine all box scales and ignore entries which are less than `2 delta` apartn
         """,
@@ -237,7 +242,8 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
         nargs="+",
         default=box_delta_scales,
         type=int,
-        help="""Anisotropy box filter and coarse-graining scales in units of horizontal grid spacing `delta`.
+        help="""
+        Anisotropy box filter and coarse-graining scales in units of horizontal grid spacing `delta`.
         Will combine all box scales and ignore entries which are less than `2 delta` apart.
         """,
     )
@@ -253,7 +259,8 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
         "--aniso_fname_out",
         default=anisotropy_name,
         type=Path,
-        help="""**Core** filename where to save the generated anisotropy eigen values. relative to output_path.
+        help="""
+        **Core** filename where to save the generated anisotropy eigen values. relative to output_path.
         Will append the filter label. Will set an '.nc' extension (whether given or not).
         """,
     )

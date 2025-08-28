@@ -74,10 +74,10 @@ def vertical_heat_flux(
     pot_temperature: xr.DataArray,
     hor_axes: Collection[str],
 ) -> xr.DataArray:
-    r"""compute vertical heat flux :math:`$w' \\theta'$` from :math:`w` and :math:`$\\theta$`
+    r"""compute vertical heat flux :math:`w' \theta'` from :math:`w` and :math:`\theta`
 
     :param vert_vel: vertical velocity field :math:`w`
-    :param pot_temperature: potential temperature :math:`$\\theta$`
+    :param pot_temperature: potential temperature :math:`\theta`
 
     :param hor_axes: labels of horizontal dimensions
         (w.r.t which to compute the fluctuations)
@@ -103,7 +103,7 @@ def Reynolds_fluct_stress(
     target_dims: list[str],
     fluctuation_axes: Collection[str],
 ) -> xr.DataArray:
-    r"""compute Reynolds stress :math:`$\mathbf{u}'_i \mathbf{u}'_j$`
+    r"""compute Reynolds stress :math:`\mathbf{u}'_i \mathbf{u}'_j`
 
     :param u: velocity field component 1
     :param v: velocity field component 2
@@ -140,7 +140,7 @@ def Fluct_TKE(
     target_dims: list[str],
     fluctuation_axes: Collection[str],
 ) -> xr.DataArray:
-    r"""compute fluctuating TKE :math:`$\mathbf{u}'_i \mathbf{u}'_i / 2$`
+    r"""compute fluctuating TKE :math:`\mathbf{u}'_i \mathbf{u}'_i / 2`
 
     :param u: velocity field component 1
     :param v: velocity field component 2

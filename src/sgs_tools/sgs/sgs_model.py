@@ -13,7 +13,7 @@ class SGSModel(Protocol):
     """
 
     def sgs_tensor(self, filter: Filter) -> xr.DataArray:
-        """compute model for SGS tensor :math:`$\\tau$` for a given filter
+        """compute model for SGS tensor :math:`\tau` for a given filter
 
         :param filter: compute the SGS tensor at this scale
         """

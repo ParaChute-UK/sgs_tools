@@ -19,8 +19,8 @@ from .util import _assert_coord_dx
 
 @dataclass(frozen=True)
 class SSquaredVelocityModel:
-    r"""Kosovic JFM 1997, 336 / Speziale 1991 Ann Rev Fluid Mech 23
-       compoment :math:` \\tau = (c_s \Delta) ^2 \mathrm{Traceless}[\overline{Sik}\overline{Skj}]`
+    r"""Kosovic JFM 1997, 336 and Speziale 1991 Ann Rev Fluid Mech 23
+    compoment :math:`\tau = (c_s \Delta)^2 \mathrm{Traceless}(\overline{S_{ik}} \overline{S_{kj}})`
 
     :ivar strain: grid-scale rate-of-strain
     :ivar cs: Smagorinsky coefficient
@@ -35,7 +35,7 @@ class SSquaredVelocityModel:
 
     def sgs_tensor(self, filter: Filter) -> xr.DataArray:
         r"""compute model for SGS tensor
-           :math:`\\tau = (c_s \Delta) ^2 \overline{Sik}\overline{Skj}`
+           :math:`\tau = (c_s \Delta) ^2 \overline{S_{ik}}\overline{S_{kj}}`
            for a given `filter` (which can be trivial, i.e. ``IdentityFilter``)
 
         :param filter: Filter used to separate "large" and "small" scales
@@ -55,7 +55,7 @@ class SSquaredVelocityModel:
 @dataclass(frozen=True)
 class SOmegaVelocityModel:
     r"""Kosovic JFM 1997, 336 / Speziale 1991 Ann Rev Fluid Mech 23
-       component :math:`\\tau = (c_s \Delta) ^2 \mathrm{Sym}[\overline{S_{ik}}\overline{\Omega_{kj}}]`
+    component :math:`\tau = (c_s \Delta) ^2 \mathrm{Sym}[\overline{S_{ik}}\overline{\Omega_{kj}}]`
 
     :ivar strain: grid-scale rate-of-strain
     :ivar rot: grid-scale rate-of-rotation
@@ -72,7 +72,7 @@ class SOmegaVelocityModel:
 
     def sgs_tensor(self, filter: Filter) -> xr.DataArray:
         r"""compute model for SGS tensor
-            :math:`$\\tau = (c_s \Delta) ^2 \mathrm{Sym}[\overline{S_{ik}}\overline{\Omega_{kj}}]$`
+            :math:`\tau = (c_s \Delta) ^2 \mathrm{Sym}[\overline{S_{ik}}\overline{\Omega_{kj}}]`
             for a given `filter` (which can be trivial, i.e. ``IdentityFilter``)
 
         :param filter: Filter used to separate "large" and "small" scales

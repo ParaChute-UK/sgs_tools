@@ -336,9 +336,17 @@ def post_process_fields(simulation: xr.Dataset) -> xr.Dataset:
         vector_dim="c1",
     )
 
-    simulation["vert_heat_flux"] = vertical_heat_flux(
-        simulation["w"], simulation["theta"], ["x", "y"]
-    )
+    if all([diag in simulation for diag in ["theta", "w"]]):
+        simulation["vert_heat_flux"] = vertical_heat_flux(
+            simulation["w"], simulation["theta"], ["x", "y"]
+        )
+    else:
+        print(
+            "Skipping missing inputs for cs_theta_diag: "
+            "['cs_theta_1', 'cs_theta_2', 'cs_theta_3']"
+        )
+        print("Available fields:", sorted(simulation, key=str))
+
     simulation["Sij"] = strain_from_vel(
         simulation["vel"],
         space_dims=["x", "y", "z"],
@@ -511,10 +519,19 @@ def run(args: Dict[str, Any]) -> None:
 
     if args["horizontal_spectra"]:
         with timer("Horizontal spectra", "s", "Horizontal spectra"):
-            cross_fields_list = set(
-                [f for fl in args["cross_spectra_fields"] for f in fl]
-            )
-            spec_fields = set(args["power_spectra_fields"]).union(cross_fields_list)
+            pspec_fields = [f for f in args["power_spectra_fields"] if f in simulation]
+            cspec_fields = [
+                s
+                for s in args["cross_spectra_fields"]
+                if s[0] in simulation and s[1] in simulation
+            ]
+            cross_fields_set = set([f for fl in cspec_fields for f in fl])
+            spec_fields = cross_fields_set.union(pspec_fields)
+            # get the missing fields from the power-spectra fields
+            # since they contain all the cross-spectra fields
+            spec_f_missing = set(args["power_spectra_fields"]) - set(pspec_fields)
+            if spec_f_missing:
+                print(f"Missing spectra fields {spec_f_missing}")
 
             output_path = output_dir / args["hspectra_fname_out"]
             if writer.check_filename(output_path) and not writer.overwrite:
@@ -523,8 +540,8 @@ def run(args: Dict[str, Any]) -> None:
                 spec_ds = spectra_1d_radial(
                     simulation[spec_fields],
                     hdims,
-                    args["power_spectra_fields"],
-                    args["cross_spectra_fields"],
+                    pspec_fields,
+                    cspec_fields,
                     radial_smooth_factor=args["radial_smooth_factor"],
                     radial_truncation=args["radial_truncation"],
                 )

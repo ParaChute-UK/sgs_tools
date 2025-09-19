@@ -322,15 +322,17 @@ def pre_process(args: dict[str, Any]) -> xr.Dataset:
             simulation = data_slice(simulation, args["t_range"], args["z_range"])
             simulation = gather_model_inputs(simulation)
     # chunk
+    chunks = {
+        "z": args["z_chunk_size"],
+        "t_0": args["t_chunk_size"],
+        "x": -1,
+        "y": -1,
+        "c1": -1,
+        "c2": -1,
+    }
+    # add caveate for degenerate t or z-slice that may drop a coordinate
     simulation = simulation.chunk(
-        chunks={
-            "z": args["z_chunk_size"],
-            "t_0": args["t_chunk_size"],
-            "x": -1,
-            "y": -1,
-            "c1": -1,
-            "c2": -1,
-        }
+        chunks={x: y for x, y in chunks.items() if x in simulation.dims}
     )
     simulation = simulation.persist()
     return simulation

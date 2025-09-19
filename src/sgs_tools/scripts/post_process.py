@@ -233,7 +233,7 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
         help="""
         Anisotropy box filter and coarse-graining scales in meters.
         Will round to nearest integer number of horizontal grid cells.
-        Will combine all box scales and ignore entries which are less than `2 delta` apartn
+        Will combine all box scales and ignore entries which are less than `2 delta` apart
         """,
     )
 

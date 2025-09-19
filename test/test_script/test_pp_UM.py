@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pytest
 
-import sgs_tools.scripts.post_process_UM as pp_um
+import sgs_tools.scripts.post_process as pp_um
 
 
 @pytest.fixture

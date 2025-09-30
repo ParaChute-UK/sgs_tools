@@ -9,6 +9,7 @@ from sgs_tools.diagnostics.anisotropy import anisotropy_analysis
 from sgs_tools.diagnostics.directional_profile import directional_profile
 from sgs_tools.diagnostics.spectra import spectra_1d_radial
 from sgs_tools.io.netcdf_writer import NetCDFWriter
+from sgs_tools.io.read import read
 from sgs_tools.util.timer import timer
 
 v_profile_fields_out = [
@@ -92,7 +93,6 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
                 """,
         formatter_class=ArgumentDefaultsHelpFormatter,
     )
-
     add_input_group(parser)
 
     output = parser.add_argument_group("Output datasets on disk")
@@ -233,7 +233,7 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
         help="""
         Anisotropy box filter and coarse-graining scales in meters.
         Will round to nearest integer number of horizontal grid cells.
-        Will combine all box scales and ignore entries which are less than `2 delta` apartn
+        Will combine all box scales and ignore entries which are less than `2 delta` apart
         """,
     )
 
@@ -270,7 +270,11 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
     # parse arguments into a dictionary
     args = vars(parser.parse_args(arguments))
 
-    # add any pottentially missing file extension
+    # check io group consistency
+    if args["input_format"] == "um":
+        assert args["h_resolution"] > 0, (
+            "Missing required a positive h_resolution for UM datasets"
+        )
     assert args["output_path"].is_dir()
 
     # parse negative values in the [t,z]_range
@@ -288,25 +292,6 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
     args["z_range="] = sorted(args["z_range"])
 
     return args
-
-
-def read(
-    fname: Path,
-    resolution: float,
-    requested_fields: list[str],
-    t_range: Sequence[float],
-    z_range: Sequence[float],
-) -> xr.Dataset:
-    from sgs_tools.io.um import data_ingest_UM_on_single_grid
-
-    simulation = data_ingest_UM_on_single_grid(
-        fname,
-        resolution,
-        requested_fields=requested_fields,
-    )
-    simulation = data_slice(simulation, t_range, z_range)
-
-    return simulation
 
 
 def data_slice(
@@ -351,9 +336,17 @@ def post_process_fields(simulation: xr.Dataset) -> xr.Dataset:
         vector_dim="c1",
     )
 
-    simulation["vert_heat_flux"] = vertical_heat_flux(
-        simulation["w"], simulation["theta"], ["x", "y"]
-    )
+    if all([diag in simulation for diag in ["theta", "w"]]):
+        simulation["vert_heat_flux"] = vertical_heat_flux(
+            simulation["w"], simulation["theta"], ["x", "y"]
+        )
+    else:
+        print(
+            "Skipping missing inputs for cs_theta_diag: "
+            "['cs_theta_1', 'cs_theta_2', 'cs_theta_3']"
+        )
+        print("Available fields:", sorted(simulation, key=str))
+
     simulation["Sij"] = strain_from_vel(
         simulation["vel"],
         space_dims=["x", "y", "z"],
@@ -491,11 +484,12 @@ def run(args: Dict[str, Any]) -> None:
 
     simulation = read(
         args["input_files"],
-        args["h_resolution"],
+        args["input_format"],
         list(all_fields),
-        args["t_range"],
-        args["z_range"],
+        resolution=args["h_resolution"],
     )
+    # slice to the requested sub-domain
+    simulation = data_slice(simulation, args["t_range"], args["z_range"])
     simulation = post_process_fields(simulation)
 
     writer = NetCDFWriter(overwrite=args["overwrite_existing"])
@@ -525,10 +519,19 @@ def run(args: Dict[str, Any]) -> None:
 
     if args["horizontal_spectra"]:
         with timer("Horizontal spectra", "s", "Horizontal spectra"):
-            cross_fields_list = set(
-                [f for fl in args["cross_spectra_fields"] for f in fl]
-            )
-            spec_fields = set(args["power_spectra_fields"]).union(cross_fields_list)
+            pspec_fields = [f for f in args["power_spectra_fields"] if f in simulation]
+            cspec_fields = [
+                s
+                for s in args["cross_spectra_fields"]
+                if s[0] in simulation and s[1] in simulation
+            ]
+            cross_fields_set = set([f for fl in cspec_fields for f in fl])
+            spec_fields = cross_fields_set.union(pspec_fields)
+            # get the missing fields from the power-spectra fields
+            # since they contain all the cross-spectra fields
+            spec_f_missing = set(args["power_spectra_fields"]) - set(pspec_fields)
+            if spec_f_missing:
+                print(f"Missing spectra fields {spec_f_missing}")
 
             output_path = output_dir / args["hspectra_fname_out"]
             if writer.check_filename(output_path) and not writer.overwrite:
@@ -537,8 +540,8 @@ def run(args: Dict[str, Any]) -> None:
                 spec_ds = spectra_1d_radial(
                     simulation[spec_fields],
                     hdims,
-                    args["power_spectra_fields"],
-                    args["cross_spectra_fields"],
+                    pspec_fields,
+                    cspec_fields,
                     radial_smooth_factor=args["radial_smooth_factor"],
                     radial_truncation=args["radial_truncation"],
                 )

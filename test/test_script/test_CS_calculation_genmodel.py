@@ -10,6 +10,8 @@ import sgs_tools.scripts.CS_calculation_genmodel as cs_gen
 def test_args():
     return [
         "test/test_script/df667_800m_L63_Slicea_p*.nc",
+        "um",
+        "--h_resolution",
         "800",
         "__test_cs_gen",
         "--z_chunk_size",
@@ -19,8 +21,6 @@ def test_args():
         "--z_range",
         "0",
         "1000",
-        "--input_format",
-        "um",
         "--plot_path",
         "__test_cs_gen/plots",
         "--filter_type",

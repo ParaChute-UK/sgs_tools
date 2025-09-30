@@ -3,7 +3,6 @@ from pathlib import Path
 from typing import Any, Dict, Sequence
 
 import matplotlib.pyplot as plt
-import numpy as np
 import xarray as xr
 from dask.diagnostics import ProgressBar
 from numpy import inf
@@ -13,9 +12,7 @@ from sgs_tools.geometry.staggered_grid import (
     compose_vector_components_on_grid,
 )
 from sgs_tools.geometry.vector_calculus import grad_scalar
-from sgs_tools.io.monc import data_ingest_MONC_on_single_grid
-from sgs_tools.io.sgs import data_ingest_SGS
-from sgs_tools.io.um import data_ingest_UM_on_single_grid
+from sgs_tools.io.read import read
 from sgs_tools.physics.fields import omega_from_vel, strain_from_vel
 from sgs_tools.scripts.arg_parsers import (
     add_dask_group,
@@ -64,8 +61,8 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
         formatter_class=ArgumentDefaultsHelpFormatter,
     )
 
-    fname = add_input_group(parser)
-    fname.add_argument(
+    io = add_input_group(parser)
+    io.add_argument(
         "output_path",
         type=Path,
         help="""
@@ -73,7 +70,7 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
         Will create/overwrite existing file and
         create any missing intermediate directories""",
     )
-    fname.add_argument(
+    io.add_argument(
         "--input_format", type=str, choices=["um", "monc", "sgs"], default="um"
     )
 
@@ -130,6 +127,23 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
     # parse arguments into a dictionary
     args = vars(parser.parse_args(arguments))
 
+    # check io group consistency
+    if args["input_format"] == "um":
+        assert args["h_resolution"] > 0, (
+            "Missing required a positive h_resolution for UM datasets"
+        )
+
+    # parse negative values in the [t,z]_range
+    if args["t_range"][0] < 0:
+        args["t_range"][0] = -inf
+    if args["t_range"][1] < 0:
+        args["t_range"][1] = inf
+
+    if args["z_range"][0] < 0:
+        args["z_range"][0] = -inf
+    if args["z_range"][1] < 0:
+        args["z_range"][1] = inf
+
     # model parsing:
     if "all" in args["sgs_model"]:
         args["sgs_model"] = set(vel_models + theta_models)
@@ -159,16 +173,6 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
 
     assert len(args["filter_scales"]) == len(args["regularize_filter_scales"])
 
-    # parse negative values in the [t,z]_range
-    if args["t_range"][0] < 0:
-        args["t_range"][0] = -inf
-    if args["t_range"][1] < 0:
-        args["t_range"][1] = inf
-
-    if args["z_range"][0] < 0:
-        args["z_range"][0] = -inf
-    if args["z_range"][1] < 0:
-        args["z_range"][1] = inf
     return args
 
 
@@ -242,35 +246,47 @@ def data_slice(
 def gather_model_inputs(simulation: xr.Dataset) -> xr.Dataset:
     # ensure velocity components are co-located
     simple_dims = ["x", "y", "z"]  # coordinates already exist in simulation
-    vel = compose_vector_components_on_grid(
-        [simulation["u"], simulation["v"], simulation["w"]],
-        simple_dims,
-        name="vel",
-        vector_dim="c1",
-    )
+    if "vel" in simulation:
+        vel = simulation["vel"]
+    else:
+        vel = compose_vector_components_on_grid(
+            [simulation["u"], simulation["v"], simulation["w"]],
+            simple_dims,
+            name="vel",
+            vector_dim="c1",
+        )
 
     # compute strain, rotation and potential temperature gradient
-    sij = strain_from_vel(
-        vel,
-        space_dims=simple_dims,
-        vec_dim="c1",
-        new_dim="c2",
-        make_traceless=True,
-    )
+    if "sij" in simulation:
+        sij = simulation["sij"]
+    else:
+        sij = strain_from_vel(
+            vel,
+            space_dims=simple_dims,
+            vec_dim="c1",
+            new_dim="c2",
+            make_traceless=True,
+        )
 
-    omegaij = omega_from_vel(
-        vel,
-        space_dims=simple_dims,
-        vec_dim="c1",
-        new_dim="c2",
-    )
+    if "omegaij" in simulation:
+        omegaij = simulation["omegaij"]
+    else:
+        omegaij = omega_from_vel(
+            vel,
+            space_dims=simple_dims,
+            vec_dim="c1",
+            new_dim="c2",
+        )
 
-    grad_theta = grad_scalar(
-        simulation["theta"],
-        space_dims=simple_dims,
-        new_dim_name="c1",
-        name="grad_theta",
-    )
+    if "grad_theta" in simulation:
+        grad_theta = simulation["grad_theta"]
+    else:
+        grad_theta = grad_scalar(
+            simulation["theta"],
+            space_dims=simple_dims,
+            new_dim_name="c1",
+            name="grad_theta",
+        )
 
     return xr.Dataset(
         {
@@ -283,48 +299,40 @@ def gather_model_inputs(simulation: xr.Dataset) -> xr.Dataset:
     )
 
 
-def read(args: dict[str, Any]) -> xr.Dataset:
-    if args["input_format"] == "sgs":
-        # read native SGS_tools  files
-        simulation = data_ingest_SGS(
-            args["input_files"],
-            requested_fields=["vel", "theta", "sij", "omegaij", "theta", "grad_theta"],
-        )
-        simulation = data_slice(simulation, args["t_range"], args["z_range"])
-    else:
-        if args["input_format"] == "um":
-            # read UM stash files
-            simulation = data_ingest_UM_on_single_grid(
-                args["input_files"],
-                args["h_resolution"],
-                requested_fields=["u", "v", "w", "theta"],
-            )
-        elif args["input_format"] == "monc":
-            # read MONC files
-            meta, simulation = data_ingest_MONC_on_single_grid(
-                args["input_files"],
-                requested_fields=["u", "v", "w", "theta"],
-            )
-            # overwrite resolution
-            assert np.isclose(meta["dxx"], meta["dyy"])
-            args["h_resolution"] = meta["dxx"]
-        else:
-            raise ValueError(f"Unsupported input format {args['input_format']}")
+def pre_process(args: dict[str, Any]) -> xr.Dataset:
+    req_fields = {
+        "um": ["u", "v", "w", "theta", "theta"],
+        "monc": ["u", "v", "w", "theta", "theta"],
+        "sgs": ["vel", "theta", "sij", "omegaij", "theta", "grad_theta"],
+    }
+    simulation = read(
+        args["input_files"],
+        args["input_format"],
+        requested_fields=req_fields[args["input_format"]],
+        resolution=args["h_resolution"],
+    )
 
-        with ProgressBar():
+    # overwrite resolution if recorded during read
+    if "h_resolution" in simulation.attrs:
+        args["h_resolution"] = simulation.attrs["h_resolution"]
+
+    with ProgressBar():
+        with timer("Extract grid-based fields", "s"):
+            # slice to the requested sub-domain
             simulation = data_slice(simulation, args["t_range"], args["z_range"])
-            with timer("Extract grid-based fields", "s"):
-                simulation = gather_model_inputs(simulation)
+            simulation = gather_model_inputs(simulation)
     # chunk
+    chunks = {
+        "z": args["z_chunk_size"],
+        "t_0": args["t_chunk_size"],
+        "x": -1,
+        "y": -1,
+        "c1": -1,
+        "c2": -1,
+    }
+    # add caveate for degenerate t or z-slice that may drop a coordinate
     simulation = simulation.chunk(
-        chunks={
-            "z": args["z_chunk_size"],
-            "t_0": args["t_chunk_size"],
-            "x": -1,
-            "y": -1,
-            "c1": -1,
-            "c2": -1,
-        }
+        chunks={x: y for x, y in chunks.items() if x in simulation.dims}
     )
     simulation = simulation.persist()
     return simulation
@@ -481,7 +489,7 @@ def run(args: Dict[str, Any]) -> None:
     # read and pre-process simulation
     # read UM stasth files: data
     with timer("Read Dataset", "s"):
-        simulation = read(args)
+        simulation = pre_process(args)
 
     # check scales make sense
     nhoriz = min(simulation["x"].shape[0], simulation["y"].shape[0])

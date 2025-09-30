@@ -24,6 +24,6 @@ def data_ingest_SGS(
     )
 
     ds = xr.open_mfdataset(fname, chunks=chunks, parallel=True, engine="h5netcdf")
-    ds = restrict_ds(ds, requested_fields)
+    ds, _ = restrict_ds(ds, requested_fields)
 
     return ds

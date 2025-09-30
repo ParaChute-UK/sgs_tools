@@ -4,6 +4,11 @@ IO
 :mod:`.io`
 ---------------
 
+Reader
+----------------
+.. automodule:: sgs_tools.io.read
+   :members:
+
 UM
 ----------------
 .. automodule:: sgs_tools.io.um

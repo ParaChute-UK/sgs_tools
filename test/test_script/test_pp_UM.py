@@ -1,4 +1,3 @@
-import shutil
 from pathlib import Path
 
 import pytest
@@ -11,7 +10,7 @@ def test_args():
     return [
         "test/test_script/df667_800m_L63_Slicea_pr.nc",
         "um",
-        "__test_pp_UM",
+        "pp",
         "--h_resolution",
         "800",
         "--overwrite_existing",
@@ -57,20 +56,15 @@ def test_args():
     ]
 
 
-def test_main_full_pipeline(test_args):
-    tmp_path = Path(test_args[2])
+def test_main_full_pipeline(test_args, master_output_dir):
+    tmp_path = master_output_dir / Path(test_args[2])
     tmp_path.mkdir(exist_ok=False, parents=False)
-    try:
-        # Execute
-        args = pp_um.parse_args(test_args)
-        pp_um.run(args)
+    test_args[2] = str(tmp_path)
+    # Execute
+    args = pp_um.parse_args(test_args)
+    pp_um.run(args)
 
-        # Assert outputs exist
-        assert (tmp_path / args["vprofile_fname_out"]).exists()
-        assert (tmp_path / args["hspectra_fname_out"]).exists()
-        assert len(list(tmp_path.glob(f"{args['aniso_fname_out'].stem}*.nc"))) > 0
-
-    finally:
-        # Cleanup
-        if tmp_path.exists():
-            shutil.rmtree(tmp_path)
+    # Assert outputs exist
+    assert (tmp_path / args["vprofile_fname_out"]).exists()
+    assert (tmp_path / args["hspectra_fname_out"]).exists()
+    assert len(list(tmp_path.glob(f"{args['aniso_fname_out'].stem}*.nc"))) > 0

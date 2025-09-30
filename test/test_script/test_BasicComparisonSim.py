@@ -1,4 +1,3 @@
-import shutil
 from pathlib import Path
 
 import pytest
@@ -13,7 +12,7 @@ def test_args():
         "test/test_script/df667_800m_L63_Slicea_p*.nc",
         "800",
         "--plot_path",
-        "__test_basic_comp_sim",
+        "basic_comp_sim",
         "--z_chunk_size",
         "10",
         "--t_chunk_size",
@@ -21,20 +20,15 @@ def test_args():
     ]
 
 
-def test_main_full_pipeline(test_args):
+def test_main_full_pipeline(test_args, master_output_dir):
     # check test output directory is clean, so we can safely wipe it on exit
-    tmp_path = Path(test_args[4])
+    tmp_path = master_output_dir / Path(test_args[4])
     tmp_path.mkdir(exist_ok=False, parents=False)
+    test_args[4] = str(tmp_path)
 
-    try:
-        # parse clargs
-        args = comp.parse_args(test_args)
-        # execute main
-        comp.run(args)
-        # Assert outputs exists
-        assert len(list(args["plot_path"].glob("*.png"))) > 0
-
-    finally:
-        # Cleanup
-        if tmp_path.exists():
-            shutil.rmtree(tmp_path)
+    # parse clargs
+    args = comp.parse_args(test_args)
+    # execute main
+    comp.run(args)
+    # Assert outputs exists
+    assert len(list(args["plot_path"].glob("*.png"))) > 0

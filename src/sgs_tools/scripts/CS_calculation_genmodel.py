@@ -467,7 +467,7 @@ def plot(args: dict[str, Any]) -> None:
         mpath = args["output_path"] / f"{model_name_map[model]}.nc"
 
         with timer(f"Plotting {model}", "s"):
-            model_data = xr.open_mfdataset(mpath)
+            model_data = xr.open_mfdataset(mpath, compat="no_conflicts")
             model_data = model_data[model]
             mean = model_data.mean(["x", "y"])
             if "cdim" in mean.dims:

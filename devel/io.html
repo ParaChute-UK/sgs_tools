@@ -423,6 +423,41 @@
 <section id="id1">
 <h2><code class="xref py py-mod docutils literal notranslate"><span class="pre">io</span></code><a class="headerlink" href="#id1" title="Link to this heading">#</a></h2>
 </section>
+<section id="module-sgs_tools.io.read">
+<span id="reader"></span><h2>Reader<a class="headerlink" href="#module-sgs_tools.io.read" title="Link to this heading">#</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="sgs_tools.io.read.read">
+<span class="sig-name descname"><span class="pre">read</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_files</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_format</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">requested_fields</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/io/read.html#read"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.io.read.read" title="Link to this definition">#</a></dt>
+<dd><p>Read simulation data from input files and return an xarray Dataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input_files</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code></span>) – Path to the input file(s) containing simulation data.</p></li>
+<li><p><strong>input_format</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – Format of the input data. Supported formats are:
+<code class="docutils literal notranslate"><span class="pre">sgs</span></code>, <code class="docutils literal notranslate"><span class="pre">um</span></code>, <code class="docutils literal notranslate"><span class="pre">monc</span></code></p></li>
+<li><p><strong>requested_fields</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span>) – List of variable names to extract from the input data.</p></li>
+<li><p><strong>kwargs</strong> – Additional keyword arguments depending on the input format.
+The <code class="docutils literal notranslate"><span class="pre">um</span></code> format, requires <code class="docutils literal notranslate"><span class="pre">resolution</span></code> (float) specifying horizontal grid spacing.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>xarray Dataset containing the requested fields and metadata, including
+the horizontal resolution stored in <code class="docutils literal notranslate"><span class="pre">attrs[&quot;h_resolution&quot;]</span></code>.</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<ul class="simple">
+<li><p>For <code class="docutils literal notranslate"><span class="pre">monc</span></code> format, resolution is inferred from metadata and assumed isotropic in x and y</p></li>
+<li><p>For <code class="docutils literal notranslate"><span class="pre">um</span></code> format, resolution must be explicitly provided via <cite>kwargs</cite>.</p></li>
+</ul>
+</div>
+</dd></dl>
+
+</section>
 <section id="module-sgs_tools.io.um">
 <span id="um"></span><h2>UM<a class="headerlink" href="#module-sgs_tools.io.um" title="Link to this heading">#</a></h2>
 <dl class="py data">
@@ -594,15 +629,34 @@ rename coordinates with reference to a logically-cartesian grid</p>
 <section id="module-sgs_tools.io.monc">
 <span id="monc"></span><h2>MONC<a class="headerlink" href="#module-sgs_tools.io.monc" title="Link to this heading">#</a></h2>
 <dl class="py function">
-<dt class="sig sig-object py" id="sgs_tools.io.monc.data_ingest_MONC_on_single_grid">
-<span class="sig-name descname"><span class="pre">data_ingest_MONC_on_single_grid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname_pattern</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">requested_fields</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['u',</span> <span class="pre">'v',</span> <span class="pre">'w',</span> <span class="pre">'theta']</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chunks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'auto'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/io/monc.html#data_ingest_MONC_on_single_grid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.io.monc.data_ingest_MONC_on_single_grid" title="Link to this definition">#</a></dt>
+<dt class="sig sig-object py" id="sgs_tools.io.monc.data_ingest_MONC">
+<span class="sig-name descname"><span class="pre">data_ingest_MONC</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname_pattern</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">requested_fields</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['u',</span> <span class="pre">'v',</span> <span class="pre">'w',</span> <span class="pre">'theta']</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chunks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'auto'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/io/monc.html#data_ingest_MONC"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.io.monc.data_ingest_MONC" title="Link to this definition">#</a></dt>
 <dd><p>read and pre-process MONC data</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>fname_pattern</strong> – MONC NetCDF diagnostic file to read. can be a glob pattern. (should belong to the same simulation)</p></li>
 <li><p><strong>requested_fields</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span>) – list of fields to read and pre-process using sgs_tools naming convention.</p></li>
+<li><p><strong>chunks</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></span>) – chunking of datasets “auto” or a dictionary of {coordinate: chunks}.</p></li>
 </ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sgs_tools.io.monc.data_ingest_MONC_on_single_grid">
+<span class="sig-name descname"><span class="pre">data_ingest_MONC_on_single_grid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname_pattern</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">requested_fields</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['u',</span> <span class="pre">'v',</span> <span class="pre">'w',</span> <span class="pre">'theta']</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chunks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'auto'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/io/monc.html#data_ingest_MONC_on_single_grid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.io.monc.data_ingest_MONC_on_single_grid" title="Link to this definition">#</a></dt>
+<dd><p>read pre-process MONC data and interpolate to a cell-centred grid</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fname_pattern</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code></span>) – MONC NetCDF diagnostic file(s) to read. will be interpreted as a glob pattern. (should belong to the same simulation)</p></li>
+<li><p><strong>requested_fields</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span>) – list of fields to read and pre-process. Defaults to [‘u’, ‘v’, ‘w’, ‘theta’]</p></li>
+<li><p><strong>chunks</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></span>) – chunking of datasets “auto” or a dictionary of {coordinate: chunks}.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></span></p>
 </dd>
 </dl>
 </dd></dl>
@@ -721,6 +775,10 @@ rename coordinates with reference to a logically-cartesian grid</p>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1"><code class="xref py py-mod docutils literal notranslate"><span class="pre">io</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-sgs_tools.io.read">Reader</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.io.read.read"><code class="docutils literal notranslate"><span class="pre">read()</span></code></a></li>
+</ul>
+</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-sgs_tools.io.um">UM</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.io.um.base_fields_dict"><code class="docutils literal notranslate"><span class="pre">base_fields_dict</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.io.um.Water_dict"><code class="docutils literal notranslate"><span class="pre">Water_dict</span></code></a></li>
@@ -738,6 +796,7 @@ rename coordinates with reference to a logically-cartesian grid</p>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-sgs_tools.io.monc">MONC</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.io.monc.data_ingest_MONC"><code class="docutils literal notranslate"><span class="pre">data_ingest_MONC()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.io.monc.data_ingest_MONC_on_single_grid"><code class="docutils literal notranslate"><span class="pre">data_ingest_MONC_on_single_grid()</span></code></a></li>
 </ul>
 </li>

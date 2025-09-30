@@ -436,7 +436,7 @@
     <span class="p">)</span>
 
     <span class="n">ds</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">open_mfdataset</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">chunks</span><span class="o">=</span><span class="n">chunks</span><span class="p">,</span> <span class="n">parallel</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">engine</span><span class="o">=</span><span class="s2">&quot;h5netcdf&quot;</span><span class="p">)</span>
-    <span class="n">ds</span> <span class="o">=</span> <span class="n">restrict_ds</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">requested_fields</span><span class="p">)</span>
+    <span class="n">ds</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">restrict_ds</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">requested_fields</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">ds</span></div>
 

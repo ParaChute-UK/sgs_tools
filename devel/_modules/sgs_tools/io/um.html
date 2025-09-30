@@ -630,8 +630,9 @@
 <span class="sd">    :return: dataset with renamed variables</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">intersection</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">fields</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">ds</span><span class="p">]</span>
-    <span class="c1"># print (&quot;Missing fields:&quot;, {k for k in fields if k not in intersection})</span>
-    <span class="k">return</span> <span class="n">ds</span><span class="p">[</span><span class="n">intersection</span><span class="p">]</span></div>
+    <span class="n">missing_fields</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">fields</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">intersection</span><span class="p">}</span>
+    <span class="c1"># print (&quot;Missing fields:&quot;, missing_fields)</span>
+    <span class="k">return</span> <span class="n">ds</span><span class="p">[</span><span class="n">intersection</span><span class="p">],</span> <span class="n">missing_fields</span></div>
 
 
 
@@ -747,7 +748,7 @@
     <span class="n">simulation</span> <span class="o">=</span> <span class="n">standardize_varnames</span><span class="p">(</span><span class="n">simulation</span><span class="p">)</span>
 
     <span class="c1"># restrict to interesting fields and rename to simple names</span>
-    <span class="n">simulation</span> <span class="o">=</span> <span class="n">restrict_ds</span><span class="p">(</span><span class="n">simulation</span><span class="p">,</span> <span class="n">fields</span><span class="o">=</span><span class="n">requested_fields</span><span class="p">)</span>
+    <span class="n">simulation</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">restrict_ds</span><span class="p">(</span><span class="n">simulation</span><span class="p">,</span> <span class="n">fields</span><span class="o">=</span><span class="n">requested_fields</span><span class="p">)</span>
     <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">simulation</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;None of the requested fields are available&quot;</span>
     <span class="c1"># unify coordinates</span>
     <span class="n">simulation</span> <span class="o">=</span> <span class="n">unify_coords</span><span class="p">(</span><span class="n">simulation</span><span class="p">,</span> <span class="n">res</span><span class="o">=</span><span class="n">res</span><span class="p">)</span>

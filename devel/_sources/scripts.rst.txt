@@ -14,12 +14,12 @@ Post-Processing
    :title: CS_calculation_genmodel.py
 
 .. sphinx_argparse_cli::
-   :module: sgs_tools.scripts.post_process_UM
+   :module: sgs_tools.scripts.post_process
    :func: parse_args
    :hook:
-   :prog: post_process_UM
+   :prog: post_process
    :group_title_prefix:
-   :title: post_process_UM.py
+   :title: post_process.py
 
 .. sphinx_argparse_cli::
    :module: sgs_tools.scripts.BasicComparisonSimAnalysis

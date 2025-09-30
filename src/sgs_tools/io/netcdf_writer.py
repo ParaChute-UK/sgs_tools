@@ -12,6 +12,7 @@ class NetCDFWriter:
     """
 
     overwrite: bool = False
+    verbose: bool = False
 
     def check_filename(self, filename: Path) -> bool:
         """Check if the file exists.
@@ -37,3 +38,5 @@ class NetCDFWriter:
             engine="netcdf4",
             auto_complex=True,
         )
+        if self.verbose:
+            print(f"Wrote: {filename}")

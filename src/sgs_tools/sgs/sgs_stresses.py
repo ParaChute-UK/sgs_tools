@@ -74,4 +74,4 @@ def momentum_stresses(
         )
         output.append(strain)
 
-    return xr.merge(output).chunk({vec_dim: -1, new_dim: -1})
+    return xr.merge(output, compat="no_conflicts").chunk({vec_dim: -1, new_dim: -1})

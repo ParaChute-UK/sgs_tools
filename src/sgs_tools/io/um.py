@@ -274,7 +274,7 @@ def unify_coords(ds: xr.Dataset, res: float) -> xr.Dataset:
         ds_cent = ds_cent.swap_dims({"x_theta": "x_centre", "y_theta": "y_centre"})
 
     if ds_stag and ds_cent:
-        ds = xr.merge([ds_stag, ds_cent])
+        ds = xr.merge([ds_stag, ds_cent], compat="no_conflicts")
     elif ds_stag:
         ds = ds_stag
     elif ds_cent:

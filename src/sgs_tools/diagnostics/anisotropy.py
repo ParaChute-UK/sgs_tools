@@ -54,6 +54,6 @@ def anisotropy_analysis(
             eigen_values[v].attrs["name"] = name_dic[tensors_view[v].name]
 
         # triggers async computation now
-        # evals = xr.merge(eigen_values).persist()
+        # evals = xr.merge(eigen_values, compat='no_conflicts').persist()
         evals = eigen_values.persist()
     return evals  # type: ignore

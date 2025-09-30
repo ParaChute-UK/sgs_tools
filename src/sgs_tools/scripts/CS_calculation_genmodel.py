@@ -335,7 +335,7 @@ def pre_process(args: dict[str, Any]) -> xr.Dataset:
         "c1": -1,
         "c2": -1,
     }
-    # add caveate for degenerate t or z-slice that may drop a coordinate
+    # add caveat for degenerate t or z-slice that may drop a coordinate
     simulation = simulation.chunk(
         chunks={x: y for x, y in chunks.items() if x in simulation.dims}
     )
@@ -444,6 +444,8 @@ def compute_cs(
 
 def plot(args: dict[str, Any]) -> None:
     row_lbl = "scale"
+
+    assert args["plot_path"] is not None or args["plot_show"]
 
     def wrap_label(text: str, width: int = 20) -> str:
         """

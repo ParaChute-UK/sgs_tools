@@ -236,82 +236,82 @@ def data_slice(
         if t in ds:
             tslice = (t_range[0] <= ds[t]) * (ds[t] <= t_range[1])
             ds = ds.where(tslice, drop=True)
-        assert not all(ds[var].size == 0 for var in ds), (
-            f"Data t-slice {t_range} results in empty variables. "
-            "Consider relaxing t_range"
-        )
+    assert not all(ds[var].size == 0 for var in ds), (
+        f"Data t-slice {t_range} results in empty variables. Consider relaxing t_range"
+    )
     return ds
 
 
-def gather_model_inputs(simulation: xr.Dataset) -> xr.Dataset:
+def gather_model_inputs(simulation: xr.Dataset, req_fields: list[str]) -> xr.Dataset:
     # ensure velocity components are co-located
     simple_dims = ["x", "y", "z"]  # coordinates already exist in simulation
-    if "vel" in simulation:
-        vel = simulation["vel"]
-    else:
-        vel = compose_vector_components_on_grid(
-            [simulation["u"], simulation["v"], simulation["w"]],
-            simple_dims,
-            name="vel",
-            vector_dim="c1",
-        )
+    ds = xr.Dataset()
 
-    # compute strain, rotation and potential temperature gradient
-    if "sij" in simulation:
-        sij = simulation["sij"]
-    else:
-        sij = strain_from_vel(
-            vel,
-            space_dims=simple_dims,
-            vec_dim="c1",
-            new_dim="c2",
-            make_traceless=True,
-        )
+    if "vel" in req_fields:
+        if "vel" in simulation:
+            ds["vel"] = simulation["vel"]
+        else:
+            ds["vel"] = compose_vector_components_on_grid(
+                [simulation["u"], simulation["v"], simulation["w"]],
+                simple_dims,
+                name="vel",
+                vector_dim="c1",
+            )
 
-    if "omegaij" in simulation:
-        omegaij = simulation["omegaij"]
-    else:
-        omegaij = omega_from_vel(
-            vel,
-            space_dims=simple_dims,
-            vec_dim="c1",
-            new_dim="c2",
-        )
+    if "sij" in req_fields:
+        # compute strain, rotation and potential temperature gradient
+        if "sij" in simulation:
+            ds["sij"] = simulation["sij"]
+        else:
+            ds["sij"] = strain_from_vel(
+                ds["vel"],
+                space_dims=simple_dims,
+                vec_dim="c1",
+                new_dim="c2",
+                make_traceless=True,
+            )
 
-    if "grad_theta" in simulation:
-        grad_theta = simulation["grad_theta"]
-    else:
-        grad_theta = grad_scalar(
-            simulation["theta"],
-            space_dims=simple_dims,
-            new_dim_name="c1",
-            name="grad_theta",
-        )
+    if "omegaij" in req_fields:
+        if "omegaij" in simulation:
+            ds["omegaij"] = simulation["omegaij"]
+        else:
+            ds["omegaij"] = omega_from_vel(
+                ds["vel"],
+                space_dims=simple_dims,
+                vec_dim="c1",
+                new_dim="c2",
+            )
 
-    return xr.Dataset(
-        {
-            "vel": vel,
-            "theta": simulation["theta"],
-            "sij": sij,
-            "omegaij": omegaij,
-            "grad_theta": grad_theta,
-        }
-    )
+    if "theta" in req_fields:
+        ds["theta"] = simulation["theta"]
+
+    if "grad_theta" in req_fields:
+        if "grad_theta" in simulation:
+            ds["grad_theta"] = simulation["grad_theta"]
+        else:
+            ds["grad_theta"] = grad_scalar(
+                ds["theta"],
+                space_dims=simple_dims,
+                new_dim_name="c1",
+                name="grad_theta",
+            )
+
+    return ds
 
 
 def pre_process(args: dict[str, Any]) -> xr.Dataset:
     req_fields = {
-        "um": ["u", "v", "w", "theta", "theta"],
-        "monc": ["u", "v", "w", "theta", "theta"],
+        "um": ["u", "v", "w", "theta"],
+        "monc": ["u", "v", "w", "theta"],
         "sgs": ["vel", "theta", "sij", "omegaij", "theta", "grad_theta"],
     }
+
     simulation = read(
         args["input_files"],
         args["input_format"],
         requested_fields=req_fields[args["input_format"]],
         resolution=args["h_resolution"],
     )
-
     # overwrite resolution if recorded during read
     if "h_resolution" in simulation.attrs:
         args["h_resolution"] = simulation.attrs["h_resolution"]
@@ -320,7 +320,12 @@ def pre_process(args: dict[str, Any]) -> xr.Dataset:
         with timer("Extract grid-based fields", "s"):
             # slice to the requested sub-domain
             simulation = data_slice(simulation, args["t_range"], args["z_range"])
-            simulation = gather_model_inputs(simulation)
+            model_req_fields = []
+            if args["sgs_model"].intersection(vel_models):
+                model_req_fields += ["vel", "sij", "omegaij"]
+            if args["sgs_model"].intersection(theta_models):
+                model_req_fields += ["theta", "grad_theta"]
+            simulation = gather_model_inputs(simulation, model_req_fields)
     # chunk
     chunks = {
         "z": args["z_chunk_size"],

@@ -14,6 +14,7 @@ from sgs_tools.util.timer import timer
 
 v_profile_fields_out = [
     "vel",
+    "vel_horiz",
     "theta",
     "s",
     "vert_heat_flux",
@@ -335,6 +336,8 @@ def post_process_fields(simulation: xr.Dataset) -> xr.Dataset:
         target_dims=["x", "y", "z"],
         vector_dim="c1",
     )
+    # horizontal wind
+    simulation["vel_horiz"] = (simulation["vel"].sel(c1=[1, 2]) ** 2).sum("c1") ** 0.5
 
     if all([diag in simulation for diag in ["theta", "w"]]):
         simulation["vert_heat_flux"] = vertical_heat_flux(

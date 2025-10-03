@@ -462,7 +462,7 @@ def choose_filter_set(
     # Box filters
     # stencil size is (filter_scale + 1)delta under finite-difference data interpretation
     if "box" in filter_shapes:
-        box_scales = [x for x in box_scales if x <= hminsize // 2]
+        box_scales = [x for x in box_scales if x <= hminsize // 10]
         filter_dic = filter_dic | {
             f"Box{scale}delta": Filter(
                 box_kernel([int(scale) + 1 for x in hdims]), hdims

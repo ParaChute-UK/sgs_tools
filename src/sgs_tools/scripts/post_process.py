@@ -441,7 +441,7 @@ def choose_filter_set(
     # only allows scales at least 2 (delta_<x>) apart
     # order of loop determines precedence
     for x in set(domain_scales + meter_scales + list(box_delta_scales)):
-        if x > 1 and x < hminsize:
+        if x > 1 and x <= hminsize:
             if not box_scales or np.min(np.abs([x - y for y in box_scales])) >= 2:
                 box_scales += [x]
 
@@ -462,7 +462,7 @@ def choose_filter_set(
     # Box filters
     # stencil size is (filter_scale + 1)delta under finite-difference data interpretation
     if "box" in filter_shapes:
-        box_scales = [x for x in box_scales if x < hminsize]
+        box_scales = [x for x in box_scales if x <= hminsize // 2]
         filter_dic = filter_dic | {
             f"Box{scale}delta": Filter(
                 box_kernel([int(scale) + 1 for x in hdims]), hdims

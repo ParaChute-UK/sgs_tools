@@ -6,7 +6,6 @@ import f90nml  # type: ignore
 from numpy import linspace
 
 from sgs_tools.scripts.arg_parsers import add_version_group
-from sgs_tools.util.gitinfo import print_git_state
 from sgs_tools.util.path_utils import add_extension
 
 
@@ -56,9 +55,6 @@ def const_level_sets(n_rho):
 
 def main():
     args = parser()
-    if args["version"]:
-        print_git_state(args["version"])
-        exit()
 
     # create namelist
     nml = f90nml.Namelist()

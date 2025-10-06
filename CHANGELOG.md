@@ -6,9 +6,12 @@ All notable changes to this project are documented in this file.
 
 #### Added
   - a central read dispatcher (#33)
+  - dynamic version CL arg and tags in netcdf outputs of CLIs
 
 #### Fixes
-  - fix: turn geometry and diagnostics into sub-packages (#34)
+  - turn geometry and diagnostics into sub-packages (#34)
+  - dynamic versioning (instructions and docs)
+  - enhancements to post_process
 
 ### [0.1.0] - 2025-08-22
 

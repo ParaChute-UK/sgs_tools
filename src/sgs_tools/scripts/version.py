@@ -5,7 +5,8 @@ from importlib.metadata import version as get_poetry_version
 from sgs_tools.scripts.arg_parsers import add_version_group
 from sgs_tools.util.gitinfo import print_git_state
 
-if __name__ == "__main__":
+
+def main():
     # Poetry dynamic version
     poetry_ver = get_poetry_version("sgs_tools")  # dynamic version from PDV
     print(f"SGS_tools: {poetry_ver}")
@@ -14,3 +15,7 @@ if __name__ == "__main__":
     add_version_group(parser)
     args = parser.parse_args()
     print_git_state(max(args.version, 0))
+
+
+if __name__ == "__main__":
+    main()

@@ -88,13 +88,18 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
         ArgumentTypeError,
     )
 
-    from sgs_tools.scripts.arg_parsers import add_dask_group, add_input_group
+    from sgs_tools.scripts.arg_parsers import (
+        add_dask_group,
+        add_input_group,
+        add_version_group,
+    )
 
     parser = ArgumentParser(
         description="""Post process a simulation and save result as NetCDF files
                 """,
         formatter_class=ArgumentDefaultsHelpFormatter,
     )
+    add_version_group(parser)
     add_input_group(parser)
 
     output = parser.add_argument_group("Output datasets on disk")

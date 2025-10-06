@@ -1,4 +1,6 @@
+import json
 import subprocess
+from datetime import datetime
 from pathlib import Path
 
 
@@ -51,7 +53,7 @@ def _diff_untracked(root):
     return "\n".join(diffs).strip()
 
 
-def get_git_state(level=0):
+def get_git_state(verbosity=0):
     root = _root()
     if not root:
         return "<no git repo>"
@@ -61,18 +63,18 @@ def get_git_state(level=0):
     clean = not bool(status.strip())
     out = {}
     # 1 User: Commit hash + dirty flag
-    commit = [f"{sha}{'' if clean else ' +dirty'}"]
-    if level >= 0:
+    commit = f"{sha}{'' if clean else '+dirty'}"
+    if verbosity >= 0:
         out["Commit"] = commit
 
     # 2 Development: list changed/untracked files
-    if level >= 1:
+    if verbosity >= 1:
         files = _git(["status", "--porcelain"], cwd=root)
         if files:
             out["Files"] = files.strip()
 
     # 3 Full debug/state logging
-    if level >= 2:
+    if verbosity >= 2:
         diff = ""
         tracked = _diff_tracked(root)
         if tracked:
@@ -87,6 +89,31 @@ def get_git_state(level=0):
     return out
 
 
-def print_git_state(level=0):
-    state = get_git_state(level)
-    print("\n".join([f"{k}:\n {v}" for k, v in state.items()]))
+def print_git_state(verbosity=0):
+    git_info = get_git_state(verbosity)
+    print("\n".join([f"{k}:\n {v}" for k, v in git_info.items()]))
+
+
+def write_git_diff_file(git_info: dict[str, str], out_path: Path | str = ".") -> str:
+    """
+    Write full Git info (Files + Changes) to an external JSON file.
+    Relies on existence of Changes and Commit keys.
+    :param git_info: Dictionary returned by get_git_state().
+    :param out_path: Location of output JSON file. Will create if missing.
+    :return: Path to the written JSON file.
+    """
+    state = {k: v.strip().splitlines() for k, v in git_info.items()}
+    state_is_dirty = bool(state.get("Changes", ""))
+
+    fname = f"sgs_tools_v{state['Commit'][0]}.json"
+    full_path = Path(out_path) / fname
+    full_path.parent.mkdir(parents=True, exist_ok=True)
+    # add a run-time time-stamp for different dirty versions
+    if full_path.exists() and state_is_dirty:
+        timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+        state["date-time"] = [timestamp]
+        full_path = full_path.with_stem(f"{full_path.stem}_{timestamp}")
+
+    with open(full_path, "w") as f:
+        json.dump(state, f, indent=2)
+    return str(full_path)

@@ -21,7 +21,11 @@ from sgs_tools.plotting.field_plot_map import (
     field_plot_kwargs,
     field_plot_map,
 )
-from sgs_tools.scripts.arg_parsers import add_dask_group, add_plotting_group
+from sgs_tools.scripts.arg_parsers import (
+    add_dask_group,
+    add_plotting_group,
+    add_version_group,
+)
 from sgs_tools.util.timer import timer
 
 default_plotting_style = {
@@ -96,6 +100,7 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
         formatter_class=ArgumentDefaultsHelpFormatter,
     )
 
+    add_version_group(parser)
     fname = parser.add_argument_group("I/O datasets on disk")
     fname.add_argument(
         "input_files",

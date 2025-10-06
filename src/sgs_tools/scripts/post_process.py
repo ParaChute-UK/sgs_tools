@@ -10,6 +10,7 @@ from sgs_tools.diagnostics.directional_profile import directional_profile
 from sgs_tools.diagnostics.spectra import spectra_1d_radial
 from sgs_tools.io.netcdf_writer import NetCDFWriter
 from sgs_tools.io.read import read
+from sgs_tools.util.gitinfo import get_git_state, write_git_diff_file
 from sgs_tools.util.timer import timer
 
 v_profile_fields_out = [
@@ -517,6 +518,12 @@ def run(args: Dict[str, Any]) -> None:
 
     hdims = args["hdims"]
 
+    # get repo state and setup as attributes of netcdf
+    git_info = get_git_state(2)
+    git_attrs = {"git_commit": git_info["Commit"]}
+    if git_info.get("Changes"):
+        git_attrs["git_diff_file"] = write_git_diff_file(args["output_path"])
+
     if args["vertical_profiles"]:
         with timer("Vertical profiles", "s"):
             f_pr = [f for f in args["vprofile_fields"] if f in simulation]
@@ -535,6 +542,7 @@ def run(args: Dict[str, Any]) -> None:
                     # rechunk for IO optimisation??
                     # have to do explicit rechunking because UM date-time coordinate is an object
                     profile = profile.chunk({"z": "auto"})
+                    profile.attrs.update(git_attrs)
                     writer.write(profile, output_path)
 
     if args["horizontal_spectra"]:
@@ -572,6 +580,7 @@ def run(args: Dict[str, Any]) -> None:
                     spec_ds = spec_ds.chunk(
                         {dim: "auto" for dim in ["x", "y", "z"] if dim in spec_ds.dims}
                     )
+                    spec_ds.attrs.update(git_attrs)
                     writer.write(spec_ds, output_path)
 
     if args["anisotropy"]:
@@ -625,6 +634,7 @@ def run(args: Dict[str, Any]) -> None:
                                     if dim in evals.dims
                                 }
                             )
+                            evals.attrs.update(git_attrs)
                             writer.write(evals, output_path)
 
 

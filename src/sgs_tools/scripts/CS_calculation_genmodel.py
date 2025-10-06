@@ -18,6 +18,7 @@ from sgs_tools.scripts.arg_parsers import (
     add_dask_group,
     add_input_group,
     add_plotting_group,
+    add_version_group,
 )
 from sgs_tools.sgs.CaratiCabot import DynamicCaratiCabotModel
 from sgs_tools.sgs.dynamic_coefficient import (
@@ -36,6 +37,7 @@ from sgs_tools.sgs.Smagorinsky import (
     SmagorinskyHeatModel,
     SmagorinskyVelocityModel,
 )
+from sgs_tools.util.gitinfo import get_git_state, write_git_diff_file
 from sgs_tools.util.timer import timer
 
 # supported models
@@ -61,6 +63,7 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
         formatter_class=ArgumentDefaultsHelpFormatter,
     )
 
+    add_version_group(parser)
     io = add_input_group(parser)
     io.add_argument(
         "output_path",
@@ -522,6 +525,12 @@ def run(args: Dict[str, Any]) -> None:
                 )
             )
 
+    # get repo state and setup as attributes of netcdf
+    git_info = get_git_state(2)
+    git_attrs = {"git_commit": git_info["Commit"]}
+    if git_info.get("Changes"):
+        git_attrs["git_diff_file"] = write_git_diff_file(args["output_path"])
+
     for m in args["sgs_model"]:
         # setup dynamic model
         with timer(f"Coeff calculation SETUP for {model_name_map[m]} model", "s"):
@@ -543,10 +552,14 @@ def run(args: Dict[str, Any]) -> None:
         with timer(f"Coeff calculation compute for {model_name_map[m]} model", "s"):
             with ProgressBar():
                 coeff.compute()
+
         # write to disk
         with timer(f"Coeff calculation write for {model_name_map[m]} model", "s"):
             with ProgressBar():
                 args["output_path"].mkdir(parents=True, exist_ok=True)
+                # tag with git info
+                coeff.attrs.update(git_attrs)
+                # write to disk
                 coeff.to_netcdf(
                     out_fname,
                     mode="w",

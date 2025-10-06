@@ -8,7 +8,7 @@ def add_version_group(parser: ArgumentParser) -> _ArgumentGroup:
         "-V",
         "--version",
         action="count",
-        default=0,
+        default=-1,
         help="show package git status + diff",
     )
     return fname

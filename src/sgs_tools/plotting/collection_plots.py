@@ -5,6 +5,21 @@ import numpy as np
 import xarray as xr
 
 
+def arrays_equal(a, b):
+    """
+    Robustly compare two arrays for equality, supporting numeric and non-numeric types.
+    Uses allclose for numeric, array_equal otherwise.
+    """
+    # Convert to numpy arrays if needed
+    a = np.asarray(a)
+    b = np.asarray(b)
+    # Check dtype kind
+    if np.issubdtype(a.dtype, np.number) and np.issubdtype(b.dtype, np.number):
+        return np.allclose(a, b, equal_nan=True)
+    else:
+        return np.array_equal(a, b)
+
+
 def plot_vertical_prof_time_slice_compare_sims_slice(
     da_collection: Mapping[str, xr.DataArray],
     plot_kwargs: Mapping[str, Any],
@@ -28,7 +43,7 @@ def plot_vertical_prof_time_slice_compare_sims_slice(
     times = xr.DataArray([])
     for k in da_collection:
         if len(times) != 0:
-            assert np.allclose(times, da_collection[k][tcoord])
+            assert arrays_equal(times, da_collection[k][tcoord].data)
         else:
             times = da_collection[k][tcoord].data
         assert len(da_collection[k].dims) == 2, f"Too many dimensions in dataarray {k}"
@@ -57,7 +72,7 @@ def plot_vertical_prof_time_slice_compare_sims_slice(
                 )  # type: ignore
             ax.legend()
             ax.set_xlabel(x_lbl, fontsize=14)
-            ax.set_title(f"time: {time.item() / 60} h", fontsize=14)
+            ax.set_title(f"{tcoord}: {time.item()}", fontsize=14)
     return fig
 
 

@@ -2,22 +2,45 @@ from argparse import ArgumentParser, _ArgumentGroup
 from pathlib import Path
 
 
+def add_version_group(parser: ArgumentParser) -> _ArgumentGroup:
+    fname = parser.add_argument_group("Package version")
+    fname.add_argument(
+        "-V",
+        "--version",
+        action="count",
+        default=0,
+        help="show package git status + diff",
+    )
+    return fname
+
+
 def add_input_group(parser: ArgumentParser) -> _ArgumentGroup:
     fname = parser.add_argument_group("I/O datasets on disk")
     fname.add_argument(
         "input_files",
         type=Path,
         help="""
-        location of UM NetCDF diagnostic file(s).
+        location of NetCDF diagnostic file(s).
         Recognizes glob patterns and walks directory trees, e.g. './my_file_p[br]*nc'
         (All files in the pattern should belong to the same simulation).
         """,
     )
 
     fname.add_argument(
-        "h_resolution",
+        "input_format",
+        type=str,
+        choices=["um", "monc", "sgs"],
+        help="Type of 'input_files'. Only support different NetCDF flavours from various production codes. 'sgs' refers to files produced by sgs_tools.",
+    )
+
+    fname.add_argument(
+        "--h_resolution",
         type=float,
-        help="horizontal resolution (will use to overwrite horizontal coordinates). **NB** works for ideal simulations",
+        default=0,
+        help="""
+        horizontal resolution in meters.
+        *ONLY* used for UM ideal simulations(will use to overwrite horizontal coordinates).
+        """,
     )
 
     fname.add_argument(

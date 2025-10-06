@@ -5,6 +5,7 @@ from typing import Any
 import f90nml  # type: ignore
 from numpy import linspace
 
+from sgs_tools.scripts.arg_parsers import add_version_group
 from sgs_tools.util.path_utils import add_extension
 
 
@@ -12,6 +13,7 @@ def parser() -> dict[str, Any]:
     parser = ArgumentParser(
         description="Create a constant level set namelist for the UM from given model top height and number of levels"
     )
+    add_version_group(parser)
 
     parser.add_argument(
         "output_file",

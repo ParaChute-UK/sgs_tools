@@ -56,10 +56,11 @@ def radial_spectrum(
         {f"d{i}": (d, ps.coords[d].values) for i, d in enumerate(fftdim)}
     )
     freq_r = ((fftcoords**2).to_dataarray().sum("variable") ** 0.5).rename(dim_name)
-
-    if radial_bin_width <= max([ps.coords[d].attrs["spacing"] for d in fftdim]):
+    max_linear_freq_space = max([ps.coords[d].attrs["spacing"] for d in fftdim])
+    if radial_bin_width <= max_linear_freq_space:
         msg = (
-            f"radial_bin_width {radial_bin_width} <= max linear frequency spacing"
+            f"radial_bin_width {radial_bin_width} <= "
+            f"max linear frequency spacing {max_linear_freq_space}"
             ", likely to have empty bins with nan values"
         )
         warnings.warn(UserWarning(msg))
@@ -168,9 +169,15 @@ def spectra_1d_radial(
         "'r' dimension found in hdims, but it is reserved for radial spectra"
     )
 
+    all_fields = set(power_spectra_fields)
+    for cfields in cross_spectra_fields:
+        all_fields.update(cfields)
+    # xrft doesn't play well with nans and chunking in to-be-spectral directions
+    prepped_data = sim[list(all_fields)].chunk({x: -1 for x in hdims}).fillna(fillnan)
+
     # power spectra
     for field in power_spectra_fields:
-        data = sim[field].fillna(fillnan)  # xrft doesn't play well with nan
+        data = prepped_data[field]
         for x in hdims:
             spec[f"{field}_F{x}"] = xrft.power_spectrum(
                 data,
@@ -200,8 +207,8 @@ def spectra_1d_radial(
 
     # cross spectra
     for field1, field2 in cross_spectra_fields:
-        data1 = sim[field1].fillna(fillnan)  # xrft doesn't play well with nan
-        data2 = sim[field2].fillna(fillnan)  # xrft doesn't play well with nan
+        data1 = prepped_data[field1]
+        data2 = prepped_data[field2]
         for x in hdims:
             spec[f"{field1}_{field2}_F{x}"] = xrft.cross_spectrum(
                 data1,

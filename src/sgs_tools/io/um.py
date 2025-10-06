@@ -117,7 +117,9 @@ def read_stash_files(fname_pattern: Path, chunks: Any = "auto") -> xr.Dataset:
         )
     )
     print(f"Reading {parsed}")
-    dataset = xr.open_mfdataset(parsed, chunks="auto", parallel=True, engine="h5netcdf")
+    dataset = xr.open_mfdataset(
+        parsed, chunks="auto", parallel=True, engine="h5netcdf", compat="no_conflicts"
+    )
     return dataset
 
 
@@ -209,8 +211,9 @@ def restrict_ds(ds: xr.Dataset, fields: Iterable[str]) -> xr.Dataset:
     :return: dataset with renamed variables
     """
     intersection = [k for k in fields if k in ds]
-    # print ("Missing fields:", {k for k in fields if k not in intersection})
-    return ds[intersection]
+    missing_fields = {k for k in fields if k not in intersection}
+    # print ("Missing fields:", missing_fields)
+    return ds[intersection], missing_fields
 
 
 # unify coordinates and implement correct x-spacing
@@ -273,7 +276,7 @@ def unify_coords(ds: xr.Dataset, res: float) -> xr.Dataset:
         ds_cent = ds_cent.swap_dims({"x_theta": "x_centre", "y_theta": "y_centre"})
 
     if ds_stag and ds_cent:
-        ds = xr.merge([ds_stag, ds_cent])
+        ds = xr.merge([ds_stag, ds_cent], compat="no_conflicts")
     elif ds_stag:
         ds = ds_stag
     elif ds_cent:
@@ -320,7 +323,7 @@ def data_ingest_UM(
     simulation = standardize_varnames(simulation)
 
     # restrict to interesting fields and rename to simple names
-    simulation = restrict_ds(simulation, fields=requested_fields)
+    simulation, _ = restrict_ds(simulation, fields=requested_fields)
     assert len(simulation) > 0, "None of the requested fields are available"
     # unify coordinates
     simulation = unify_coords(simulation, res=res)

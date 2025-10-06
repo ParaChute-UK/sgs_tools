@@ -23,7 +23,6 @@ from sphinx_conf import version
 project = "SGS_tools"
 copyright = "2024, the HiFi project"
 author = "Dimitar G Vlaykov"
-release = version
 
 master_doc = "index"
 
@@ -72,7 +71,10 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 # html_theme = 'classic'
 # html_theme = "sphinxdoc"
 html_theme = "pydata_sphinx_theme"
-html_theme_options = {"show_nav_level": 2}
+html_theme_options = {
+    "show_nav_level": 2,
+    "announcement": f"Version: {version}",
+}
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".

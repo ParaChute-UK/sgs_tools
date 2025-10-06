@@ -15,6 +15,7 @@ from sgs_tools.scripts.BasicComparisonSimAnalysis import (
     prof_fields,
     slice_fields,
 )
+from sgs_tools.util.gitinfo import print_git_state
 from sgs_tools.util.timer import timer
 
 plotting_styles = [
@@ -152,6 +153,10 @@ def main():
     with timer("Total execution time", "min"):
         with timer("Arguments", "ms"):
             args = parse_args()
+
+        if args["version"]:
+            print_git_state(args["version"])
+            exit()
 
         ds_collection, field_plot_map = io(args)
 

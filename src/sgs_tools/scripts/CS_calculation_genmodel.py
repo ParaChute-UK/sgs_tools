@@ -37,7 +37,7 @@ from sgs_tools.sgs.Smagorinsky import (
     SmagorinskyHeatModel,
     SmagorinskyVelocityModel,
 )
-from sgs_tools.util.gitinfo import get_git_state, write_git_diff_file
+from sgs_tools.util.gitinfo import get_git_state, print_git_state, write_git_diff_file
 from sgs_tools.util.timer import timer
 
 # supported models
@@ -571,6 +571,9 @@ def run(args: Dict[str, Any]) -> None:
 
 def main():
     args = parse_args()
+    if args["version"]:
+        print_git_state(args["version"])
+        exit()
     print(args)
     with timer("Total execution time", "min"):
         run(args)

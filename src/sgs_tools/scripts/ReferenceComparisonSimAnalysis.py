@@ -4,7 +4,11 @@ from typing import Any
 
 from numpy import array, inf
 
-from sgs_tools.scripts.arg_parsers import add_dask_group, add_plotting_group
+from sgs_tools.scripts.arg_parsers import (
+    add_dask_group,
+    add_plotting_group,
+    add_version_group,
+)
 from sgs_tools.scripts.BasicComparisonSimAnalysis import (
     io,
     plot,
@@ -41,6 +45,7 @@ def parse_args() -> dict[str, Any]:
                 """,
         formatter_class=ArgumentDefaultsHelpFormatter,
     )
+    add_version_group(parser)
 
     fname = parser.add_argument_group("I/O datasets on disk")
     fname.add_argument(

@@ -30,7 +30,7 @@ def data_ingest_MONC(
         )
     )
 
-    ds = xr.open_mfdataset(fname, chunks=chunks, parallel=True)
+    ds = xr.open_mfdataset(fname, chunks=chunks, parallel=True, compat="no_conflicts")
 
     # parse metadata
     metadata = ds["options_database"].load().data

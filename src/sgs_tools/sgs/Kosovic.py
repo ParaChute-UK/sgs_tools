@@ -4,14 +4,16 @@ from typing import Sequence
 
 import xarray as xr
 
-from ..geometry.tensor_algebra import (
-    symmetrise,
-    traceless,
+from ..geometry.tensor_algebra import matrix_prod, symmetrise, traceless
+from .dynamic_minimisation import (
+    LillyMinimisation2Model,
+    LillyMinimisation3Model,
+    Minimisation,
 )
-from .dynamic_coefficient import LillyMinimisation2Model, Minimisation
 from .dynamic_sgs_model import LeonardVelocityTensor, LinCombDynamicModel
 from .filter import Filter
 from .sgs_model import LinCombSGSModel
+from .Smagorinsky import SmagorinskyVelocityModel
 from .util import _assert_coord_dx
 
 
@@ -44,9 +46,7 @@ class SSquaredVelocityModel:
         _assert_coord_dx(filter.filter_dims, self.strain, self.dx)
 
         sij = filter.filter(self.strain)
-        sleft = sij.rename({self.tensor_dims[1]: "dummy1"})
-        sright = sij.rename({self.tensor_dims[0]: "dummy1"})
-        s_prod = traceless(xr.dot(sleft, sright, dim="dummy1", optimize=True))
+        s_prod = traceless(matrix_prod(sij, sij, *self.tensor_dims))
 
         tau = (self.cs * self.dx) ** 2 * s_prod
         return tau
@@ -87,18 +87,17 @@ class SOmegaVelocityModel:
           If false will produce trace-full result"""
         )
 
-        sij = filter.filter(self.strain).rename({self.tensor_dims[1]: "dummy1"})
-        rotij = filter.filter(self.rot).rename({self.tensor_dims[0]: "dummy1"})
-        s_prod = symmetrise(xr.dot(sij, rotij, dim="dummy1", optimize=True))
+        sij = filter.filter(self.strain)
+        rotij = filter.filter(self.rot)
+        s_prod = symmetrise(matrix_prod(sij, rotij, *self.tensor_dims))
         # assumes that self.rot is anti-symmetric, and self.strain is symmetric
         # so we don't need to make the product traceless explicitly
         tau = (self.cs * self.dx) ** 2 * s_prod
         return tau
 
 
-def DynamicKosovicModel(
+def DynamicKosovicModel2(
     sij: xr.DataArray,
-    omegaij: xr.DataArray,
     vel: xr.DataArray,
     res: float,
     compoment_coeff: Sequence[float],
@@ -107,8 +106,51 @@ def DynamicKosovicModel(
         contraction_dims=["c1", "c2"], coeff_dim="cdim"
     ),
 ) -> LinCombDynamicModel:
+    """Dynamic version of the model by
+    Kosovic 1997 JFM vol. 336, pp. 151–182 model without the S-Omega term
+    same as
+    Moin 1993 New Approaches and Concepts in Turbulence, Springer, first model
+
+    :param sij: grid-scale rate-of-strain tensor
+    :param vel: velocity field used for dynamic coefficient computation
+    :param res: constant resolution with respect to dimension to-be-filtered
+    :param compoment_coeff: tuple of three Smagorinsky coefficients for parallel, perpendicular, and normal components
+    :param tensor_dims: labels of dimensions indexing tensor components, defaults to ("c1", "c2")
+    :return: Combined SGS model with dynamically computed coefficients
+    """
+    static_model = LinCombSGSModel(
+        [
+            SmagorinskyVelocityModel(
+                strain=sij,
+                cs=compoment_coeff[0],
+                dx=res,
+                tensor_dims=tensor_dims,
+            ),
+            SSquaredVelocityModel(
+                strain=sij,
+                cs=compoment_coeff[1],
+                dx=res,
+                tensor_dims=tensor_dims,
+            ),
+        ]
+    )
+    leonard = LeonardVelocityTensor(vel, tensor_dims)
+    return LinCombDynamicModel(static_model, leonard, minimisation)
+
+
+def DynamicKosovicModel3(
+    sij: xr.DataArray,
+    omegaij: xr.DataArray,
+    vel: xr.DataArray,
+    res: float,
+    compoment_coeff: Sequence[float],
+    tensor_dims: tuple[str, str] = ("c1", "c2"),
+    minimisation: Minimisation = LillyMinimisation3Model(
+        contraction_dims=["c1", "c2"], coeff_dim="cdim"
+    ),
+) -> LinCombDynamicModel:
     r"""Dynamic version of the model by
-    Carati & Cabot Proceedings of the 1996 Summer Program -- Center for Turbulence Research
+    Kosovic 1997 JFM vol. 336, pp. 151–182 model without the S-Omega term
 
     :param sij: grid-scale rate-of-strain tensor
     :param omegaij: grid-scale rate-of-rotation tensor
@@ -120,16 +162,22 @@ def DynamicKosovicModel(
     """
     static_model = LinCombSGSModel(
         [
-            SSquaredVelocityModel(
+            SmagorinskyVelocityModel(
                 strain=sij,
                 cs=compoment_coeff[0],
+                dx=res,
+                tensor_dims=tensor_dims,
+            ),
+            SSquaredVelocityModel(
+                strain=sij,
+                cs=compoment_coeff[1],
                 dx=res,
                 tensor_dims=tensor_dims,
             ),
             SOmegaVelocityModel(
                 strain=sij,
                 rot=omegaij,
-                cs=compoment_coeff[1],
+                cs=compoment_coeff[2],
                 dx=res,
                 tensor_dims=tensor_dims,
             ),

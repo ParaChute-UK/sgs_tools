@@ -10,10 +10,12 @@ from sgs_tools.diagnostics.directional_profile import directional_profile
 from sgs_tools.diagnostics.spectra import spectra_1d_radial
 from sgs_tools.io.netcdf_writer import NetCDFWriter
 from sgs_tools.io.read import read
+from sgs_tools.util.gitinfo import get_git_state, write_git_diff_file
 from sgs_tools.util.timer import timer
 
 v_profile_fields_out = [
     "vel",
+    "vel_horiz",
     "theta",
     "s",
     "vert_heat_flux",
@@ -74,7 +76,7 @@ box_delta_scales = [2, 4, 8, 16]
 box_meter_scales = [800, 400, 200, 100]
 box_domain_scales = [1, 0.5, 0.25]
 gauss_scales = [2, 4]
-
+filter_shapes = ["gauss", "box", "coarse"]
 
 anisotropy_name = r"post_proc_anisotropy"
 
@@ -254,6 +256,13 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
         type=int,
         help="""Anisotropy Gaussian filter scales in  units of horizontal grid spacing. Support 2 and 4""",
     )
+    anisotropy.add_argument(
+        "--filter_shapes",
+        nargs="+",
+        default=filter_shapes,
+        type=str,
+        help=f"""Anisotropy filter shapes. Support any of {filter_shapes}""",
+    )
 
     spectra.add_argument(
         "--aniso_fname_out",
@@ -335,6 +344,8 @@ def post_process_fields(simulation: xr.Dataset) -> xr.Dataset:
         target_dims=["x", "y", "z"],
         vector_dim="c1",
     )
+    # horizontal wind
+    simulation["vel_horiz"] = (simulation["vel"].sel(c1=[1, 2]) ** 2).sum("c1") ** 0.5
 
     if all([diag in simulation for diag in ["theta", "w"]]):
         simulation["vert_heat_flux"] = vertical_heat_flux(
@@ -410,6 +421,7 @@ def choose_filter_set(
     ],  # sub-km grey zone horizontal resolutions
     box_domain_scales: Sequence[float] = [0.25, 0.5, 1],  # domain unit scales
     gauss_scales: Sequence[float] = [2, 4],  # Gaussian filter scales
+    filter_shapes: Sequence[str] = ["gauss", "box", "coarse"],  # filter shapes
     hdims: Sequence[str] = ["x", "y"],
 ):
     from sgs_tools.sgs.coarse_grain import CoarseGrain
@@ -430,7 +442,7 @@ def choose_filter_set(
     # only allows scales at least 2 (delta_<x>) apart
     # order of loop determines precedence
     for x in set(domain_scales + meter_scales + list(box_delta_scales)):
-        if x > 1 and x < hminsize:
+        if x > 1 and x <= hminsize:
             if not box_scales or np.min(np.abs([x - y for y in box_scales])) >= 2:
                 box_scales += [x]
 
@@ -442,29 +454,38 @@ def choose_filter_set(
     assert min(box_scales) > 1, "Unsupported box_scales less than 0."
 
     # Coarse-graining filters
-    filter_dic = filter_dic | {
-        f"Coarse{scale}delta": CoarseGrain({x: int(scale) for x in hdims})
-        for scale in box_scales
-    }
+    if "coarse" in filter_shapes:
+        filter_dic = filter_dic | {
+            f"Coarse{scale}delta": CoarseGrain({x: int(scale) for x in hdims})
+            for scale in box_scales
+        }
 
     # Box filters
     # stencil size is (filter_scale + 1)delta under finite-difference data interpretation
-    box_scales = [x for x in box_scales if x < hminsize]
-    filter_dic = filter_dic | {
-        f"Box{scale}delta": Filter(box_kernel([int(scale) + 1 for x in hdims]), hdims)
-        for scale in box_scales
-    }
-
-    # Gausssian filters
-    for s in gauss_scales:
-        if s == 2:
-            filter_dic[f"Gauss{2}delta"] = Filter(weight_gauss_3d, filter_dims=hdims)
-        elif s == 4:
-            filter_dic[f"Gauss{4}delta"] = Filter(weight_gauss_5d, filter_dims=hdims)
-        else:
-            warnings.warn(
-                f"Skipping unsupported Gauss scale {s}. Support only 2 and 4."
+    if "box" in filter_shapes:
+        box_scales = [x for x in box_scales if x <= hminsize // 10]
+        filter_dic = filter_dic | {
+            f"Box{scale}delta": Filter(
+                box_kernel([int(scale) + 1 for x in hdims]), hdims
             )
+            for scale in box_scales
+        }
+
+    if "gauss" in filter_shapes:
+        # Gausssian filters
+        for s in gauss_scales:
+            if s == 2:
+                filter_dic[f"Gauss{2}delta"] = Filter(
+                    weight_gauss_3d, filter_dims=hdims
+                )
+            elif s == 4:
+                filter_dic[f"Gauss{4}delta"] = Filter(
+                    weight_gauss_5d, filter_dims=hdims
+                )
+            else:
+                warnings.warn(
+                    f"Skipping unsupported Gauss scale {s}. Support only 2 and 4."
+                )
 
     return filter_dic
 
@@ -497,6 +518,12 @@ def run(args: Dict[str, Any]) -> None:
 
     hdims = args["hdims"]
 
+    # get repo state and setup as attributes of netcdf
+    git_info = get_git_state(2)
+    git_attrs = {"git_commit": git_info["Commit"]}
+    if git_info.get("Changes"):
+        git_attrs["git_diff_file"] = write_git_diff_file(args["output_path"])
+
     if args["vertical_profiles"]:
         with timer("Vertical profiles", "s"):
             f_pr = [f for f in args["vprofile_fields"] if f in simulation]
@@ -515,6 +542,7 @@ def run(args: Dict[str, Any]) -> None:
                     # rechunk for IO optimisation??
                     # have to do explicit rechunking because UM date-time coordinate is an object
                     profile = profile.chunk({"z": "auto"})
+                    profile.attrs.update(git_attrs)
                     writer.write(profile, output_path)
 
     if args["horizontal_spectra"]:
@@ -552,6 +580,7 @@ def run(args: Dict[str, Any]) -> None:
                     spec_ds = spec_ds.chunk(
                         {dim: "auto" for dim in ["x", "y", "z"] if dim in spec_ds.dims}
                     )
+                    spec_ds.attrs.update(git_attrs)
                     writer.write(spec_ds, output_path)
 
     if args["anisotropy"]:
@@ -571,8 +600,10 @@ def run(args: Dict[str, Any]) -> None:
                 box_meter_scales=args["box_meter_scales"],
                 box_domain_scales=args["box_domain_scales"],
                 gauss_scales=args["gauss_scales"],
+                filter_shapes=args["filter_shapes"],
                 hdims=hdims,
             )
+
             print(f"Filters: {filter_dic.keys()}")
 
             # rechunk velocity -- unify filtering and vector dimensions
@@ -603,6 +634,7 @@ def run(args: Dict[str, Any]) -> None:
                                     if dim in evals.dims
                                 }
                             )
+                            evals.attrs.update(git_attrs)
                             writer.write(evals, output_path)
 
 

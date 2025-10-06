@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry-dynamic-versioning]
 enable = true
-style = "semver"        # or "pep440" depending on your preference
+style = "semver"        # expects tags v?.?.?; otherwise "pep440" takes it without the "v"
 vcs = "git"
 
 [tool.poetry-dynamic-versioning.substitution]
@@ -31,7 +31,7 @@ classifiers = [
 ]
 
 [tool.poetry.dependencies]
-python = ">=3.11"
+python = ">=3.11,<4.0"
 matplotlib = ">=3.6"
 xarray = {version = ">=2023.9", extras = ["io","accel","parallel"]}
 xrft = "*"
@@ -67,3 +67,4 @@ sim_comparison = "sgs_tools.scripts.BasicComparisonSimAnalysis:main"
 ref_comparison = "sgs_tools.scripts.ReferenceComparisonSimAnalysis:main"
 um_levels = "sgs_tools.scripts.make_UM_level_sets:main"
 post_process = "sgs_tools.scripts.post_process:main"
+sgs_tools_version = "sgs_tools.scripts.version:main"

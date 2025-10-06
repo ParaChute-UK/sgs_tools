@@ -50,3 +50,5 @@ documentation/
 .tox/
 .ruff_cache
 .coverage
+#test output directories
+__test_out

@@ -117,7 +117,9 @@ def read_stash_files(fname_pattern: Path, chunks: Any = "auto") -> xr.Dataset:
         )
     )
     print(f"Reading {parsed}")
-    dataset = xr.open_mfdataset(parsed, chunks="auto", parallel=True, engine="h5netcdf")
+    dataset = xr.open_mfdataset(
+        parsed, chunks="auto", parallel=True, engine="h5netcdf", compat="no_conflicts"
+    )
     return dataset
 
 
@@ -274,7 +276,7 @@ def unify_coords(ds: xr.Dataset, res: float) -> xr.Dataset:
         ds_cent = ds_cent.swap_dims({"x_theta": "x_centre", "y_theta": "y_centre"})
 
     if ds_stag and ds_cent:
-        ds = xr.merge([ds_stag, ds_cent])
+        ds = xr.merge([ds_stag, ds_cent], compat="no_conflicts")
     elif ds_stag:
         ds = ds_stag
     elif ds_cent:

@@ -3,7 +3,7 @@ from dataclasses import dataclass
 import xarray as xr  # only used for type hints
 
 from ..geometry.tensor_algebra import Frobenius_norm
-from .dynamic_coefficient import Minimisation
+from .dynamic_minimisation import Minimisation
 from .dynamic_sgs_model import DynamicModel, LeonardThetaTensor, LeonardVelocityTensor
 from .filter import Filter
 from .util import _assert_coord_dx
@@ -13,13 +13,11 @@ from .util import _assert_coord_dx
 class SmagorinskyVelocityModel:
     """Smagorinsky model for the velocity equation
 
-    :ivar vel: grid-scale velocity
     :ivar strain: grid-scale rate-of-strain
     :ivar cs: Smagorinsky coefficient
     :ivar dx: constant resolution with respect to dimension to-be-filtered
     """
 
-    vel: xr.DataArray
     strain: xr.DataArray
     cs: float
     dx: float
@@ -35,8 +33,7 @@ class SmagorinskyVelocityModel:
 
         # only makes sense for uniform coordinates in the filtering directions
         # with spacing of self.dx
-        for arr in [self.vel, self.strain]:
-            _assert_coord_dx(list(filter.filter_dims), arr, self.dx)
+        _assert_coord_dx(filter.filter_dims, self.strain, self.dx)
 
         sij = filter.filter(self.strain)
         snorm = Frobenius_norm(sij, self.tensor_dims)
@@ -48,14 +45,12 @@ class SmagorinskyVelocityModel:
 class SmagorinskyHeatModel:
     """Smagorinsky model for the Heat equation
 
-    :ivar vel: grid-scale velocity
     :ivar grad_theta: grid-scale (potential) temperature gradient
     :ivar strain: grid-scale rate-of-strain
     :ivar ctheta: Smagorinsky coefficient for the heat equation
     :ivar dx: constant resolution with respect to dimension to-be-filtered
     """
 
-    vel: xr.DataArray
     grad_theta: xr.DataArray
     strain: xr.DataArray
     ctheta: float
@@ -72,7 +67,7 @@ class SmagorinskyHeatModel:
 
         # only makes sense for uniform coordinates in the filtering directions
         # with spacing of self.dx
-        for arr in [self.vel, self.grad_theta, self.strain]:
+        for arr in [self.grad_theta, self.strain]:
             _assert_coord_dx(filter.filter_dims, arr, self.dx)
 
         snorm = Frobenius_norm(filter.filter(self.strain), self.tensor_dims)
@@ -82,14 +77,17 @@ class SmagorinskyHeatModel:
 
 
 def DynamicSmagorinskyVelocityModel(
-    smag_vel: SmagorinskyVelocityModel, minimisation: Minimisation
+    smag_vel: SmagorinskyVelocityModel, vel: xr.DataArray, minimisation: Minimisation
 ) -> DynamicModel:
-    leonard = LeonardVelocityTensor(smag_vel.vel, smag_vel.tensor_dims)
+    leonard = LeonardVelocityTensor(vel, smag_vel.tensor_dims)
     return DynamicModel(smag_vel, leonard, minimisation)
 
 
 def DynamicSmagorinskyHeatModel(
-    smag_theta: SmagorinskyHeatModel, theta: xr.DataArray, minimisation: Minimisation
+    smag_theta: SmagorinskyHeatModel,
+    vel: xr.DataArray,
+    theta: xr.DataArray,
+    minimisation: Minimisation,
 ) -> DynamicModel:
-    leonard = LeonardThetaTensor(smag_theta.vel, theta, smag_theta.tensor_dims)
+    leonard = LeonardThetaTensor(vel, theta, smag_theta.tensor_dims)
     return DynamicModel(smag_theta, leonard, minimisation)

@@ -10,7 +10,11 @@ from ..geometry.tensor_algebra import (
     tensor_self_outer_product,
     traceless,
 )
-from .dynamic_coefficient import LillyMinimisation3Model, Minimisation
+from .dynamic_minimisation import (
+    LillyMinimisation2Model,
+    LillyMinimisation3Model,
+    Minimisation,
+)
 from .dynamic_sgs_model import LeonardVelocityTensor, LinCombDynamicModel
 from .filter import Filter
 from .sgs_model import LinCombSGSModel
@@ -178,19 +182,67 @@ class NVelocityModel:
         )
 
 
-def DynamicCaratiCabotModel(
+def DynamicCaratiCabotModel2(
     sij: xr.DataArray,
     vel: xr.DataArray,
     res: float,
     compoment_coeff: Sequence[float],
     n: Sequence[float],
     tensor_dims: tuple[str, str] = ("c1", "c2"),
-    minimisation: Minimisation = LillyMinimisation3Model(
+    minimisation: Minimisation = LillyMinimisation2Model(
         contraction_dims=["c1", "c2"], coeff_dim="cdim"
     ),
 ) -> LinCombDynamicModel:
     r"""Dynamic version of the model by
     Carati & Cabot Proceedings of the 1996 Summer Program -- Center for Turbulence Research
+    Dynamic version of the model by
+    Carati & Cabot Proceedings of the 1996 Summer Program -- Center for Turbulence Research
+    the model version without the third term NiNj
+
+    :param sij: grid-scale rate-of-strain tensor
+    :param vel: velocity field used for dynamic coefficient computation
+    :param res: constant resolution with respect to dimension to-be-filtered
+    :param compoment_coeff: tuple of three Smagorinsky coefficients for parallel, perpendicular, and normal components
+    :param n: triple of floats to be coerced as a 3d constant vector along one of the tensor dimensions
+    :param tensor_dims: labels of dimensions indexing tensor components, defaults to ("c1", "c2")
+    :return: Combined SGS model with dynamically computed coefficients
+    """
+    static_model = LinCombSGSModel(
+        [
+            SparallelVelocityModel(
+                strain=sij,
+                cs=compoment_coeff[0],
+                dx=res,
+                n=n,
+                tensor_dims=tensor_dims,
+            ),
+            SperpVelocityModel(
+                strain=sij,
+                cs=compoment_coeff[1],
+                dx=res,
+                n=n,
+                tensor_dims=tensor_dims,
+            ),
+        ]
+    )
+    leonard = LeonardVelocityTensor(vel, tensor_dims)
+    return LinCombDynamicModel(static_model, leonard, minimisation)
+
+
+def DynamicCaratiCabotModel3(
+    sij: xr.DataArray,
+    vel: xr.DataArray,
+    res: float,
+    compoment_coeff: Sequence[float],
+    n=Sequence[float],
+    tensor_dims: tuple[str, str] = ("c1", "c2"),
+    minimisation: Minimisation = LillyMinimisation3Model(
+        contraction_dims=["c1", "c2"], coeff_dim="cdim"
+    ),
+) -> LinCombDynamicModel:
+    """Dynamic version of the model by
+    Carati & Cabot Proceedings of the 1996 Summer Program -- Center for Turbulence Research
+    Adding the ignored term NiNj
 
     :param sij: grid-scale rate-of-strain tensor
     :param vel: velocity field used for dynamic coefficient computation

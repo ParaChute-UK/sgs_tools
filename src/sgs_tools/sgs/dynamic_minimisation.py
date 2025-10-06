@@ -254,9 +254,21 @@ class LillyMinimisationNModel:
             )
         )
 
+        # FIXME: can't get the distributed xarray API to handle this trivially
+        # so go down to dask mapping of numpy.linalg.solve -> need to reorder axes
         LM = LM.transpose(..., self.coeff_dim)
         LM_expanded = LM.expand_dims(dim="rhs", axis=-1)
         MM = MM.transpose(..., self.coeff_dim, self.coeff_dim + "_dummy")
+        # mm_condition = (
+        #     da.map_blocks(
+        #         np.linalg.cond,
+        #         MM,
+        #         p=None, # order of the norm
+        #         dtype=MM.data.dtype,
+        #     )
+        #     .compute()
+        #     .max()
+        # )
 
         mm_condition = (
             xr.apply_ufunc(
@@ -292,3 +304,8 @@ class LillyMinimisationNModel:
         )
 
         return coefficients.squeeze("rhs")
+
+        # rewrap with Xarray metadata
+        # Note: need to make this eager, otherwise get a 0-size object from da.map_blocks
+        # coefficients = da.map_blocks(np.linalg.solve, MM, LM, dtype=MM.data.dtype)
+        # xr.DataArray(coefficients.compute().squeeze('rhs'), dims=LM.dims, coords=LM.coords)

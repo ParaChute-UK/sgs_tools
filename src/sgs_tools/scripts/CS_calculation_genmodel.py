@@ -18,36 +18,38 @@ from sgs_tools.scripts.arg_parsers import (
     add_dask_group,
     add_input_group,
     add_plotting_group,
+    add_version_group,
 )
-from sgs_tools.sgs.CaratiCabot import DynamicCaratiCabotModel
-from sgs_tools.sgs.dynamic_coefficient import (
+from sgs_tools.sgs.CaratiCabot import DynamicCaratiCabotModel2, DynamicCaratiCabotModel3
+from sgs_tools.sgs.dynamic_minimisation import (
     LillyMinimisation1Model,
     LillyMinimisation2Model,
     LillyMinimisation3Model,
 )
-from sgs_tools.sgs.dynamic_sgs_model import (
-    DynamicModelProtcol,
-)
+from sgs_tools.sgs.dynamic_sgs_model import DynamicModelProtcol
 from sgs_tools.sgs.filter import Filter, box_kernel, weight_gauss_3d, weight_gauss_5d
-from sgs_tools.sgs.Kosovic import DynamicKosovicModel
+from sgs_tools.sgs.Kosovic import DynamicKosovicModel2, DynamicKosovicModel3
 from sgs_tools.sgs.Smagorinsky import (
     DynamicSmagorinskyHeatModel,
     DynamicSmagorinskyVelocityModel,
     SmagorinskyHeatModel,
     SmagorinskyVelocityModel,
 )
+from sgs_tools.util.gitinfo import get_git_state, write_git_diff_file
 from sgs_tools.util.timer import timer
 
 # supported models
-vel_models = ["Smag_vel", "Smag_vel_diag", "Carati", "Kosovic"]
+vel_models = ["Smag_vel", "Smag_vel_diag", "Carati2", "Carati3", "Kosovic2", "Kosovic3"]
 theta_models = ["Smag_theta", "Smag_theta_diag"]
 model_choices = ["all", "vel_all", "theta_all"] + vel_models + theta_models
 
 model_name_map = {
     "Smag_vel": "Cs_isotropic",
     "Smag_vel_diag": "Cs_diagonal",
-    "Carati": "Cs_CaratiCabot",
-    "Kosovic": "Cs_Kosovic",
+    "Carati2": "Cs_CaratiCabot_2comp",
+    "Carati3": "Cs_CaratiCabot_3comp",
+    "Kosovic2": "Cs_Kosovic_2comp",
+    "Kosovic3": "Cs_Kosovic_3comp",
     "Smag_theta": "Ctheta_isotropic",
     "Smag_theta_diag": "Ctheta_diagonal",
 }
@@ -61,6 +63,7 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
         formatter_class=ArgumentDefaultsHelpFormatter,
     )
 
+    add_version_group(parser)
     io = add_input_group(parser)
     io.add_argument(
         "output_path",
@@ -236,82 +239,82 @@ def data_slice(
         if t in ds:
             tslice = (t_range[0] <= ds[t]) * (ds[t] <= t_range[1])
             ds = ds.where(tslice, drop=True)
-        assert not all(ds[var].size == 0 for var in ds), (
-            f"Data t-slice {t_range} results in empty variables. "
-            "Consider relaxing t_range"
-        )
+    assert not all(ds[var].size == 0 for var in ds), (
+        f"Data t-slice {t_range} results in empty variables. Consider relaxing t_range"
+    )
     return ds
 
 
-def gather_model_inputs(simulation: xr.Dataset) -> xr.Dataset:
+def gather_model_inputs(simulation: xr.Dataset, req_fields: list[str]) -> xr.Dataset:
     # ensure velocity components are co-located
     simple_dims = ["x", "y", "z"]  # coordinates already exist in simulation
-    if "vel" in simulation:
-        vel = simulation["vel"]
-    else:
-        vel = compose_vector_components_on_grid(
-            [simulation["u"], simulation["v"], simulation["w"]],
-            simple_dims,
-            name="vel",
-            vector_dim="c1",
-        )
+    ds = xr.Dataset()
 
-    # compute strain, rotation and potential temperature gradient
-    if "sij" in simulation:
-        sij = simulation["sij"]
-    else:
-        sij = strain_from_vel(
-            vel,
-            space_dims=simple_dims,
-            vec_dim="c1",
-            new_dim="c2",
-            make_traceless=True,
-        )
+    if "vel" in req_fields:
+        if "vel" in simulation:
+            ds["vel"] = simulation["vel"]
+        else:
+            ds["vel"] = compose_vector_components_on_grid(
+                [simulation["u"], simulation["v"], simulation["w"]],
+                simple_dims,
+                name="vel",
+                vector_dim="c1",
+            )
 
-    if "omegaij" in simulation:
-        omegaij = simulation["omegaij"]
-    else:
-        omegaij = omega_from_vel(
-            vel,
-            space_dims=simple_dims,
-            vec_dim="c1",
-            new_dim="c2",
-        )
+    if "sij" in req_fields:
+        # compute strain, rotation and potential temperature gradient
+        if "sij" in simulation:
+            ds["sij"] = simulation["sij"]
+        else:
+            ds["sij"] = strain_from_vel(
+                ds["vel"],
+                space_dims=simple_dims,
+                vec_dim="c1",
+                new_dim="c2",
+                make_traceless=True,
+            )
 
-    if "grad_theta" in simulation:
-        grad_theta = simulation["grad_theta"]
-    else:
-        grad_theta = grad_scalar(
-            simulation["theta"],
-            space_dims=simple_dims,
-            new_dim_name="c1",
-            name="grad_theta",
-        )
+    if "omegaij" in req_fields:
+        if "omegaij" in simulation:
+            ds["omegaij"] = simulation["omegaij"]
+        else:
+            ds["omegaij"] = omega_from_vel(
+                ds["vel"],
+                space_dims=simple_dims,
+                vec_dim="c1",
+                new_dim="c2",
+            )
 
-    return xr.Dataset(
-        {
-            "vel": vel,
-            "theta": simulation["theta"],
-            "sij": sij,
-            "omegaij": omegaij,
-            "grad_theta": grad_theta,
-        }
-    )
+    if "theta" in req_fields:
+        ds["theta"] = simulation["theta"]
+
+    if "grad_theta" in req_fields:
+        if "grad_theta" in simulation:
+            ds["grad_theta"] = simulation["grad_theta"]
+        else:
+            ds["grad_theta"] = grad_scalar(
+                ds["theta"],
+                space_dims=simple_dims,
+                new_dim_name="c1",
+                name="grad_theta",
+            )
+
+    return ds
 
 
 def pre_process(args: dict[str, Any]) -> xr.Dataset:
     req_fields = {
-        "um": ["u", "v", "w", "theta", "theta"],
-        "monc": ["u", "v", "w", "theta", "theta"],
+        "um": ["u", "v", "w", "theta"],
+        "monc": ["u", "v", "w", "theta"],
         "sgs": ["vel", "theta", "sij", "omegaij", "theta", "grad_theta"],
     }
+
     simulation = read(
         args["input_files"],
         args["input_format"],
         requested_fields=req_fields[args["input_format"]],
         resolution=args["h_resolution"],
     )
-
     # overwrite resolution if recorded during read
     if "h_resolution" in simulation.attrs:
         args["h_resolution"] = simulation.attrs["h_resolution"]
@@ -320,7 +323,12 @@ def pre_process(args: dict[str, Any]) -> xr.Dataset:
         with timer("Extract grid-based fields", "s"):
             # slice to the requested sub-domain
             simulation = data_slice(simulation, args["t_range"], args["z_range"])
-            simulation = gather_model_inputs(simulation)
+            model_req_fields = []
+            if args["sgs_model"].intersection(vel_models):
+                model_req_fields += ["vel", "sij", "omegaij"]
+            if args["sgs_model"].intersection(theta_models):
+                model_req_fields += ["theta", "grad_theta"]
+            simulation = gather_model_inputs(simulation, model_req_fields)
     # chunk
     chunks = {
         "z": args["z_chunk_size"],
@@ -330,7 +338,7 @@ def pre_process(args: dict[str, Any]) -> xr.Dataset:
         "c1": -1,
         "c2": -1,
     }
-    # add caveate for degenerate t or z-slice that may drop a coordinate
+    # add caveat for degenerate t or z-slice that may drop a coordinate
     simulation = simulation.chunk(
         chunks={x: y for x, y in chunks.items() if x in simulation.dims}
     )
@@ -344,27 +352,39 @@ def model_selection(
     if model == "Smag_vel":
         return DynamicSmagorinskyVelocityModel(
             SmagorinskyVelocityModel(
-                vel=simulation.vel,
                 strain=simulation.sij,
                 cs=1.0,
                 dx=h_resolution,
                 tensor_dims=("c1", "c2"),
             ),
+            simulation.vel,
             LillyMinimisation1Model(contraction_dims=["c1", "c2"], coeff_dim="cdim"),
         )
     if model == "Smag_vel_diag":
         return DynamicSmagorinskyVelocityModel(
             SmagorinskyVelocityModel(
-                vel=simulation.vel,
                 strain=simulation.sij,
                 cs=1.0,
                 dx=h_resolution,
                 tensor_dims=("c1", "c2"),
             ),
+            simulation.vel,
             LillyMinimisation1Model(contraction_dims=["c2"], coeff_dim="cdim"),
         )
-    if model == "Carati":
-        return DynamicCaratiCabotModel(
+    if model == "Carati2":
+        return DynamicCaratiCabotModel2(
+            simulation.sij,
+            res=h_resolution,
+            compoment_coeff=[1.0, 1.0],
+            n=[0.0, 0.0, 1.0],  # gravity direction
+            vel=simulation.vel,
+            tensor_dims=("c1", "c2"),
+            minimisation=LillyMinimisation2Model(
+                contraction_dims=["c1", "c2"], coeff_dim="cdim"
+            ),
+        )
+    if model == "Carati3":
+        return DynamicCaratiCabotModel3(
             simulation.sij,
             res=h_resolution,
             compoment_coeff=[1.0, 1.0, 1.0],
@@ -375,10 +395,9 @@ def model_selection(
                 contraction_dims=["c1", "c2"], coeff_dim="cdim"
             ),
         )
-    if model == "Kosovic":
-        return DynamicKosovicModel(
+    if model == "Kosovic2":
+        return DynamicKosovicModel2(
             simulation.sij,
-            simulation.omegaij,
             res=h_resolution,
             compoment_coeff=[1.0, 1.0],
             vel=simulation.vel,
@@ -387,30 +406,42 @@ def model_selection(
                 contraction_dims=["c1", "c2"], coeff_dim="cdim"
             ),
         )
+    if model == "Kosovic3":
+        return DynamicKosovicModel3(
+            simulation.sij,
+            simulation.omegaij,
+            res=h_resolution,
+            compoment_coeff=[1.0, 1.0, 1.0],
+            vel=simulation.vel,
+            tensor_dims=("c1", "c2"),
+            minimisation=LillyMinimisation3Model(
+                contraction_dims=["c1", "c2"], coeff_dim="cdim"
+            ),
+        )
     if model == "Smag_theta":
         return DynamicSmagorinskyHeatModel(
             SmagorinskyHeatModel(
-                vel=simulation.vel,
                 grad_theta=simulation.grad_theta,
                 strain=simulation.sij,
                 ctheta=1.0,
                 dx=h_resolution,
                 tensor_dims=("c1", "c2"),
             ),
-            simulation["theta"],
+            simulation.vel,
+            simulation.theta,
             LillyMinimisation1Model(contraction_dims=["c1"], coeff_dim="cdim"),
         )
     if model == "Smag_theta_diag":
         return DynamicSmagorinskyHeatModel(
             SmagorinskyHeatModel(
-                vel=simulation.vel,
                 grad_theta=simulation.grad_theta,
                 strain=simulation.sij,
                 ctheta=1.0,
                 dx=h_resolution,
                 tensor_dims=("c1", "c2"),
             ),
-            simulation["theta"],
+            simulation.vel,
+            simulation.theta,
             LillyMinimisation1Model(contraction_dims=[], coeff_dim="cdim"),
         )
     else:
@@ -440,6 +471,8 @@ def compute_cs(
 def plot(args: dict[str, Any]) -> None:
     row_lbl = "scale"
 
+    assert args["plot_path"] is not None or args["plot_show"]
+
     def wrap_label(text: str, width: int = 20) -> str:
         """
         Inserts `\n` at word boundaries so that no line exceeds `width` characters.
@@ -460,7 +493,7 @@ def plot(args: dict[str, Any]) -> None:
         mpath = args["output_path"] / f"{model_name_map[model]}.nc"
 
         with timer(f"Plotting {model}", "s"):
-            model_data = xr.open_mfdataset(mpath)
+            model_data = xr.open_mfdataset(mpath, compat="no_conflicts")
             model_data = model_data[model]
             mean = model_data.mean(["x", "y"])
             if "cdim" in mean.dims:
@@ -515,6 +548,12 @@ def run(args: Dict[str, Any]) -> None:
                 )
             )
 
+    # get repo state and setup as attributes of netcdf
+    git_info = get_git_state(2)
+    git_attrs = {"git_commit": git_info["Commit"]}
+    if git_info.get("Changes"):
+        git_attrs["git_diff_file"] = write_git_diff_file(args["output_path"])
+
     for m in args["sgs_model"]:
         # setup dynamic model
         with timer(f"Coeff calculation SETUP for {model_name_map[m]} model", "s"):
@@ -536,10 +575,14 @@ def run(args: Dict[str, Any]) -> None:
         with timer(f"Coeff calculation compute for {model_name_map[m]} model", "s"):
             with ProgressBar():
                 coeff.compute()
+
         # write to disk
         with timer(f"Coeff calculation write for {model_name_map[m]} model", "s"):
             with ProgressBar():
                 args["output_path"].mkdir(parents=True, exist_ok=True)
+                # tag with git info
+                coeff.attrs.update(git_attrs)
+                # write to disk
                 coeff.to_netcdf(
                     out_fname,
                     mode="w",

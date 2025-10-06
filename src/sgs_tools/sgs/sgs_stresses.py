@@ -3,7 +3,6 @@ from typing import Sequence
 import xarray as xr
 
 from sgs_tools.geometry.tensor_algebra import tensor_self_outer_product
-from sgs_tools.physics.fields import strain_from_vel
 from sgs_tools.sgs.coarse_grain import CoarseGrain
 from sgs_tools.sgs.filter import Filter
 
@@ -61,17 +60,4 @@ def momentum_stresses(
     reynolds.attrs["long_name"] = r"$ \langle u_i' u_j' \rangle $"
     output.append(reynolds)
 
-    # strain at scale -- leave making it traceless to the client
-
-    if all(vel_mean[x].size >= 2 for x in space_dims):
-        rechunked = vel_mean.chunk({x: "auto" for x in space_dims})
-        strain = strain_from_vel(
-            rechunked,
-            space_dims=space_dims,
-            vec_dim=vec_dim,
-            new_dim=new_dim,
-            make_traceless=False,
-        )
-        output.append(strain)
-
-    return xr.merge(output).chunk({vec_dim: -1, new_dim: -1})
+    return xr.merge(output, compat="no_conflicts").chunk({vec_dim: -1, new_dim: -1})

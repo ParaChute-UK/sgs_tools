@@ -2,6 +2,18 @@ from argparse import ArgumentParser, _ArgumentGroup
 from pathlib import Path
 
 
+def add_version_group(parser: ArgumentParser) -> _ArgumentGroup:
+    fname = parser.add_argument_group("Package version")
+    fname.add_argument(
+        "-V",
+        "--version",
+        action="count",
+        default=0,
+        help="show package git status + diff",
+    )
+    return fname
+
+
 def add_input_group(parser: ArgumentParser) -> _ArgumentGroup:
     fname = parser.add_argument_group("I/O datasets on disk")
     fname.add_argument(

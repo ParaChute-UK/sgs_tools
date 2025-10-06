@@ -108,6 +108,13 @@ You can still use `pip` for user installations, but we recommend Poetry for cont
 
       > This adds dev tools like `tox`, `pytest`, `ruff`, `mypy`, and `pre-commit` to the dependencies.
 
+      ```console
+      poetry self add poetry-dynamic-versioning@latest
+      ```
+      > Install Poetry Dynamic Versioning plugin.
+        Make sure to run this inside the Poetry environment of the git repo, not from 'conda', 'pip', etc.
+        Check with ```poetry version``` that the Git tags, commit hashes / dirty markers are detected correctly.
+
   5. Activate Git hooks to help clean up formatting etc. on commit (this may slow down the commit somewhat).
       ```console
       pre-commit install

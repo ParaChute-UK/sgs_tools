@@ -76,7 +76,7 @@ def get_git_state(verbosity=1):
 
 def print_git_state(verbosity=1):
     git_info = get_git_state(verbosity)
-    print("\n".join([f"{k}:\n {v}" for k, v in git_info.items()]))
+    print("\n".join([f"{k}:\n{v}" for k, v in git_info.items()]))
 
 
 def write_git_diff_file(git_info: dict[str, str], out_path: Path | str = ".") -> str:

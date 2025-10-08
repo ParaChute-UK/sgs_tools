@@ -1,5 +1,15 @@
-from argparse import ArgumentParser, _ArgumentGroup
+from argparse import Action, ArgumentParser, _ArgumentGroup
 from pathlib import Path
+
+from sgs_tools.util.gitinfo import print_git_state
+
+
+class VerboseAction(Action):
+    def __call__(self, parser, namespace, values, option_string=None):
+        # Call the git info printer and exit immediately
+        if values > 0:
+            print_git_state(values)
+            parser.exit()
 
 
 def add_version_group(parser: ArgumentParser) -> _ArgumentGroup:
@@ -10,6 +20,7 @@ def add_version_group(parser: ArgumentParser) -> _ArgumentGroup:
         type=int,
         choices=range(4),
         default=0,
+        action=VerboseAction,
         help="show package git status (0=off, 1=hash, 2=files, 3=full difference)",
     )
     return fname

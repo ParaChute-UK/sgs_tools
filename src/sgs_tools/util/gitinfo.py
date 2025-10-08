@@ -47,7 +47,8 @@ def get_git_state(verbosity=0):
         return "<no git repo>"
 
     sha = _git(["rev-parse", "--short", "HEAD"], cwd=root) or "<no commit>"
-    status = _git(["status", "--porcelain"], cwd=root)
+    # include untracked files, exclude notebooks
+    status = _git(["status", "--porcelain", "--", ":!*.ipynb"], cwd=root)
     clean = not bool(status.strip())
     out = {}
     # 1 User: Commit hash + dirty flag

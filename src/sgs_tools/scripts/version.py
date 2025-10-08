@@ -14,7 +14,7 @@ def main():
     parser = argparse.ArgumentParser()
     add_version_group(parser)
     args = parser.parse_args()
-    print_git_state(max(args.version, 0))
+    print_git_state(max(args.git_version, 1))
 
 
 if __name__ == "__main__":

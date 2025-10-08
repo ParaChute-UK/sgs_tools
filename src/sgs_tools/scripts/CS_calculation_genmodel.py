@@ -526,7 +526,7 @@ def run(args: Dict[str, Any]) -> None:
             )
 
     # get repo state and setup as attributes of netcdf
-    git_info = get_git_state(2)
+    git_info = get_git_state(verbosity=3)
     git_attrs = {"git_commit": git_info["Commit"]}
     if git_info.get("Changes"):
         git_attrs["git_diff_file"] = write_git_diff_file(args["output_path"])

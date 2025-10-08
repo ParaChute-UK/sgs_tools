@@ -41,7 +41,7 @@ def _diff_untracked(root):
     return "\n".join(diffs).strip()
 
 
-def get_git_state(verbosity=0):
+def get_git_state(verbosity=1):
     root = _root()
     if not root:
         return "<no git repo>"
@@ -53,17 +53,17 @@ def get_git_state(verbosity=0):
     out = {}
     # 1 User: Commit hash + dirty flag
     commit = f"{sha}{'' if clean else '+dirty'}"
-    if verbosity >= 0:
+    if verbosity > 0:
         out["Commit"] = commit
 
     # 2 Development: list changed/untracked files
-    if verbosity >= 1:
+    if verbosity > 1:
         files = _git(["status", "--porcelain"], cwd=root)
         if files:
             out["Files"] = files.strip()
 
     # 3 Full debug/state logging
-    if verbosity >= 2:
+    if verbosity > 2:
         tracked = _diff_tracked(root)
         if tracked:
             out["Tracked"] = tracked
@@ -74,7 +74,7 @@ def get_git_state(verbosity=0):
     return out
 
 
-def print_git_state(verbosity=0):
+def print_git_state(verbosity=1):
     git_info = get_git_state(verbosity)
     print("\n".join([f"{k}:\n {v}" for k, v in git_info.items()]))
 

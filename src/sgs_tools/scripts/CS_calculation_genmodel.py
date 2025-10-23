@@ -19,6 +19,7 @@ from sgs_tools.scripts.arg_parsers import (
     add_plotting_group,
     add_version_group,
 )
+from sgs_tools.scripts.fname_out import build_output_fname
 from sgs_tools.sgs.CaratiCabot import DynamicCaratiCabotModel
 from sgs_tools.sgs.dynamic_coefficient import (
     LillyMinimisation1Model,
@@ -45,6 +46,7 @@ vel_models = ["Smag_vel", "Smag_vel_diag", "Carati", "Kosovic"]
 theta_models = ["Smag_theta", "Smag_theta_diag"]
 model_choices = ["all", "vel_all", "theta_all"] + vel_models + theta_models
 
+
 model_name_map = {
     "Smag_vel": "Cs_isotropic",
     "Smag_vel_diag": "Cs_diagonal",
@@ -53,6 +55,8 @@ model_name_map = {
     "Smag_theta": "Ctheta_isotropic",
     "Smag_theta_diag": "Ctheta_diagonal",
 }
+
+SCRIPT_TAG = "pp"
 
 
 def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
@@ -64,14 +68,26 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
     )
 
     add_version_group(parser)
-    io = add_input_group(parser)
-    io.add_argument(
+    add_input_group(parser)
+    output = parser.add_argument_group("Output datasets on disk")
+
+    output.add_argument(
         "output_path",
         type=Path,
         help="""
         Output directory, where to write netcdf output files.
         Will create/overwrite existing file and
         create any missing intermediate directories""",
+    )
+
+    output.add_argument(
+        "--fname_suffix",
+        type=str,
+        default="",
+        help=(
+            "Optional suffix appended to output filenames. "
+            r"Final pattern: {model_name}_{fname_suffix}_pp.nc"
+        ),
     )
 
     add_plotting_group(parser)
@@ -530,7 +546,13 @@ def run(args: Dict[str, Any]) -> None:
 
     for m in args["sgs_model"]:
         # setup dynamic model
-        with timer(f"Coeff calculation SETUP for {model_name_map[m]} model", "s"):
+        out_fname = build_output_fname(
+            args["output_path"] / model_name_map[m],
+            args["fname_suffix"],
+            SCRIPT_TAG,
+            ext=".nc",
+        )
+        with timer(f"Coeff calculation SETUP for {out_fname.stem} model", "s"):
             dynamic_model = model_selection(m, simulation, args["h_resolution"])
 
             coeff = compute_cs(
@@ -543,15 +565,13 @@ def run(args: Dict[str, Any]) -> None:
                 coeff = coeff.rename({"cdim": "c1"})
             coeff.name = m
 
-        out_fname = args["output_path"] / f"{model_name_map[m]}.nc"
-
         # trigger computation -- split for time logging
-        with timer(f"Coeff calculation compute for {model_name_map[m]} model", "s"):
+        with timer(f"Coeff calculation compute for {out_fname.stem} model", "s"):
             with TermimalProgressBar():
                 coeff.compute()
 
         # write to disk
-        with timer(f"Coeff calculation write for {model_name_map[m]} model", "s"):
+        with timer(f"Coeff calculation write for {out_fname.stem} model", "s"):
             with TermimalProgressBar():
                 args["output_path"].mkdir(parents=True, exist_ok=True)
                 # tag with git info

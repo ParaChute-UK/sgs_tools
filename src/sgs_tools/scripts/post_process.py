@@ -10,8 +10,11 @@ from sgs_tools.diagnostics.directional_profile import directional_profile
 from sgs_tools.diagnostics.spectra import spectra_1d_radial
 from sgs_tools.io.netcdf_writer import NetCDFWriter
 from sgs_tools.io.read import read
+from sgs_tools.scripts.fname_out import build_output_fname
 from sgs_tools.util.gitinfo import get_git_state, write_git_diff_file
 from sgs_tools.util.timer import timer
+
+BASE_NAME = "post_proc"
 
 v_profile_fields_out = [
     "vel",
@@ -31,8 +34,6 @@ v_profile_fields_out = [
     "cs_diag",
     "cs_theta_diag",
 ]
-
-
 v_profile_fields_map = {
     "vel": {"u", "v", "w"},
     "vel_horiz": {"u", "v"},
@@ -44,10 +45,8 @@ v_profile_fields_map = {
     "cs_diag": {"cs_1", "cs_2", "cs_3"},
     "cs_theta_diag": {"cs_theta_1", "cs_theta_2", "cs_theta_3"},
 }
-
 v_profiles_stats = ["mean", "std", "median"]
-v_prof_name = "post_proc_vert_profiles.nc"
-
+VPROF_TAG = "vprof"
 
 power_spectra_fields = ["u", "v", "w", "theta"]
 cross_spectra_fields = [
@@ -56,8 +55,7 @@ cross_spectra_fields = [
     ("u", "v"),
     ("theta", "w"),
 ]
-spectra_name = "post_proc_spectra.nc"
-
+SPECTRA_TAG = "spectra"
 
 anisotropy_fields = ["u", "v", "w"]
 box_delta_scales = [2, 4, 8, 16]
@@ -65,8 +63,7 @@ box_meter_scales = [800, 400, 200, 100]
 box_domain_scales = [1, 0.5, 0.25]
 gauss_scales = [2, 4]
 filter_shapes = ["gauss", "box", "coarse"]
-
-anisotropy_name = r"post_proc_anisotropy"
+ANISOTROPY_TAG = "anisotropy"
 
 
 def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
@@ -137,9 +134,11 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
 
     vprof.add_argument(
         "--vprofile_fname_out",
-        default=v_prof_name,
+        default=BASE_NAME,
         type=str,
-        help="""Filename where to save the generated vertical profile. relative to output_path""",
+        help="""**Core filename where to save the generated vertical profile. relative to output_path.
+                Will add an '.nc' extension (so don't give one).
+              """,
     )
 
     spectra = parser.add_argument_group("Horizontal spectra")
@@ -195,9 +194,11 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
 
     spectra.add_argument(
         "--hspectra_fname_out",
-        default=spectra_name,
+        default=BASE_NAME,
         type=str,
-        help="""Filename where to save the generated horisontal spectra. relative to output_path""",
+        help="""**Core** filename where to save the generated horisontal spectra. relative to output_path.
+                Will add an '.nc' extension (so don't give one).
+              """,
     )
 
     anisotropy = parser.add_argument_group("Anisotropy diagnostics")
@@ -259,11 +260,11 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
 
     spectra.add_argument(
         "--aniso_fname_out",
-        default=anisotropy_name,
+        default=BASE_NAME,
         type=Path,
         help="""
         **Core** filename where to save the generated anisotropy eigen values. relative to output_path.
-        Will append the filter label. Will set an '.nc' extension (whether given or not).
+        Will append the filter label. Will add an '.nc' extension (so don't give one).
         """,
     )
 
@@ -514,7 +515,6 @@ def run(args: Dict[str, Any]) -> None:
     simulation = post_process_fields(simulation, args["vprof_fields"])
 
     writer = NetCDFWriter(overwrite=args["overwrite_existing"])
-    output_dir = args["output_path"]
 
     hdims = args["hdims"]
 
@@ -531,7 +531,9 @@ def run(args: Dict[str, Any]) -> None:
             if f_missing:
                 print(f"Missing vertical profile fields {f_missing}")
             # don't overwrite but skip existing filters/scales
-            output_path = output_dir / args["vprofile_fname_out"]
+            output_path = build_output_fname(
+                args["output_path"] / args["vprofile_fname_out"], VPROF_TAG, ext=".nc"
+            )
             if writer.check_filename(output_path) and not writer.overwrite:
                 print(f"Warning: Skip existing file {output_path}.")
             else:
@@ -560,8 +562,9 @@ def run(args: Dict[str, Any]) -> None:
             spec_f_missing = set(args["power_spectra_fields"]) - set(pspec_fields)
             if spec_f_missing:
                 print(f"Missing spectra fields {spec_f_missing}")
-
-            output_path = output_dir / args["hspectra_fname_out"]
+            output_path = build_output_fname(
+                args["output_path"] / args["hspectra_fname_out"], SPECTRA_TAG, ext=".nc"
+            )
             if writer.check_filename(output_path) and not writer.overwrite:
                 print(f"Warning: Skip existing file {output_path}.")
             else:
@@ -613,9 +616,12 @@ def run(args: Dict[str, Any]) -> None:
                 with timer(
                     f"{filt_lbl}:{filt.scales()}", "s", f"{filt_lbl}:{filt.scales()}"
                 ):
-                    output_path = (
-                        output_dir / f"{args['aniso_fname_out'].stem}_{filt_lbl}"
-                    ).with_suffix(".nc")
+                    output_path = build_output_fname(
+                        args["output_path"] / args["aniso_fname_out"],
+                        filt_lbl,
+                        ANISOTROPY_TAG,
+                        ext=".nc",
+                    )
                     # don't over-write but skip existing filters/scales
                     if not writer.overwrite and writer.check_filename(output_path):
                         print(f"Warning: Skip existing file {output_path}.")

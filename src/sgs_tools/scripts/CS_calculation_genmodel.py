@@ -4,7 +4,6 @@ from typing import Any, Dict, Sequence
 
 import matplotlib.pyplot as plt
 import xarray as xr
-from dask.diagnostics import ProgressBar
 from numpy import inf
 from xarray.core.types import T_Xarray
 
@@ -38,6 +37,7 @@ from sgs_tools.sgs.Smagorinsky import (
     SmagorinskyVelocityModel,
 )
 from sgs_tools.util.gitinfo import get_git_state, write_git_diff_file
+from sgs_tools.util.terminal_progress_bar import TermimalProgressBar
 from sgs_tools.util.timer import timer
 
 # supported models
@@ -316,7 +316,7 @@ def pre_process(args: dict[str, Any]) -> xr.Dataset:
     if "h_resolution" in simulation.attrs:
         args["h_resolution"] = simulation.attrs["h_resolution"]
 
-    with ProgressBar():
+    with TermimalProgressBar():
         with timer("Extract grid-based fields", "s"):
             # slice to the requested sub-domain
             simulation = data_slice(simulation, args["t_range"], args["z_range"])
@@ -547,12 +547,12 @@ def run(args: Dict[str, Any]) -> None:
 
         # trigger computation -- split for time logging
         with timer(f"Coeff calculation compute for {model_name_map[m]} model", "s"):
-            with ProgressBar():
+            with TermimalProgressBar():
                 coeff.compute()
 
         # write to disk
         with timer(f"Coeff calculation write for {model_name_map[m]} model", "s"):
-            with ProgressBar():
+            with TermimalProgressBar():
                 args["output_path"].mkdir(parents=True, exist_ok=True)
                 # tag with git info
                 coeff.attrs.update(git_attrs)

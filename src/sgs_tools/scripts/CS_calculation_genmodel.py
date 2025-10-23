@@ -480,7 +480,12 @@ def plot(args: dict[str, Any]) -> None:
 
     figures = {}
     for model in args["sgs_model"]:
-        mpath = args["output_path"] / f"{model_name_map[model]}.nc"
+        mpath = build_output_fname(
+            args["output_path"] / model_name_map[model],
+            args["fname_suffix"],
+            SCRIPT_TAG,
+            ext=".nc",
+        )
 
         with timer(f"Plotting {model}", "s"):
             model_data = xr.open_mfdataset(mpath, compat="no_conflicts")

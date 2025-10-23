@@ -3,6 +3,7 @@ from pathlib import Path
 import pytest
 
 import sgs_tools.scripts.post_process as pp_um
+from sgs_tools.scripts.fname_out import build_output_fname
 
 
 @pytest.fixture
@@ -34,16 +35,16 @@ def test_args():
         "y",
         "--vertical_profiles",
         "--vprofile_fname_out",
-        "profiles.nc",
+        "profiles",
         "--horizontal_spectra",
         "--hspectra_fname_out",
-        "spectra.nc",
+        "spectra",
         "--radial_smooth_factor",
         "1",
         "--radial_truncation",
         "--anisotropy",
         "--aniso_fname_out",
-        "aniso.nc",
+        "aniso",
         "--box_delta_scales",
         "2",
         "4",
@@ -65,6 +66,12 @@ def test_main_full_pipeline(test_args, master_output_dir):
     pp_um.run(args)
 
     # Assert outputs exist
-    assert (tmp_path / args["vprofile_fname_out"]).exists()
-    assert (tmp_path / args["hspectra_fname_out"]).exists()
-    assert len(list(tmp_path.glob(f"{args['aniso_fname_out'].stem}*.nc"))) > 0
+
+    assert build_output_fname(
+        tmp_path / args["vprofile_fname_out"], pp_um.VPROF_TAG
+    ).exists()
+    assert build_output_fname(
+        tmp_path / args["hspectra_fname_out"], pp_um.SPECTRA_TAG
+    ).exists()
+    aniso_glob = build_output_fname(args["aniso_fname_out"], "*", pp_um.ANISOTROPY_TAG)
+    assert len(list(tmp_path.glob(str(aniso_glob)))) > 0

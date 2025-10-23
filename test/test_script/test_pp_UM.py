@@ -12,6 +12,8 @@ def test_args():
         "test/test_script/df667_800m_L63_Slicea_pr.nc",
         "um",
         "pp",
+        "--fname_suffix",
+        "test_me",
         "--h_resolution",
         "800",
         "--overwrite_existing",
@@ -68,10 +70,12 @@ def test_main_full_pipeline(test_args, master_output_dir):
     # Assert outputs exist
 
     assert build_output_fname(
-        tmp_path / args["vprofile_fname_out"], pp_um.VPROF_TAG
+        tmp_path / args["vprofile_fname_out"], args["fname_suffix"], pp_um.VPROF_TAG
     ).exists()
     assert build_output_fname(
-        tmp_path / args["hspectra_fname_out"], pp_um.SPECTRA_TAG
+        tmp_path / args["hspectra_fname_out"], args["fname_suffix"], pp_um.SPECTRA_TAG
     ).exists()
-    aniso_glob = build_output_fname(args["aniso_fname_out"], "*", pp_um.ANISOTROPY_TAG)
+    aniso_glob = build_output_fname(
+        args["aniso_fname_out"], args["fname_suffix"], "*", pp_um.ANISOTROPY_TAG
+    )
     assert len(list(tmp_path.glob(str(aniso_glob)))) > 0

@@ -100,7 +100,16 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
         action="store_true",
         help="""behaviour if diagnostic file already exists. default: skip""",
     )
-
+    output.add_argument(
+        "--fname_suffix",
+        type=str,
+        default="",
+        help=(
+            "Optional suffix appended to output filenames. "
+            r"Final pattern: {base_name}_{fname_suffix}_{statistics_tag}.nc, "
+            "where ``base_name`` is one of ``vprofile_fname_out``| ``hspectra_fname_out`` | ``aniso_fname_out``"
+        ),
+    )
     parser.add_argument(
         "--hdims",
         default=["x", "y"],
@@ -532,7 +541,10 @@ def run(args: Dict[str, Any]) -> None:
                 print(f"Missing vertical profile fields {f_missing}")
             # don't overwrite but skip existing filters/scales
             output_path = build_output_fname(
-                args["output_path"] / args["vprofile_fname_out"], VPROF_TAG, ext=".nc"
+                args["output_path"] / args["vprofile_fname_out"],
+                args["fname_suffix"],
+                VPROF_TAG,
+                ext=".nc",
             )
             if writer.check_filename(output_path) and not writer.overwrite:
                 print(f"Warning: Skip existing file {output_path}.")
@@ -563,7 +575,10 @@ def run(args: Dict[str, Any]) -> None:
             if spec_f_missing:
                 print(f"Missing spectra fields {spec_f_missing}")
             output_path = build_output_fname(
-                args["output_path"] / args["hspectra_fname_out"], SPECTRA_TAG, ext=".nc"
+                args["output_path"] / args["hspectra_fname_out"],
+                args["fname_suffix"],
+                SPECTRA_TAG,
+                ext=".nc",
             )
             if writer.check_filename(output_path) and not writer.overwrite:
                 print(f"Warning: Skip existing file {output_path}.")
@@ -618,6 +633,7 @@ def run(args: Dict[str, Any]) -> None:
                 ):
                     output_path = build_output_fname(
                         args["output_path"] / args["aniso_fname_out"],
+                        args["fname_suffix"],
                         filt_lbl,
                         ANISOTROPY_TAG,
                         ext=".nc",

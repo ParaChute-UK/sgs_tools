@@ -494,7 +494,7 @@ def run(args: Dict[str, Any]) -> None:
     )
     # parse args['prof_fields'] through if v_profile_fields_map, add them if missing
     v_profile_fields_in = {
-        v for f in args["vprof_fields"] for v in (v_profile_fields_map.get(f, {f}))
+        v for f in args["vprofile_fields"] for v in (v_profile_fields_map.get(f, {f}))
     }
     all_fields = (
         set()
@@ -512,7 +512,7 @@ def run(args: Dict[str, Any]) -> None:
     # slice to the requested sub-domain
     simulation = data_slice(simulation, args["t_range"], args["z_range"])
     # compute secondary diagnostics (if available)
-    simulation = post_process_fields(simulation, args["vprof_fields"])
+    simulation = post_process_fields(simulation, args["vprofile_fields"])
 
     writer = NetCDFWriter(overwrite=args["overwrite_existing"])
 

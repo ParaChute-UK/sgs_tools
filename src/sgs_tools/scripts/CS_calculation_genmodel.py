@@ -73,9 +73,6 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
         Will create/overwrite existing file and
         create any missing intermediate directories""",
     )
-    io.add_argument(
-        "--input_format", type=str, choices=["um", "monc", "sgs"], default="um"
-    )
 
     add_plotting_group(parser)
     add_dask_group(parser)

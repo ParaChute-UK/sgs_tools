@@ -12,6 +12,7 @@ All notable changes to this project are documented in this file.
   - turn geometry and diagnostics into sub-packages (#34)
   - dynamic versioning (instructions and docs)
   - enhancements to post_process
+  - unify output filename convention
 
 ### [0.1.0] - 2025-08-22
 

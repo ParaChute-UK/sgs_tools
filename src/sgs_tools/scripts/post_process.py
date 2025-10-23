@@ -31,32 +31,20 @@ v_profile_fields_out = [
     "cs_diag",
     "cs_theta_diag",
 ]
-v_profile_fields_in = [
-    # base
-    "u",
-    "v",
-    "w",
-    "theta",
-    # sgs
-    "tke",
-    "csDelta",
-    "cs",
-    "cs_theta",
-    "cs_1",
-    "cs_2",
-    "cs_3",
-    "cs_theta_1",
-    "cs_theta_2",
-    "cs_theta_3",
-    # diffusivities
-    "s",
-    "smag_visc_m",
-    "smag_visc_h",
-    "smag_visc_m_vert",
-    "smag_visc_h_vert",
-    # stability
-    # "Richardson",
-]
+
+
+v_profile_fields_map = {
+    "vel": {"u", "v", "w"},
+    "vel_horiz": {"u", "v"},
+    "s": {"Sij"},
+    "vert_heat_flux": {"theta", "w"},
+    "vert_mom_flux": {"u", "v", "w"},
+    "fluct_ke": {"u", "v", "w"},
+    "tke": {"u", "v", "w"},
+    "cs_diag": {"cs_1", "cs_2", "cs_3"},
+    "cs_theta_diag": {"cs_theta_1", "cs_theta_2", "cs_theta_3"},
+}
+
 v_profiles_stats = ["mean", "std", "median"]
 v_prof_name = "post_proc_vert_profiles.nc"
 
@@ -335,7 +323,9 @@ def data_slice(
 
 
 # create simple post-processing fields
-def post_process_fields(simulation: xr.Dataset) -> xr.Dataset:
+def post_process_fields(
+    simulation: xr.Dataset, requested_fields: Sequence[str]
+) -> xr.Dataset:
     from sgs_tools.geometry.tensor_algebra import Frobenius_norm
     from sgs_tools.physics.fields import (
         Fluct_TKE,
@@ -344,51 +334,58 @@ def post_process_fields(simulation: xr.Dataset) -> xr.Dataset:
         vertical_heat_flux,
     )
 
-    simulation["vel"] = compose_vector_components_on_grid(
-        [simulation["u"], simulation["v"], simulation["w"]],
-        target_dims=["x", "y", "z"],
-        vector_dim="c1",
-    )
-    # horizontal wind
-    simulation["vel_horiz"] = (simulation["vel"].sel(c1=[1, 2]) ** 2).sum("c1") ** 0.5
+    with_missing_dependencies = []
+    available = set(simulation)
+    for f in requested_fields:
+        dependencies = v_profile_fields_map.get(f, {f})
+        missing = dependencies - available
+        if missing:
+            with_missing_dependencies.append(f)
+            print(f"Skipping {f} because of missing dependencies {missing}")
 
-    if all([diag in simulation for diag in ["theta", "w"]]):
+    if "vel" not in with_missing_dependencies:
+        simulation["vel"] = compose_vector_components_on_grid(
+            [simulation["u"], simulation["v"], simulation["w"]],
+            target_dims=["x", "y", "z"],
+            vector_dim="c1",
+        )
+    # horizontal wind
+    if "vel_horiz" not in with_missing_dependencies:
+        simulation["vel_horiz"] = (simulation["u"] ** 2 + simulation["v"] ** 2) ** 0.5
+
+    if "vert_heat_flux" not in with_missing_dependencies:
         simulation["vert_heat_flux"] = vertical_heat_flux(
             simulation["w"], simulation["theta"], ["x", "y"]
         )
-    else:
-        print(
-            "Skipping missing inputs for cs_theta_diag: "
-            "['cs_theta_1', 'cs_theta_2', 'cs_theta_3']"
+
+    if "s" not in with_missing_dependencies:
+        simulation["Sij"] = strain_from_vel(
+            simulation["vel"],
+            space_dims=["x", "y", "z"],
+            vec_dim="c1",
+            new_dim="c2",
+            make_traceless=True,
         )
-        print("Available fields:", sorted(simulation, key=str))
+        simulation["s"] = Frobenius_norm(simulation["Sij"], ["c1", "c2"])
 
-    simulation["Sij"] = strain_from_vel(
-        simulation["vel"],
-        space_dims=["x", "y", "z"],
-        vec_dim="c1",
-        new_dim="c2",
-        make_traceless=True,
-    )
-    simulation["s"] = Frobenius_norm(simulation["Sij"], ["c1", "c2"])
+    if "vert_mom_flux" not in with_missing_dependencies:
+        simulation["vert_mom_flux"] = simulation["vel"] * simulation["w"]
 
-    simulation["vert_mom_flux"] = simulation["vel"] * simulation["w"]
-
-    simulation["fluct_ke"] = Fluct_TKE(
-        simulation["u"], simulation["v"], simulation["w"], ["x", "y", "z"], ["x", "y"]
-    )
-
-    if all([diag in simulation for diag in ["cs_1", "cs_2", "cs_3"]]):
+    if "fluct_ke" not in with_missing_dependencies:
+        simulation["fluct_ke"] = Fluct_TKE(
+            simulation["u"],
+            simulation["v"],
+            simulation["w"],
+            ["x", "y", "z"],
+            ["x", "y"],
+        )
+    if "cs_diag" not in with_missing_dependencies:
         simulation["cs_diag"] = compose_vector_components_on_grid(
             [simulation["cs_1"], simulation["cs_2"], simulation["cs_3"]],
             target_dims=[],
             vector_dim="c1",
         )
-    else:
-        print("Skipping missing inputs for cs_diag: ['cs_1', 'cs_2', 'cs_3']")
-        print("Available fields:", sorted(simulation, key=str))
-
-    if all([diag in simulation for diag in ["cs_theta_1", "cs_theta_2", "cs_theta_3"]]):
+    if "cs_theta_diag" not in with_missing_dependencies:
         simulation["cs_theta_diag"] = compose_vector_components_on_grid(
             [
                 simulation["cs_theta_1"],
@@ -398,13 +395,6 @@ def post_process_fields(simulation: xr.Dataset) -> xr.Dataset:
             target_dims=[],
             vector_dim="c1",
         )
-    else:
-        print(
-            "Skipping missing inputs for cs_theta_diag: "
-            "['cs_theta_1', 'cs_theta_2', 'cs_theta_3']"
-        )
-        print("Available fields:", sorted(simulation, key=str))
-
     return simulation
 
 
@@ -496,11 +486,15 @@ def choose_filter_set(
 
 
 def run(args: Dict[str, Any]) -> None:
+    # get the flattened set of args['prof_fields'] and rargs["cross_spectra_fields"]
     spectra_fields_list = set(
         [f for fl in args["cross_spectra_fields"] for f in fl]
         + args["power_spectra_fields"]
     )
-
+    # parse args['prof_fields'] through if v_profile_fields_map, add them if missing
+    v_profile_fields_in = {
+        v for f in args["vprof_fields"] for v in (v_profile_fields_map.get(f, {f}))
+    }
     all_fields = (
         set()
         .union(v_profile_fields_in)
@@ -516,7 +510,8 @@ def run(args: Dict[str, Any]) -> None:
     )
     # slice to the requested sub-domain
     simulation = data_slice(simulation, args["t_range"], args["z_range"])
-    simulation = post_process_fields(simulation)
+    # compute secondary diagnostics (if available)
+    simulation = post_process_fields(simulation, args["vprof_fields"])
 
     writer = NetCDFWriter(overwrite=args["overwrite_existing"])
     output_dir = args["output_path"]

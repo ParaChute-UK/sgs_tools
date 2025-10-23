@@ -504,7 +504,13 @@ def plot(args: dict[str, Any]) -> None:
             figures[model].suptitle(str(model).replace("_", " "), fontsize=14, y=1)
         if args["plot_path"] is not None:
             args["plot_path"].mkdir(parents=True, exist_ok=True)
-            figures[model].savefig(args["plot_path"] / f"{model}.pdf", dpi=180)
+            fname = build_output_fname(
+                args["plot_path"] / model_name_map[model],
+                args["fname_suffix"],
+                SCRIPT_TAG,
+                ext=".pdf",
+            )
+            figures[model].savefig(fname, dpi=180)
     # interactive plotting out of time
     if args["plot_show"]:
         for name, fig in figures.items():

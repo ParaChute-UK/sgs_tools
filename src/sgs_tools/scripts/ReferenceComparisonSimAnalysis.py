@@ -15,6 +15,7 @@ from sgs_tools.scripts.BasicComparisonSimAnalysis import (
     prof_fields,
     slice_fields,
 )
+from sgs_tools.scripts.cli_helpers import print_args_dict, print_header
 from sgs_tools.util.timer import timer
 
 plotting_styles = [
@@ -152,6 +153,8 @@ def main():
     with timer("Total execution time", "min"):
         with timer("Arguments", "ms"):
             args = parse_args()
+            print_header("ref_comparison")
+            print_args_dict(args, args["verbosity"])
 
         ds_collection, field_plot_map = io(args)
 

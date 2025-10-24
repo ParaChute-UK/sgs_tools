@@ -10,6 +10,7 @@ from sgs_tools.diagnostics.directional_profile import directional_profile
 from sgs_tools.diagnostics.spectra import spectra_1d_radial
 from sgs_tools.io.netcdf_writer import NetCDFWriter
 from sgs_tools.io.read import read
+from sgs_tools.scripts.cli_helpers import print_args_dict, print_header
 from sgs_tools.scripts.fname_out import build_output_fname
 from sgs_tools.util.gitinfo import get_git_state, write_git_diff_file
 from sgs_tools.util.timer import timer
@@ -76,6 +77,7 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
     from sgs_tools.scripts.arg_parsers import (
         add_dask_group,
         add_input_group,
+        add_output_group,
         add_version_group,
     )
 
@@ -86,8 +88,8 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
     )
     add_version_group(parser)
     add_input_group(parser)
-
-    output = parser.add_argument_group("Output datasets on disk")
+    output = add_output_group(parser)
+    output.title = "Output datasets on disk"
     output.add_argument(
         "output_path",
         type=Path,
@@ -662,6 +664,9 @@ def run(args: Dict[str, Any]) -> None:
 
 def main() -> None:
     args = parse_args()
+    print_header("post_process", args["verbosity"])
+    print_args_dict(args)
+
     with timer("Total execution time", "min"):
         run(args)
 

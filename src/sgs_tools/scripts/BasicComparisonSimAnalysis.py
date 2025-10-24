@@ -26,6 +26,7 @@ from sgs_tools.scripts.arg_parsers import (
     add_plotting_group,
     add_version_group,
 )
+from sgs_tools.scripts.cli_helpers import print_args_dict, print_header
 from sgs_tools.util.timer import timer
 
 default_plotting_style = {
@@ -637,6 +638,8 @@ def run(args: Dict[str, Any]) -> None:
 def main():
     with timer("Arguments", "ms"):
         args = parse_args()
+        print_header("sim_comparison")
+        print_args_dict(args, args["verbosity"])
     with timer("Total execution time", "min"):
         run(args)
 

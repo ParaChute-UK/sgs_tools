@@ -16,9 +16,11 @@ from sgs_tools.physics.fields import omega_from_vel, strain_from_vel
 from sgs_tools.scripts.arg_parsers import (
     add_dask_group,
     add_input_group,
+    add_output_group,
     add_plotting_group,
     add_version_group,
 )
+from sgs_tools.scripts.cli_helpers import print_args_dict, print_header
 from sgs_tools.scripts.fname_out import build_output_fname
 from sgs_tools.sgs.CaratiCabot import DynamicCaratiCabotModel
 from sgs_tools.sgs.dynamic_coefficient import (
@@ -69,7 +71,9 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
 
     add_version_group(parser)
     add_input_group(parser)
-    output = parser.add_argument_group("Output datasets on disk")
+
+    output = add_output_group(parser)
+    output.title = "Output datasets on disk"
 
     output.add_argument(
         "output_path",
@@ -599,7 +603,8 @@ def run(args: Dict[str, Any]) -> None:
 
 def main():
     args = parse_args()
-    print(args)
+    print_header("cs_dynamic", args["verbosity"])
+    print_args_dict(args)
     with timer("Total execution time", "min"):
         run(args)
 

@@ -21,7 +21,7 @@ def add_version_group(parser: ArgumentParser) -> _ArgumentGroup:
         choices=range(4),
         default=0,
         action=VerboseAction,
-        help="show package git status (0=off, 1=hash, 2=files, 3=full difference)",
+        help="show package git status (0=off, 1=hash, 2=files, 3=full difference) and exit",
     )
     return fname
 

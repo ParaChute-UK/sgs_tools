@@ -1,29 +1,29 @@
 from argparse import Action, ArgumentParser, _ArgumentGroup
 from pathlib import Path
 
-from sgs_tools.util.gitinfo import print_git_state
+from sgs_tools.util.gitinfo import print_version_info
 
 
-class VerboseAction(Action):
+class VersionAction(Action):
     def __call__(self, parser, namespace, values, option_string=None):
         # Call the git info printer and exit immediately
         if values > 0:
-            print_git_state(values)
+            print_version_info(values)
             parser.exit()
 
 
 def add_version_group(parser: ArgumentParser) -> _ArgumentGroup:
-    fname = parser.add_argument_group("Package version")
-    fname.add_argument(
+    version = parser.add_argument_group("Package version")
+    version.add_argument(
         "-V",
         "--git_version",
         type=int,
         choices=range(4),
         default=0,
-        action=VerboseAction,
-        help="show package git status (0=off, 1=hash, 2=files, 3=full difference) and exit",
+        action=VersionAction,
+        help="show package version (0=installed, 1=+last commit, 2=+modified files, 3=+ full file difference) and exit",
     )
-    return fname
+    return version
 
 
 def add_input_group(parser: ArgumentParser) -> _ArgumentGroup:
@@ -117,3 +117,15 @@ def add_dask_group(parser: ArgumentParser) -> _ArgumentGroup:
     )
 
     return dask
+
+
+def add_output_group(parser: ArgumentParser) -> _ArgumentGroup:
+    output = parser.add_argument_group("Output")
+    output.add_argument(
+        "-v",
+        "--verbosity",
+        action="count",
+        default=0,
+        help="verbosity level. Increase by -v , -vv, etc.",
+    )
+    return output

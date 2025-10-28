@@ -272,7 +272,7 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
     spectra.add_argument(
         "--aniso_fname_out",
         default=BASE_NAME,
-        type=Path,
+        type=str,
         help="""
         **Core** filename where to save the generated anisotropy eigen values. relative to output_path.
         Will append the filter label. Will add an '.nc' extension (so don't give one).

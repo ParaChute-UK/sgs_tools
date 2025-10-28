@@ -154,7 +154,7 @@ def main():
         with timer("Arguments", "ms"):
             args = parse_args()
             print_header("ref_comparison")
-            print_args_dict(args, args["verbosity"])
+            print_args_dict(args)
 
         ds_collection, field_plot_map = io(args)
 

@@ -639,7 +639,7 @@ def main():
     with timer("Arguments", "ms"):
         args = parse_args()
         print_header("sim_comparison")
-        print_args_dict(args, args["verbosity"])
+        print_args_dict(args)
     with timer("Total execution time", "min"):
         run(args)
 

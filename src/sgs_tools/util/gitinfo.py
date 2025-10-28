@@ -98,7 +98,7 @@ def write_git_diff_file(git_info: dict[str, str], out_path: Path | str = ".") ->
     timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
     state["date-time"] = [timestamp]
 
-    fname = f"sgs_tools_v{state['Commit'][0]}.json"
+    fname = f"sgs_tools_v{state['Repository Status'][0]}.json"
     full_path = Path(out_path) / fname
     full_path.parent.mkdir(parents=True, exist_ok=True)
     # add a run-time time-stamp for different dirty versions

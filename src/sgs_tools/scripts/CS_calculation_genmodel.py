@@ -165,15 +165,8 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
         args["z_range"][1] = inf
 
     # model parsing:
-    if "all" in args["sgs_model"]:
-        args["sgs_model"] = set(vel_models + theta_models)
-    elif "vel_all" in args["sgs_model"]:
-        args["sgs_model"].remove("vel_all")
-        args["sgs_model"] += vel_models
-    elif "theta_all" in args["sgs_model"]:
-        args["sgs_model"].remove("theta_all")
-        args["sgs_model"] += theta_models
-    args["sgs_model"] = set(args["sgs_model"])
+    args["sgs_model"] = parse_model_names(args["sgs_model"])
+
     # parameter consistency checks
     if args["filter_type"] == "gaussian":
         assert all([x in [2, 4] for x in args["filter_scales"]]), (
@@ -194,6 +187,19 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
     assert len(args["filter_scales"]) == len(args["regularize_filter_scales"])
 
     return args
+
+
+def parse_model_names(in_models: Sequence[str]) -> set[str]:
+    sgs_models = list(in_models)
+    if "all" in in_models:
+        sgs_models = vel_models + theta_models
+    elif "vel_all" in in_models:
+        sgs_models.remove("vel_all")
+        sgs_models += vel_models
+    elif "theta_all" in sgs_models:
+        sgs_models.remove("theta_all")
+        sgs_models += theta_models
+    return set(sgs_models)
 
 
 def make_filter(shape: str, scale: int, dims=Sequence[str]) -> Filter:

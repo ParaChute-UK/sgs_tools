@@ -662,8 +662,8 @@ def run(args: Dict[str, Any]) -> None:
                             writer.write(evals, output_path)
 
 
-def main() -> None:
-    args = parse_args()
+def main(arguments: Sequence[str] | None = None) -> None:
+    args = parse_args(arguments)
     print_header("post_process", args["verbosity"])
     print_args_dict(args)
 

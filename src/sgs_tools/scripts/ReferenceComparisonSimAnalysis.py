@@ -1,6 +1,6 @@
 from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
 from pathlib import Path
-from typing import Any
+from typing import Any, Dict, Sequence
 
 from numpy import array, inf
 
@@ -36,7 +36,7 @@ plotting_styles = [
 ]
 
 
-def parse_args() -> dict[str, Any]:
+def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
     parser = ArgumentParser(
         description="""
                     Create (and optionally save) standard diagnostic plots for
@@ -123,7 +123,7 @@ def parse_args() -> dict[str, Any]:
     add_dask_group(parser)
 
     # parse arguments into a dictionary
-    args = vars(parser.parse_args())
+    args = vars(parser.parse_args(arguments))
 
     # collated input files. Order matters -- should match order in plotting_styles
     args["input_files"] = [args["target"], args["reference"]]
@@ -149,10 +149,10 @@ def parse_args() -> dict[str, Any]:
     return args
 
 
-def main():
+def main(arguments: Sequence[str] | None = None) -> None:
     with timer("Total execution time", "min"):
         with timer("Arguments", "ms"):
-            args = parse_args()
+            args = parse_args(arguments)
             print_header("ref_comparison")
             print_args_dict(args)
 

@@ -635,9 +635,9 @@ def run(args: Dict[str, Any]) -> None:
         plot(ds_collection, args, slice_fields, prof_fields, field_plot_map)
 
 
-def main():
+def main(arguments: Sequence[str] | None = None) -> None:
     with timer("Arguments", "ms"):
-        args = parse_args()
+        args = parse_args(arguments)
         print_header("sim_comparison")
         print_args_dict(args)
     with timer("Total execution time", "min"):

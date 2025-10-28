@@ -601,8 +601,8 @@ def run(args: Dict[str, Any]) -> None:
                 )
 
 
-def main():
-    args = parse_args()
+def main(arguments: Sequence[str] | None = None) -> None:
+    args = parse_args(arguments)
     print_header("cs_dynamic", args["verbosity"])
     print_args_dict(args)
     with timer("Total execution time", "min"):

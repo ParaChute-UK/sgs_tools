@@ -280,10 +280,16 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
     )
 
     add_dask_group(parser)
-
     # parse arguments into a dictionary
     args = vars(parser.parse_args(arguments))
 
+    if not (
+        args["vertical_profiles"] or args["horizontal_spectra"] or args["anisotropy"]
+    ):
+        parser.error(
+            "No analysis selected. Please enable at least one of "
+            "--anisotropy, --horizontal-spectra, or --vertical-profiles."
+        )
     # check io group consistency
     if args["input_format"] == "um":
         assert args["h_resolution"] > 0, (
@@ -507,12 +513,15 @@ def run(args: Dict[str, Any]) -> None:
     v_profile_fields_in = {
         v for f in args["vprofile_fields"] for v in (v_profile_fields_map.get(f, {f}))
     }
-    all_fields = (
-        set()
-        .union(v_profile_fields_in)
-        .union(spectra_fields_list)
-        .union(anisotropy_fields)
-    )
+    all_fields: set[str] = set()
+    if args["vertical_profiles"]:
+        all_fields = all_fields.union(v_profile_fields_in)
+
+    if args["horizontal_spectra"]:
+        all_fields = all_fields.union(spectra_fields_list)
+
+    if args["anisotropy"]:
+        all_fields = all_fields.union(anisotropy_fields)
 
     simulation = read(
         args["input_files"],

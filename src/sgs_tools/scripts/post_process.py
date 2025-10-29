@@ -352,31 +352,32 @@ def post_process_fields(
         vertical_heat_flux,
     )
 
-    with_missing_dependencies = []
+    supported = []
     available = set(simulation)
     for f in requested_fields:
         dependencies = v_profile_fields_map.get(f, {f})
         missing = dependencies - available
-        if missing:
-            with_missing_dependencies.append(f)
+        if not missing:
+            supported.append(f)
+        else:
             print(f"Skipping {f} because of missing dependencies {missing}")
 
-    if "vel" not in with_missing_dependencies:
+    if "vel" in supported:
         simulation["vel"] = compose_vector_components_on_grid(
             [simulation["u"], simulation["v"], simulation["w"]],
             target_dims=["x", "y", "z"],
             vector_dim="c1",
         )
     # horizontal wind
-    if "vel_horiz" not in with_missing_dependencies:
+    if "vel_horiz" in supported:
         simulation["vel_horiz"] = (simulation["u"] ** 2 + simulation["v"] ** 2) ** 0.5
 
-    if "vert_heat_flux" not in with_missing_dependencies:
+    if "vert_heat_flux" in supported:
         simulation["vert_heat_flux"] = vertical_heat_flux(
             simulation["w"], simulation["theta"], ["x", "y"]
         )
 
-    if "s" not in with_missing_dependencies:
+    if "s" in supported:
         simulation["Sij"] = strain_from_vel(
             simulation["vel"],
             space_dims=["x", "y", "z"],
@@ -386,10 +387,10 @@ def post_process_fields(
         )
         simulation["s"] = Frobenius_norm(simulation["Sij"], ["c1", "c2"])
 
-    if "vert_mom_flux" not in with_missing_dependencies:
+    if "vert_mom_flux" in supported:
         simulation["vert_mom_flux"] = simulation["vel"] * simulation["w"]
 
-    if "fluct_ke" not in with_missing_dependencies:
+    if "fluct_ke" in supported:
         simulation["fluct_ke"] = Fluct_TKE(
             simulation["u"],
             simulation["v"],
@@ -397,13 +398,13 @@ def post_process_fields(
             ["x", "y", "z"],
             ["x", "y"],
         )
-    if "cs_diag" not in with_missing_dependencies:
+    if "cs_diag" in supported:
         simulation["cs_diag"] = compose_vector_components_on_grid(
             [simulation["cs_1"], simulation["cs_2"], simulation["cs_3"]],
             target_dims=[],
             vector_dim="c1",
         )
-    if "cs_theta_diag" not in with_missing_dependencies:
+    if "cs_theta_diag" in supported:
         simulation["cs_theta_diag"] = compose_vector_components_on_grid(
             [
                 simulation["cs_theta_1"],

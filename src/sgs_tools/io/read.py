@@ -28,7 +28,7 @@ def read(
     .. note::
         - For ``monc`` format, resolution is inferred from metadata and assumed isotropic in x and y
         - For ``um`` format, resolution must be explicitly provided via `kwargs`.
-
+        - For ``sgs`` format, if h_resolution is not a dataset attribute it is guessed by the spacing in "x" and "y" coordinates
     """
 
     if input_format == "sgs":
@@ -36,7 +36,15 @@ def read(
             input_files,
             requested_fields=requested_fields,
         )
-        assert "h_resolution" in simulation.attrs, "missing attribute 'h_resolution'."
+        if "h_resolution" not in simulation.attrs:
+            dx = simulation.coords["x"].diff(dim="x")
+            dy = simulation.coords["y"].diff(dim="y")
+            assert dx.std().item() < 1e-10
+            assert dy.std().item() < 1e-10
+
+            assert np.isclose(dx[0], dy[0])
+            simulation.attrs["h_resolution"] = dx[0].item()
+
     elif input_format == "um":
         simulation = data_ingest_UM_on_single_grid(
             input_files, requested_fields=requested_fields, res=kwargs["resolution"]

@@ -1,4 +1,8 @@
-from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
+from argparse import (
+    ArgumentDefaultsHelpFormatter,
+    ArgumentParser,
+    RawDescriptionHelpFormatter,
+)
 from pathlib import Path
 from typing import Any, Dict, Sequence
 
@@ -22,6 +26,7 @@ from sgs_tools.scripts.arg_parsers import (
 )
 from sgs_tools.scripts.cli_helpers import print_args_dict, print_header
 from sgs_tools.scripts.fname_out import build_output_fname
+from sgs_tools.scripts.post_process import main as vprof_main
 from sgs_tools.sgs.CaratiCabot import DynamicCaratiCabotModel
 from sgs_tools.sgs.dynamic_coefficient import (
     LillyMinimisation1Model,
@@ -58,15 +63,42 @@ model_name_map = {
     "Smag_theta_diag": "Ctheta_diagonal",
 }
 
-SCRIPT_TAG = "pp"
+SCRIPT_TAG = "offline"
+
+
+class CustomFormatter(ArgumentDefaultsHelpFormatter, RawDescriptionHelpFormatter):
+    pass
 
 
 def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
     parser = ArgumentParser(
-        description="""Compute dynamic Smagorinsky coefficients as function
-                        of scale from UM NetCDF output and store them in
-                        a NetCDF files""",
-        formatter_class=ArgumentDefaultsHelpFormatter,
+        description="""
+        CS Dynamic Workflow
+
+        A unified interface for computing and analyzing dynamic model coefficients.
+
+        This tool provides three independent but interoperable sub-commands.
+          - 'compute' — compute dynamic coefficient fields
+             for selected SGS models and store them as NetCDF output files. (default)
+
+          - 'vprof' — compute vertical profiles by reading the coefficient
+             datasets produced by 'compute' and writing the results back to disk.
+
+          - 'plot' — generate basic diagnostic plots from the outputs of 'compute';
+             plots can be shown interactively or saved to disk.
+
+        Can run the sub-command individually or together, provided the necessary
+        input or intermediate files exist on disk. If no sub-command is given
+        will run just 'compute'
+        """,
+        formatter_class=CustomFormatter,
+    )
+    parser.add_argument(
+        "commands",
+        nargs="*",
+        choices=["compute", "vprof", "plot"],
+        help="Workflow steps to execute",
+        default="compute",
     )
 
     add_version_group(parser)
@@ -94,12 +126,9 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
         ),
     )
 
-    add_plotting_group(parser)
     add_dask_group(parser)
 
-    model = parser.add_argument_group("Model parameters")
-
-    model.add_argument(
+    parser.add_argument(
         "--sgs_model",
         type=str,
         nargs="+",
@@ -108,7 +137,15 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
         help="Choice of models for which to compute dynamic coefficients.",
     )
 
-    model.add_argument(
+    compute = parser.add_argument_group(
+        title="Compute dynamic coefficients fields",
+        description=(
+            "Compute dynamic coefficient fields for the selected SGS models, "
+            "filtering and regularization kernels and scale. "
+            "Save each model to separate NetCDF file."
+        ),
+    )
+    compute.add_argument(
         "--filter_type",
         type=str,
         default="box",
@@ -116,7 +153,7 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
         help="Shape of filter kernel to use for scale separation.",
     )
 
-    model.add_argument(
+    compute.add_argument(
         "--filter_scales",
         type=int,
         default=(2,),
@@ -126,7 +163,7 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
         "Otherwise, must provide as many values as for `regularize_filter_scales`",
     )
 
-    model.add_argument(
+    compute.add_argument(
         "--regularize_filter_type",
         type=str,
         default="box",
@@ -134,7 +171,7 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
         help="Shape of filter kernel used for coefficient regularization.",
     )
 
-    model.add_argument(
+    compute.add_argument(
         "--regularize_filter_scales",
         type=int,
         default=(2,),
@@ -144,6 +181,22 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
         "Otherwise, must provide as many values as for `filter_scale`",
     )
 
+    # Vertical profile workflow
+    parser.add_argument_group(
+        title="Compute vertical profiles",
+        description=(
+            "Compute vertical profiles for each selected SGS model "
+            "and save them as NetCDF files."
+        ),
+    )
+
+    # Plotting workflow
+    plotting = add_plotting_group(parser)
+    plotting.title = "Plotting parameters"
+    plotting.description = (
+        "Generate basic diagnostic plots from the compute output. "
+        "Plots can be shown interactively or saved to disk."
+    )
     # parse arguments into a dictionary
     args = vars(parser.parse_args(arguments))
 
@@ -244,7 +297,7 @@ def add_scale_coords(
 def data_slice(
     ds: xr.Dataset, t_range: Sequence[float], z_range: Sequence[float]
 ) -> xr.Dataset:
-    """restrit ds to the intervals inside [t,z]_range.
+    """Restrict ds to the intervals inside [t,z]_range.
        Restrict a set of standard coordinate names for t and z.
     :param ds: input dataset/dataarray
     :param t_range: time interval
@@ -468,7 +521,47 @@ def compute_cs(
     return cs_at_scale
 
 
+def compute_vprof(args: dict[str, Any]) -> None:
+    """Compute vertical profiles and save to disk
+    -- can be called standalone provided args contain the required keys
+    """
+    for model in args["sgs_model"]:
+        cs_model_path = build_output_fname(
+            args["output_path"] / model_name_map[model],
+            args["fname_suffix"],
+            SCRIPT_TAG,
+            ext=".nc",
+        )
+
+        vprof_args = [
+            cs_model_path,
+            "sgs",
+            args["output_path"],
+            "--fname_suffix",
+            "_".join([args["fname_suffix"], SCRIPT_TAG]),
+            "--overwrite_existing",
+            "--vertical_profiles",
+            "--vprofile_fname_out",
+            model_name_map[model],
+            "--z_chunk_size",
+            args["z_chunk_size"],
+            "--t_chunk_size",
+            args["t_chunk_size"],
+            "--vprofile_fields",
+            model,
+        ]
+        if args["verbosity"]:
+            vprof_args += ["-" + "v" * args["verbosity"]]
+        # convert all to str for parsing
+        vprof_args = list(map(str, vprof_args))
+        with timer(f"Statistics {model}", "s"):
+            vprof_main(vprof_args)
+
+
 def plot(args: dict[str, Any]) -> None:
+    """Plot Cs basic plots and save to disk
+    -- can be called standalone provided args contain the required keys
+    """
     row_lbl = "scale"
 
     assert args["plot_path"] is not None or args["plot_show"]
@@ -529,7 +622,7 @@ def plot(args: dict[str, Any]) -> None:
         plt.show()
 
 
-def run(args: Dict[str, Any]) -> None:
+def compute(args: Dict[str, Any]) -> None:
     # read and pre-process simulation
     # read UM stasth files: data
     with timer("Read Dataset", "s"):
@@ -611,16 +704,22 @@ def main(arguments: Sequence[str] | None = None) -> None:
     args = parse_args(arguments)
     print_header("cs_dynamic", args["verbosity"])
     print_args_dict(args)
-    with timer("Total execution time", "min"):
-        run(args)
 
-    # plot
-    if args["plot_show"] or args["plot_path"] is not None:
-        with timer("Plotting", "s"):
-            # try:
-            plot(args)
-        # except:
-        #   print("Failed in generating plots")
+    # Map sub-command names to functions and sort in logical order
+    command_map = {"compute": compute, "vprof": compute_vprof, "plot": plot}
+    command_priority = {"compute": 0, "vprof": 1, "plot": 1}
+    # Sort any provided commands according to priority
+    commands = sorted(
+        dict.fromkeys(args["commands"]),  # deduplicate but preserve order
+        key=lambda c: command_priority.get(c, 99),
+    )
+
+    for cmd in commands:
+        func = command_map.get(cmd)
+        if func is None:
+            raise ValueError(f"Unknown command: {cmd}")
+        with timer(f"{cmd} execution", "min"):
+            func(args)
 
 
 if __name__ == "__main__":

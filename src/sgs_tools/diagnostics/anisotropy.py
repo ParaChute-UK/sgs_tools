@@ -24,8 +24,8 @@ def anisotropy_analysis(
 ) -> xr.Dataset:
     tensor_dims = [vec_dim, vec_dim + "_1"]
 
-    # rechunk along vector dimensions
-    vel = velocity.chunk({x: -1 for x in [vec_dim]})
+    # rechunk along vector and filering dimensions
+    vel = velocity.chunk({x: -1 for x in [vec_dim] + list(filt.filter_dims)})
 
     # with performance_report(filename = profile_path):
     # with client.get_task_stream() as task[f'{sim}_{flt_lbl}']:

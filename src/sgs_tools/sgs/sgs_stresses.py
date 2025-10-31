@@ -32,7 +32,7 @@ def momentum_stresses(
 
     output = []
     # filt(v)
-    vel_mean = filter.filter(vel).persist()
+    vel_mean = filter.filter(vel)
 
     # filt(v v)
     covariance = tensor_self_outer_product(vel, vec_dim=vec_dim, new_dim=new_dim)

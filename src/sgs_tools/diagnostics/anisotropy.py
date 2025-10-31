@@ -25,14 +25,13 @@ def anisotropy_analysis(
     tensor_dims = [vec_dim, vec_dim + "_1"]
 
     # rechunk along vector dimensions
-    vel = velocity.chunk({x: -1 for x in [vec_dim]}).persist()
+    vel = velocity.chunk({x: -1 for x in [vec_dim]})
 
     # with performance_report(filename = profile_path):
     # with client.get_task_stream() as task[f'{sim}_{flt_lbl}']:
     with timer("Filtering:"):
         tensors_view = momentum_stresses(vel, filt, *tensor_dims)
-        # triggers async computation now, avoids DAG duplication
-        tensors = tensors_view.persist()
+        tensors = tensors_view
 
     with timer("Anisotropy:"):
         ani_tensors = anisotropy_renorm(tensors, tensor_dims)
@@ -52,8 +51,4 @@ def anisotropy_analysis(
             eigen_values[v].attrs = tensors_view[v].attrs
             eigen_values[v].name = tensors_view[v].name
             eigen_values[v].attrs["name"] = name_dic[tensors_view[v].name]
-
-        # triggers async computation now
-        # evals = xr.merge(eigen_values, compat='no_conflicts').persist()
-        evals = eigen_values.persist()
-    return evals  # type: ignore
+    return eigen_values  # type: ignore

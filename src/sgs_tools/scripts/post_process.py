@@ -417,6 +417,40 @@ def post_process_fields(
     return simulation
 
 
+def pre_process(args: dict[str, Any], req_fields: list[str]) -> xr.Dataset:
+    simulation = read(
+        args["input_files"],
+        args["input_format"],
+        requested_fields=req_fields,
+        resolution=args["h_resolution"],
+    )
+    # overwrite resolution if recorded during read
+    if "h_resolution" in simulation.attrs:
+        args["h_resolution"] = simulation.attrs["h_resolution"]
+
+    # slice to the requested sub-domain
+    simulation = data_slice(simulation, args["t_range"], args["z_range"])
+    # compute secondary diagnostics (if available)
+    simulation = post_process_fields(simulation, args["vprofile_fields"])
+
+    # chunk
+    chunks = {
+        "z": args["z_chunk_size"],
+        "t_0": args["t_chunk_size"],
+        "x": -1,
+        "y": -1,
+        "c1": -1,
+        "c2": -1,
+        "c1_1": -1,
+    }
+    # add caveat for degenerate t or z-slice that may drop a coordinate
+    simulation = simulation.chunk(
+        chunks={x: y for x, y in chunks.items() if x in simulation.dims}
+    )
+    simulation = simulation.persist()
+    return simulation
+
+
 # select filters based on number of points and horizontal spacing
 def choose_filter_set(
     hminsize: int,  # number of grid points in horizontal direction
@@ -513,17 +547,9 @@ def run(args: Dict[str, Any]) -> None:
 
     if args["anisotropy"]:
         all_fields = all_fields.union(anisotropy_fields)
+        # read and pre-process simulation
 
-    simulation = read(
-        args["input_files"],
-        args["input_format"],
-        list(all_fields),
-        resolution=args["h_resolution"],
-    )
-    # slice to the requested sub-domain
-    simulation = data_slice(simulation, args["t_range"], args["z_range"])
-    # compute secondary diagnostics (if available)
-    simulation = post_process_fields(simulation, args["vprofile_fields"])
+    simulation = pre_process(args, list(all_fields))
 
     writer = NetCDFWriter(overwrite=args["overwrite_existing"])
 

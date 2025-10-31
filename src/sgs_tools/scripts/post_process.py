@@ -685,15 +685,6 @@ def run(args: Dict[str, Any]) -> None:
                             {"filter": xr.DataArray([filt_lbl], dims=["filter"])}
                         )
                         with timer(f"write {output_path}", "s"):
-                            # rechunk for IO optimisation
-                            # have to do explicit rechunking because UM date-time coordinate is an object
-                            evals.chunk(
-                                {
-                                    dim: "auto"
-                                    for dim in ["x", "y", "z", "c1", "c2"]
-                                    if dim in evals.dims
-                                }
-                            )
                             evals.attrs.update(git_attrs)
                             writer.write(evals, output_path)
 

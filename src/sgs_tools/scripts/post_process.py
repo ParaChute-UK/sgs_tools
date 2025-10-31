@@ -13,6 +13,7 @@ from sgs_tools.io.read import read
 from sgs_tools.scripts.cli_helpers import print_args_dict, print_header
 from sgs_tools.scripts.fname_out import build_output_fname
 from sgs_tools.util.gitinfo import get_git_state, write_git_diff_file
+from sgs_tools.util.terminal_progress_bar import TerminalProgressBar
 from sgs_tools.util.timer import timer
 
 BASE_NAME = "post_proc"
@@ -565,7 +566,10 @@ def run(args: Dict[str, Any]) -> None:
         git_attrs["git_diff_file"] = write_git_diff_file(args["output_path"])
 
     if args["vertical_profiles"]:
-        with timer("Vertical profiles", "s"):
+        with (
+            timer("Vertical profiles", "s"),
+            TerminalProgressBar(),
+        ):
             f_pr = [f for f in args["vprofile_fields"] if f in simulation]
             f_missing = [f for f in args["vprofile_fields"] if f not in simulation]
             if f_missing:
@@ -591,7 +595,10 @@ def run(args: Dict[str, Any]) -> None:
                     writer.write(profile, output_path)
 
     if args["horizontal_spectra"]:
-        with timer("Horizontal spectra", "s", "Horizontal spectra"):
+        with (
+            timer("Horizontal spectra"),
+            TerminalProgressBar(),
+        ):
             pspec_fields = [f for f in args["power_spectra_fields"] if f in simulation]
             cspec_fields = [
                 s
@@ -633,7 +640,7 @@ def run(args: Dict[str, Any]) -> None:
                     writer.write(spec_ds, output_path)
 
     if args["anisotropy"]:
-        with timer("Anisotropy", "s", "Anisotropy"):
+        with timer("Anisotropy", "s"), TerminalProgressBar():
             # anisotropy diagnostic
 
             # min horizontal number of cells

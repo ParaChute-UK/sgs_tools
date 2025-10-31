@@ -7,7 +7,6 @@ from sgs_tools.geometry.tensor_algebra import anisotropy_renorm
 from sgs_tools.sgs.coarse_grain import CoarseGrain
 from sgs_tools.sgs.filter import Filter
 from sgs_tools.sgs.sgs_stresses import momentum_stresses
-from sgs_tools.util.timer import timer
 
 name_dic: Dict[Hashable, Hashable] = {
     "filt_v_stress": "Filtered stress",
@@ -26,29 +25,22 @@ def anisotropy_analysis(
 
     # rechunk along vector and filering dimensions
     vel = velocity.chunk({x: -1 for x in [vec_dim] + list(filt.filter_dims)})
-
-    # with performance_report(filename = profile_path):
-    # with client.get_task_stream() as task[f'{sim}_{flt_lbl}']:
-    with timer("Filtering:"):
-        tensors_view = momentum_stresses(vel, filt, *tensor_dims)
-        tensors = tensors_view
-
-    with timer("Anisotropy:"):
-        ani_tensors = anisotropy_renorm(tensors, tensor_dims)
-    with timer("e-values:"):
-        # compute eigen values of anisotropy tensor
-        # fill nans with 0: nans come from stagnation points/laminar flow
-        # (v.v==0 or gradv.gradv == 0), so fill with zeroes
-        # Note -- this expect symmetric matrices and take the Lower triangular part
-        eigen_values = xarray_einstats.linalg.eigvalsh(
-            ani_tensors.fillna(0),  # type: ignore
-            tensor_dims,
-            dask="parallelized",
-        )
-
-        # restore lost attributes frp, egvalsh computation
-        for v in eigen_values:
-            eigen_values[v].attrs = tensors_view[v].attrs
-            eigen_values[v].name = tensors_view[v].name
-            eigen_values[v].attrs["name"] = name_dic[tensors_view[v].name]
+    # collect tensors to be analysed
+    tensors = momentum_stresses(vel, filt, *tensor_dims)
+    # renormalise by trace
+    ani_tensors = anisotropy_renorm(tensors, tensor_dims)
+    # compute eigen values of anisotropy tensor
+    # fill nans with 0: nans come from stagnation points/laminar flow
+    # (v.v==0 or gradv.gradv == 0), so fill with zeroes
+    # Note -- this expect symmetric matrices and take the Lower triangular part
+    eigen_values = xarray_einstats.linalg.eigvalsh(
+        ani_tensors.fillna(0),  # type: ignore
+        tensor_dims,
+        dask="parallelized",
+    )
+    # restore lost attributes frp, egvalsh computation
+    for v in eigen_values:
+        eigen_values[v].attrs = tensors[v].attrs
+        eigen_values[v].name = tensors[v].name
+        eigen_values[v].attrs["name"] = name_dic[tensors[v].name]
     return eigen_values  # type: ignore

@@ -3,7 +3,7 @@ import sys
 from dask.diagnostics import ProgressBar
 
 
-class TermimalProgressBar:
+class TerminalProgressBar:
     def __init__(self):
         self.enabled = sys.stdout.isatty()
         self._pbar = ProgressBar() if self.enabled else None

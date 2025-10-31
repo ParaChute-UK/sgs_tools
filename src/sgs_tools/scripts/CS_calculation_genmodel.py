@@ -45,7 +45,7 @@ from sgs_tools.sgs.Smagorinsky import (
     SmagorinskyVelocityModel,
 )
 from sgs_tools.util.gitinfo import get_git_state, write_git_diff_file
-from sgs_tools.util.terminal_progress_bar import TermimalProgressBar
+from sgs_tools.util.terminal_progress_bar import TerminalProgressBar
 from sgs_tools.util.timer import timer
 
 # supported models
@@ -395,7 +395,7 @@ def pre_process(args: dict[str, Any]) -> xr.Dataset:
     if "h_resolution" in simulation.attrs:
         args["h_resolution"] = simulation.attrs["h_resolution"]
 
-    with TermimalProgressBar():
+    with TerminalProgressBar():
         with timer("Extract grid-based fields", "s"):
             # slice to the requested sub-domain
             simulation = data_slice(simulation, args["t_range"], args["z_range"])
@@ -681,12 +681,12 @@ def compute(args: Dict[str, Any]) -> None:
 
         # trigger computation -- split for time logging
         with timer(f"Coeff calculation compute for {out_fname.stem} model", "s"):
-            with TermimalProgressBar():
+            with TerminalProgressBar():
                 coeff.compute()
 
         # write to disk
         with timer(f"Coeff calculation write for {out_fname.stem} model", "s"):
-            with TermimalProgressBar():
+            with TerminalProgressBar():
                 args["output_path"].mkdir(parents=True, exist_ok=True)
                 # tag with git info
                 coeff.attrs.update(git_attrs)

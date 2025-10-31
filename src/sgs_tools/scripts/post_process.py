@@ -223,7 +223,7 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
     anisotropy.add_argument(
         "--box_domain_scales",
         nargs="+",
-        default=box_domain_scales,
+        default=[],
         type=float,
         help="""
         Anisotropy box filter and coarse-graining scales in fraction of the horizontal domain size.
@@ -235,7 +235,7 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
     anisotropy.add_argument(
         "--box_meter_scales",
         nargs="+",
-        default=box_meter_scales,
+        default=[],
         type=float,
         help="""
         Anisotropy box filter and coarse-graining scales in meters.
@@ -247,7 +247,7 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
     anisotropy.add_argument(
         "--box_delta_scales",
         nargs="+",
-        default=box_delta_scales,
+        default=[],
         type=int,
         help="""
         Anisotropy box filter and coarse-graining scales in units of horizontal grid spacing `delta`.
@@ -257,7 +257,7 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
     anisotropy.add_argument(
         "--gauss_scales",
         nargs="+",
-        default=gauss_scales,
+        default=[],
         type=int,
         help="""Anisotropy Gaussian filter scales in  units of horizontal grid spacing. Support 2 and 4""",
     )
@@ -421,20 +421,10 @@ def post_process_fields(
 def choose_filter_set(
     hminsize: int,  # number of grid points in horizontal direction
     dx: float,  # horizontal grid spacing
-    box_delta_scales: Sequence[int] = [
-        2,
-        4,
-        8,
-        16,
-    ],  # effective resolution/decorelation scales
-    box_meter_scales: Sequence[float] = [
-        800.0,
-        400.0,
-        200.0,
-        100.0,
-    ],  # sub-km grey zone horizontal resolutions
-    box_domain_scales: Sequence[float] = [0.25, 0.5, 1],  # domain unit scales
-    gauss_scales: Sequence[float] = [2, 4],  # Gaussian filter scales
+    box_delta_scales: Sequence[int] = box_delta_scales,  # grid cell unit scales
+    box_meter_scales: Sequence[float] = box_meter_scales,  # SI unit scales
+    box_domain_scales: Sequence[float] = box_domain_scales,  # domain unit scales
+    gauss_scales: Sequence[float] = gauss_scales,  # Gaussian filter scales
     filter_shapes: Sequence[str] = ["gauss", "box", "coarse"],  # filter shapes
     hdims: Sequence[str] = ["x", "y"],
 ):

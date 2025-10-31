@@ -7,6 +7,7 @@ All notable changes to this project are documented in this file.
 #### Added
   - a central read dispatcher (#33)
   - dynamic version CL arg and tags in netcdf outputs of CLIs
+  - Debug utility to track memory usage
 
 #### Fixes
   - turn geometry and diagnostics into sub-packages (#34)

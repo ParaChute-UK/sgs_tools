@@ -529,27 +529,30 @@ def choose_filter_set(
 
 
 def run(args: Dict[str, Any]) -> None:
-    # get the flattened set of args['prof_fields'] and rargs["cross_spectra_fields"]
-    spectra_fields_list = set(
-        [f for fl in args["cross_spectra_fields"] for f in fl]
-        + args["power_spectra_fields"]
-    )
-    # parse args['prof_fields'] through if v_profile_fields_map, add them if missing
-    v_profile_fields_in = {
-        v for f in args["vprofile_fields"] for v in (v_profile_fields_map.get(f, {f}))
-    }
-    all_fields: set[str] = set()
-    if args["vertical_profiles"]:
-        all_fields = all_fields.union(v_profile_fields_in)
+    with timer("Read and Preprocess", "s"):
+        # get the flattened set of args['prof_fields'] and args["cross_spectra_fields"]
+        spectra_fields_list = set(
+            [f for fl in args["cross_spectra_fields"] for f in fl]
+            + args["power_spectra_fields"]
+        )
+        # parse args['prof_fields'] through if v_profile_fields_map, add them if missing
+        v_profile_fields_in = {
+            v
+            for f in args["vprofile_fields"]
+            for v in (v_profile_fields_map.get(f, {f}))
+        }
+        all_fields: set[str] = set()
+        if args["vertical_profiles"]:
+            all_fields = all_fields.union(v_profile_fields_in)
 
-    if args["horizontal_spectra"]:
-        all_fields = all_fields.union(spectra_fields_list)
+        if args["horizontal_spectra"]:
+            all_fields = all_fields.union(spectra_fields_list)
 
-    if args["anisotropy"]:
-        all_fields = all_fields.union(anisotropy_fields)
-        # read and pre-process simulation
+        if args["anisotropy"]:
+            all_fields = all_fields.union(anisotropy_fields)
+            # read and pre-process simulation
 
-    simulation = pre_process(args, list(all_fields))
+        simulation = pre_process(args, list(all_fields))
 
     writer = NetCDFWriter(overwrite=args["overwrite_existing"])
 

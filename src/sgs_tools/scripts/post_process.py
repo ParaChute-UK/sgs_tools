@@ -296,7 +296,10 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
         assert args["h_resolution"] > 0, (
             "Missing required a positive h_resolution for UM datasets"
         )
-    assert args["output_path"].is_dir()
+    if args["output_path"].exists() and not args["output_path"].is_dir():
+        raise NotADirectoryError(
+            f"{args['output_path']} exists but is not a directory."
+        )
 
     # parse negative values in the [t,z]_range
     if args["t_range"][0] < 0:

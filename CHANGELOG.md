@@ -6,6 +6,7 @@ All notable changes to this project are documented in this file.
 
 #### Added
   - a central read dispatcher (#33)
+  - refactor reader: on empty requested_fields, retain all available fields (#40)
 
 #### Fixes
   - fix: turn geometry and diagnostics into sub-packages (#34)

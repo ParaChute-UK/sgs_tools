@@ -1,11 +1,12 @@
 import re
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any
 
 import numpy as np
 import xarray as xr
 
 from sgs_tools.geometry.staggered_grid import interpolate_to_grid
+from sgs_tools.io.read_util import restrict_ds, standardize_varnames
 
 base_fields_dict = {
     "U_COMPNT_OF_WIND_AFTER_TIMESTEP": "u",
@@ -191,29 +192,6 @@ def rename_variables(ds: xr.Dataset) -> xr.Dataset:
     return ds
 
 
-def standardize_varnames(ds: xr.Dataset) -> xr.Dataset:
-    """rename variables in ``ds`` using ``field_names_dict``
-
-    :param ds: input dataset
-    :return: dataset with renamed variables
-    """
-    restricted_dict = {k: v for k, v in field_names_dict.items() if k in ds}
-    return ds.rename(restricted_dict)
-
-
-def restrict_ds(ds: xr.Dataset, fields: Iterable[str]) -> xr.Dataset:
-    """restrict the dataset to fields of interest and rename using fields dict
-
-    :param ds: input dataset
-    :param fields: list of fields to restrict to, must be contained by `ds`
-    :return: dataset with renamed variables
-    """
-    intersection = [k for k in fields if k in ds]
-    missing_fields = {k for k in fields if k not in intersection}
-    # print ("Missing fields:", missing_fields)
-    return ds[intersection], missing_fields
-
-
 # unify coordinate names and implement correct x-spacing for UM ideal sims
 # xarray doesn't handle duplicate dimensions well, so use clunkily split-rename-merge
 def unify_coords(ds: xr.Dataset, res: float) -> xr.Dataset:
@@ -319,7 +297,7 @@ def data_ingest_UM(
     simulation = rename_variables(simulation)
 
     # rename to sgs_tools naming convention
-    simulation = standardize_varnames(simulation)
+    simulation = standardize_varnames(simulation, field_names_dict)
 
     # restrict to interesting fields and rename to simple names
     if requested_fields:

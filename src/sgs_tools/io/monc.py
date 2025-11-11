@@ -6,7 +6,7 @@ import xarray as xr
 from pandas import to_numeric
 
 from sgs_tools.geometry.staggered_grid import interpolate_to_grid
-from sgs_tools.io.um import restrict_ds
+from sgs_tools.io.read_util import restrict_ds, standardize_varnames
 
 base_field_dict = {"th": "theta", "p": "P"}
 
@@ -47,8 +47,7 @@ def data_ingest_MONC(
 
     ds = ds.squeeze()
     # rename to sgs_tools naming convention
-    field_dict = {k: v for k, v in base_field_dict.items() if k in ds}
-    ds = ds.rename(field_dict)
+    ds = standardize_varnames(ds, base_field_dict)
 
     # standardize coordinate names
     ds = ds.rename(coord_dict)

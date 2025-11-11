@@ -14,13 +14,16 @@ import os
 import sys
 
 sys.path.insert(0, os.path.abspath(".."))
+sys.path.insert(0, os.path.abspath(".entangled"))
 
+from sphinx_conf import version
 
 # -- Project information -----------------------------------------------------
 
 project = "SGS_tools"
 copyright = "2024, the HiFi project"
 author = "Dimitar G Vlaykov"
+release = version
 
 master_doc = "index"
 
@@ -31,11 +34,13 @@ master_doc = "index"
 # ones.
 extensions = [
     "sphinx.ext.autodoc",
-    "sphinx.ext.imgmath",
+    "sphinx.ext.mathjax",
     "sphinx_autodoc_typehints",
     "sphinx_mdinclude",
     "sphinx.ext.viewcode",
     "sphinx_argparse_cli",
+    "sphinx_copybutton",
+    "sphinxemoji.sphinxemoji",
 ]
 
 

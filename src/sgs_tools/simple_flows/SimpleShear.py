@@ -9,8 +9,8 @@ from ..geometry.grid import CoordScalar, Grid
 @dataclass(frozen=True)
 class SimpleShear:
     """prescribe velocity for a simple shear flow on a general grid
-        roughly: product({`amplitudes`[i] * x[i] for i in `dimensions`})
-        where x[i] is the coordinate in the i'th direction
+        roughly: product(``amplitudes [i] * x[i]`` for i in ``dimensions``)
+        where ``x[i]`` is the coordinate in the i'th direction
 
     :ivar grid: grid which provices coordinates
     :ivar dimensions: labels of shearing directions

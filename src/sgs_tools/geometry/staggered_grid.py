@@ -24,9 +24,9 @@ def interpolate_to_grid(
     """Spatial interpolation to a target_grid
 
     :param ds: input data array or dataset. Needs to have dimensions with coordinates
-        that are labelled 'x*', 'y*', 'z*' etc. or
+        that are labelled ``x*``, ``y*``, ``z*`` etc. or
 
-    :param target_dims: list of 3 dimension names  to interpolate to, in the order xdim, ydim, zdim.
+    :param target_dims: list of dimension names  to interpolate to, in the order xdim, ydim, zdim.
         They must exist in ds as DataArry/coordinates
     :param coord_map: dictionary of {existing_dimension_in_ds : target_coordinate_as_DataArray}
     :param drop_coords: flag to exclude spatial coordinates relying on removed dims from output
@@ -42,9 +42,9 @@ def interpolate_to_grid(
         y_dims = [y for y in ds.dims if str(y).startswith("y")]
         z_dims = [z for z in ds.dims if str(z).startswith("z")]
         missing_coords = [dim for dim in target_dims if dim not in ds.coords]
-        assert (
-            len(missing_coords) == 0
-        ), f"missing target coordinages {missing_coords} from input data"
+        assert len(missing_coords) == 0, (
+            f"missing target coordinages {missing_coords} from input data"
+        )
         x_target = [x for x in target_dims if x.startswith("x")]
         y_target = [y for y in target_dims if y.startswith("y")]
         z_target = [z for z in target_dims if z.startswith("z")]
@@ -68,10 +68,11 @@ def interpolate_to_grid(
             )
 
     else:
+        assert coord_map, "Should specify one of target_dims or coord_map"
         missing_dims = [dim for dim in coord_map.keys() if dim not in ds.dims]
-        assert (
-            len(missing_dims) == 0
-        ), f"missing input dimensions {missing_dims} from input data"
+        assert len(missing_dims) == 0, (
+            f"missing input dimensions {missing_dims} from input data"
+        )
 
     # rename any possible dimensions that will clash with coord-map targets:
     ds_interp = ds
@@ -107,6 +108,7 @@ def compose_vector_components_on_grid(
     drop_coords: bool = True,
 ) -> xr.DataArray:
     """turn a list of arrays into a vector field
+
     :param components: list of vector components
     :param target_dims: if target_dims is given, it will interpolate onto it first, otherwise all componets must have the same dimesions and coordinates
     :param vector_dim: label of dimension indexing vector components
@@ -115,19 +117,25 @@ def compose_vector_components_on_grid(
     :param drop_coords: flag picked up by :meth:`interpolate_to_grid` to exclude spatial coordinates relying on removed dims from output
     """
     # interpolate
-    if target_dims is []:
+    if len(target_dims) == 0:
         assert all([components[0].dims == x.dims for x in components[1:]]), (
             "The components' dimensions don't match. "
-            "Choose a set of dimensions to interpolate t!"
+            "Choose a set of dimensions to interpolate to!"
         )
-        vec = components
+        vec_arr = xr.concat(
+            components,
+            dim=xr.DataArray(range(1, len(components) + 1), dims=[vector_dim]),
+        )
     else:
-        vec = [
-            interpolate_to_grid(comp, target_dims, drop_coords=drop_coords)
-            for comp in components
-        ]
+        assert all([c.name for c in components])
+        vec_ds = xr.Dataset({c.name: c for c in components})
+        vec_arr = interpolate_to_grid(
+            vec_ds, target_dims, drop_coords=drop_coords
+        ).to_array(dim="vel")
+        vec_arr = vec_arr.assign_coords(
+            {vector_dim: ("vel", range(1, len(components) + 1))}
+        ).swap_dims({"vel": vector_dim})
     # combine into a vector
-    vec_arr = xr.concat(vec, dim=xr.DataArray(range(1, 4), dims=[vector_dim]))
     # add meta data
     if name:
         vec_arr.name = name
@@ -139,7 +147,7 @@ def compose_vector_components_on_grid(
 def diff_lin_on_grid(
     ds: xr.DataArray, dim: str, periodic_field: bool = False
 ) -> xr.DataArray:
-    """differentiate a dataarray on staggered grid
+    r"""differentiate a dataarray on staggered grid
     assumes that we have coordinate staggering as\:
 
     .. parsed-literal::
@@ -148,14 +156,15 @@ def diff_lin_on_grid(
         |             |                 |            |
         + ------ c_centre(i) ---------- + ----- c_centre(i+1)
 
-    where `c_{face|center}` is any dimension
+    where ``c_{face|center}`` is any dimension
+
     :param ds: input array to be differentiated
     :param dim: dimension along which to differentiate
     :param periodic_field: boundary condition treatment; if `False` will
-    fill boundary values with NaN. Note that only 1 boundary is undefined\:
-    upper boundary for face-coordinates, and lower boundary for centre-coordinates.
+      fill boundary values with NaN. Note that only 1 boundary is undefined\:
+      upper boundary for face-coordinates, and lower boundary for centre-coordinates.
     :return: the derivative on the grid with offset staggering in the differentiated dimension
-    face -> centre and v.v.
+      face -> centre and v.v.
     """
 
     def delta(coord, shift):
@@ -205,6 +214,7 @@ def grad_on_cart_grid(
     periodic_field: list[bool] = [False, False, False],
 ) -> xr.Dataset:
     """differentiate a scalar with respect to given space dims on staggered grid
+
     :param ds: input array to be differentiated
     :param space_dims: labels for the spatial dimensions (to be differentiated against)
     :param periodic_field: boundary condition treatment; passed to :meth:`diff_lin_on_grid`
@@ -231,17 +241,18 @@ def grad_vec_on_grid(
     name: str | None = None,
 ) -> xr.DataArray:
     """computes gradient of a vector described onto target dimensions
-    ds: should be a dataset which only contains the components of the vector in sorted order and target coordinates.
-    target_dims: the dimensions to compute the derivative on (must be coordinates in input dataset)
-    new_dim_name: the names of the new dimensions: [vector component, differential component]
-    name : name for output dataarray (optional)
+
+    :param ds: should be a dataset which only contains the components of the vector in sorted order and target coordinates.
+    :param target_dims: the dimensions to compute the derivative on (must be coordinates in input dataset)
+    :param new_dim_name: the names of the new dimensions: [vector component, differential component]
+    :param name: name for output dataarray (optional)
     """
     # unpack new_dim_name
     vec_name, d_name = new_dim_name
     gradvec_comp = {}
 
     for i, f in enumerate(ds):
-        # individual sapce dimensions for each staggered field
+        # individual space dimensions for each staggered field
         space_dims = sorted([str(d) for d in ds[f].dims if str(d)[0] in "xyz"])
         grad_f = grad_on_cart_grid(ds[f], space_dims)
         # interpolate onto target coordinates from original ds (must exist)
@@ -249,9 +260,8 @@ def grad_vec_on_grid(
         # so make an explicit coordinate map
         coord_map = {}
         for k in grad_f.dims:
-            k_str = str(
-                k
-            )  # xr.Dataset.dims is a Hashable and interpolate expects a str
+            # xr.Dataset.dims is a Hashable and interpolate expects a str
+            k_str = str(k)
             if k_str[0] in "xyz":
                 # name match by first character xyz
                 target_coord = [c for c in target_dims if c[0] == k_str[0]][0]
@@ -259,16 +269,14 @@ def grad_vec_on_grid(
         grad_f_on_cent_ds = interpolate_to_grid(grad_f, coord_map=coord_map)
         # convert to a dataarray
         grad_f_on_cent = grad_f_on_cent_ds.to_dataarray(d_name).sortby(d_name)
-        # rename c1 coordinates: fragile this works only because of
-        # the naming in interpolate_to_grid
-        grad_f_on_cent[d_name] = [f"d{x.item()[-1]}" for x in grad_f_on_cent[d_name]]
-        grad_f_on_cent[d_name] = [f"d{x.item()[-1]}" for x in grad_f_on_cent[d_name]]
+        # rename c1 coordinates
+        grad_f_on_cent[d_name] = range(1, len(grad_f_on_cent[d_name]) + 1)
         gradvec_comp[f] = grad_f_on_cent
 
     gradvec_da = xr.Dataset(gradvec_comp).to_dataarray(dim=vec_name)
     gradvec_da = gradvec_da.sortby(vec_name)
-    # rename c2 coordinates: less fragile but still a bit idiosyncratic
-    gradvec_da[vec_name] = [f"v{i+1}" for i in range(len(gradvec_comp))]
+    # rename c2 coordinates
+    gradvec_da[vec_name] = range(1, len(gradvec_comp) + 1)
     if name is not None:
         gradvec_da.name = name
     return gradvec_da

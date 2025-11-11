@@ -5,13 +5,17 @@
 .. toctree::
    :maxdepth: 1
    :caption: Package structure:
+   :hidden:
 
    io
    geometry
    physics
-   simple_flow
    sgs
+   diagnostics
+   simple_flow
    scripts
+   plotting
+   devlog
 
 ==================
 Indices and tables
@@ -20,5 +24,3 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-
-.. mdinclude:: ../TASKLIST.md

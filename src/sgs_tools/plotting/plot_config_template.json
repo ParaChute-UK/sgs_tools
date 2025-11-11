@@ -1,0 +1,8 @@
+[{
+  "label": "string",
+  "linestyle": "string",
+  "color": "string",
+  "linewdith": "float",
+  "marker": "string"
+  }
+]

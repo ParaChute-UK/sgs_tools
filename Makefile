@@ -1,17 +1,25 @@
-.PHONY: test doc format mypy
-
-test:
-	python3 -m tox
+.PHONY: doc test mypy_check style_check pre_commit
 
 doc:
-	cd doc && make html
+	@echo "Generating documentation..."
+	@if command -v poetry >/dev/null 2>&1; then \
+ 		poetry install --with doc; \
+		poetry run sphinx-build -b html doc/ documentation; \
+  else \
+    echo "Poetry not found. Attempting pip-based build..."; \
+    pip install .[doc]; \
+    sphinx-build -b html doc/ documentation; \
+  fi
+	@echo "Documentation generated at $$(pwd)/documentation/index.html"
 
-format:
-	python3 -m tox -e fmt
+test:
+	tox
 
-mypy:
-	python3 -m tox -e mypy
-
+mypy_check:
+	tox -e mypy
 
 style_check:
-	python3 -m tox -e style_check
+	tox -e style_check
+
+pre_commit:
+	tox -e pre_commit

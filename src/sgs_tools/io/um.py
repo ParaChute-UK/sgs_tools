@@ -214,7 +214,7 @@ def restrict_ds(ds: xr.Dataset, fields: Iterable[str]) -> xr.Dataset:
     return ds[intersection], missing_fields
 
 
-# unify coordinates and implement correct x-spacing
+# unify coordinate names and implement correct x-spacing for UM ideal sims
 # xarray doesn't handle duplicate dimensions well, so use clunkily split-rename-merge
 def unify_coords(ds: xr.Dataset, res: float) -> xr.Dataset:
     """unify coordinate names
@@ -306,11 +306,12 @@ def data_ingest_UM(
     res: float,
     requested_fields: list[str] = ["u", "v", "w", "theta"],
 ) -> xr.Dataset:
-    """read and pre-process UM data
+    """read and pre-process UM data using sgs_tools naming convention.
+    Any unknown fields will retain their original names.
 
     :param fname_pattern: UM NetCDF diagnostic file(s) to read. will be interpreted as a glob pattern. (should belong to the same simulation)
     :param res: horizontal resolution (will use to overwrite horizontal coordinates). **NB** works for ideal simulations
-    :param  requested_fields: list of fields to read and pre-process. Defaults to ['u', 'v', 'w', 'theta']
+    :param requested_fields: list of fields to retain in ds, if falsy will retain all.
     """
     # all the fields we will need for the Cs calculations
     simulation = read_stash_files(fname_pattern)
@@ -321,7 +322,8 @@ def data_ingest_UM(
     simulation = standardize_varnames(simulation)
 
     # restrict to interesting fields and rename to simple names
-    simulation, _ = restrict_ds(simulation, fields=requested_fields)
+    if requested_fields:
+        simulation, _ = restrict_ds(simulation, fields=requested_fields)
     assert len(simulation) > 0, "None of the requested fields are available"
     # unify coordinates
     simulation = unify_coords(simulation, res=res)
@@ -333,11 +335,12 @@ def data_ingest_UM_on_single_grid(
     res: float,
     requested_fields: list[str] = ["u", "v", "w", "theta"],
 ) -> xr.Dataset:
-    """read pre-process UM data and interpolate to a cell-centred grid
+    """read, pre-process UM data and interpolate to a cell-centred grid
+    Any unknown fields will retain their original names.
 
     :param fname_pattern: UM NetCDF diagnostic file(s) to read. will be interpreted as a glob pattern. (should belong to the same simulation)
     :param res: horizontal resolution (will use to overwrite horizontal coordinates). **NB** works for ideal simulations
-    :param  requested_fields: list of fields to read and pre-process. Defaults to ['u', 'v', 'w', 'theta']
+    :param  requested_fields: list of fields to retain in ds, if falsy will retain all.
     """
     # read, constrain fields, unify grids
     simulation = data_ingest_UM(fname_pattern, res, requested_fields)

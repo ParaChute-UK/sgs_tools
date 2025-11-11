@@ -11,10 +11,11 @@ def data_ingest_SGS(
     requested_fields: list[str] = ["u", "v", "w", "theta"],
     chunks: Any = "auto",
 ):
-    """read and pre-process local-convention (sgs_tools) NetCDF data
+    """read and pre-process local-convention (sgs_tools) NetCDF data using sgs_tools naming convention.
+    Any unknown fields will retain their original names.
 
     :param fname_pattern: NetCDF diagnostic file to read. can be a glob pattern. (should belong to the same simulation)
-    :param  requested_fields: list of fields to read and pre-process using sgs_tools naming convention.
+    :param requested_fields: list of fields to retain in ds, if falsy will retain all.
     :param chunks: chunking for data
     """
     fname = list(
@@ -24,6 +25,6 @@ def data_ingest_SGS(
     )
 
     ds = xr.open_mfdataset(fname, chunks=chunks, parallel=True, engine="h5netcdf")
-    ds, _ = restrict_ds(ds, requested_fields)
-
+    if requested_fields:
+        ds, _ = restrict_ds(ds, requested_fields)
     return ds

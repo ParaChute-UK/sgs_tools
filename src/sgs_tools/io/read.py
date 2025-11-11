@@ -9,7 +9,7 @@ from sgs_tools.io.um import data_ingest_UM_on_single_grid
 
 
 def read(
-    input_files: Path, input_format: str, requested_fields: list[str], **kwargs
+    input_files: Path | str, input_format: str, requested_fields: list[str], **kwargs
 ) -> xr.Dataset:
     """
     Read simulation data from input files and return an xarray Dataset.

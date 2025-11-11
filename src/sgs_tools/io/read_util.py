@@ -1,6 +1,20 @@
+from pathlib import Path
 from typing import Dict, Iterable
 
 import xarray as xr
+
+
+def parse_fname_pattern(fname_pattern: str | Path) -> list[Path]:
+    """
+    parse any glob wildcards from ``fname_pattern``
+    return a list of concrete Paths
+    """
+    print(f"Parsing {fname_pattern}")
+    fpattern = Path(fname_pattern)
+    # return list because of incomplete typehints of xr.open_mfdataset
+    return list(
+        Path(fpattern.root).glob(str(Path(*fpattern.parts[fpattern.is_absolute() :])))
+    )
 
 
 def standardize_varnames(

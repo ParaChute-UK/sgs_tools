@@ -1,0 +1,853 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>IO &#8212; SGS_tools 0.0.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="_static/custom.css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="_static/documentation_options.js?v=7026087e"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'io';</script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Geometry" href="geometry.html" />
+    <link rel="prev" title="sgs_tools" href="index.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="0.0.0" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">SGS_tools 0.0.0 documentation</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="#">
+    IO
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="geometry.html">
+    Geometry
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="physics.html">
+    Physical Fields
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="sgs.html">
+    Sub-grid scales
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="diagnostics.html">
+    Diagnostics
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="simple_flow.html">
+    Simple Flow Examples
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="scripts.html">
+    Scripts
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="plotting.html">
+    Plotting
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="devlog.html">
+    Development Log
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="#">
+    IO
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="geometry.html">
+    Geometry
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="physics.html">
+    Physical Fields
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="sgs.html">
+    Sub-grid scales
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="diagnostics.html">
+    Diagnostics
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="simple_flow.html">
+    Simple Flow Examples
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="scripts.html">
+    Scripts
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="plotting.html">
+    Plotting
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="devlog.html">
+    Development Log
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"></div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">IO</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="io">
+<h1>IO<a class="headerlink" href="#io" title="Link to this heading">#</a></h1>
+<section id="id1">
+<h2><code class="xref py py-mod docutils literal notranslate"><span class="pre">io</span></code><a class="headerlink" href="#id1" title="Link to this heading">#</a></h2>
+</section>
+<section id="module-sgs_tools.io.read">
+<span id="reader"></span><h2>Reader<a class="headerlink" href="#module-sgs_tools.io.read" title="Link to this heading">#</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="sgs_tools.io.read.read">
+<span class="sig-name descname"><span class="pre">read</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_files</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_format</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">requested_fields</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/io/read.html#read"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.io.read.read" title="Link to this definition">#</a></dt>
+<dd><p>Read simulation data from input files and return an xarray Dataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input_files</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code></span>) – Path to the input file(s) containing simulation data.</p></li>
+<li><p><strong>input_format</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – Format of the input data. Supported formats are:
+<code class="docutils literal notranslate"><span class="pre">sgs</span></code>, <code class="docutils literal notranslate"><span class="pre">um</span></code>, <code class="docutils literal notranslate"><span class="pre">monc</span></code></p></li>
+<li><p><strong>requested_fields</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span>) – List of variable names to extract from the input data.</p></li>
+<li><p><strong>kwargs</strong> – Additional keyword arguments depending on the input format.
+The <code class="docutils literal notranslate"><span class="pre">um</span></code> format, requires <code class="docutils literal notranslate"><span class="pre">resolution</span></code> (float) specifying horizontal grid spacing.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>xarray Dataset containing the requested fields and metadata, including
+the horizontal resolution stored in <code class="docutils literal notranslate"><span class="pre">attrs[&quot;h_resolution&quot;]</span></code>.</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<ul class="simple">
+<li><p>For <code class="docutils literal notranslate"><span class="pre">monc</span></code> format, resolution is inferred from metadata and assumed isotropic in x and y</p></li>
+<li><p>For <code class="docutils literal notranslate"><span class="pre">um</span></code> format, resolution must be explicitly provided via <cite>kwargs</cite>.</p></li>
+</ul>
+</div>
+</dd></dl>
+
+</section>
+<section id="module-sgs_tools.io.um">
+<span id="um"></span><h2>UM<a class="headerlink" href="#module-sgs_tools.io.um" title="Link to this heading">#</a></h2>
+<dl class="py data">
+<dt class="sig sig-object py" id="sgs_tools.io.um.base_fields_dict">
+<span class="sig-name descname"><span class="pre">base_fields_dict</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'THETA_AFTER_TIMESTEP':</span> <span class="pre">'theta',</span> <span class="pre">'U_COMPNT_OF_WIND_AFTER_TIMESTEP':</span> <span class="pre">'u',</span> <span class="pre">'V_COMPNT_OF_WIND_AFTER_TIMESTEP':</span> <span class="pre">'v',</span> <span class="pre">'W_COMPNT_OF_WIND_AFTER_TIMESTEP':</span> <span class="pre">'w'}</span></em><a class="headerlink" href="#sgs_tools.io.um.base_fields_dict" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="sgs_tools.io.um.Water_dict">
+<span class="sig-name descname"><span class="pre">Water_dict</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'CLD_ICE_MIXING_RATIO__mcf__AFTER_TS':</span> <span class="pre">'q_i',</span> <span class="pre">'CLD_LIQ_MIXING_RATIO__mcl__AFTER_TS':</span> <span class="pre">'q_l',</span> <span class="pre">'GRAUPEL_MIXING_RATIO__mg__AFTER_TS':</span> <span class="pre">'q_g',</span> <span class="pre">'LARGE_SCALE_RAINFALL_RATE____KG_M2_S':</span> <span class="pre">'rain',</span> <span class="pre">'SPECIFIC_HUMIDITY_AFTER_TIMESTEP':</span> <span class="pre">'q_v'}</span></em><a class="headerlink" href="#sgs_tools.io.um.Water_dict" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="sgs_tools.io.um.Smagorinsky_dict">
+<span class="sig-name descname"><span class="pre">Smagorinsky_dict</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'CS_THETA':</span> <span class="pre">'cs_theta',</span> <span class="pre">'GRADIENT_RICHARDSON_NUMBER':</span> <span class="pre">'Richardson',</span> <span class="pre">'MIXING_LENGTH_RNEUTML':</span> <span class="pre">'csDelta',</span> <span class="pre">'SHEAR_AT_SCALE_DELTA':</span> <span class="pre">'s',</span> <span class="pre">'SMAG__S__SHEAR_TERM_':</span> <span class="pre">'s_smag',</span> <span class="pre">'SMAG__VISC_H':</span> <span class="pre">'smag_visc_h',</span> <span class="pre">'SMAG__VISC_M':</span> <span class="pre">'smag_visc_m',</span> <span class="pre">'TURBULENT_KINETIC_ENERGY':</span> <span class="pre">'tke'}</span></em><a class="headerlink" href="#sgs_tools.io.um.Smagorinsky_dict" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="sgs_tools.io.um.dynamic_SGS_dict">
+<span class="sig-name descname"><span class="pre">dynamic_SGS_dict</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'CS_SQUARED_AT_2_DELTA':</span> <span class="pre">'cs2d',</span> <span class="pre">'CS_SQUARED_AT_4_DELTA':</span> <span class="pre">'cs4d',</span> <span class="pre">'CS_THETA_AT_SCALE_2DELTA':</span> <span class="pre">'cs_theta_2d',</span> <span class="pre">'CS_THETA_AT_SCALE_4DELTA':</span> <span class="pre">'cs_theta_4d'}</span></em><a class="headerlink" href="#sgs_tools.io.um.dynamic_SGS_dict" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="sgs_tools.io.um.dynamic_anisotropic_SGS_dict">
+<span class="sig-name descname"><span class="pre">dynamic_anisotropic_SGS_dict</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'CS_1':</span> <span class="pre">'cs_1',</span> <span class="pre">'CS_2':</span> <span class="pre">'cs_2',</span> <span class="pre">'CS_3':</span> <span class="pre">'cs_3',</span> <span class="pre">'CS_THETA_1':</span> <span class="pre">'cs_theta_1',</span> <span class="pre">'CS_THETA_2':</span> <span class="pre">'cs_theta_2',</span> <span class="pre">'CS_THETA_3':</span> <span class="pre">'cs_theta_3',</span> <span class="pre">'RHOKH_DIFF_COEFF___LOCAL_SCHEME':</span> <span class="pre">'smag_visc_h_vert',</span> <span class="pre">'RHOKM_DIFF_COEFF___LOCAL_SCHEME':</span> <span class="pre">'smag_visc_m_vert'}</span></em><a class="headerlink" href="#sgs_tools.io.um.dynamic_anisotropic_SGS_dict" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="sgs_tools.io.um.dynamic_SGS_diag_dict">
+<span class="sig-name descname"><span class="pre">dynamic_SGS_diag_dict</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'D11_TENSOR_COMPONENT':</span> <span class="pre">'diag11',</span> <span class="pre">'D12_TENSOR_COMPONENT':</span> <span class="pre">'diag12',</span> <span class="pre">'D13_TENSOR_COMPONENT':</span> <span class="pre">'diag13',</span> <span class="pre">'D22_TENSOR_COMPONENT':</span> <span class="pre">'diag22',</span> <span class="pre">'D23_TENSOR_COMPONENT':</span> <span class="pre">'diag23',</span> <span class="pre">'D33_TENSOR_COMPONENT':</span> <span class="pre">'diag33',</span> <span class="pre">'FjFj_CONT_VECTORS':</span> <span class="pre">'ff',</span> <span class="pre">'HjTj_CONT_VECTORS':</span> <span class="pre">'ht',</span> <span class="pre">'Lagrangian_averaged_FjFj_vector':</span> <span class="pre">'FF',</span> <span class="pre">'Lagrangian_averaged_HjTj_vector':</span> <span class="pre">'HT',</span> <span class="pre">'Lagrangian_averaged_LijMij_tensors':</span> <span class="pre">'LM',</span> <span class="pre">'Lagrangian_averaged_MijMij_tensors':</span> <span class="pre">'MM',</span> <span class="pre">'Lagrangian_averaged_NijNij_tensors':</span> <span class="pre">'NN',</span> <span class="pre">'Lagrangian_averaged_QijNij_tensors':</span> <span class="pre">'QN',</span> <span class="pre">'Lagrangian_averaged_RjFj_vector':</span> <span class="pre">'RF',</span> <span class="pre">'Lagrangian_averaged_TjTj_vector':</span> <span class="pre">'TT',</span> <span class="pre">'LijMij_CONT_TENSORS':</span> <span class="pre">'lm',</span> <span class="pre">'MijMij_CONT_TENSORS':</span> <span class="pre">'mm',</span> <span class="pre">'NijNij_CONT_TENSORS':</span> <span class="pre">'nn',</span> <span class="pre">'QijNij_CONT_TENSORS':</span> <span class="pre">'qn',</span> <span class="pre">'Richardson':</span> <span class="pre">'Richardson_diag',</span> <span class="pre">'RjFj_CONT_VECTORS':</span> <span class="pre">'rf',</span> <span class="pre">'SHEAR_AT_SCALE_2DELTA':</span> <span class="pre">'s2d',</span> <span class="pre">'SHEAR_AT_SCALE_4DELTA':</span> <span class="pre">'s4d',</span> <span class="pre">'Tdecorr_heat':</span> <span class="pre">'Tdecorr_heat',</span> <span class="pre">'Tdecorr_momentum':</span> <span class="pre">'Tdecorr_momentum',</span> <span class="pre">'TjTj_CONT_VECTORS':</span> <span class="pre">'tt'}</span></em><a class="headerlink" href="#sgs_tools.io.um.dynamic_SGS_diag_dict" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sgs_tools.io.um.read_stash_files">
+<span class="sig-name descname"><span class="pre">read_stash_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname_pattern</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chunks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'auto'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/io/um.html#read_stash_files"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.io.um.read_stash_files" title="Link to this definition">#</a></dt>
+<dd><p>combine a list of output Stash files</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>fname_pattern</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code></span>) – filename(s) to read. Will be interpreted as a glob pattern.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><cite>xarray.Dataset</cite> with all available variables</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sgs_tools.io.um.rename_variables">
+<span class="sig-name descname"><span class="pre">rename_variables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/io/um.html#rename_variables"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.io.um.rename_variables" title="Link to this definition">#</a></dt>
+<dd><dl class="simple">
+<dt>rename STASH variables:</dt><dd><p>UM STASH varaibles adopt their <cite>long_name</cite> with special characters replaced by ‘_’.
+The stash code is retained as an attribute for back-searches.
+Spacial coordinates/dimesions are renamed to <code class="docutils literal notranslate"><span class="pre">z_{theta|rho}</span></code> and <code class="docutils literal notranslate"><span class="pre">{x|y}_{face|centre}</span></code>.
+Time coordinate becomes <code class="docutils literal notranslate"><span class="pre">t</span></code> and <code class="docutils literal notranslate"><span class="pre">t_0</span></code>.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ds</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></span>) – input dataset</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dataset with renamed variables</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sgs_tools.io.um.unify_coords">
+<span class="sig-name descname"><span class="pre">unify_coords</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">res</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/io/um.html#unify_coords"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.io.um.unify_coords" title="Link to this definition">#</a></dt>
+<dd><p>unify coordinate names</p>
+<p>implement correct x-spacing using <code class="docutils literal notranslate"><span class="pre">res</span></code>, assume <code class="docutils literal notranslate"><span class="pre">res</span></code> is given in the correct units
+rename coordinates with reference to a logically-cartesian grid</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ds</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></span>) – input dataset</p></li>
+<li><p><strong>res</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></span>) – resolution of dataset – to create correct x-y grid for idealised runs (the existing one is in lat-lon coords)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dataset with renamed variables</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sgs_tools.io.um.data_ingest_UM">
+<span class="sig-name descname"><span class="pre">data_ingest_UM</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname_pattern</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">res</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">requested_fields</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['u',</span> <span class="pre">'v',</span> <span class="pre">'w',</span> <span class="pre">'theta']</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/io/um.html#data_ingest_UM"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.io.um.data_ingest_UM" title="Link to this definition">#</a></dt>
+<dd><p>read and pre-process UM data using sgs_tools naming convention.
+Any unknown fields will retain their original names.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fname_pattern</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code></span>) – UM NetCDF diagnostic file(s) to read. will be interpreted as a glob pattern. (should belong to the same simulation)</p></li>
+<li><p><strong>res</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></span>) – horizontal resolution (will use to overwrite horizontal coordinates). <strong>NB</strong> works for ideal simulations</p></li>
+<li><p><strong>requested_fields</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span>) – list of fields to retain in ds, if falsy will retain all.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sgs_tools.io.um.data_ingest_UM_on_single_grid">
+<span class="sig-name descname"><span class="pre">data_ingest_UM_on_single_grid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname_pattern</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">res</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">requested_fields</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['u',</span> <span class="pre">'v',</span> <span class="pre">'w',</span> <span class="pre">'theta']</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/io/um.html#data_ingest_UM_on_single_grid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.io.um.data_ingest_UM_on_single_grid" title="Link to this definition">#</a></dt>
+<dd><p>read, pre-process UM data and interpolate to a cell-centred grid
+Any unknown fields will retain their original names.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fname_pattern</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code></span>) – UM NetCDF diagnostic file(s) to read. will be interpreted as a glob pattern. (should belong to the same simulation)</p></li>
+<li><p><strong>res</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></span>) – horizontal resolution (will use to overwrite horizontal coordinates). <strong>NB</strong> works for ideal simulations</p></li>
+<li><p><strong>requested_fields</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span>) – list of fields to retain in ds, if falsy will retain all.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-sgs_tools.io.monc">
+<span id="monc"></span><h2>MONC<a class="headerlink" href="#module-sgs_tools.io.monc" title="Link to this heading">#</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="sgs_tools.io.monc.data_ingest_MONC">
+<span class="sig-name descname"><span class="pre">data_ingest_MONC</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname_pattern</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">requested_fields</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['u',</span> <span class="pre">'v',</span> <span class="pre">'w',</span> <span class="pre">'theta']</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chunks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'auto'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/io/monc.html#data_ingest_MONC"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.io.monc.data_ingest_MONC" title="Link to this definition">#</a></dt>
+<dd><p>read and pre-process MONC data using sgs_tools naming convention.
+Any unknown fields will retain their original names.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fname_pattern</strong> – MONC NetCDF diagnostic file to read. can be a glob pattern. (should belong to the same simulation)</p></li>
+<li><p><strong>requested_fields</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span>) – list of fields to retain in ds, if falsy will retain all.</p></li>
+<li><p><strong>chunks</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></span>) – chunking of datasets “auto” or a dictionary of {coordinate: chunks}.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>metadata dictionary, xarray Dataset of fields.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sgs_tools.io.monc.data_ingest_MONC_on_single_grid">
+<span class="sig-name descname"><span class="pre">data_ingest_MONC_on_single_grid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname_pattern</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">requested_fields</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['u',</span> <span class="pre">'v',</span> <span class="pre">'w',</span> <span class="pre">'theta']</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chunks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'auto'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/io/monc.html#data_ingest_MONC_on_single_grid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.io.monc.data_ingest_MONC_on_single_grid" title="Link to this definition">#</a></dt>
+<dd><p>read pre-process MONC data and interpolate to a cell-centred grid
+Any unknown fields will retain their original names.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fname_pattern</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code></span>) – MONC NetCDF diagnostic file(s) to read. will be interpreted as a glob pattern. (should belong to the same simulation)</p></li>
+<li><p><strong>requested_fields</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span>) – list of fields to retain in ds, if falsy will retain all.</p></li>
+<li><p><strong>chunks</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></span>) – chunking of datasets “auto” or a dictionary of {coordinate: chunks}.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-sgs_tools.io.sgs">
+<span id="sgs-own-format"></span><h2>SGS (own format)<a class="headerlink" href="#module-sgs_tools.io.sgs" title="Link to this heading">#</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="sgs_tools.io.sgs.data_ingest_SGS">
+<span class="sig-name descname"><span class="pre">data_ingest_SGS</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname_pattern</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">requested_fields</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['u',</span> <span class="pre">'v',</span> <span class="pre">'w',</span> <span class="pre">'theta']</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chunks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'auto'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/io/sgs.html#data_ingest_SGS"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.io.sgs.data_ingest_SGS" title="Link to this definition">#</a></dt>
+<dd><p>read and pre-process local-convention (sgs_tools) NetCDF data using sgs_tools naming convention.
+Will not rename any fields, assume they are in local convention.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fname_pattern</strong> – NetCDF diagnostic file to read. can be a glob pattern. (should belong to the same simulation)</p></li>
+<li><p><strong>requested_fields</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span>) – list of fields to retain in ds, if falsy will retain all.</p></li>
+<li><p><strong>chunks</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></span>) – chunking for data</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-sgs_tools.io.netcdf_writer">
+<span id="writer"></span><h2>Writer<a class="headerlink" href="#module-sgs_tools.io.netcdf_writer" title="Link to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="sgs_tools.io.netcdf_writer.NetCDFWriter">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">NetCDFWriter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">overwrite</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/io/netcdf_writer.html#NetCDFWriter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.io.netcdf_writer.NetCDFWriter" title="Link to this definition">#</a></dt>
+<dd><p>A class to write xarray datasets to NetCDF files.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>overwrite</strong> – overwrite existing files if set to True. If False, raises an OSError if the file already exists.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="sgs_tools.io.netcdf_writer.NetCDFWriter.check_filename">
+<span class="sig-name descname"><span class="pre">check_filename</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/io/netcdf_writer.html#NetCDFWriter.check_filename"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.io.netcdf_writer.NetCDFWriter.check_filename" title="Link to this definition">#</a></dt>
+<dd><p>Check if the file exists.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>filename</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code></span>) – Path to the NetCDF file.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sgs_tools.io.netcdf_writer.NetCDFWriter.write">
+<span class="sig-name descname"><span class="pre">write</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/io/netcdf_writer.html#NetCDFWriter.write"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.io.netcdf_writer.NetCDFWriter.write" title="Link to this definition">#</a></dt>
+<dd><p>Write an xarray Dataset to a NetCDF file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>array</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></span>) – xarray Dataset to write.</p></li>
+<li><p><strong>filename</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code></span>) – Path to the output NetCDF file.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="index.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">sgs_tools</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="geometry.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Geometry</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1"><code class="xref py py-mod docutils literal notranslate"><span class="pre">io</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-sgs_tools.io.read">Reader</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.io.read.read"><code class="docutils literal notranslate"><span class="pre">read()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-sgs_tools.io.um">UM</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.io.um.base_fields_dict"><code class="docutils literal notranslate"><span class="pre">base_fields_dict</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.io.um.Water_dict"><code class="docutils literal notranslate"><span class="pre">Water_dict</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.io.um.Smagorinsky_dict"><code class="docutils literal notranslate"><span class="pre">Smagorinsky_dict</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.io.um.dynamic_SGS_dict"><code class="docutils literal notranslate"><span class="pre">dynamic_SGS_dict</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.io.um.dynamic_anisotropic_SGS_dict"><code class="docutils literal notranslate"><span class="pre">dynamic_anisotropic_SGS_dict</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.io.um.dynamic_SGS_diag_dict"><code class="docutils literal notranslate"><span class="pre">dynamic_SGS_diag_dict</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.io.um.read_stash_files"><code class="docutils literal notranslate"><span class="pre">read_stash_files()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.io.um.rename_variables"><code class="docutils literal notranslate"><span class="pre">rename_variables()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.io.um.unify_coords"><code class="docutils literal notranslate"><span class="pre">unify_coords()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.io.um.data_ingest_UM"><code class="docutils literal notranslate"><span class="pre">data_ingest_UM()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.io.um.data_ingest_UM_on_single_grid"><code class="docutils literal notranslate"><span class="pre">data_ingest_UM_on_single_grid()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-sgs_tools.io.monc">MONC</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.io.monc.data_ingest_MONC"><code class="docutils literal notranslate"><span class="pre">data_ingest_MONC()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.io.monc.data_ingest_MONC_on_single_grid"><code class="docutils literal notranslate"><span class="pre">data_ingest_MONC_on_single_grid()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-sgs_tools.io.sgs">SGS (own format)</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.io.sgs.data_ingest_SGS"><code class="docutils literal notranslate"><span class="pre">data_ingest_SGS()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-sgs_tools.io.netcdf_writer">Writer</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.io.netcdf_writer.NetCDFWriter"><code class="docutils literal notranslate"><span class="pre">NetCDFWriter</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.io.netcdf_writer.NetCDFWriter.check_filename"><code class="docutils literal notranslate"><span class="pre">NetCDFWriter.check_filename()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.io.netcdf_writer.NetCDFWriter.write"><code class="docutils literal notranslate"><span class="pre">NetCDFWriter.write()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/io.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2024, the HiFi project.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

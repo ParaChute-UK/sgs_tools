@@ -6,7 +6,11 @@ import numpy as np
 import xarray as xr
 
 from sgs_tools.geometry.staggered_grid import interpolate_to_grid
-from sgs_tools.io.read_util import restrict_ds, standardize_varnames
+from sgs_tools.io.read_util import (
+    parse_fname_pattern,
+    restrict_ds,
+    standardize_varnames,
+)
 
 base_fields_dict = {
     "U_COMPNT_OF_WIND_AFTER_TIMESTEP": "u",
@@ -109,14 +113,10 @@ def read_stash_files(fname_pattern: Path, chunks: Any = "auto") -> xr.Dataset:
     :return: `xarray.Dataset` with all available variables
     """
 
-    print(f"Reading {fname_pattern}")
-    # parse any glob wildcards in directory or filena
+    # parse any glob wildcards in directory or filenames
     # turn parsed into list because of incomplete typehints of xr.open_mfdataset
-    parsed = list(
-        Path(fname_pattern.root).glob(
-            str(Path(*fname_pattern.parts[fname_pattern.is_absolute() :]))
-        )
-    )
+    parsed = parse_fname_pattern(fname_pattern)
+
     print(f"Reading {parsed}")
     dataset = xr.open_mfdataset(parsed, chunks="auto", parallel=True, engine="h5netcdf")
     return dataset
@@ -280,7 +280,7 @@ def compose_diagnostic_tensor(ds: xr.Dataset) -> xr.Dataset:
 
 
 def data_ingest_UM(
-    fname_pattern: Path,
+    fname_pattern: Path | str,
     res: float,
     requested_fields: list[str] = ["u", "v", "w", "theta"],
 ) -> xr.Dataset:
@@ -291,15 +291,18 @@ def data_ingest_UM(
     :param res: horizontal resolution (will use to overwrite horizontal coordinates). **NB** works for ideal simulations
     :param requested_fields: list of fields to retain in ds, if falsy will retain all.
     """
-    # all the fields we will need for the Cs calculations
-    simulation = read_stash_files(fname_pattern)
+
+    # parse filename (glob, ~, etc.)
+    fname = parse_fname_pattern(fname_pattern)
+    # open file(s)
+    simulation = xr.open_mfdataset(
+        fname, chunks="auto", parallel=True, engine="h5netcdf"
+    )
     # parse UM stash codes into variable names
     simulation = rename_variables(simulation)
-
     # rename to sgs_tools naming convention
     simulation = standardize_varnames(simulation, field_names_dict)
-
-    # restrict to interesting fields and rename to simple names
+    # restrict to interesting fields
     if requested_fields:
         simulation, _ = restrict_ds(simulation, fields=requested_fields)
     assert len(simulation) > 0, "None of the requested fields are available"
@@ -309,7 +312,7 @@ def data_ingest_UM(
 
 
 def data_ingest_UM_on_single_grid(
-    fname_pattern: Path,
+    fname_pattern: Path | str,
     res: float,
     requested_fields: list[str] = ["u", "v", "w", "theta"],
 ) -> xr.Dataset:

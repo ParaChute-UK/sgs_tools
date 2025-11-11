@@ -416,7 +416,11 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">sgs_tools.geometry.staggered_grid</span><span class="w"> </span><span class="kn">import</span> <span class="n">interpolate_to_grid</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">sgs_tools.io.read_util</span><span class="w"> </span><span class="kn">import</span> <span class="n">restrict_ds</span><span class="p">,</span> <span class="n">standardize_varnames</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sgs_tools.io.read_util</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">parse_fname_pattern</span><span class="p">,</span>
+    <span class="n">restrict_ds</span><span class="p">,</span>
+    <span class="n">standardize_varnames</span><span class="p">,</span>
+<span class="p">)</span>
 
 <span class="n">base_fields_dict</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;U_COMPNT_OF_WIND_AFTER_TIMESTEP&quot;</span><span class="p">:</span> <span class="s2">&quot;u&quot;</span><span class="p">,</span>
@@ -521,14 +525,10 @@
 <span class="sd">    :return: `xarray.Dataset` with all available variables</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Reading </span><span class="si">{</span><span class="n">fname_pattern</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="c1"># parse any glob wildcards in directory or filena</span>
+    <span class="c1"># parse any glob wildcards in directory or filenames</span>
     <span class="c1"># turn parsed into list because of incomplete typehints of xr.open_mfdataset</span>
-    <span class="n">parsed</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
-        <span class="n">Path</span><span class="p">(</span><span class="n">fname_pattern</span><span class="o">.</span><span class="n">root</span><span class="p">)</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span>
-            <span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="o">*</span><span class="n">fname_pattern</span><span class="o">.</span><span class="n">parts</span><span class="p">[</span><span class="n">fname_pattern</span><span class="o">.</span><span class="n">is_absolute</span><span class="p">()</span> <span class="p">:]))</span>
-        <span class="p">)</span>
-    <span class="p">)</span>
+    <span class="n">parsed</span> <span class="o">=</span> <span class="n">parse_fname_pattern</span><span class="p">(</span><span class="n">fname_pattern</span><span class="p">)</span>
+
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Reading </span><span class="si">{</span><span class="n">parsed</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
     <span class="n">dataset</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">open_mfdataset</span><span class="p">(</span><span class="n">parsed</span><span class="p">,</span> <span class="n">chunks</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span> <span class="n">parallel</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">engine</span><span class="o">=</span><span class="s2">&quot;h5netcdf&quot;</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">dataset</span></div>
@@ -701,7 +701,7 @@
 <div class="viewcode-block" id="data_ingest_UM">
 <a class="viewcode-back" href="../../../io.html#sgs_tools.io.um.data_ingest_UM">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">data_ingest_UM</span><span class="p">(</span>
-    <span class="n">fname_pattern</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
+    <span class="n">fname_pattern</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">res</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">requested_fields</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;u&quot;</span><span class="p">,</span> <span class="s2">&quot;v&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="s2">&quot;theta&quot;</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
@@ -712,15 +712,18 @@
 <span class="sd">    :param res: horizontal resolution (will use to overwrite horizontal coordinates). **NB** works for ideal simulations</span>
 <span class="sd">    :param requested_fields: list of fields to retain in ds, if falsy will retain all.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># all the fields we will need for the Cs calculations</span>
-    <span class="n">simulation</span> <span class="o">=</span> <span class="n">read_stash_files</span><span class="p">(</span><span class="n">fname_pattern</span><span class="p">)</span>
+
+    <span class="c1"># parse filename (glob, ~, etc.)</span>
+    <span class="n">fname</span> <span class="o">=</span> <span class="n">parse_fname_pattern</span><span class="p">(</span><span class="n">fname_pattern</span><span class="p">)</span>
+    <span class="c1"># open file(s)</span>
+    <span class="n">simulation</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">open_mfdataset</span><span class="p">(</span>
+        <span class="n">fname</span><span class="p">,</span> <span class="n">chunks</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span> <span class="n">parallel</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">engine</span><span class="o">=</span><span class="s2">&quot;h5netcdf&quot;</span>
+    <span class="p">)</span>
     <span class="c1"># parse UM stash codes into variable names</span>
     <span class="n">simulation</span> <span class="o">=</span> <span class="n">rename_variables</span><span class="p">(</span><span class="n">simulation</span><span class="p">)</span>
-
     <span class="c1"># rename to sgs_tools naming convention</span>
     <span class="n">simulation</span> <span class="o">=</span> <span class="n">standardize_varnames</span><span class="p">(</span><span class="n">simulation</span><span class="p">,</span> <span class="n">field_names_dict</span><span class="p">)</span>
-
-    <span class="c1"># restrict to interesting fields and rename to simple names</span>
+    <span class="c1"># restrict to interesting fields</span>
     <span class="k">if</span> <span class="n">requested_fields</span><span class="p">:</span>
         <span class="n">simulation</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">restrict_ds</span><span class="p">(</span><span class="n">simulation</span><span class="p">,</span> <span class="n">fields</span><span class="o">=</span><span class="n">requested_fields</span><span class="p">)</span>
     <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">simulation</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;None of the requested fields are available&quot;</span>
@@ -733,7 +736,7 @@
 <div class="viewcode-block" id="data_ingest_UM_on_single_grid">
 <a class="viewcode-back" href="../../../io.html#sgs_tools.io.um.data_ingest_UM_on_single_grid">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">data_ingest_UM_on_single_grid</span><span class="p">(</span>
-    <span class="n">fname_pattern</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
+    <span class="n">fname_pattern</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">res</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">requested_fields</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;u&quot;</span><span class="p">,</span> <span class="s2">&quot;v&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="s2">&quot;theta&quot;</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>

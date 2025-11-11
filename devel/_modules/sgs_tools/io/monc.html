@@ -416,7 +416,11 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="kn">import</span> <span class="n">to_numeric</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">sgs_tools.geometry.staggered_grid</span><span class="w"> </span><span class="kn">import</span> <span class="n">interpolate_to_grid</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">sgs_tools.io.read_util</span><span class="w"> </span><span class="kn">import</span> <span class="n">restrict_ds</span><span class="p">,</span> <span class="n">standardize_varnames</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sgs_tools.io.read_util</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">parse_fname_pattern</span><span class="p">,</span>
+    <span class="n">restrict_ds</span><span class="p">,</span>
+    <span class="n">standardize_varnames</span><span class="p">,</span>
+<span class="p">)</span>
 
 <span class="n">base_field_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;th&quot;</span><span class="p">:</span> <span class="s2">&quot;theta&quot;</span><span class="p">,</span> <span class="s2">&quot;p&quot;</span><span class="p">:</span> <span class="s2">&quot;P&quot;</span><span class="p">}</span>
 
@@ -426,7 +430,7 @@
 <div class="viewcode-block" id="data_ingest_MONC">
 <a class="viewcode-back" href="../../../io.html#sgs_tools.io.monc.data_ingest_MONC">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">data_ingest_MONC</span><span class="p">(</span>
-    <span class="n">fname_pattern</span><span class="p">,</span>
+    <span class="n">fname_pattern</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">requested_fields</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;u&quot;</span><span class="p">,</span> <span class="s2">&quot;v&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="s2">&quot;theta&quot;</span><span class="p">],</span>
     <span class="n">chunks</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="s2">&quot;auto&quot;</span><span class="p">,</span>
 <span class="p">):</span>
@@ -438,14 +442,10 @@
 <span class="sd">    :param chunks: chunking of datasets &quot;auto&quot; or a dictionary of {coordinate: chunks}.</span>
 <span class="sd">    :return: metadata dictionary, xarray Dataset of fields.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">fname</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
-        <span class="n">Path</span><span class="p">(</span><span class="n">fname_pattern</span><span class="o">.</span><span class="n">root</span><span class="p">)</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span>
-            <span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="o">*</span><span class="n">fname_pattern</span><span class="o">.</span><span class="n">parts</span><span class="p">[</span><span class="n">fname_pattern</span><span class="o">.</span><span class="n">is_absolute</span><span class="p">()</span> <span class="p">:]))</span>
-        <span class="p">)</span>
-    <span class="p">)</span>
-
+    <span class="c1"># parse filename (glob, ~, etc.)</span>
+    <span class="n">fname</span> <span class="o">=</span> <span class="n">parse_fname_pattern</span><span class="p">(</span><span class="n">fname_pattern</span><span class="p">)</span>
+    <span class="c1"># open file(s)</span>
     <span class="n">ds</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">open_mfdataset</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">chunks</span><span class="o">=</span><span class="n">chunks</span><span class="p">,</span> <span class="n">parallel</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-
     <span class="c1"># parse metadata</span>
     <span class="n">metadata</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;options_database&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">load</span><span class="p">()</span><span class="o">.</span><span class="n">data</span>
     <span class="n">metadata</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">char</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">metadata</span><span class="p">))</span>
@@ -456,7 +456,6 @@
             <span class="n">metadata</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">to_numeric</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
     <span class="n">metadata</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">metadata</span><span class="o">.</span><span class="n">items</span><span class="p">()))</span>
     <span class="k">del</span> <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;options_database&quot;</span><span class="p">]</span>
-
     <span class="n">ds</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>
     <span class="c1"># rename to sgs_tools naming convention</span>
     <span class="n">ds</span> <span class="o">=</span> <span class="n">standardize_varnames</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">base_field_dict</span><span class="p">)</span>
@@ -478,7 +477,7 @@
 <div class="viewcode-block" id="data_ingest_MONC_on_single_grid">
 <a class="viewcode-back" href="../../../io.html#sgs_tools.io.monc.data_ingest_MONC_on_single_grid">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">data_ingest_MONC_on_single_grid</span><span class="p">(</span>
-    <span class="n">fname_pattern</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
+    <span class="n">fname_pattern</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">requested_fields</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;u&quot;</span><span class="p">,</span> <span class="s2">&quot;v&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="s2">&quot;theta&quot;</span><span class="p">],</span>
     <span class="n">chunks</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="s2">&quot;auto&quot;</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>

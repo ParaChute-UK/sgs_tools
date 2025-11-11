@@ -421,7 +421,7 @@
 <div class="viewcode-block" id="read">
 <a class="viewcode-back" href="../../../io.html#sgs_tools.io.read.read">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">read</span><span class="p">(</span>
-    <span class="n">input_files</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">input_format</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">requested_fields</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span>
+    <span class="n">input_files</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span><span class="p">,</span> <span class="n">input_format</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">requested_fields</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Read simulation data from input files and return an xarray Dataset.</span>

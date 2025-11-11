@@ -1,0 +1,706 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>sgs_tools.sgs.dynamic_sgs_model &#8212; SGS_tools 0.0.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../../_static/documentation_options.js?v=7026087e"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/sgs_tools/sgs/dynamic_sgs_model';</script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="0.0.0" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">SGS_tools 0.0.0 documentation</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../io.html">
+    IO
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../geometry.html">
+    Geometry
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../physics.html">
+    Physical Fields
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../sgs.html">
+    Sub-grid scales
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../diagnostics.html">
+    Diagnostics
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../simple_flow.html">
+    Simple Flow Examples
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../scripts.html">
+    Scripts
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../plotting.html">
+    Plotting
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../devlog.html">
+    Development Log
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../io.html">
+    IO
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../geometry.html">
+    Geometry
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../physics.html">
+    Physical Fields
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../sgs.html">
+    Sub-grid scales
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../diagnostics.html">
+    Diagnostics
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../simple_flow.html">
+    Simple Flow Examples
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../scripts.html">
+    Scripts
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../plotting.html">
+    Plotting
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../devlog.html">
+    Development Log
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">sgs_tools.sgs.dynamic_sgs_model</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for sgs_tools.sgs.dynamic_sgs_model</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Protocol</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">..geometry.tensor_algebra</span><span class="w"> </span><span class="kn">import</span> <span class="n">tensor_self_outer_product</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.dynamic_coefficient</span><span class="w"> </span><span class="kn">import</span> <span class="n">Minimisation</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.filter</span><span class="w"> </span><span class="kn">import</span> <span class="n">Filter</span><span class="p">,</span> <span class="n">IdentityFilter</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.sgs_model</span><span class="w"> </span><span class="kn">import</span> <span class="n">LinCombSGSModel</span><span class="p">,</span> <span class="n">SGSModel</span>
+
+
+<div class="viewcode-block" id="LeonardTensor">
+<a class="viewcode-back" href="../../../sgs.html#sgs_tools.sgs.dynamic_sgs_model.LeonardTensor">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">LeonardTensor</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;compute the Leonard tensor for a large-scale equation</span>
+
+<span class="sd">    :meth:`compute`: returns the Leonard tensor for a given filter</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">filter</span><span class="p">:</span> <span class="n">Filter</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;&quot;&quot;&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="LeonardVelocityTensor">
+<a class="viewcode-back" href="../../../sgs.html#sgs_tools.sgs.dynamic_sgs_model.LeonardVelocityTensor">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">LeonardVelocityTensor</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Leonard tensor for the velocity</span>
+
+<span class="sd">    :ivar vel: grid-scale/base velocity field</span>
+<span class="sd">    :ivar tensor_dims: tensor dimensions</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">vel</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span>
+    <span class="n">tensor_dims</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span>
+
+<div class="viewcode-block" id="LeonardVelocityTensor.compute">
+<a class="viewcode-back" href="../../../sgs.html#sgs_tools.sgs.dynamic_sgs_model.LeonardVelocityTensor.compute">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">filter</span><span class="p">:</span> <span class="n">Filter</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;compute the Leonard tensor as</span>
+<span class="sd">            :math:`\overline{v_i v_j} - \overline{v_i} \overline{v_j}`,</span>
+<span class="sd">            where :math:`\overline{\ast}` means filtering</span>
+
+<span class="sd">        :param filter: Filter used to separate &quot;large&quot; and &quot;small&quot; scales</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">resolved</span> <span class="o">=</span> <span class="n">tensor_self_outer_product</span><span class="p">(</span><span class="nb">filter</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vel</span><span class="p">),</span> <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">tensor_dims</span><span class="p">)</span>
+        <span class="n">filtered</span> <span class="o">=</span> <span class="nb">filter</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">tensor_self_outer_product</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vel</span><span class="p">,</span> <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">tensor_dims</span><span class="p">))</span>
+        <span class="n">L</span> <span class="o">=</span> <span class="n">filtered</span> <span class="o">-</span> <span class="n">resolved</span>
+        <span class="k">return</span> <span class="n">L</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="LeonardThetaTensor">
+<a class="viewcode-back" href="../../../sgs.html#sgs_tools.sgs.dynamic_sgs_model.LeonardThetaTensor">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">LeonardThetaTensor</span><span class="p">:</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Leonard tensor for the (potential) temperature :math:`\theta`</span>
+
+<span class="sd">    :ivar vel: grid-scale/base velocity field</span>
+<span class="sd">    :ivar theta: grid-scale/base temperature field</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">vel</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span>
+    <span class="n">theta</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span>
+    <span class="n">tensor_dims</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span>
+
+<div class="viewcode-block" id="LeonardThetaTensor.compute">
+<a class="viewcode-back" href="../../../sgs.html#sgs_tools.sgs.dynamic_sgs_model.LeonardThetaTensor.compute">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">filter</span><span class="p">:</span> <span class="n">Filter</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;compute the Leonard tensor as</span>
+<span class="sd">            :math:`\overline{v_i \theta} - \overline{v_i} \overline{\theta}`,</span>
+<span class="sd">            where :math:`\overline{\ast}` means filtering</span>
+
+<span class="sd">        :param filter: Filter used to separate &quot;large&quot; and &quot;small&quot; scales</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">resolved</span> <span class="o">=</span> <span class="nb">filter</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vel</span><span class="p">)</span> <span class="o">*</span> <span class="nb">filter</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">theta</span><span class="p">)</span>
+        <span class="n">filtered</span> <span class="o">=</span> <span class="nb">filter</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vel</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">theta</span><span class="p">)</span>
+        <span class="n">L</span> <span class="o">=</span> <span class="n">filtered</span> <span class="o">-</span> <span class="n">resolved</span>
+        <span class="k">return</span> <span class="n">L</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="M_Germano_tensor">
+<a class="viewcode-back" href="../../../sgs.html#sgs_tools.sgs.dynamic_sgs_model.M_Germano_tensor">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">M_Germano_tensor</span><span class="p">(</span><span class="n">sgs_model</span><span class="p">:</span> <span class="n">SGSModel</span><span class="p">,</span> <span class="nb">filter</span><span class="p">:</span> <span class="n">Filter</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">:</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;compute the Mij Germano model tensor as</span>
+<span class="sd">    :math:`(&lt;\tau(\matrhm{at grid})&gt; - \alpha^2 \tau(\mathrm{at filter}))`,</span>
+<span class="sd">    where :math:`\Delta * \alpha` is the area/volume spanned by the filter kernel</span>
+<span class="sd">    and :math:`\Delta` is the filter scale.</span>
+
+<span class="sd">    :param sgs_model: SGS model used to compute the SGS tensor.</span>
+<span class="sd">    :param filter: Filter used to separate &quot;large&quot; and &quot;small&quot; scales</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">IdentityFilter</span><span class="p">(</span><span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(),</span> <span class="nb">filter</span><span class="o">.</span><span class="n">filter_dims</span><span class="p">)</span>
+    <span class="n">filtered</span> <span class="o">=</span> <span class="nb">filter</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">sgs_model</span><span class="o">.</span><span class="n">sgs_tensor</span><span class="p">(</span><span class="nb">id</span><span class="p">))</span>
+    <span class="n">resolved</span> <span class="o">=</span> <span class="n">sgs_model</span><span class="o">.</span><span class="n">sgs_tensor</span><span class="p">(</span><span class="nb">filter</span><span class="p">)</span>
+    <span class="n">alpha_sq</span> <span class="o">=</span> <span class="nb">filter</span><span class="o">.</span><span class="n">kernel</span><span class="o">.</span><span class="n">size</span>
+    <span class="n">M</span> <span class="o">=</span> <span class="n">filtered</span> <span class="o">-</span> <span class="n">alpha_sq</span> <span class="o">*</span> <span class="n">resolved</span>
+    <span class="k">return</span> <span class="n">M</span></div>
+
+
+
+<div class="viewcode-block" id="DynamicModelProtcol">
+<a class="viewcode-back" href="../../../sgs.html#sgs_tools.sgs.dynamic_sgs_model.DynamicModelProtcol">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">DynamicModelProtcol</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;compute the Leonard tensor for a large-scale equation</span>
+
+<span class="sd">    :meth compute_coeff : returns the SGS tensor for a given filter</span>
+<span class="sd">    :meth sgs_tensor: returns the SGS tensor for a given test and regularisation filter</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_coeff</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">test_filter</span><span class="p">:</span> <span class="n">Filter</span><span class="p">,</span> <span class="n">reg_filter</span><span class="p">:</span> <span class="n">Filter</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">sgs_tensor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">test_filter</span><span class="p">:</span> <span class="n">Filter</span><span class="p">,</span> <span class="n">reg_filter</span><span class="p">:</span> <span class="n">Filter</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; &quot;&quot;&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="DynamicModel">
+<a class="viewcode-back" href="../../../sgs.html#sgs_tools.sgs.dynamic_sgs_model.DynamicModel">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">DynamicModel</span><span class="p">:</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Dynamic model for SGS model</span>
+
+<span class="sd">    :ivar static_model: Static SGS model</span>
+<span class="sd">    :ivar leonard: Leonard tensor for the large-scale equation</span>
+<span class="sd">    :ivar minimisation: Minimisation method to compute coefficients</span>
+<span class="sd">    :meth compute_coeff: computes the amplitude coefficients for the SGS model</span>
+<span class="sd">    :meth sgs_tensor: computes the SGS tensor for a given test and regularisation filters</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">static_model</span><span class="p">:</span> <span class="n">SGSModel</span>
+    <span class="n">leonard</span><span class="p">:</span> <span class="n">LeonardTensor</span>
+    <span class="n">minimisation</span><span class="p">:</span> <span class="n">Minimisation</span>
+
+<div class="viewcode-block" id="DynamicModel.compute_coeff">
+<a class="viewcode-back" href="../../../sgs.html#sgs_tools.sgs.dynamic_sgs_model.DynamicModel.compute_coeff">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_coeff</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">test_filter</span><span class="p">:</span> <span class="n">Filter</span><span class="p">,</span> <span class="n">reg_filter</span><span class="p">:</span> <span class="n">Filter</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;compute the amplitude coefficient for the SGS model</span>
+
+<span class="sd">        :param test_filter: Filter used to separate &quot;large&quot; and &quot;small&quot; scales</span>
+<span class="sd">        :param reg_filter: Filter used for regularisation</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">L</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">leonard</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span><span class="n">test_filter</span><span class="p">)</span>
+        <span class="n">M</span> <span class="o">=</span> <span class="n">M_Germano_tensor</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">static_model</span><span class="p">,</span> <span class="n">test_filter</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">minimisation</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="p">[</span><span class="n">M</span><span class="p">],</span> <span class="n">reg_filter</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DynamicModel.sgs_tensor">
+<a class="viewcode-back" href="../../../sgs.html#sgs_tools.sgs.dynamic_sgs_model.DynamicModel.sgs_tensor">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sgs_tensor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">test_filter</span><span class="p">:</span> <span class="n">Filter</span><span class="p">,</span> <span class="n">reg_filter</span><span class="p">:</span> <span class="n">Filter</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;compute the SGS tensor for a given test and regularisation filter</span>
+
+<span class="sd">        :param test_filter: Filter used to separate &quot;large&quot; and &quot;small&quot; scales</span>
+<span class="sd">        :param reg_filter: Filter used for regularisation</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_coeff</span><span class="p">(</span>
+            <span class="n">test_filter</span><span class="p">,</span> <span class="n">reg_filter</span>
+        <span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">static_model</span><span class="o">.</span><span class="n">sgs_tensor</span><span class="p">(</span><span class="n">test_filter</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="LinCombDynamicModel">
+<a class="viewcode-back" href="../../../sgs.html#sgs_tools.sgs.dynamic_sgs_model.LinCombDynamicModel">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">LinCombDynamicModel</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Dynamic model for linear combination SGS model</span>
+
+<span class="sd">    :ivar static_model: Static linear combination SGS model</span>
+<span class="sd">    :ivar leonard: Leonard tensor for the large-scale equation</span>
+<span class="sd">    :ivar minimisation: Minimisation method to compute coefficients</span>
+<span class="sd">    :meth compute_coeff: computes the coefficients for the SGS model</span>
+<span class="sd">    :meth sgs_tensor: computes the SGS tensor for a given test and regularisation filter</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">static_model</span><span class="p">:</span> <span class="n">LinCombSGSModel</span>
+    <span class="n">leonard</span><span class="p">:</span> <span class="n">LeonardTensor</span>
+    <span class="n">minimisation</span><span class="p">:</span> <span class="n">Minimisation</span>
+
+<div class="viewcode-block" id="LinCombDynamicModel.compute_coeff">
+<a class="viewcode-back" href="../../../sgs.html#sgs_tools.sgs.dynamic_sgs_model.LinCombDynamicModel.compute_coeff">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_coeff</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">test_filter</span><span class="p">:</span> <span class="n">Filter</span><span class="p">,</span> <span class="n">reg_filter</span><span class="p">:</span> <span class="n">Filter</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;compute the coefficients for the SGS model</span>
+
+<span class="sd">        :param test_filter: Filter used to separate &quot;large&quot; and &quot;small&quot; scales</span>
+<span class="sd">        :param reg_filter: Filter used for regularisation</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">L</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">leonard</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span><span class="n">test_filter</span><span class="p">)</span>
+        <span class="n">M</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">M_Germano_tensor</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">test_filter</span><span class="p">)</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">static_model</span><span class="o">.</span><span class="n">model_components</span>
+        <span class="p">]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">minimisation</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">reg_filter</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="LinCombDynamicModel.sgs_tensor">
+<a class="viewcode-back" href="../../../sgs.html#sgs_tools.sgs.dynamic_sgs_model.LinCombDynamicModel.sgs_tensor">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sgs_tensor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">test_filter</span><span class="p">:</span> <span class="n">Filter</span><span class="p">,</span> <span class="n">reg_filter</span><span class="p">:</span> <span class="n">Filter</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;compute the SGS tensor for a given test and regularisation filter</span>
+
+<span class="sd">        :param test_filter: Filter used to separate &quot;large&quot; and &quot;small&quot; scales</span>
+<span class="sd">        :param reg_filter: Filter used for regularisation</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">tau_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">static_model</span><span class="o">.</span><span class="n">sgs_tensor_list</span><span class="p">(</span><span class="n">test_filter</span><span class="p">)</span>
+        <span class="n">coeff</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_coeff</span><span class="p">(</span><span class="n">test_filter</span><span class="p">,</span> <span class="n">reg_filter</span><span class="p">)</span>
+        <span class="c1"># ensure alignment of coefficient index label between static_model and minimisation</span>
+        <span class="n">cdim</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">minimisation</span><span class="o">.</span><span class="n">coeff_dim</span>
+        <span class="k">if</span> <span class="n">cdim</span> <span class="ow">in</span> <span class="n">tau_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">dims</span><span class="p">:</span>
+            <span class="n">coeff</span> <span class="o">=</span> <span class="n">coeff</span><span class="o">.</span><span class="n">rename</span><span class="p">({</span><span class="n">cdim</span><span class="p">:</span> <span class="n">cdim</span> <span class="o">+</span> <span class="s2">&quot;_dummy&quot;</span><span class="p">})</span>
+            <span class="n">cdim</span> <span class="o">=</span> <span class="n">cdim</span> <span class="o">+</span> <span class="s2">&quot;_dummy&quot;</span>
+        <span class="n">tau_arr</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">tau_list</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="n">cdim</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">coeff</span> <span class="o">*</span> <span class="n">tau_arr</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="n">cdim</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2024, the HiFi project.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

@@ -410,12 +410,13 @@
   <h1>Source code for sgs_tools.io.um</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Iterable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">sgs_tools.geometry.staggered_grid</span><span class="w"> </span><span class="kn">import</span> <span class="n">interpolate_to_grid</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sgs_tools.io.read_util</span><span class="w"> </span><span class="kn">import</span> <span class="n">restrict_ds</span><span class="p">,</span> <span class="n">standardize_varnames</span>
 
 <span class="n">base_fields_dict</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;U_COMPNT_OF_WIND_AFTER_TIMESTEP&quot;</span><span class="p">:</span> <span class="s2">&quot;u&quot;</span><span class="p">,</span>
@@ -607,36 +608,7 @@
 
 
 
-<div class="viewcode-block" id="standardize_varnames">
-<a class="viewcode-back" href="../../../io.html#sgs_tools.io.um.standardize_varnames">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">standardize_varnames</span><span class="p">(</span><span class="n">ds</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;rename variables in ``ds`` using ``field_names_dict``</span>
-
-<span class="sd">    :param ds: input dataset</span>
-<span class="sd">    :return: dataset with renamed variables</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">restricted_dict</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">field_names_dict</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">ds</span><span class="p">}</span>
-    <span class="k">return</span> <span class="n">ds</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">restricted_dict</span><span class="p">)</span></div>
-
-
-
-<div class="viewcode-block" id="restrict_ds">
-<a class="viewcode-back" href="../../../io.html#sgs_tools.io.um.restrict_ds">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">restrict_ds</span><span class="p">(</span><span class="n">ds</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">,</span> <span class="n">fields</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;restrict the dataset to fields of interest and rename using fields dict</span>
-
-<span class="sd">    :param ds: input dataset</span>
-<span class="sd">    :param fields: list of fields to restrict to, must be contained by `ds`</span>
-<span class="sd">    :return: dataset with renamed variables</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">intersection</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">fields</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">ds</span><span class="p">]</span>
-    <span class="n">missing_fields</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">fields</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">intersection</span><span class="p">}</span>
-    <span class="c1"># print (&quot;Missing fields:&quot;, missing_fields)</span>
-    <span class="k">return</span> <span class="n">ds</span><span class="p">[</span><span class="n">intersection</span><span class="p">],</span> <span class="n">missing_fields</span></div>
-
-
-
-<span class="c1"># unify coordinates and implement correct x-spacing</span>
+<span class="c1"># unify coordinate names and implement correct x-spacing for UM ideal sims</span>
 <span class="c1"># xarray doesn&#39;t handle duplicate dimensions well, so use clunkily split-rename-merge</span>
 <div class="viewcode-block" id="unify_coords">
 <a class="viewcode-back" href="../../../io.html#sgs_tools.io.um.unify_coords">[docs]</a>
@@ -733,11 +705,12 @@
     <span class="n">res</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">requested_fields</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;u&quot;</span><span class="p">,</span> <span class="s2">&quot;v&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="s2">&quot;theta&quot;</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;read and pre-process UM data</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;read and pre-process UM data using sgs_tools naming convention.</span>
+<span class="sd">    Any unknown fields will retain their original names.</span>
 
 <span class="sd">    :param fname_pattern: UM NetCDF diagnostic file(s) to read. will be interpreted as a glob pattern. (should belong to the same simulation)</span>
 <span class="sd">    :param res: horizontal resolution (will use to overwrite horizontal coordinates). **NB** works for ideal simulations</span>
-<span class="sd">    :param  requested_fields: list of fields to read and pre-process. Defaults to [&#39;u&#39;, &#39;v&#39;, &#39;w&#39;, &#39;theta&#39;]</span>
+<span class="sd">    :param requested_fields: list of fields to retain in ds, if falsy will retain all.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># all the fields we will need for the Cs calculations</span>
     <span class="n">simulation</span> <span class="o">=</span> <span class="n">read_stash_files</span><span class="p">(</span><span class="n">fname_pattern</span><span class="p">)</span>
@@ -745,10 +718,11 @@
     <span class="n">simulation</span> <span class="o">=</span> <span class="n">rename_variables</span><span class="p">(</span><span class="n">simulation</span><span class="p">)</span>
 
     <span class="c1"># rename to sgs_tools naming convention</span>
-    <span class="n">simulation</span> <span class="o">=</span> <span class="n">standardize_varnames</span><span class="p">(</span><span class="n">simulation</span><span class="p">)</span>
+    <span class="n">simulation</span> <span class="o">=</span> <span class="n">standardize_varnames</span><span class="p">(</span><span class="n">simulation</span><span class="p">,</span> <span class="n">field_names_dict</span><span class="p">)</span>
 
     <span class="c1"># restrict to interesting fields and rename to simple names</span>
-    <span class="n">simulation</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">restrict_ds</span><span class="p">(</span><span class="n">simulation</span><span class="p">,</span> <span class="n">fields</span><span class="o">=</span><span class="n">requested_fields</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">requested_fields</span><span class="p">:</span>
+        <span class="n">simulation</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">restrict_ds</span><span class="p">(</span><span class="n">simulation</span><span class="p">,</span> <span class="n">fields</span><span class="o">=</span><span class="n">requested_fields</span><span class="p">)</span>
     <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">simulation</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;None of the requested fields are available&quot;</span>
     <span class="c1"># unify coordinates</span>
     <span class="n">simulation</span> <span class="o">=</span> <span class="n">unify_coords</span><span class="p">(</span><span class="n">simulation</span><span class="p">,</span> <span class="n">res</span><span class="o">=</span><span class="n">res</span><span class="p">)</span>
@@ -763,11 +737,12 @@
     <span class="n">res</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">requested_fields</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;u&quot;</span><span class="p">,</span> <span class="s2">&quot;v&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="s2">&quot;theta&quot;</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;read pre-process UM data and interpolate to a cell-centred grid</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;read, pre-process UM data and interpolate to a cell-centred grid</span>
+<span class="sd">    Any unknown fields will retain their original names.</span>
 
 <span class="sd">    :param fname_pattern: UM NetCDF diagnostic file(s) to read. will be interpreted as a glob pattern. (should belong to the same simulation)</span>
 <span class="sd">    :param res: horizontal resolution (will use to overwrite horizontal coordinates). **NB** works for ideal simulations</span>
-<span class="sd">    :param  requested_fields: list of fields to read and pre-process. Defaults to [&#39;u&#39;, &#39;v&#39;, &#39;w&#39;, &#39;theta&#39;]</span>
+<span class="sd">    :param  requested_fields: list of fields to retain in ds, if falsy will retain all.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># read, constrain fields, unify grids</span>
     <span class="n">simulation</span> <span class="o">=</span> <span class="n">data_ingest_UM</span><span class="p">(</span><span class="n">fname_pattern</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">requested_fields</span><span class="p">)</span>

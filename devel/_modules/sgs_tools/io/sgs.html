@@ -409,11 +409,13 @@
                   
   <h1>Source code for sgs_tools.io.sgs</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">sgs_tools.io.um</span><span class="w"> </span><span class="kn">import</span> <span class="n">restrict_ds</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sgs_tools.io.read_util</span><span class="w"> </span><span class="kn">import</span> <span class="n">restrict_ds</span><span class="p">,</span> <span class="n">standardize_varnames</span>
+
+<span class="n">degenerate_naming_convention</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
 
 
 <div class="viewcode-block" id="data_ingest_SGS">
@@ -423,10 +425,11 @@
     <span class="n">requested_fields</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;u&quot;</span><span class="p">,</span> <span class="s2">&quot;v&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="s2">&quot;theta&quot;</span><span class="p">],</span>
     <span class="n">chunks</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="s2">&quot;auto&quot;</span><span class="p">,</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;read and pre-process local-convention (sgs_tools) NetCDF data</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;read and pre-process local-convention (sgs_tools) NetCDF data using sgs_tools naming convention.</span>
+<span class="sd">    Will not rename any fields, assume they are in local convention.</span>
 
 <span class="sd">    :param fname_pattern: NetCDF diagnostic file to read. can be a glob pattern. (should belong to the same simulation)</span>
-<span class="sd">    :param  requested_fields: list of fields to read and pre-process using sgs_tools naming convention.</span>
+<span class="sd">    :param requested_fields: list of fields to retain in ds, if falsy will retain all.</span>
 <span class="sd">    :param chunks: chunking for data</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">fname</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
@@ -436,8 +439,11 @@
     <span class="p">)</span>
 
     <span class="n">ds</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">open_mfdataset</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">chunks</span><span class="o">=</span><span class="n">chunks</span><span class="p">,</span> <span class="n">parallel</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">engine</span><span class="o">=</span><span class="s2">&quot;h5netcdf&quot;</span><span class="p">)</span>
-    <span class="n">ds</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">restrict_ds</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">requested_fields</span><span class="p">)</span>
+    <span class="c1"># rename to sgs_tools naming convention</span>
+    <span class="n">ds</span> <span class="o">=</span> <span class="n">standardize_varnames</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">degenerate_naming_convention</span><span class="p">)</span>
 
+    <span class="k">if</span> <span class="n">requested_fields</span><span class="p">:</span>
+        <span class="n">ds</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">restrict_ds</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">requested_fields</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">ds</span></div>
 
 </pre></div>

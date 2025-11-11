@@ -531,43 +531,6 @@ Time coordinate becomes <code class="docutils literal notranslate"><span class="
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="sgs_tools.io.um.standardize_varnames">
-<span class="sig-name descname"><span class="pre">standardize_varnames</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/io/um.html#standardize_varnames"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.io.um.standardize_varnames" title="Link to this definition">#</a></dt>
-<dd><p>rename variables in <code class="docutils literal notranslate"><span class="pre">ds</span></code> using <code class="docutils literal notranslate"><span class="pre">field_names_dict</span></code></p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>ds</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></span>) – input dataset</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></span></p>
-</dd>
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>dataset with renamed variables</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="sgs_tools.io.um.restrict_ds">
-<span class="sig-name descname"><span class="pre">restrict_ds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fields</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/io/um.html#restrict_ds"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.io.um.restrict_ds" title="Link to this definition">#</a></dt>
-<dd><p>restrict the dataset to fields of interest and rename using fields dict</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>ds</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></span>) – input dataset</p></li>
-<li><p><strong>fields</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span>) – list of fields to restrict to, must be contained by <cite>ds</cite></p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></span></p>
-</dd>
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>dataset with renamed variables</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
 <dt class="sig sig-object py" id="sgs_tools.io.um.unify_coords">
 <span class="sig-name descname"><span class="pre">unify_coords</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">res</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/io/um.html#unify_coords"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.io.um.unify_coords" title="Link to this definition">#</a></dt>
 <dd><p>unify coordinate names</p>
@@ -592,13 +555,14 @@ rename coordinates with reference to a logically-cartesian grid</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="sgs_tools.io.um.data_ingest_UM">
 <span class="sig-name descname"><span class="pre">data_ingest_UM</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname_pattern</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">res</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">requested_fields</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['u',</span> <span class="pre">'v',</span> <span class="pre">'w',</span> <span class="pre">'theta']</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/io/um.html#data_ingest_UM"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.io.um.data_ingest_UM" title="Link to this definition">#</a></dt>
-<dd><p>read and pre-process UM data</p>
+<dd><p>read and pre-process UM data using sgs_tools naming convention.
+Any unknown fields will retain their original names.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>fname_pattern</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code></span>) – UM NetCDF diagnostic file(s) to read. will be interpreted as a glob pattern. (should belong to the same simulation)</p></li>
 <li><p><strong>res</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></span>) – horizontal resolution (will use to overwrite horizontal coordinates). <strong>NB</strong> works for ideal simulations</p></li>
-<li><p><strong>requested_fields</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span>) – list of fields to read and pre-process. Defaults to [‘u’, ‘v’, ‘w’, ‘theta’]</p></li>
+<li><p><strong>requested_fields</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span>) – list of fields to retain in ds, if falsy will retain all.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
@@ -610,13 +574,14 @@ rename coordinates with reference to a logically-cartesian grid</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="sgs_tools.io.um.data_ingest_UM_on_single_grid">
 <span class="sig-name descname"><span class="pre">data_ingest_UM_on_single_grid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname_pattern</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">res</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">requested_fields</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['u',</span> <span class="pre">'v',</span> <span class="pre">'w',</span> <span class="pre">'theta']</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/io/um.html#data_ingest_UM_on_single_grid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.io.um.data_ingest_UM_on_single_grid" title="Link to this definition">#</a></dt>
-<dd><p>read pre-process UM data and interpolate to a cell-centred grid</p>
+<dd><p>read, pre-process UM data and interpolate to a cell-centred grid
+Any unknown fields will retain their original names.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>fname_pattern</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code></span>) – UM NetCDF diagnostic file(s) to read. will be interpreted as a glob pattern. (should belong to the same simulation)</p></li>
 <li><p><strong>res</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></span>) – horizontal resolution (will use to overwrite horizontal coordinates). <strong>NB</strong> works for ideal simulations</p></li>
-<li><p><strong>requested_fields</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span>) – list of fields to read and pre-process. Defaults to [‘u’, ‘v’, ‘w’, ‘theta’]</p></li>
+<li><p><strong>requested_fields</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span>) – list of fields to retain in ds, if falsy will retain all.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
@@ -631,14 +596,18 @@ rename coordinates with reference to a logically-cartesian grid</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="sgs_tools.io.monc.data_ingest_MONC">
 <span class="sig-name descname"><span class="pre">data_ingest_MONC</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname_pattern</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">requested_fields</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['u',</span> <span class="pre">'v',</span> <span class="pre">'w',</span> <span class="pre">'theta']</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chunks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'auto'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/io/monc.html#data_ingest_MONC"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.io.monc.data_ingest_MONC" title="Link to this definition">#</a></dt>
-<dd><p>read and pre-process MONC data</p>
+<dd><p>read and pre-process MONC data using sgs_tools naming convention.
+Any unknown fields will retain their original names.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>fname_pattern</strong> – MONC NetCDF diagnostic file to read. can be a glob pattern. (should belong to the same simulation)</p></li>
-<li><p><strong>requested_fields</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span>) – list of fields to read and pre-process using sgs_tools naming convention.</p></li>
+<li><p><strong>requested_fields</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span>) – list of fields to retain in ds, if falsy will retain all.</p></li>
 <li><p><strong>chunks</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></span>) – chunking of datasets “auto” or a dictionary of {coordinate: chunks}.</p></li>
 </ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>metadata dictionary, xarray Dataset of fields.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -646,12 +615,13 @@ rename coordinates with reference to a logically-cartesian grid</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="sgs_tools.io.monc.data_ingest_MONC_on_single_grid">
 <span class="sig-name descname"><span class="pre">data_ingest_MONC_on_single_grid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname_pattern</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">requested_fields</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['u',</span> <span class="pre">'v',</span> <span class="pre">'w',</span> <span class="pre">'theta']</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chunks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'auto'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/io/monc.html#data_ingest_MONC_on_single_grid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.io.monc.data_ingest_MONC_on_single_grid" title="Link to this definition">#</a></dt>
-<dd><p>read pre-process MONC data and interpolate to a cell-centred grid</p>
+<dd><p>read pre-process MONC data and interpolate to a cell-centred grid
+Any unknown fields will retain their original names.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>fname_pattern</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code></span>) – MONC NetCDF diagnostic file(s) to read. will be interpreted as a glob pattern. (should belong to the same simulation)</p></li>
-<li><p><strong>requested_fields</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span>) – list of fields to read and pre-process. Defaults to [‘u’, ‘v’, ‘w’, ‘theta’]</p></li>
+<li><p><strong>requested_fields</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span>) – list of fields to retain in ds, if falsy will retain all.</p></li>
 <li><p><strong>chunks</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></span>) – chunking of datasets “auto” or a dictionary of {coordinate: chunks}.</p></li>
 </ul>
 </dd>
@@ -667,12 +637,13 @@ rename coordinates with reference to a logically-cartesian grid</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="sgs_tools.io.sgs.data_ingest_SGS">
 <span class="sig-name descname"><span class="pre">data_ingest_SGS</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname_pattern</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">requested_fields</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['u',</span> <span class="pre">'v',</span> <span class="pre">'w',</span> <span class="pre">'theta']</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chunks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'auto'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/io/sgs.html#data_ingest_SGS"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.io.sgs.data_ingest_SGS" title="Link to this definition">#</a></dt>
-<dd><p>read and pre-process local-convention (sgs_tools) NetCDF data</p>
+<dd><p>read and pre-process local-convention (sgs_tools) NetCDF data using sgs_tools naming convention.
+Will not rename any fields, assume they are in local convention.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>fname_pattern</strong> – NetCDF diagnostic file to read. can be a glob pattern. (should belong to the same simulation)</p></li>
-<li><p><strong>requested_fields</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span>) – list of fields to read and pre-process using sgs_tools naming convention.</p></li>
+<li><p><strong>requested_fields</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span>) – list of fields to retain in ds, if falsy will retain all.</p></li>
 <li><p><strong>chunks</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></span>) – chunking for data</p></li>
 </ul>
 </dd>
@@ -788,8 +759,6 @@ rename coordinates with reference to a logically-cartesian grid</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.io.um.dynamic_SGS_diag_dict"><code class="docutils literal notranslate"><span class="pre">dynamic_SGS_diag_dict</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.io.um.read_stash_files"><code class="docutils literal notranslate"><span class="pre">read_stash_files()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.io.um.rename_variables"><code class="docutils literal notranslate"><span class="pre">rename_variables()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.io.um.standardize_varnames"><code class="docutils literal notranslate"><span class="pre">standardize_varnames()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.io.um.restrict_ds"><code class="docutils literal notranslate"><span class="pre">restrict_ds()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.io.um.unify_coords"><code class="docutils literal notranslate"><span class="pre">unify_coords()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.io.um.data_ingest_UM"><code class="docutils literal notranslate"><span class="pre">data_ingest_UM()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.io.um.data_ingest_UM_on_single_grid"><code class="docutils literal notranslate"><span class="pre">data_ingest_UM_on_single_grid()</span></code></a></li>

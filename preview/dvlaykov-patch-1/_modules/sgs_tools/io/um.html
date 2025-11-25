@@ -1,0 +1,836 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>sgs_tools.io.um &#8212; SGS_tools 0.0.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../../_static/documentation_options.js?v=7026087e"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/sgs_tools/io/um';</script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="0.0.0" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">SGS_tools 0.0.0 documentation</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../io.html">
+    IO
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../geometry.html">
+    Geometry
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../physics.html">
+    Physical Fields
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../sgs.html">
+    Sub-grid scales
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../diagnostics.html">
+    Diagnostics
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../simple_flow.html">
+    Simple Flow Examples
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../scripts.html">
+    Scripts
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../plotting.html">
+    Plotting
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../devlog.html">
+    Development Log
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../io.html">
+    IO
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../geometry.html">
+    Geometry
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../physics.html">
+    Physical Fields
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../sgs.html">
+    Sub-grid scales
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../diagnostics.html">
+    Diagnostics
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../simple_flow.html">
+    Simple Flow Examples
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../scripts.html">
+    Scripts
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../plotting.html">
+    Plotting
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../devlog.html">
+    Development Log
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">sgs_tools.io.um</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for sgs_tools.io.um</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">sgs_tools.geometry.staggered_grid</span><span class="w"> </span><span class="kn">import</span> <span class="n">interpolate_to_grid</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sgs_tools.io.read_util</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">parse_fname_pattern</span><span class="p">,</span>
+    <span class="n">restrict_ds</span><span class="p">,</span>
+    <span class="n">standardize_varnames</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">base_fields_dict</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;U_COMPNT_OF_WIND_AFTER_TIMESTEP&quot;</span><span class="p">:</span> <span class="s2">&quot;u&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;V_COMPNT_OF_WIND_AFTER_TIMESTEP&quot;</span><span class="p">:</span> <span class="s2">&quot;v&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;W_COMPNT_OF_WIND_AFTER_TIMESTEP&quot;</span><span class="p">:</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;THETA_AFTER_TIMESTEP&quot;</span><span class="p">:</span> <span class="s2">&quot;theta&quot;</span><span class="p">,</span>
+    <span class="c1">#&#39;TEMPERATURE_ON_THETA_LEVELS&#39; : &#39;T&#39;,</span>
+    <span class="c1"># &#39;PRESSURE_AT_THETA_LEVELS_AFTER_TS&#39; : &#39;P&#39;</span>
+<span class="p">}</span>
+<span class="s2">&quot;&quot;</span>
+
+<span class="n">Water_dict</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;CLD_LIQ_MIXING_RATIO__mcl__AFTER_TS&quot;</span><span class="p">:</span> <span class="s2">&quot;q_l&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;CLD_ICE_MIXING_RATIO__mcf__AFTER_TS&quot;</span><span class="p">:</span> <span class="s2">&quot;q_i&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;LARGE_SCALE_RAINFALL_RATE____KG_M2_S&quot;</span><span class="p">:</span> <span class="s2">&quot;rain&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;GRAUPEL_MIXING_RATIO__mg__AFTER_TS&quot;</span><span class="p">:</span> <span class="s2">&quot;q_g&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;SPECIFIC_HUMIDITY_AFTER_TIMESTEP&quot;</span><span class="p">:</span> <span class="s2">&quot;q_v&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+<span class="s2">&quot;&quot;</span>
+
+<span class="n">Smagorinsky_dict</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;SMAG__S__SHEAR_TERM_&quot;</span><span class="p">:</span> <span class="s2">&quot;s_smag&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;SMAG__VISC_M&quot;</span><span class="p">:</span> <span class="s2">&quot;smag_visc_m&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;SMAG__VISC_H&quot;</span><span class="p">:</span> <span class="s2">&quot;smag_visc_h&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;SHEAR_AT_SCALE_DELTA&quot;</span><span class="p">:</span> <span class="s2">&quot;s&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;MIXING_LENGTH_RNEUTML&quot;</span><span class="p">:</span> <span class="s2">&quot;csDelta&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;CS_THETA&quot;</span><span class="p">:</span> <span class="s2">&quot;cs_theta&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;TURBULENT_KINETIC_ENERGY&quot;</span><span class="p">:</span> <span class="s2">&quot;tke&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;GRADIENT_RICHARDSON_NUMBER&quot;</span><span class="p">:</span> <span class="s2">&quot;Richardson&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+<span class="s2">&quot;&quot;</span>
+
+<span class="n">dynamic_SGS_dict</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;CS_SQUARED_AT_2_DELTA&quot;</span><span class="p">:</span> <span class="s2">&quot;cs2d&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;CS_SQUARED_AT_4_DELTA&quot;</span><span class="p">:</span> <span class="s2">&quot;cs4d&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;CS_THETA_AT_SCALE_2DELTA&quot;</span><span class="p">:</span> <span class="s2">&quot;cs_theta_2d&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;CS_THETA_AT_SCALE_4DELTA&quot;</span><span class="p">:</span> <span class="s2">&quot;cs_theta_4d&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+<span class="s2">&quot;&quot;</span>
+
+<span class="n">dynamic_anisotropic_SGS_dict</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;RHOKM_DIFF_COEFF___LOCAL_SCHEME&quot;</span><span class="p">:</span> <span class="s2">&quot;smag_visc_m_vert&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;RHOKH_DIFF_COEFF___LOCAL_SCHEME&quot;</span><span class="p">:</span> <span class="s2">&quot;smag_visc_h_vert&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;CS_1&quot;</span><span class="p">:</span> <span class="s2">&quot;cs_1&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;CS_2&quot;</span><span class="p">:</span> <span class="s2">&quot;cs_2&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;CS_3&quot;</span><span class="p">:</span> <span class="s2">&quot;cs_3&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;CS_THETA_1&quot;</span><span class="p">:</span> <span class="s2">&quot;cs_theta_1&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;CS_THETA_2&quot;</span><span class="p">:</span> <span class="s2">&quot;cs_theta_2&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;CS_THETA_3&quot;</span><span class="p">:</span> <span class="s2">&quot;cs_theta_3&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+<span class="s2">&quot;&quot;</span>
+
+<span class="n">dynamic_SGS_diag_dict</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;LijMij_CONT_TENSORS&quot;</span><span class="p">:</span> <span class="s2">&quot;lm&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;QijNij_CONT_TENSORS&quot;</span><span class="p">:</span> <span class="s2">&quot;qn&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;MijMij_CONT_TENSORS&quot;</span><span class="p">:</span> <span class="s2">&quot;mm&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;NijNij_CONT_TENSORS&quot;</span><span class="p">:</span> <span class="s2">&quot;nn&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;HjTj_CONT_VECTORS&quot;</span><span class="p">:</span> <span class="s2">&quot;ht&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;TjTj_CONT_VECTORS&quot;</span><span class="p">:</span> <span class="s2">&quot;tt&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;RjFj_CONT_VECTORS&quot;</span><span class="p">:</span> <span class="s2">&quot;rf&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;FjFj_CONT_VECTORS&quot;</span><span class="p">:</span> <span class="s2">&quot;ff&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;SHEAR_AT_SCALE_2DELTA&quot;</span><span class="p">:</span> <span class="s2">&quot;s2d&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;SHEAR_AT_SCALE_4DELTA&quot;</span><span class="p">:</span> <span class="s2">&quot;s4d&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;D11_TENSOR_COMPONENT&quot;</span><span class="p">:</span> <span class="s2">&quot;diag11&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;D22_TENSOR_COMPONENT&quot;</span><span class="p">:</span> <span class="s2">&quot;diag22&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;D33_TENSOR_COMPONENT&quot;</span><span class="p">:</span> <span class="s2">&quot;diag33&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;D13_TENSOR_COMPONENT&quot;</span><span class="p">:</span> <span class="s2">&quot;diag13&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;D23_TENSOR_COMPONENT&quot;</span><span class="p">:</span> <span class="s2">&quot;diag23&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;D12_TENSOR_COMPONENT&quot;</span><span class="p">:</span> <span class="s2">&quot;diag12&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Lagrangian_averaged_LijMij_tensors&quot;</span><span class="p">:</span> <span class="s2">&quot;LM&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Lagrangian_averaged_MijMij_tensors&quot;</span><span class="p">:</span> <span class="s2">&quot;MM&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Lagrangian_averaged_QijNij_tensors&quot;</span><span class="p">:</span> <span class="s2">&quot;QN&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Lagrangian_averaged_NijNij_tensors&quot;</span><span class="p">:</span> <span class="s2">&quot;NN&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Lagrangian_averaged_HjTj_vector&quot;</span><span class="p">:</span> <span class="s2">&quot;HT&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Lagrangian_averaged_TjTj_vector&quot;</span><span class="p">:</span> <span class="s2">&quot;TT&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Lagrangian_averaged_RjFj_vector&quot;</span><span class="p">:</span> <span class="s2">&quot;RF&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Lagrangian_averaged_FjFj_vector&quot;</span><span class="p">:</span> <span class="s2">&quot;FF&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Tdecorr_momentum&quot;</span><span class="p">:</span> <span class="s2">&quot;Tdecorr_momentum&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Tdecorr_heat&quot;</span><span class="p">:</span> <span class="s2">&quot;Tdecorr_heat&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Richardson&quot;</span><span class="p">:</span> <span class="s2">&quot;Richardson_diag&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+<span class="s2">&quot;&quot;</span>
+
+<span class="n">field_names_dict</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">base_fields_dict</span>
+    <span class="o">|</span> <span class="n">Water_dict</span>
+    <span class="o">|</span> <span class="n">Smagorinsky_dict</span>
+    <span class="o">|</span> <span class="n">dynamic_SGS_dict</span>
+    <span class="o">|</span> <span class="n">dynamic_SGS_diag_dict</span>
+    <span class="o">|</span> <span class="n">dynamic_anisotropic_SGS_dict</span>
+<span class="p">)</span>
+
+
+<span class="c1"># IO</span>
+<span class="c1"># open datasets</span>
+<div class="viewcode-block" id="read_stash_files">
+<a class="viewcode-back" href="../../../io.html#sgs_tools.io.um.read_stash_files">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_stash_files</span><span class="p">(</span><span class="n">fname_pattern</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">chunks</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="s2">&quot;auto&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;combine a list of output Stash files</span>
+
+<span class="sd">    :param fname_pattern: filename(s) to read. Will be interpreted as a glob pattern.</span>
+<span class="sd">    :return: `xarray.Dataset` with all available variables</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># parse any glob wildcards in directory or filenames</span>
+    <span class="c1"># turn parsed into list because of incomplete typehints of xr.open_mfdataset</span>
+    <span class="n">parsed</span> <span class="o">=</span> <span class="n">parse_fname_pattern</span><span class="p">(</span><span class="n">fname_pattern</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Reading </span><span class="si">{</span><span class="n">parsed</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">dataset</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">open_mfdataset</span><span class="p">(</span><span class="n">parsed</span><span class="p">,</span> <span class="n">chunks</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span> <span class="n">parallel</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">engine</span><span class="o">=</span><span class="s2">&quot;h5netcdf&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">dataset</span></div>
+
+
+
+<span class="c1"># Pre-process input UM arrays</span>
+<div class="viewcode-block" id="rename_variables">
+<a class="viewcode-back" href="../../../io.html#sgs_tools.io.um.rename_variables">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">rename_variables</span><span class="p">(</span><span class="n">ds</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;rename STASH variables:</span>
+<span class="sd">       UM STASH varaibles adopt their `long_name` with special characters replaced by &#39;_&#39;.</span>
+<span class="sd">       The stash code is retained as an attribute for back-searches.</span>
+<span class="sd">       Spacial coordinates/dimesions are renamed to ``z_{theta|rho}`` and ``{x|y}_{face|centre}``.</span>
+<span class="sd">       Time coordinate becomes ``t`` and ``t_0``.</span>
+
+<span class="sd">    :param ds: input dataset</span>
+<span class="sd">    :return: dataset with renamed variables</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">varname_str</span><span class="p">(</span><span class="n">varStr</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;replace special characters in varStr with &quot;_&quot; &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\W|^(?=\d)&quot;</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span><span class="p">,</span> <span class="n">varStr</span><span class="p">)</span>
+
+    <span class="n">varname_dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">ds</span><span class="p">:</span>
+        <span class="n">lname</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="n">var</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;long_name&quot;</span><span class="p">,</span> <span class="s2">&quot;None&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">&quot;|&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span>
+        <span class="k">if</span> <span class="s2">&quot;STASH&quot;</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">var</span><span class="p">)</span> <span class="ow">and</span> <span class="n">lname</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">ds</span><span class="p">[</span><span class="n">var</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;original_vname&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">var</span>
+            <span class="n">varname_dict</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="n">varname_str</span><span class="p">(</span><span class="n">lname</span><span class="p">)</span>
+    <span class="n">ds</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">varname_dict</span><span class="p">)</span>
+
+    <span class="c1"># swap vertical dimension to height about sea level (in m) to better compare across simulations</span>
+    <span class="n">vertical_dim_map</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;thlev_eta_theta&quot;</span><span class="p">:</span> <span class="s2">&quot;thlev_zsea_theta&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;thlev_bl_eta_theta&quot;</span><span class="p">:</span> <span class="s2">&quot;thlev_bl_zsea_theta&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;rholev_eta_rho&quot;</span><span class="p">:</span> <span class="s2">&quot;rholev_zsea_rho&quot;</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="n">vertical_dim_map</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">vertical_dim_map</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">ds</span> <span class="ow">and</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">ds</span>
+    <span class="p">}</span>
+    <span class="n">ds</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">swap_dims</span><span class="p">(</span><span class="n">vertical_dim_map</span><span class="p">)</span>
+
+    <span class="c1"># rename dimension fields by association with a primary field</span>
+    <span class="n">dim_names</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;thlev_zsea_theta&quot;</span><span class="p">:</span> <span class="s2">&quot;z_theta&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;rholev_zsea_rho&quot;</span><span class="p">:</span> <span class="s2">&quot;z_rho&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;latitude_t&quot;</span><span class="p">:</span> <span class="s2">&quot;y_theta&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;longitude_t&quot;</span><span class="p">:</span> <span class="s2">&quot;x_theta&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;latitude_cu&quot;</span><span class="p">:</span> <span class="s2">&quot;y_cu&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;longitude_cu&quot;</span><span class="p">:</span> <span class="s2">&quot;x_cu&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;latitude_cv&quot;</span><span class="p">:</span> <span class="s2">&quot;y_cv&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;longitude_cv&quot;</span><span class="p">:</span> <span class="s2">&quot;x_cv&quot;</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="n">intersection</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">dim_names</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">ds</span><span class="p">}</span>
+    <span class="n">ds</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">intersection</span><span class="p">)</span>
+
+    <span class="c1"># swap to an easy time-dimension</span>
+    <span class="n">tname</span> <span class="o">=</span> <span class="s2">&quot;min15T0&quot;</span>
+    <span class="k">if</span> <span class="s2">&quot;min15T0_0&quot;</span> <span class="ow">in</span> <span class="n">ds</span><span class="p">:</span>
+        <span class="n">torigin</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;min15T0_0&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">torigin</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;min15T0&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">tsuffix</span> <span class="ow">in</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;_0&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">tname</span> <span class="o">+</span> <span class="n">tsuffix</span> <span class="ow">in</span> <span class="n">ds</span><span class="p">:</span>
+            <span class="n">delta_t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">rint</span><span class="p">(</span>
+                <span class="p">(</span><span class="n">ds</span><span class="p">[</span><span class="n">tname</span> <span class="o">+</span> <span class="n">tsuffix</span><span class="p">]</span> <span class="o">-</span> <span class="n">torigin</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">timedelta64</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;m&quot;</span><span class="p">)</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+            <span class="n">ds</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">assign_coords</span><span class="p">({</span><span class="s2">&quot;t&quot;</span> <span class="o">+</span> <span class="n">tsuffix</span><span class="p">:</span> <span class="p">(</span><span class="n">tname</span> <span class="o">+</span> <span class="n">tsuffix</span><span class="p">,</span> <span class="n">delta_t</span><span class="o">.</span><span class="n">data</span><span class="p">)})</span>
+            <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;t&quot;</span> <span class="o">+</span> <span class="n">tsuffix</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;standard_name&quot;</span><span class="p">:</span> <span class="s2">&quot;time&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;axis&quot;</span><span class="p">:</span> <span class="s2">&quot;T&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;unit&quot;</span><span class="p">:</span> <span class="s2">&quot;min&quot;</span><span class="p">,</span>
+            <span class="p">}</span>
+            <span class="n">ds</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">swap_dims</span><span class="p">({</span><span class="n">tname</span> <span class="o">+</span> <span class="n">tsuffix</span><span class="p">:</span> <span class="s2">&quot;t&quot;</span> <span class="o">+</span> <span class="n">tsuffix</span><span class="p">})</span>
+    <span class="k">return</span> <span class="n">ds</span></div>
+
+
+
+<span class="c1"># unify coordinate names and implement correct x-spacing for UM ideal sims</span>
+<span class="c1"># xarray doesn&#39;t handle duplicate dimensions well, so use clunkily split-rename-merge</span>
+<div class="viewcode-block" id="unify_coords">
+<a class="viewcode-back" href="../../../io.html#sgs_tools.io.um.unify_coords">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">unify_coords</span><span class="p">(</span><span class="n">ds</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">,</span> <span class="n">res</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;unify coordinate names</span>
+
+<span class="sd">    implement correct x-spacing using ``res``, assume ``res`` is given in the correct units</span>
+<span class="sd">    rename coordinates with reference to a logically-cartesian grid</span>
+
+<span class="sd">    :param ds: input dataset</span>
+<span class="sd">    :param res: resolution of dataset -- to create correct x-y grid for idealised runs (the existing one is in lat-lon coords)</span>
+<span class="sd">    :return: dataset with renamed variables</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># actual coordinates</span>
+    <span class="n">x_face</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span>
+        <span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">x_theta</span><span class="o">.</span><span class="n">size</span><span class="p">)</span> <span class="o">*</span> <span class="n">res</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="n">ds</span><span class="o">.</span><span class="n">x_theta</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">False</span>
+    <span class="p">)</span>
+    <span class="n">x_centre</span> <span class="o">=</span> <span class="n">x_face</span> <span class="o">+</span> <span class="n">res</span> <span class="o">/</span> <span class="mi">2</span>
+
+    <span class="c1"># split into centered and staggered variables</span>
+    <span class="n">cent_vars</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">ds</span> <span class="k">if</span> <span class="s2">&quot;x_theta&quot;</span> <span class="ow">in</span> <span class="n">ds</span><span class="p">[</span><span class="n">x</span><span class="p">]</span><span class="o">.</span><span class="n">dims</span> <span class="ow">and</span> <span class="s2">&quot;y_theta&quot;</span> <span class="ow">in</span> <span class="n">ds</span><span class="p">[</span><span class="n">x</span><span class="p">]</span><span class="o">.</span><span class="n">dims</span><span class="p">]</span>
+    <span class="n">stag_vars</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">ds</span> <span class="k">if</span> <span class="n">x</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">cent_vars</span><span class="p">]</span>
+
+    <span class="c1"># rename dimensions/coords of staggered variables</span>
+    <span class="n">ds_stag</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="n">stag_vars</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">ds_stag</span><span class="p">:</span>
+        <span class="n">ds_stag</span><span class="p">[</span><span class="s2">&quot;x_centre&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span>
+            <span class="n">x_centre</span><span class="p">,</span> <span class="n">coords</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;x_cv&quot;</span><span class="p">:</span> <span class="n">ds</span><span class="o">.</span><span class="n">x_cv</span><span class="p">},</span> <span class="n">dims</span><span class="o">=</span><span class="s2">&quot;x_cv&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;x_centre&quot;</span>
+        <span class="p">)</span>
+        <span class="n">ds_stag</span><span class="p">[</span><span class="s2">&quot;y_centre&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span>
+            <span class="n">x_centre</span><span class="p">,</span> <span class="n">coords</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;y_cu&quot;</span><span class="p">:</span> <span class="n">ds</span><span class="o">.</span><span class="n">y_cu</span><span class="p">},</span> <span class="n">dims</span><span class="o">=</span><span class="s2">&quot;y_cu&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;y_centre&quot;</span>
+        <span class="p">)</span>
+        <span class="n">ds_stag</span><span class="p">[</span><span class="s2">&quot;x_face&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span>
+            <span class="n">x_face</span><span class="p">,</span> <span class="n">coords</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;x_cu&quot;</span><span class="p">:</span> <span class="n">ds</span><span class="o">.</span><span class="n">x_cu</span><span class="p">},</span> <span class="n">dims</span><span class="o">=</span><span class="s2">&quot;x_cu&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;x_face&quot;</span>
+        <span class="p">)</span>
+        <span class="n">ds_stag</span><span class="p">[</span><span class="s2">&quot;y_face&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span>
+            <span class="n">x_face</span><span class="p">,</span> <span class="n">coords</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;y_cv&quot;</span><span class="p">:</span> <span class="n">ds</span><span class="o">.</span><span class="n">y_cv</span><span class="p">},</span> <span class="n">dims</span><span class="o">=</span><span class="s2">&quot;y_cv&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;y_face&quot;</span>
+        <span class="p">)</span>
+
+        <span class="n">ds_stag</span> <span class="o">=</span> <span class="n">ds_stag</span><span class="o">.</span><span class="n">swap_dims</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;x_cu&quot;</span><span class="p">:</span> <span class="s2">&quot;x_face&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;x_cv&quot;</span><span class="p">:</span> <span class="s2">&quot;x_centre&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;y_cu&quot;</span><span class="p">:</span> <span class="s2">&quot;y_centre&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;y_cv&quot;</span><span class="p">:</span> <span class="s2">&quot;y_face&quot;</span><span class="p">,</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+
+    <span class="c1"># rename dimensions/coords of centred variables</span>
+    <span class="n">ds_cent</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="n">cent_vars</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">ds_cent</span><span class="p">:</span>
+        <span class="n">ds_cent</span><span class="p">[</span><span class="s2">&quot;x_centre&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span>
+            <span class="n">x_centre</span><span class="p">,</span> <span class="n">coords</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;x_theta&quot;</span><span class="p">:</span> <span class="n">ds</span><span class="o">.</span><span class="n">x_theta</span><span class="p">},</span> <span class="n">dims</span><span class="o">=</span><span class="s2">&quot;x_theta&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;x_centre&quot;</span>
+        <span class="p">)</span>
+        <span class="n">ds_cent</span><span class="p">[</span><span class="s2">&quot;y_centre&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span>
+            <span class="n">x_centre</span><span class="p">,</span> <span class="n">coords</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;y_theta&quot;</span><span class="p">:</span> <span class="n">ds</span><span class="o">.</span><span class="n">y_theta</span><span class="p">},</span> <span class="n">dims</span><span class="o">=</span><span class="s2">&quot;y_theta&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;y_centre&quot;</span>
+        <span class="p">)</span>
+        <span class="n">ds_cent</span> <span class="o">=</span> <span class="n">ds_cent</span><span class="o">.</span><span class="n">swap_dims</span><span class="p">({</span><span class="s2">&quot;x_theta&quot;</span><span class="p">:</span> <span class="s2">&quot;x_centre&quot;</span><span class="p">,</span> <span class="s2">&quot;y_theta&quot;</span><span class="p">:</span> <span class="s2">&quot;y_centre&quot;</span><span class="p">})</span>
+
+    <span class="k">if</span> <span class="n">ds_stag</span> <span class="ow">and</span> <span class="n">ds_cent</span><span class="p">:</span>
+        <span class="n">ds</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">merge</span><span class="p">([</span><span class="n">ds_stag</span><span class="p">,</span> <span class="n">ds_cent</span><span class="p">])</span>
+    <span class="k">elif</span> <span class="n">ds_stag</span><span class="p">:</span>
+        <span class="n">ds</span> <span class="o">=</span> <span class="n">ds_stag</span>
+    <span class="k">elif</span> <span class="n">ds_cent</span><span class="p">:</span>
+        <span class="n">ds</span> <span class="o">=</span> <span class="n">ds_cent</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No recocognized coordinates in ds&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ds</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">compose_diagnostic_tensor</span><span class="p">(</span><span class="n">ds</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
+    <span class="n">diag_ij</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span>
+        <span class="p">[</span>
+            <span class="n">xr</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">ds</span><span class="o">.</span><span class="n">diag11</span><span class="p">,</span> <span class="n">ds</span><span class="o">.</span><span class="n">diag12</span><span class="p">,</span> <span class="n">ds</span><span class="o">.</span><span class="n">diag13</span><span class="p">],</span> <span class="s2">&quot;c1&quot;</span><span class="p">),</span>
+            <span class="n">xr</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">ds</span><span class="o">.</span><span class="n">diag12</span><span class="p">,</span> <span class="n">ds</span><span class="o">.</span><span class="n">diag22</span><span class="p">,</span> <span class="n">ds</span><span class="o">.</span><span class="n">diag23</span><span class="p">],</span> <span class="s2">&quot;c1&quot;</span><span class="p">),</span>
+            <span class="n">xr</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">ds</span><span class="o">.</span><span class="n">diag13</span><span class="p">,</span> <span class="n">ds</span><span class="o">.</span><span class="n">diag23</span><span class="p">,</span> <span class="n">ds</span><span class="o">.</span><span class="n">diag33</span><span class="p">],</span> <span class="s2">&quot;c1&quot;</span><span class="p">),</span>
+        <span class="p">],</span>
+        <span class="s2">&quot;c2&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">diag_ij</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Diag_ij&quot;</span>
+    <span class="n">diag_ij</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;long_name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Diagnostic tensor&quot;</span>
+
+    <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;Diag_ij&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">diag_ij</span>
+    <span class="n">ds</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">drop_vars</span><span class="p">([</span><span class="s2">&quot;diag11&quot;</span><span class="p">,</span> <span class="s2">&quot;diag22&quot;</span><span class="p">,</span> <span class="s2">&quot;diag33&quot;</span><span class="p">,</span> <span class="s2">&quot;diag12&quot;</span><span class="p">,</span> <span class="s2">&quot;diag13&quot;</span><span class="p">,</span> <span class="s2">&quot;diag23&quot;</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">ds</span>
+
+
+<div class="viewcode-block" id="data_ingest_UM">
+<a class="viewcode-back" href="../../../io.html#sgs_tools.io.um.data_ingest_UM">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">data_ingest_UM</span><span class="p">(</span>
+    <span class="n">fname_pattern</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">res</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">requested_fields</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;u&quot;</span><span class="p">,</span> <span class="s2">&quot;v&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="s2">&quot;theta&quot;</span><span class="p">],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;read and pre-process UM data using sgs_tools naming convention.</span>
+<span class="sd">    Any unknown fields will retain their original names.</span>
+
+<span class="sd">    :param fname_pattern: UM NetCDF diagnostic file(s) to read. will be interpreted as a glob pattern. (should belong to the same simulation)</span>
+<span class="sd">    :param res: horizontal resolution (will use to overwrite horizontal coordinates). **NB** works for ideal simulations</span>
+<span class="sd">    :param requested_fields: list of fields to retain in ds, if falsy will retain all.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># parse filename (glob, ~, etc.)</span>
+    <span class="n">fname</span> <span class="o">=</span> <span class="n">parse_fname_pattern</span><span class="p">(</span><span class="n">fname_pattern</span><span class="p">)</span>
+    <span class="c1"># open file(s)</span>
+    <span class="n">simulation</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">open_mfdataset</span><span class="p">(</span>
+        <span class="n">fname</span><span class="p">,</span> <span class="n">chunks</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span> <span class="n">parallel</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">engine</span><span class="o">=</span><span class="s2">&quot;h5netcdf&quot;</span>
+    <span class="p">)</span>
+    <span class="c1"># parse UM stash codes into variable names</span>
+    <span class="n">simulation</span> <span class="o">=</span> <span class="n">rename_variables</span><span class="p">(</span><span class="n">simulation</span><span class="p">)</span>
+    <span class="c1"># rename to sgs_tools naming convention</span>
+    <span class="n">simulation</span> <span class="o">=</span> <span class="n">standardize_varnames</span><span class="p">(</span><span class="n">simulation</span><span class="p">,</span> <span class="n">field_names_dict</span><span class="p">)</span>
+    <span class="c1"># restrict to interesting fields</span>
+    <span class="k">if</span> <span class="n">requested_fields</span><span class="p">:</span>
+        <span class="n">simulation</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">restrict_ds</span><span class="p">(</span><span class="n">simulation</span><span class="p">,</span> <span class="n">fields</span><span class="o">=</span><span class="n">requested_fields</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">simulation</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;None of the requested fields are available&quot;</span>
+    <span class="c1"># unify coordinates</span>
+    <span class="n">simulation</span> <span class="o">=</span> <span class="n">unify_coords</span><span class="p">(</span><span class="n">simulation</span><span class="p">,</span> <span class="n">res</span><span class="o">=</span><span class="n">res</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">simulation</span></div>
+
+
+
+<div class="viewcode-block" id="data_ingest_UM_on_single_grid">
+<a class="viewcode-back" href="../../../io.html#sgs_tools.io.um.data_ingest_UM_on_single_grid">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">data_ingest_UM_on_single_grid</span><span class="p">(</span>
+    <span class="n">fname_pattern</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">res</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">requested_fields</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;u&quot;</span><span class="p">,</span> <span class="s2">&quot;v&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="s2">&quot;theta&quot;</span><span class="p">],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;read, pre-process UM data and interpolate to a cell-centred grid</span>
+<span class="sd">    Any unknown fields will retain their original names.</span>
+
+<span class="sd">    :param fname_pattern: UM NetCDF diagnostic file(s) to read. will be interpreted as a glob pattern. (should belong to the same simulation)</span>
+<span class="sd">    :param res: horizontal resolution (will use to overwrite horizontal coordinates). **NB** works for ideal simulations</span>
+<span class="sd">    :param  requested_fields: list of fields to retain in ds, if falsy will retain all.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># read, constrain fields, unify grids</span>
+    <span class="n">simulation</span> <span class="o">=</span> <span class="n">data_ingest_UM</span><span class="p">(</span><span class="n">fname_pattern</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">requested_fields</span><span class="p">)</span>
+
+    <span class="c1"># interpolate all vars to a cell-centred grid</span>
+    <span class="n">centre_dims</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;x_centre&quot;</span><span class="p">,</span> <span class="s2">&quot;y_centre&quot;</span><span class="p">,</span> <span class="s2">&quot;z_theta&quot;</span><span class="p">]</span>
+    <span class="n">simulation</span> <span class="o">=</span> <span class="n">interpolate_to_grid</span><span class="p">(</span><span class="n">simulation</span><span class="p">,</span> <span class="n">centre_dims</span><span class="p">,</span> <span class="n">drop_coords</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="c1"># rename spatial dimensions to &#39;xyz&#39;</span>
+    <span class="n">simple_dims</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;z&quot;</span><span class="p">]</span>
+    <span class="n">dim_names</span> <span class="o">=</span> <span class="p">{</span><span class="n">d_new</span><span class="p">:</span> <span class="n">d_old</span> <span class="k">for</span> <span class="n">d_new</span><span class="p">,</span> <span class="n">d_old</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">centre_dims</span><span class="p">,</span> <span class="n">simple_dims</span><span class="p">)}</span>
+    <span class="n">simulation</span> <span class="o">=</span> <span class="n">simulation</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">dim_names</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">simulation</span></div>
+
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2024, the HiFi project.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

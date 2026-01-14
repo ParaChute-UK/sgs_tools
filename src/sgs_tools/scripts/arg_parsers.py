@@ -32,9 +32,9 @@ def add_input_group(parser: ArgumentParser) -> _ArgumentGroup:
         "input_files",
         type=Path,
         help="""
-        location of NetCDF diagnostic file(s).
+        Location of NetCDF diagnostic file(s).
         Recognizes glob patterns and walks directory trees, e.g. './my_file_p[br]*nc'
-        (All files in the pattern should belong to the same simulation).
+        All files in a glob pattern should belong to the same simulation.
         """,
     )
 
@@ -103,7 +103,7 @@ def add_dask_group(parser: ArgumentParser) -> _ArgumentGroup:
         help="""
       Size of dask array chunks in the vertical direction. Should divide the total number of levels.
       Smaller size leads to smaller memory footprint, but may penalize walltime.
-      NB:The default value has not been optimised.""",
+""",
     )
 
     dask.add_argument(
@@ -113,9 +113,31 @@ def add_dask_group(parser: ArgumentParser) -> _ArgumentGroup:
         help="""
       Size of dask array chunks in the time direction. Should divide the total number time snapshots.
       Smaller size leads to smaller memory footprint, but may penalize walltime.
-      NB:The default value has not been optimised.""",
+    """,
+    )
+    dask.add_argument(
+        "--h_chunk_size",
+        type=int,
+        default=-1,
+        help="""
+      Size of dask array chunks in the "horizontal" directions. Should divide into the domain size.
+      Smaller size leads to smaller memory footprint, but can penalize walltime heavily (building DAGs).
+      Default -1 means don't chunk, keep dimesions together -- useful for horizontal filtering.
+      If it doesn't fit in memory try 1/2 to 1/4 of domain size.
+    """,
     )
 
+    dask.add_argument(
+        "--mem_limit_MB",
+        type=float,
+        default=None,
+        help="""
+        Target memory limit in MB used to control chunk size of dask array chunks.
+        If on a dask cluster it is
+        May not be fully enforced by this CLI.
+        Smaller size leads to smaller memory footprint, but may penalize walltime.
+        """,
+    )
     return dask
 
 

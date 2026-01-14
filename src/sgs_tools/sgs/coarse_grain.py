@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Dict
+from typing import Dict, Hashable
 
 import numpy as np
 import xarray as xr
@@ -17,7 +17,7 @@ class CoarseGrain:
       will be paired with dimensions of the kernel.
     """
 
-    window: Dict[str, int]
+    window: Dict[Hashable, int]
 
     @property
     def filter_dims(self):

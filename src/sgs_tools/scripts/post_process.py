@@ -13,6 +13,7 @@ from sgs_tools.io.read import read
 from sgs_tools.scripts.cli_helpers import print_args_dict, print_header
 from sgs_tools.scripts.fname_out import build_output_fname
 from sgs_tools.util.gitinfo import get_git_state, write_git_diff_file
+from sgs_tools.util.memory import get_mem_limit_MB, memory_watch
 from sgs_tools.util.terminal_progress_bar import TerminalProgressBar
 from sgs_tools.util.timer import timer
 
@@ -441,8 +442,9 @@ def pre_process(args: dict[str, Any], req_fields: list[str]) -> xr.Dataset:
     chunks = {
         "z": args["z_chunk_size"],
         "t_0": args["t_chunk_size"],
-        "x": -1,
-        "y": -1,
+        "t": args["t_chunk_size"],
+        "x": args["h_chunk_size"],
+        "y": args["h_chunk_size"],
         "c1": -1,
         "c2": -1,
         "c1_1": -1,
@@ -451,7 +453,6 @@ def pre_process(args: dict[str, Any], req_fields: list[str]) -> xr.Dataset:
     simulation = simulation.chunk(
         chunks={x: y for x, y in chunks.items() if x in simulation.dims}
     )
-    simulation = simulation.persist()
     return simulation
 
 
@@ -533,7 +534,11 @@ def choose_filter_set(
 
 
 def run(args: Dict[str, Any]) -> None:
-    with timer("Read and Preprocess", "s"):
+    with (
+        timer("Read and Preprocess", "s"),
+        TerminalProgressBar(),
+        memory_watch("Read and PreProcess", "GB"),
+    ):
         # get the flattened set of args['prof_fields'] and args["cross_spectra_fields"]
         spectra_fields_list = set(
             [f for fl in args["cross_spectra_fields"] for f in fl]
@@ -556,7 +561,7 @@ def run(args: Dict[str, Any]) -> None:
             all_fields = all_fields.union(anisotropy_fields)
             # read and pre-process simulation
 
-        simulation = pre_process(args, list(all_fields))
+        simulation = pre_process(args, list(all_fields))  # .persist()
 
     writer = NetCDFWriter(overwrite=args["overwrite_existing"])
 
@@ -572,6 +577,7 @@ def run(args: Dict[str, Any]) -> None:
         with (
             timer("Vertical profiles", "s"),
             TerminalProgressBar(),
+            memory_watch("Vertical profiles", "GB"),
         ):
             f_pr = [f for f in args["vprofile_fields"] if f in simulation]
             f_missing = [f for f in args["vprofile_fields"] if f not in simulation]
@@ -601,6 +607,7 @@ def run(args: Dict[str, Any]) -> None:
         with (
             timer("Horizontal spectra"),
             TerminalProgressBar(),
+            memory_watch("Horizontal Spectra", "GB"),
         ):
             pspec_fields = [f for f in args["power_spectra_fields"] if f in simulation]
             cspec_fields = [
@@ -643,7 +650,7 @@ def run(args: Dict[str, Any]) -> None:
                     writer.write(spec_ds, output_path)
 
     if args["anisotropy"]:
-        with timer("Anisotropy", "s"), TerminalProgressBar():
+        with timer("Anisotropy", "s"):
             # anisotropy diagnostic
 
             # min horizontal number of cells
@@ -664,13 +671,18 @@ def run(args: Dict[str, Any]) -> None:
             )
 
             print(f"Filters: {filter_dic.keys()}")
-
-            # rechunk velocity -- unify filtering and vector dimensions
-            vel = simulation["vel"].chunk({x: -1 for x in hdims + ["c1"]}).persist()
+            mem_limit_MB = args["mem_limit_MB"] or get_mem_limit_MB(0.5, 0.1)
+            print(f"Mem limit {mem_limit_MB:.0g} MB")
             # run analysis
             for filt_lbl, filt in filter_dic.items():
-                with timer(
-                    f"{filt_lbl}:{filt.scales()}", "s", f"{filt_lbl}:{filt.scales()}"
+                with (
+                    timer(
+                        f"{filt_lbl}:{filt.scales()}",
+                        "s",
+                        f"{filt_lbl}:{filt.scales()}",
+                    ),
+                    TerminalProgressBar(),
+                    memory_watch(f"{filt_lbl}:{filt.scales()}", "GB"),
                 ):
                     output_path = build_output_fname(
                         args["output_path"] / args["aniso_fname_out"],
@@ -683,7 +695,9 @@ def run(args: Dict[str, Any]) -> None:
                     if not writer.overwrite and writer.check_filename(output_path):
                         print(f"Warning: Skip existing file {output_path}.")
                     else:
-                        evals = anisotropy_analysis(vel, filt)
+                        evals = anisotropy_analysis(
+                            simulation["vel"], filt, "c1", mem_limit_MB
+                        )
                         evals = evals.expand_dims(
                             {"filter": xr.DataArray([filt_lbl], dims=["filter"])}
                         )

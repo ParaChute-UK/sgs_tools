@@ -6,11 +6,11 @@ from typing import Any, Dict, Iterable, Mapping, Sequence
 import matplotlib.pyplot as plt
 import xarray as xr
 from matplotlib.figure import Figure
-from numpy import arange, array, inf, linspace, ndarray
+from numpy import arange, array, inf, linspace, nan, ndarray
 from pint import UnitRegistry  # type: ignore
 
 from sgs_tools.diagnostics.directional_profile import directional_profile
-from sgs_tools.io.um import data_ingest_UM
+from sgs_tools.io.read import read
 from sgs_tools.physics.fields import Reynolds_fluct_stress, vertical_heat_flux
 from sgs_tools.plotting.collection_plots import (
     plot_horizontal_slice_tseries,
@@ -46,12 +46,17 @@ slice_fields = (
     "cs",
     "cs_theta",
     # debug
+    "s",
     "s2d",
     "s4d",
     "lm",
     "mm",
     "qn",
     "nn",
+    "cs2d",
+    "cs4d",
+    "cs_theta_2d",
+    "cs_theta_4d",
 )
 prof_fields = (
     "u",
@@ -80,6 +85,10 @@ prof_fields = (
     "mm",
     "qn",
     "nn",
+    "cs2d",
+    "cs4d",
+    "cs_theta_2d",
+    "cs_theta_4d",
     # annisotropics
 )
 
@@ -108,21 +117,31 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
         type=Path,
         nargs="+",
         help="""
-            Location of a set simulation outputs -- UM NetCDF diagnostic files.
+            Location of a set NetCDF simulation file(s).
             Recognizes glob patterns and walks directory trees, e.g. './my_file_p[br]*nc'
             Can have multiple files per simulation, but only one glob pattern per simulation.
-            (All files in a glob pattern should belong to the same simulation). """,
+            All files in a glob pattern should belong to the same simulation.
+            """,
     )
 
     fname.add_argument(
-        "h_resolution",
+        "input_format",
+        type=str,
+        choices=["um", "monc", "sgs"],
+        help="Type of 'input_files'. Only support different NetCDF flavours from various production codes. 'sgs' refers to files produced by sgs_tools. All simulations must have the same format",
+    )
+
+    fname.add_argument(
+        "--h_resolution",
         type=float,
         nargs="+",
+        default=[0],
         help="""
-                horizontal resolution (will use to overwrite horizontal coordinates).
-                If a single resolution is given, assume it applies to all input files.
-                Else, must give as many resolutions as inpu_file glob patterns.
-              **NB** works for ideal simulations""",
+        horizontal resolution in meters.
+        *ONLY* used for UM ideal simulations(will use to overwrite horizontal coordinates).
+        If a single resolution is given, assume it applies to all input files.
+        Else, must give as many resolutions as inpu_file glob patterns.
+        """,
     )
 
     fname.add_argument(
@@ -188,7 +207,8 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
     if len(args["h_resolution"]) == 1:
         args["h_resolution"] = [args["h_resolution"][0]] * len(args["input_files"])
     else:
-        assert len(args["h_resolution"]) == len(args["input_files"])
+        if args["input_format"] == "um":
+            assert len(args["h_resolution"]) == len(args["input_files"])
 
     # initial validation
     assert args["plot_show"] or args["plot_path"], (
@@ -248,11 +268,19 @@ def preprocess_dataset(
     # shouldn't be a memory burden for lazy caculations.
     ds, offline_field_map = add_offline_fields(ds)
 
-    # drop initial conditions to unify time dimension
+    # unify time dimension
     if "t_0" in ds:
         if "t" in ds:
-            ds = ds.sel(t_0=ds["t"].data).drop_vars("t_0")
-        ds = ds.rename({"t_0": "t"})
+            # pad missing ICs with nans --FIXME (hack)
+            # vars that live on t (drop the t_0-dim stuff)
+            ds_t = ds.drop_dims("t_0").reindex(t=ds["t_0"].values, fill_value=nan)
+            # vars that live on t_0 (drop the t-dim stuff)
+            ds_t0 = ds.drop_dims("t").rename({"t_0": "t"})
+            # now both subsets use dim t_0 → safe to merge
+            ds = xr.merge([ds_t, ds_t0], compat="no_conflicts")
+            # drop initial condition
+            # ds = ds.sel(t_0=ds["t"].data).drop_vars("t_0")
+        # ds = ds.rename({"t_0": "t"})
 
     # take z-range
     for z in "z", "z_rho", "z_theta", "z_face", "z_centre", "thlev_bl_zsea_theta":
@@ -295,7 +323,7 @@ def add_offline_fields(
             (None, None),
             "Oranges",
         )
-    except KeyError:
+    except Exception:
         print("Can't add w^2 with missing ingredients")
 
     # vertical heat flux
@@ -313,7 +341,7 @@ def add_offline_fields(
             (None, None),
             "Oranges",
         )
-    except KeyError:
+    except Exception:
         print("Can't add vertical_heat_flux with missing ingredients")
 
     # momentum flux ~ Reynolds stress
@@ -352,7 +380,7 @@ def add_offline_fields(
             (None, None),
             "Oranges",
         )
-    except KeyError:
+    except Exception:
         print("Can't add components of Reynolds stress with missing ingredients")
 
     # extract cs from mixing length
@@ -362,7 +390,7 @@ def add_offline_fields(
             "non-homogeneous horizontal resolution"
         )
         ds["cs"] = ds["csDelta"] / delta_x[0].item()
-    except KeyError:
+    except Exception:
         print("Can't add cs with missing ingredients")
 
     # moisture species and cumulative humidity
@@ -522,6 +550,17 @@ def plot(
     field_plot_map,
 ) -> None:
     """master plotting routine"""
+    if args["plot_path"] is not None:
+        print(f"Saving plots to {args['plot_path']}")
+        # parse time range; assume all datasets use the same time scale
+        ureg = UnitRegistry()  # use to parse resolution
+        ds = next(iter(ds_collection.values()))
+        tunit = ds["t"].unit
+        tmin = ds["t"].min().item() * ureg(tunit)
+        tmax = ds["t"].max().item() * ureg(tunit)
+        tlabel = f"times{tmin.to('h').magnitude:0g}-{tmax.to('h').magnitude:0g}h"
+        args["plot_path"].mkdir(parents=True, exist_ok=True)
+
     # plot horizontal slices
     with timer("Plot horizontal slices", "s"):
         try:
@@ -532,8 +571,16 @@ def plot(
                 field_plot_map,
                 args["verbose"],
             )
+            if args["plot_path"] is not None:
+                for z in hor_slice:
+                    for f in hor_slice[z]:
+                        hor_slice[z][f].savefig(
+                            args["plot_path"] / f"Slice_z{z:g}m_{tlabel}_{f}.png",
+                            dpi=180,
+                        )
         except KeyboardInterrupt:
             print("Detected Keyboard interrup, proceeding with vertical profiles")
+
     # plot vertical profiles
     # transpose plot map and match to dataset labels
     plot_map: Dict[str, Dict[str, Any]] = {
@@ -558,6 +605,14 @@ def plot(
             vert_prof = plot_vert_profiles(
                 ds_collection, prof_fields, reductions, plot_map, args["verbose"]
             )
+            if args["plot_path"] is not None:
+                for red in vert_prof:
+                    for f in vert_prof[red]:
+                        vert_prof[red][f].savefig(
+                            args["plot_path"] / f"Profile_{tlabel}_{red}_{f}.png",
+                            dpi=180,
+                        )
+
         except KeyboardInterrupt:
             print("Detected Keyboard interrup, proceeding with cloud plot.")
 
@@ -565,31 +620,13 @@ def plot(
     cloud_fig = plot_clouds(
         ds_collection, arange(0.005, 0.15, 0.005), field_plot_map, plot_map
     )
+    if args["plot_path"] is not None and cloud_fig:
+        cloud_fig.savefig(args["plot_path"] / f"Clouds_CL_{tlabel}.png", dpi=180)
 
-    # save plots to disk
-    if args["plot_path"] is not None:
-        print(f"Saving plots to {args['plot_path']}")
-        # parse time range; assume all datasets use the same time scale
-        ureg = UnitRegistry()  # use to parse resolution
-        ds = next(iter(ds_collection.values()))
-        tunit = ds["t"].unit
-        tmin = ds["t"].min().item() * ureg(tunit)
-        tmax = ds["t"].max().item() * ureg(tunit)
-        tlabel = f"times{tmin.to('h').magnitude:0g}-{tmax.to('h').magnitude:0g}h"
-        args["plot_path"].mkdir(parents=True, exist_ok=True)
-        for z in hor_slice:
-            for f in hor_slice[z]:
-                hor_slice[z][f].savefig(
-                    args["plot_path"] / f"Slice_z{z:g}m_{tlabel}_{f}.png", dpi=180
-                )
-        for red in vert_prof:
-            for f in vert_prof[red]:
-                vert_prof[red][f].savefig(
-                    args["plot_path"] / f"Profile_{tlabel}_{red}_{f}.png", dpi=180
-                )
-        if cloud_fig:
-            cloud_fig.savefig(args["plot_path"] / f"Clouds_CL_{tlabel}.png", dpi=180)
-    # interactive plotting out of time
+    # remove spuriously created empty directory
+    if args["plot_path"] and not any(args["plot_path"].iterdir()):
+        args["plot_path"].rmdir()
+    # interactive plotting (out of local timer)
     if args["plot_show"]:
         plt.show()
     plt.close()
@@ -598,14 +635,17 @@ def plot(
 def io(args) -> tuple[Dict[str, xr.Dataset], Dict[str, field_plot_kwargs]]:
     # read UM stasth files: data
     ds_collection: Dict[str, xr.Dataset] = {}
+    requested_fields = list(slice_fields + prof_fields + cloud_fields)
     with timer("Read Dataset", "s"):
         for f, res, plot_map in zip(
             args["input_files"], args["h_resolution"], args["plot_map"]
         ):
-            ds = data_ingest_UM(
+            ds = read(
                 f,
-                res,
-                requested_fields=list(slice_fields + prof_fields + cloud_fields),
+                args["input_format"],
+                requested_fields=requested_fields,
+                resolution=res,
+                interp_grid=False,
             )
             if len(ds) == 0:
                 continue

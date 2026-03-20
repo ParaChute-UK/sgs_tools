@@ -12,12 +12,13 @@ class CoarseGrain:
     r"""Coarse-graining filter class with kernel along dimensions
     the dimensions of kernel and filter_dims are matched one-to-one as given
 
-    :ivar kernel: filter kernel
-    :ivar filter_dims: dimensions along which to perform filtering;
-      will be paired with dimensions of the kernel.
+    :ivar window: {dimension_name: number of grid points to average over}
+    :ivar bdry_cnd: boundary conditions: support the same as xr.coarsen,
+        notably 'trim' and 'exact'
     """
 
     window: Dict[Hashable, int]
+    bc: str
 
     @property
     def filter_dims(self):
@@ -56,7 +57,7 @@ class CoarseGrain:
         """
         # Note this needs further optimisation
         rechunked = self.__rechunked__(field)
-        return rechunked.coarsen(self.window, boundary="trim").mean(keep_attrs=True)  # type: ignore
+        return rechunked.coarsen(self.window, boundary=self.bc).mean(keep_attrs=True)  # type: ignore
 
 
 def coarse_grain_fluct(field: xr.DataArray, coarse: CoarseGrain) -> xr.DataArray:

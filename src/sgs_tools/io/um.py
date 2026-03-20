@@ -114,13 +114,7 @@ def read_stash_files(fname_pattern: Path | str, chunks: Any = "auto") -> xr.Data
     """
 
     # parse any glob wildcards in directory or filenames
-    # turn parsed into list because of incomplete typehints of xr.open_mfdataset
-    _fname_pattern = Path(fname_pattern)
-    parsed = list(
-        Path(_fname_pattern.root).glob(
-            str(Path(*_fname_pattern.parts[_fname_pattern.is_absolute() :]))
-        )
-    )
+    parsed = parse_fname_pattern(fname_pattern)
     print(f"Reading {parsed}")
     dataset = xr.open_mfdataset(
         parsed, chunks="auto", parallel=True, engine="h5netcdf", compat="no_conflicts"
@@ -298,12 +292,8 @@ def data_ingest_UM(
     :param requested_fields: list of fields to retain in ds, if falsy will retain all.
     """
 
-    # parse filename (glob, ~, etc.)
-    fname = parse_fname_pattern(fname_pattern)
     # open file(s)
-    simulation = xr.open_mfdataset(
-        fname, chunks="auto", parallel=True, engine="h5netcdf"
-    )
+    simulation = read_stash_files(fname_pattern)
     # parse UM stash codes into variable names
     simulation = rename_variables(simulation)
     # rename to sgs_tools naming convention

@@ -18,7 +18,7 @@ class CoarseGrain:
     """
 
     window: Dict[Hashable, int]
-    bc: str
+    bc: str = "exact"
 
     @property
     def filter_dims(self):

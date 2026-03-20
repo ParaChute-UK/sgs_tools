@@ -3,6 +3,7 @@ from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
 from pathlib import Path
 from typing import Any, Dict, Sequence
 
+import matplotlib.pyplot as plt
 from numpy import array, inf
 
 from sgs_tools.scripts.arg_parsers import (
@@ -11,6 +12,7 @@ from sgs_tools.scripts.arg_parsers import (
     add_version_group,
 )
 from sgs_tools.scripts.BasicComparisonSimAnalysis import (
+    default_plotting_style,
     io,
     plot,
     prof_fields,

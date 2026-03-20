@@ -106,7 +106,7 @@ field_names_dict = (
 
 # IO
 # open datasets
-def read_stash_files(fname_pattern: Path, chunks: Any = "auto") -> xr.Dataset:
+def read_stash_files(fname_pattern: Path | str, chunks: Any = "auto") -> xr.Dataset:
     """combine a list of output Stash files
 
     :param fname_pattern: filename(s) to read. Will be interpreted as a glob pattern.
@@ -115,8 +115,12 @@ def read_stash_files(fname_pattern: Path, chunks: Any = "auto") -> xr.Dataset:
 
     # parse any glob wildcards in directory or filenames
     # turn parsed into list because of incomplete typehints of xr.open_mfdataset
-    parsed = parse_fname_pattern(fname_pattern)
-
+    _fname_pattern = Path(fname_pattern)
+    parsed = list(
+        Path(_fname_pattern.root).glob(
+            str(Path(*_fname_pattern.parts[_fname_pattern.is_absolute() :]))
+        )
+    )
     print(f"Reading {parsed}")
     dataset = xr.open_mfdataset(
         parsed, chunks="auto", parallel=True, engine="h5netcdf", compat="no_conflicts"

@@ -16,7 +16,7 @@ Python tools for sub-grid scale (SGS) fluid dynamics analysis.
   To install the latest development version (from GitHub `devel` branch):
 
   ```console
-  pip install git+https://github.com/dvlaykov/sgs_tools.git@devel
+  pip install git+https://github.com/parachute-uk/sgs_tools.git@devel
   ```
 
   > **Requires Python >=3.11**. Installation on older versions will fail with possibly unclear error messages.
@@ -40,10 +40,10 @@ Python tools for sub-grid scale (SGS) fluid dynamics analysis.
     import sgs_tools
     print (sgs_tools.__version__)
   ```
-  See [documentation](https://dvlaykov.github.io/sgs_tools/) for available module and functionality and CLI scripts for sample usage.
+  See [documentation](https://parachute-uk.github.io/sgs_tools/) for available module and functionality and CLI scripts for sample usage.
 
 ## 📚 Documentation
-The documentation is hosted [here](https://dvlaykov.github.io/sgs_tools/).
+The documentation is hosted [here](https://parachute-uk.github.io/sgs_tools/).
 (It is updated via GitHub Actions, so may be a few minutes behind the latest PR merge.)
 
 To build the documentation locally:
@@ -51,7 +51,7 @@ To build the documentation locally:
 
   1. Install the package with documentation extras ([sphinx](https://www.sphinx-doc.org/en/master/) and addons)
        ```console
-         pip install git+https://github.com/dvlaykov/sgs_tools.git@devel#egg=sgs_tools[doc]
+         pip install git+https://github.com/parachute-uk/sgs_tools.git@devel#egg=sgs_tools[doc]
        ```
      Or, if you're using Poetry
        ```console
@@ -70,7 +70,7 @@ To build the documentation locally:
 
 We welcome contributions of all kinds — bug reports, feature requests, documentation improvements, and pull requests.
 
-> Open [issues](https://github.com/dvlaykov/sgs_tools) for questions, ideas, or feedback. We appreciate your input!
+> Open [issues](https://github.com/parachute-uk/sgs_tools) for questions, ideas, or feedback. We appreciate your input!
 
 > To get started on a pull request follow the Development Setup instructions below.
 
@@ -91,7 +91,7 @@ You can still use `pip` for user installations, but we recommend Poetry for cont
 ### 🥼 Setup
   1. Clone the repository
       ```console
-      git clone https://github.com/dvlaykov/sgs_tools.git
+      git clone https://github.com/parachute-uk/sgs_tools.git
       cd sgs_tools
       ```
   2. Create and activate a virtual environment in the preferred way (venv, conda, ...) [Optional, Recommended]

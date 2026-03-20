@@ -1,11 +1,16 @@
 import re
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any
 
 import numpy as np
 import xarray as xr
 
 from sgs_tools.geometry.staggered_grid import interpolate_to_grid
+from sgs_tools.io.read_util import (
+    parse_fname_pattern,
+    restrict_ds,
+    standardize_varnames,
+)
 
 base_fields_dict = {
     "U_COMPNT_OF_WIND_AFTER_TIMESTEP": "u",
@@ -108,14 +113,10 @@ def read_stash_files(fname_pattern: Path, chunks: Any = "auto") -> xr.Dataset:
     :return: `xarray.Dataset` with all available variables
     """
 
-    print(f"Reading {fname_pattern}")
-    # parse any glob wildcards in directory or filena
+    # parse any glob wildcards in directory or filenames
     # turn parsed into list because of incomplete typehints of xr.open_mfdataset
-    parsed = list(
-        Path(fname_pattern.root).glob(
-            str(Path(*fname_pattern.parts[fname_pattern.is_absolute() :]))
-        )
-    )
+    parsed = parse_fname_pattern(fname_pattern)
+
     print(f"Reading {parsed}")
     dataset = xr.open_mfdataset(
         parsed, chunks="auto", parallel=True, engine="h5netcdf", compat="no_conflicts"
@@ -193,30 +194,7 @@ def rename_variables(ds: xr.Dataset) -> xr.Dataset:
     return ds
 
 
-def standardize_varnames(ds: xr.Dataset) -> xr.Dataset:
-    """rename variables in ``ds`` using ``field_names_dict``
-
-    :param ds: input dataset
-    :return: dataset with renamed variables
-    """
-    restricted_dict = {k: v for k, v in field_names_dict.items() if k in ds}
-    return ds.rename(restricted_dict)
-
-
-def restrict_ds(ds: xr.Dataset, fields: Iterable[str]) -> xr.Dataset:
-    """restrict the dataset to fields of interest and rename using fields dict
-
-    :param ds: input dataset
-    :param fields: list of fields to restrict to, must be contained by `ds`
-    :return: dataset with renamed variables
-    """
-    intersection = [k for k in fields if k in ds]
-    missing_fields = {k for k in fields if k not in intersection}
-    # print ("Missing fields:", missing_fields)
-    return ds[intersection], missing_fields
-
-
-# unify coordinates and implement correct x-spacing
+# unify coordinate names and implement correct x-spacing for UM ideal sims
 # xarray doesn't handle duplicate dimensions well, so use clunkily split-rename-merge
 def unify_coords(ds: xr.Dataset, res: float) -> xr.Dataset:
     """unify coordinate names
@@ -304,26 +282,31 @@ def compose_diagnostic_tensor(ds: xr.Dataset) -> xr.Dataset:
 
 
 def data_ingest_UM(
-    fname_pattern: Path,
+    fname_pattern: Path | str,
     res: float,
     requested_fields: list[str] = ["u", "v", "w", "theta"],
 ) -> xr.Dataset:
-    """read and pre-process UM data
+    """read and pre-process UM data using sgs_tools naming convention.
+    Any unknown fields will retain their original names.
 
     :param fname_pattern: UM NetCDF diagnostic file(s) to read. will be interpreted as a glob pattern. (should belong to the same simulation)
     :param res: horizontal resolution (will use to overwrite horizontal coordinates). **NB** works for ideal simulations
-    :param  requested_fields: list of fields to read and pre-process. Defaults to ['u', 'v', 'w', 'theta']
+    :param requested_fields: list of fields to retain in ds, if falsy will retain all.
     """
-    # all the fields we will need for the Cs calculations
-    simulation = read_stash_files(fname_pattern)
+
+    # parse filename (glob, ~, etc.)
+    fname = parse_fname_pattern(fname_pattern)
+    # open file(s)
+    simulation = xr.open_mfdataset(
+        fname, chunks="auto", parallel=True, engine="h5netcdf"
+    )
     # parse UM stash codes into variable names
     simulation = rename_variables(simulation)
-
     # rename to sgs_tools naming convention
-    simulation = standardize_varnames(simulation)
-
-    # restrict to interesting fields and rename to simple names
-    simulation, _ = restrict_ds(simulation, fields=requested_fields)
+    simulation = standardize_varnames(simulation, field_names_dict)
+    # restrict to interesting fields
+    if requested_fields:
+        simulation, _ = restrict_ds(simulation, fields=requested_fields)
     assert len(simulation) > 0, "None of the requested fields are available"
     # unify coordinates
     simulation = unify_coords(simulation, res=res)
@@ -331,15 +314,16 @@ def data_ingest_UM(
 
 
 def data_ingest_UM_on_single_grid(
-    fname_pattern: Path,
+    fname_pattern: Path | str,
     res: float,
     requested_fields: list[str] = ["u", "v", "w", "theta"],
 ) -> xr.Dataset:
-    """read pre-process UM data and interpolate to a cell-centred grid
+    """read, pre-process UM data and interpolate to a cell-centred grid
+    Any unknown fields will retain their original names.
 
     :param fname_pattern: UM NetCDF diagnostic file(s) to read. will be interpreted as a glob pattern. (should belong to the same simulation)
     :param res: horizontal resolution (will use to overwrite horizontal coordinates). **NB** works for ideal simulations
-    :param  requested_fields: list of fields to read and pre-process. Defaults to ['u', 'v', 'w', 'theta']
+    :param  requested_fields: list of fields to retain in ds, if falsy will retain all.
     """
     # read, constrain fields, unify grids
     simulation = data_ingest_UM(fname_pattern, res, requested_fields)

@@ -49,7 +49,7 @@ def test_args():
         "aniso",
         "--box_delta_scales",
         "2",
-        "4",
+        "5",
         "--box_meter_scales",
         "100",
         "--box_domain_scales",

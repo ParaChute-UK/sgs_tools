@@ -44,7 +44,7 @@ def test_main_full_pipeline(master_output_dir, test_args):
     # parse clargs
     args = cs_gen.parse_args(test_args)
     # execute main
-    cs_gen.run(args)
+    cs_gen.compute(args)
     # Assert outputs exists
     assert len(list(args["output_path"].glob("*.nc"))) > 0
     # execute plotting

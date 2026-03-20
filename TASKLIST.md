@@ -24,3 +24,6 @@
     * Add a nonlinear model extensions
     * Generalise dynamic coefficient calculations
     * Optimize simultaneous calculation at multiple scales or contraction dims
+
+  * Scripts
+    * Add a primer for CLI usage

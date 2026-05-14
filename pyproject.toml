@@ -1,70 +1,68 @@
 [build-system]
-requires = ["poetry-core>=1.0.0", "poetry-dynamic-versioning>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+  requires = ["poetry-core>=1.0.0", "poetry-dynamic-versioning>=1.0.0"]
+  build-backend = "poetry.core.masonry.api"
 
 [tool.poetry-dynamic-versioning]
-enable = true
-style = "semver"        # expects tags v?.?.?; otherwise "pep440" takes it without the "v"
-vcs = "git"
+  enable = true
+  style = "semver"        # expects tags v?.?.?; otherwise "pep440" takes it without the "v"
+  vcs = "git"
 
 [tool.poetry-dynamic-versioning.substitution]
-files = ["src/sgs_tools/__init__.py"]
+  files = ["src/sgs_tools/__init__.py"]
 
 [tool.poetry]
-name = "sgs_tools"
-version = "0.0.0" # placeholder replaced dynamically
-description = "Python tools for sub-grid scale fluid analyis"
-authors = [
-    "Dimtar Vlaykov <d.vlaykov@exeter.ac.uk>"
-]
-readme="README.md"
-repository = "https://github.com/dvlaykov/sgs_tools.git"
-packages = [
-{ include = "sgs_tools", from = "src"}
+  name = "sgs_tools"
+  version = "0.0.0" # placeholder replaced dynamically
+  description = "Python tools for sub-grid scale fluid analyis"
+  authors = ["Dimtar Vlaykov <d.vlaykov@exeter.ac.uk>"]
+  readme="README.md"
+  repository = "https://github.com/dvlaykov/sgs_tools.git"
+  packages = [
+  { include = "sgs_tools", from = "src" }
 ]
 
 classifiers = [
-    "Development Status :: 2 - Pre-Alpha",
-    "Intended Audience :: Science/Research",
-    "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.11"
+  "Development Status :: 2 - Pre-Alpha",
+  "Intended Audience :: Science/Research",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.11"
 ]
 
 [tool.poetry.dependencies]
-python = ">=3.11,<4.0"
-matplotlib = ">=3.6"
-xarray = {version = ">=2023.9", extras = ["io","accel","parallel"]}
-xrft = "*"
-xarray-einstats = "*"
-f90nml = "*"
-netcdf4= "*"
-h5netcdf="*"
-pint = "*"
+  python = ">=3.11,<4.0"
+  matplotlib = ">=3.6"
+  xarray = {version = ">=2023.9", extras = ["io","accel","parallel"]}
+  xrft = "*"
+  xarray-einstats = "*"
+  f90nml = "*"
+  netcdf4= "*"
+  h5netcdf="*"
+  pint = "*"
 
 [tool.poetry.group.dev.dependencies]
-tox = "*"
-mypy  = "~=1.17.0"
-pytest = "~=7.2"
-pytest-cov = "~=4.0"
-ruff  = "0.12.5"
-pre-commit="~=3.4.0"
+  tox = "*"
+  mypy  = "~=1.17.0"
+  pytest = "~=7.2"
+  pytest-cov = "~=4.0"
+  ruff  = "0.12.5"
+  pre-commit="~=3.4.0"
 
 
 
 [tool.poetry.group.doc.dependencies]
-    sphinx  = "*"
-    sphinx_autodoc_typehints = "*"
-    sphinx_argparse_cli = "*"
-    sphinx-mdinclude = "*"
-    pydata-sphinx-theme = "*"
-    sphinx_copybutton = "*"
-    sphinxemoji="*"
+  sphinx  = "*"
+  sphinx_autodoc_typehints = "*"
+  sphinx_argparse_cli = "*"
+  sphinx-mdinclude = "*"
+  pydata-sphinx-theme = "*"
+  sphinx_copybutton = "*"
+  sphinxemoji="*"
 
 
 [tool.poetry.scripts]
-cs_dynamic = "sgs_tools.scripts.CS_calculation_genmodel:main"
-sim_comparison = "sgs_tools.scripts.BasicComparisonSimAnalysis:main"
-ref_comparison = "sgs_tools.scripts.ReferenceComparisonSimAnalysis:main"
-um_levels = "sgs_tools.scripts.make_UM_level_sets:main"
-post_process = "sgs_tools.scripts.post_process:main"
-sgs_tools_version = "sgs_tools.scripts.version:main"
+  cs_dynamic = "sgs_tools.scripts.CS_calculation_genmodel:main"
+  sim_comparison = "sgs_tools.scripts.BasicComparisonSimAnalysis:main"
+  ref_comparison = "sgs_tools.scripts.ReferenceComparisonSimAnalysis:main"
+  um_levels = "sgs_tools.scripts.make_UM_level_sets:main"
+  post_process = "sgs_tools.scripts.post_process:main"
+  sgs_tools_version = "sgs_tools.scripts.version:main"

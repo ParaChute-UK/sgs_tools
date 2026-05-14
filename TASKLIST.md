@@ -1,29 +1,31 @@
 ## Task List
-  * **Documentation** -- comlete coverage
-  * **Unit testing** -- increase coverage
-  * **Add notebook examples**
 
-  * IO
-    * PTerodaCTILES ??
-    * ??
+* **Documentation** -- complete coverage
+* **Unit testing** -- increase coverage
+* **Add notebook examples**
 
-  * Geometry
-    * Integrate staggered and non-staggered grid interfaces
-    * Implement derivatives as ?methods? on grids
+* IO
+  * PTerodaCTILES ??
+  * UM PP files??
+  * MUSIC dumps
 
-  * Physics
-    * Integrate with [MONC_utils](https://github.com/ParaConUK/monc_utils)
-    * Integrate SGS Fluxes analysis from P. Burns
+* Geometry
+  * Integrate staggered and non-staggered grid interfaces
+  * Implement derivatives as ?methods? on grids
 
-  * Analysis tools
-    * Add Histograms/PDFs and violin calculators
-    * Enhance tensor invariant calculators
-    * Add quadrant analysis support
+* Physics
+  * Integrate with [MONC_utils](https://github.com/ParaConUK/monc_utils)
+  * Integrate SGS Fluxes analysis from P. Burns
 
-  * SGS
-    * Add a nonlinear model extensions
-    * Generalise dynamic coefficient calculations
-    * Optimize simultaneous calculation at multiple scales or contraction dims
+* Analysis tools
+  * Add Histograms/PDFs and violin calculators
+  * Enhance tensor invariant calculators
+  * Add quadrant analysis support
 
-  * Scripts
-    * Add a primer for CLI usage
+* SGS
+  * Add a nonlinear model extensions
+  * Generalise dynamic coefficient calculations
+  * Optimize simultaneous calculation at multiple scales or contraction dims
+
+* Scripts
+  * Add a primer for CLI usage

@@ -45,6 +45,7 @@ dmypy.json
 
 # Sphinx documentation
 documentation/
+*.html
 
 #testing
 .tox/

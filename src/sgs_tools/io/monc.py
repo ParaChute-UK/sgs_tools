@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Any
+from typing import Any, Dict, Tuple
 
 import numpy as np
 import xarray as xr
@@ -65,7 +65,7 @@ def data_ingest_MONC_on_single_grid(
     fname_pattern: Path | str,
     requested_fields: list[str] = ["u", "v", "w", "theta"],
     chunks: Any = "auto",
-) -> xr.Dataset:
+) -> Tuple[Dict[str, str], xr.Dataset]:
     """read pre-process MONC data and interpolate to a cell-centred grid
     Any unknown fields will retain their original names.
 

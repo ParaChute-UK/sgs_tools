@@ -358,7 +358,7 @@ def post_process_fields(
     )
 
     supported = []
-    available = set(simulation)
+    available = {str(s) for s in simulation}
     for f in requested_fields:
         dependencies = v_profile_fields_map.get(f, {f})
         missing = dependencies - available

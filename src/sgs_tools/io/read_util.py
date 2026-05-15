@@ -29,7 +29,7 @@ def standardize_varnames(
     return ds.rename(restricted_dict)
 
 
-def restrict_ds(ds: xr.Dataset, fields: Iterable[str]) -> xr.Dataset:
+def restrict_ds(ds: xr.Dataset, fields: Iterable[str]) -> tuple[xr.Dataset, set[str]]:
     """restrict the dataset to fields of interest and rename using fields dict
 
     :param ds: input dataset

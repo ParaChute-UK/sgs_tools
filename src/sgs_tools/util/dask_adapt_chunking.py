@@ -1,10 +1,10 @@
 import math
 import warnings
-from typing import Dict, Hashable
+from typing import Dict, Hashable, Mapping
 
 
 def adaptive_chunks(
-    domain: Dict[Hashable, int],
+    domain: Mapping[Hashable, int],
     min_chunks: Dict[Hashable, int] = {},
     fixed_chunks: Dict[Hashable, int] = {},
     itemsize: int = 8,

@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import xarray as xr
 from matplotlib.figure import Figure
 from numpy import arange, array, inf, linspace, nan, ndarray
-from pint import UnitRegistry  # type: ignore
+from pint import UnitRegistry
 
 from sgs_tools.diagnostics.directional_profile import directional_profile
 from sgs_tools.io.read import read
@@ -553,7 +553,7 @@ def plot(
     if args["plot_path"] is not None:
         print(f"Saving plots to {args['plot_path']}")
         # parse time range; assume all datasets use the same time scale
-        ureg = UnitRegistry()  # use to parse resolution
+        ureg = UnitRegistry()  # type: ignore
         ds = next(iter(ds_collection.values()))
         tunit = ds["t"].unit
         tmin = ds["t"].min().item() * ureg(tunit)

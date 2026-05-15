@@ -12,6 +12,7 @@ from sgs_tools.io.netcdf_writer import NetCDFWriter
 from sgs_tools.io.read import read
 from sgs_tools.scripts.cli_helpers import print_args_dict, print_header
 from sgs_tools.scripts.fname_out import build_output_fname
+from sgs_tools.util.dask_adapt_chunking import chunk_ds
 from sgs_tools.util.gitinfo import get_git_state, write_git_diff_file
 from sgs_tools.util.memory import get_mem_limit_MB, memory_watch
 from sgs_tools.util.terminal_progress_bar import TerminalProgressBar
@@ -450,8 +451,8 @@ def pre_process(args: dict[str, Any], req_fields: list[str]) -> xr.Dataset:
         "c1_1": -1,
     }
     # add caveat for degenerate t or z-slice that may drop a coordinate
-    simulation = simulation.chunk(
-        chunks={x: y for x, y in chunks.items() if x in simulation.dims}
+    simulation = chunk_ds(
+        simulation, chunks={x: y for x, y in chunks.items() if x in simulation.dims}
     )
     return simulation
 
@@ -599,7 +600,7 @@ def run(args: Dict[str, Any]) -> None:
                 with timer(f"write {output_path}", "s"):
                     # rechunk for IO optimisation??
                     # have to do explicit rechunking because UM date-time coordinate is an object
-                    profile = profile.chunk({"z": "auto"})
+                    profile = chunk_ds(profile, {"z": "auto"})
                     profile.attrs.update(git_attrs)
                     writer.write(profile, output_path)
 
@@ -643,8 +644,9 @@ def run(args: Dict[str, Any]) -> None:
                 with timer(f"write {output_path}", "s"):
                     # rechunk for IO optimisation ??
                     # have to do explicit rechunking because UM date-time coordinate is an object
-                    spec_ds = spec_ds.chunk(
-                        {dim: "auto" for dim in ["x", "y", "z"] if dim in spec_ds.dims}
+                    spec_ds = chunk_ds(
+                        spec_ds,
+                        {dim: "auto" for dim in ["x", "y", "z"] if dim in spec_ds.dims},
                     )
                     spec_ds.attrs.update(git_attrs)
                     writer.write(spec_ds, output_path)

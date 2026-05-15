@@ -44,6 +44,7 @@ from sgs_tools.sgs.Smagorinsky import (
     SmagorinskyHeatModel,
     SmagorinskyVelocityModel,
 )
+from sgs_tools.util.dask_adapt_chunking import chunk_ds
 from sgs_tools.util.gitinfo import get_git_state, write_git_diff_file
 from sgs_tools.util.terminal_progress_bar import TerminalProgressBar
 from sgs_tools.util.timer import timer
@@ -415,8 +416,8 @@ def pre_process(args: dict[str, Any]) -> xr.Dataset:
         "c2": -1,
     }
     # add caveat for degenerate t or z-slice that may drop a coordinate
-    simulation = simulation.chunk(
-        chunks={x: y for x, y in chunks.items() if x in simulation.dims}
+    simulation = chunk_ds(
+        simulation, chunks={x: y for x, y in chunks.items() if x in simulation.dims}
     )
     simulation = simulation.persist()
     return simulation

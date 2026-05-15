@@ -5,6 +5,8 @@ import numpy as np
 import xarray as xr
 import xrft  # type: ignore
 
+from sgs_tools.util.dask_adapt_chunking import chunk_ds
+
 
 def radial_spectrum(
     ps: xr.DataArray,
@@ -173,7 +175,9 @@ def spectra_1d_radial(
     for cfields in cross_spectra_fields:
         all_fields.update(cfields)
     # xrft doesn't play well with nans and chunking in to-be-spectral directions
-    prepped_data = sim[list(all_fields)].chunk({x: -1 for x in hdims}).fillna(fillnan)
+    prepped_data = chunk_ds(sim[list(all_fields)], {x: -1 for x in hdims}).fillna(
+        fillnan
+    )
 
     # power spectra
     for field in power_spectra_fields:

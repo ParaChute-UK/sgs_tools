@@ -27,6 +27,7 @@ from sgs_tools.scripts.arg_parsers import (
     add_version_group,
 )
 from sgs_tools.scripts.cli_helpers import print_args_dict, print_header
+from sgs_tools.util.dask_adapt_chunking import chunk_ds
 from sgs_tools.util.timer import timer
 
 default_plotting_style = {
@@ -656,7 +657,7 @@ def io(args) -> tuple[Dict[str, xr.Dataset], Dict[str, field_plot_kwargs]]:
             # add chunking for better memory management
             # will not chunk along z because staggering makes it annoying
             # for simple plotting it should be ok
-            ds = ds.chunk({"t": args["t_chunk_size"]})
+            ds = chunk_ds(ds, {"t": args["t_chunk_size"]})
 
             # store with a label from the plotting map
             ds_collection[plot_map["label"]] = ds

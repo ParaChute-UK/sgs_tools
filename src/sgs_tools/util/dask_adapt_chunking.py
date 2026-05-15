@@ -1,6 +1,8 @@
 import math
 import warnings
-from typing import Dict, Hashable, Mapping
+from typing import Any, Dict, Hashable, Mapping
+
+from xarray import Dataset
 
 
 def adaptive_chunks(
@@ -73,3 +75,21 @@ def adaptive_chunks(
         )
 
     return chunks
+
+
+def chunk_ds(ds: Dataset, chunks: Dict[Hashable | str, Any]) -> Dataset:
+    """rechunk the dataset according to the provided chunks
+    needed for variables with different dimensions
+
+    :param ds: input dataset
+    :param chunks: chunks a dictionary lie
+    :return: chunked dataset
+    """
+    chunk_dict = {}
+    for d in ds.dims:
+        if d in chunks:
+            chunk_dict[d] = chunks[d]
+        else:
+            chunk_dict[d] = ds.chunks[d]
+
+    return ds.chunk(chunk_dict)

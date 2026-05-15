@@ -3,6 +3,8 @@ from typing import Callable, Sequence
 import xarray as xr
 from xarray.core.types import T_Xarray
 
+from sgs_tools.util.dask_adapt_chunking import chunk_ds
+
 
 def profile_reduction(
     da: T_Xarray,
@@ -31,7 +33,7 @@ def directional_profile(
     red_dims: Sequence[str],
     stats: Sequence[str] = ["mean", "std"],
 ) -> xr.Dataset:
-    s = simulation.chunk({x: -1 for x in red_dims})
+    s = chunk_ds(simulation, {x: -1 for x in red_dims})
     prof = []
     for stat in stats:
         prof.append(profile_reduction(s, stat, red_dims))

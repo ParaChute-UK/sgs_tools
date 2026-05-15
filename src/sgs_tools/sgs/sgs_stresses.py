@@ -5,6 +5,7 @@ import xarray as xr
 from sgs_tools.geometry.tensor_algebra import tensor_self_outer_product
 from sgs_tools.sgs.coarse_grain import CoarseGrain
 from sgs_tools.sgs.filter import Filter
+from sgs_tools.util.dask_adapt_chunking import chunk_ds
 
 
 def momentum_stresses(
@@ -50,14 +51,14 @@ def momentum_stresses(
     output.append(sgs)
 
     # reynolds
-    vel_prime = vel - vel_mean.reindex_like(
-        vel, method="nearest"
+    vel_prime = vel - vel_mean.reindex_like(vel, method="nearest").chunk(
+        vel.chunks  # type: ignore
     )  # up-sample vel_mean to the vel grid (in case Filter is a Coarse-graining)
-    # relegate this to fluctuation function -- filter method?
+    # TODO?: delegate this to fluctuation function -- filter method
     fluct_cov = tensor_self_outer_product(vel_prime, vec_dim=vec_dim, new_dim=new_dim)
     reynolds = filter.filter(fluct_cov)
     reynolds.name = "Reynolds_stress"
     reynolds.attrs["long_name"] = r"$ \langle u_i' u_j' \rangle $"
     output.append(reynolds)
 
-    return xr.merge(output, compat="no_conflicts").chunk({vec_dim: -1, new_dim: -1})
+    return chunk_ds(xr.merge(output, compat="no_conflicts"), {vec_dim: -1, new_dim: -1})

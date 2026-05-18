@@ -50,6 +50,6 @@ documentation/
 #testing
 .tox/
 .ruff_cache
-.coverage
+.coverage*
 #test output directories
 __test_out

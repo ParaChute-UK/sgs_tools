@@ -1,5 +1,5 @@
+from collections.abc import Iterable
 from pathlib import Path
-from typing import Dict, Iterable
 
 import xarray as xr
 
@@ -18,7 +18,7 @@ def parse_fname_pattern(fname_pattern: str | Path) -> list[Path]:
 
 
 def standardize_varnames(
-    ds: xr.Dataset, field_names_convention: Dict[str, str]
+    ds: xr.Dataset, field_names_convention: dict[str, str]
 ) -> xr.Dataset:
     """rename variables in ``ds`` using ``field_names_dict``
 

@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Any, Dict, Tuple
+from typing import Any
 
 import numpy as np
 import xarray as xr
@@ -15,17 +15,19 @@ from sgs_tools.io.read_util import (
 base_field_dict = {"th": "theta", "p": "P"}
 
 coord_dict = {"zn": "z_theta"}
+__default_req_fields = ["u", "v", "w", "theta"]
 
 
 def data_ingest_MONC(
     fname_pattern: Path | str,
-    requested_fields: list[str] = ["u", "v", "w", "theta"],
+    requested_fields: list[str] = __default_req_fields,
     chunks: Any = "auto",
 ):
     """read and pre-process MONC data using sgs_tools naming convention.
     Any unknown fields will retain their original names.
 
-    :param fname_pattern: MONC NetCDF diagnostic file to read. can be a glob pattern. (should belong to the same simulation)
+    :param fname_pattern: MONC NetCDF diagnostic file to read. can be a glob pattern.
+    (should belong to the same simulation)
     :param  requested_fields: list of fields to retain in ds, if falsy will retain all.
     :param chunks: chunking of datasets "auto" or a dictionary of {coordinate: chunks}.
     :return: metadata dictionary, xarray Dataset of fields.
@@ -63,13 +65,14 @@ def data_ingest_MONC(
 
 def data_ingest_MONC_on_single_grid(
     fname_pattern: Path | str,
-    requested_fields: list[str] = ["u", "v", "w", "theta"],
+    requested_fields: list[str] = __default_req_fields,
     chunks: Any = "auto",
-) -> Tuple[Dict[str, str], xr.Dataset]:
+) -> tuple[dict[str, str], xr.Dataset]:
     """read pre-process MONC data and interpolate to a cell-centred grid
     Any unknown fields will retain their original names.
 
-    :param fname_pattern: MONC NetCDF diagnostic file(s) to read. will be interpreted as a glob pattern. (should belong to the same simulation)
+    :param fname_pattern: MONC NetCDF diagnostic file(s) to read.
+      will be interpreted as a glob pattern. (should belong to the same simulation)
     :param  requested_fields: list of fields to retain in ds, if falsy will retain all.
     :param chunks: chunking of datasets "auto" or a dictionary of {coordinate: chunks}.
     """

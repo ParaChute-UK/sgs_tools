@@ -1,6 +1,6 @@
 # yourpkg/cli_main.py
 from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
-from typing import Sequence
+from collections.abc import Sequence
 
 from sgs_tools.scripts.arg_parsers import add_output_group
 from sgs_tools.util.gitinfo import print_version_info

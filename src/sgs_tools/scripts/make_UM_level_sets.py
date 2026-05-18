@@ -11,14 +11,20 @@ from sgs_tools.util.path_utils import add_extension
 
 def parser() -> dict[str, Any]:
     parser = ArgumentParser(
-        description="Create a constant level set namelist for the UM from given model top height and number of levels"
+        description=(
+            "Create a constant level set namelist for the UM "
+            "from given model top height and number of levels"
+        )
     )
     add_version_group(parser)
 
     parser.add_argument(
         "output_file",
         type=Path,
-        help="output path, will create/overwrite existing file and create any missing intermediate directories",
+        help=(
+            "output path, will create/overwrite existing file and "
+            "create any missing intermediate directories"
+        ),
     )
 
     parser.add_argument(

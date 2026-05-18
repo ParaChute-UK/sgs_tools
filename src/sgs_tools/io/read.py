@@ -24,15 +24,18 @@ def read(
 
     :param requested_fields: List of variable names to extract from the input data.
     :param kwargs: Additional keyword arguments depending on the input format.
-      The ``um`` format, requires ``resolution`` (float) specifying horizontal grid spacing.
+      The ``um`` format, requires ``resolution`` (float)
+      specifying horizontal grid spacing.
 
     :return: xarray Dataset containing the requested fields and metadata, including
       the horizontal resolution stored in ``attrs["h_resolution"]``.
 
     .. note::
-        - For ``monc`` format, resolution is inferred from metadata and assumed isotropic in x and y
+        - For ``monc`` format, resolution is inferred from metadata and assumed
+            isotropic in x and y
         - For ``um`` format, resolution must be explicitly provided via `kwargs`.
-        - For ``sgs`` format, if h_resolution is not a dataset attribute it is guessed by the spacing in "x" and "y" coordinates
+        - For ``sgs`` format, if h_resolution is not a dataset attribute
+            it is guessed by the spacing in "x" and "y" coordinates
     """
     if input_format == "sgs":
         simulation = data_ingest_SGS(

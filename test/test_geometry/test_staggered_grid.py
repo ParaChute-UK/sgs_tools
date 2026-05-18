@@ -218,8 +218,8 @@ def test_grad_vec_on_grid(vector_components):
 
     result = grad_vec_on_grid(
         ds,
-        target_dims=["x_centre", "y_centre"],
-        new_dim_name=["c1", "c2"],
+        target_dims=("x_centre", "y_centre"),
+        new_dim_name=("c1", "c2"),
         name="gradient",
     )
 

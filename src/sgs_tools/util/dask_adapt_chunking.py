@@ -1,39 +1,50 @@
 import math
 import warnings
-from typing import Any, Dict, Hashable, Mapping
+from collections.abc import Hashable, Mapping
+from typing import Any
 
 from xarray import Dataset
 
 
 def adaptive_chunks(
     domain: Mapping[Hashable, int],
-    min_chunks: Dict[Hashable, int] = {},
-    fixed_chunks: Dict[Hashable, int] = {},
+    min_chunks: dict[Hashable, int] | None = None,
+    fixed_chunks: dict[Hashable, int] | None = None,
     itemsize: int = 8,
     target_mem_MB: float = 256.0,
-) -> Dict[Hashable, int]:
+) -> dict[Hashable, int]:
     """
     Compute adaptive chunk sizes for a given domain and memory target.
 
-    :param domain : Full domain sizes per dimension, e.g. {'x': 1024, 'y': 1024, 'z': 70}.
-    :param min_chunks : Minimum chunk sizes per adaptinve dimension; acts as lower bound and rounding base,
+    :param domain : Full domain sizes per dimension, e.g.
+      {'x': 1024, 'y': 1024, 'z': 70}.
+    :param min_chunks : Minimum chunk sizes per adaptinve dimension;
+      acts as lower bound and rounding base. If None, uses an empty dict.
     :param fixed_chunks : Chunk sizes that must remain fixed (subset of domain).
+      If None, uses an empty dict.
     :param itemsize : Bytes per element, e.g. 8 for single float64 (default).
     :param target_mem_MB : Approximate desired memory per chunk in MB (default: 200).
 
     :return: Mapping of dimension names to computed chunk sizes.
     """
-    if not all({x in domain for x in fixed_chunks}):
+    if min_chunks is None:
+        min_chunks = {}
+    if fixed_chunks is None:
+        fixed_chunks = {}
+    if not all(x in domain for x in fixed_chunks):
         raise ValueError(
-            f"fixed_chunks has dimensions missing from domain:{fixed_chunks.keys()} vs. {domain.keys()}"
+            f"fixed_chunks has dimensions missing from domain:{fixed_chunks.keys()}"
+            f"vs. {domain.keys()}"
         )
-    if not all({x in domain for x in min_chunks}):
+    if not all(x in domain for x in min_chunks):
         raise ValueError(
-            f"min_chunks has dimensions missing from domain:{min_chunks.keys()} vs. {domain.keys()}"
+            f"min_chunks has dimensions missing from domain:{min_chunks.keys()}"
+            f"vs. {domain.keys()}"
         )
-    if not all({x not in fixed_chunks for x in min_chunks}):
+    if not all(x not in fixed_chunks for x in min_chunks):
         raise ValueError(
-            f"min_chunks has dimensions missing from domain:{min_chunks.keys()} vs. {domain.keys()}"
+            f"min_chunks has dimensions missing from domain:{min_chunks.keys()}"
+            f" vs. {domain.keys()}"
         )
 
     chunks = fixed_chunks
@@ -69,15 +80,17 @@ def adaptive_chunks(
     est_mem_MB = math.prod(chunks.values()) * itemsize / 1024**2
     if est_mem_MB > target_mem_MB * 1.2:  # allow 20% slack
         warnings.warn(
-            f"Estimated chunk memory {est_mem_MB:.1f} MB exceeds target {target_mem_MB:.1f} MB "
+            f"Estimated chunk memory {est_mem_MB:.1f} MB"
+            f"exceeds target {target_mem_MB:.1f} MB "
             "by 20% after enforcing minimum chunk sizes and rounding.",
             RuntimeWarning,
+            stacklevel=2,
         )
 
     return chunks
 
 
-def chunk_ds(ds: Dataset, chunks: Dict[Hashable | str, Any]) -> Dataset:
+def chunk_ds(ds: Dataset, chunks: dict[Hashable | str, Any]) -> Dataset:
     """rechunk the dataset according to the provided chunks
     needed for variables with different dimensions
 

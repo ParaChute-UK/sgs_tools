@@ -31,10 +31,11 @@ MINIMAL_ARGS = {
 @pytest.mark.parametrize("script_name", MINIMAL_ARGS.keys())
 def test_cli_main_minimal(script_name, capsys):
     """Import each CLI's main() and verify it runs with minimal valid arguments."""
-    # Import dynamically from the script name convention, e.g. "sgs_dynamic" -> "sgs_tools.scripts.dynamic"
+    # Import dynamically from the script name convention,
+    # e.g. "sgs_dynamic" -> "sgs_tools.scripts.dynamic"
     module_name = f"sgs_tools.scripts.{script_name}"
     mod = import_module(module_name)
-    main = getattr(mod, "main")
+    main = mod.main
     assert main is not None, f"{script_name} has no main()"
     # Run with the minimal valid arguments
     try:

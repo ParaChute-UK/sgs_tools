@@ -1,4 +1,4 @@
-from typing import Dict, Hashable
+from collections.abc import Hashable
 
 import xarray as xr
 import xarray_einstats
@@ -9,7 +9,7 @@ from sgs_tools.sgs.filter import Filter
 from sgs_tools.sgs.sgs_stresses import momentum_stresses
 from sgs_tools.util.dask_adapt_chunking import adaptive_chunks
 
-name_dic: Dict[Hashable, Hashable] = {
+name_dic: dict[Hashable, Hashable] = {
     "filt_v_stress": "Filtered stress",
     "sgs_v_stress": "SGS stress",
     "Reynolds_stress": "Reynolds stress",

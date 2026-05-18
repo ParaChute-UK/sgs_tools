@@ -1,5 +1,5 @@
+from collections.abc import Sequence
 from dataclasses import dataclass
-from typing import Sequence
 
 import dask.array as da
 import xarray as xr
@@ -20,11 +20,13 @@ from .util import _assert_coord_dx
 def s_parallel(
     s: xr.DataArray, n: xr.DataArray, tensor_dims: tuple[str, str]
 ) -> xr.DataArray:
-    r"""Projection of s in the n-direction: :math:`s^{\parallel}=(n_i (s.n)_j + (s.n)_i n_j - \frac{2}{3} \delta_{ij} (n.s.n) )`"""
+    r"""Projection of s in the n-direction:
+    :math:`s^{\parallel}=(n_i (s.n)_j + (s.n)_i n_j - \frac{2}{3} \delta_{ij} (n.s.n) )`
+    """
     assert len(n.dims) == 1
     assert len(tensor_dims) == 2
     assert n.dims[0] in tensor_dims
-    assert all([d in s.dims for d in tensor_dims])
+    assert all(d in s.dims for d in tensor_dims)
 
     s_vec = xr.dot(s, n, dim=n.dims)  # s = S.n
     S_parallel = symmetrise(n * s_vec, dims=tensor_dims)  # the first two terms
@@ -41,13 +43,15 @@ def s_perpendicular(
 
 @dataclass(frozen=True)
 class SparallelVelocityModel:
-    r"""Carati & Cabot Proceedings of the 1996 Summer Program -- Center for Turbulence Research
+    r"""Carati & Cabot Proceedings of the 1996 Summer Program --
+    Center for Turbulence Research
     S_parallel component = :math:`|S| Traceless[Symmetric[(S.n)n]]`
 
     :ivar strain: grid-scale rate-of-strain
     :ivar cs: Smagorinsky coefficient
     :ivar dx: constant resolution with respect to dimension to-be-filtered
-    :ivar n: triple of floats to be coerce as a 3d constant vector along one of the tensor dimensions
+    :ivar n: triple of floats to be coerce as a 3d constant vector
+      along one of the tensor dimensions
     :ivar tensor_dims: labels of dimensions indexing tensor components
     """
 
@@ -85,13 +89,15 @@ class SparallelVelocityModel:
 
 @dataclass(frozen=True)
 class SperpVelocityModel:
-    r"""Carati & Cabot Proceedings of the 1996 Summer Program -- Center for Turbulence Research
+    r"""Carati & Cabot Proceedings of the 1996 Summer Program --
+    Center for Turbulence Research
     :math:`S_{\textrm{perp component}} = |S| Traceless(S - (S.n + n.S))`
 
     :ivar strain: grid-scale rate-of-strain
     :ivar cs: Smagorinsky coefficient
     :ivar dx: constant resolution with respect to dimension to-be-filtered
-    :ivar n: triple of floats to be coerce as a 3d constant vector along one of the tensor dimensions
+    :ivar n: triple of floats to be coerce as a 3d constant vector
+      along one of the tensor dimensions
     :ivar tensor_dims: labels of dimensions indexing tensor components
     """
 
@@ -131,13 +137,15 @@ class SperpVelocityModel:
 
 @dataclass(frozen=True)
 class NVelocityModel:
-    r"""Carati & Cabot Proceedings of the 1996 Summer Program -- Center for Turbulence Research
+    r"""Carati & Cabot Proceedings of the 1996 Summer Program --
+    Center for Turbulence Research
     :math:`N component = |S|(n.s.n) Traceless(n * n)`
 
     :ivar strain: grid-scale rate-of-strain
     :ivar cs: Smagorinsky coefficient
     :ivar dx: constant resolution with respect to dimension to-be-filtered
-    :ivar n: triple of floats to be coerce as a 3d constant vector along one of the tensor dimensions
+    :ivar n: triple of floats to be coerce as a 3d constant vector
+      along one of the tensor dimensions
     :ivar tensor_dims: labels of dimensions indexing tensor components
     """
 
@@ -178,6 +186,9 @@ class NVelocityModel:
         )
 
 
+__default_min = LillyMinimisation3Model(contraction_dims=["c1", "c2"], coeff_dim="cdim")
+
+
 def DynamicCaratiCabotModel(
     sij: xr.DataArray,
     vel: xr.DataArray,
@@ -185,19 +196,21 @@ def DynamicCaratiCabotModel(
     compoment_coeff: Sequence[float],
     n: Sequence[float],
     tensor_dims: tuple[str, str] = ("c1", "c2"),
-    minimisation: Minimisation = LillyMinimisation3Model(
-        contraction_dims=["c1", "c2"], coeff_dim="cdim"
-    ),
+    minimisation: Minimisation = __default_min,
 ) -> LinCombDynamicModel:
     r"""Dynamic version of the model by
-    Carati & Cabot Proceedings of the 1996 Summer Program -- Center for Turbulence Research
+    Carati & Cabot Proceedings of the 1996 Summer Program --
+      Center for Turbulence Research
 
     :param sij: grid-scale rate-of-strain tensor
     :param vel: velocity field used for dynamic coefficient computation
     :param res: constant resolution with respect to dimension to-be-filtered
-    :param compoment_coeff: tuple of three Smagorinsky coefficients for parallel, perpendicular, and normal components
-    :param n: triple of floats to be coerced as a 3d constant vector along one of the tensor dimensions
-    :param tensor_dims: labels of dimensions indexing tensor components, defaults to ("c1", "c2")
+    :param compoment_coeff: tuple of three Smagorinsky coefficients for
+      parallel, perpendicular, and normal components
+    :param n: triple of floats to be coerced as a 3d constant vector
+      along one of the tensor dimensions
+    :param tensor_dims: labels of dimensions indexing tensor components,
+       defaults to ("c1", "c2")
     :return: Combined SGS model with dynamically computed coefficients
     """
     static_model = LinCombSGSModel(

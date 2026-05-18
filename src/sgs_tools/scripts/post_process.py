@@ -1,6 +1,7 @@
 import warnings
+from collections.abc import Sequence
 from pathlib import Path
-from typing import Any, Dict, Sequence
+from typing import Any
 
 import numpy as np
 import xarray as xr
@@ -70,7 +71,7 @@ filter_shapes = ["gauss", "box", "coarse"]
 ANISOTROPY_TAG = "anisotropy"
 
 
-def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
+def parse_args(arguments: Sequence[str] | None = None) -> dict[str, Any]:
     from argparse import (
         ArgumentDefaultsHelpFormatter,
         ArgumentParser,
@@ -112,7 +113,8 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
         help=(
             "Optional suffix appended to output filenames. "
             r"Final pattern: {base_name}_{fname_suffix}_{statistics_tag}.nc, "
-            "where ``base_name`` is one of ``vprofile_fname_out``| ``hspectra_fname_out`` | ``aniso_fname_out``"
+            "where ``base_name`` is one of ``vprofile_fname_out``| "
+            "``hspectra_fname_out`` | ``aniso_fname_out``"
         ),
     )
     parser.add_argument(
@@ -150,7 +152,8 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
         "--vprofile_fname_out",
         default=BASE_NAME,
         type=str,
-        help="""**Core filename where to save the generated vertical profile. relative to output_path.
+        help="""**Core** filename where to save the generated vertical profile.
+                relative to output_path.
                 Will add an '.nc' extension (so don't give one).
               """,
     )
@@ -175,7 +178,8 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
         tup = tuple(s.split(","))
         if len(tup) != 2:
             raise ArgumentTypeError(
-                f"Expected only 2 fields for each comma-separated cross-spectrum, got {len(tup)}"
+                "Expected only 2 fields for each comma-separated cross-spectrum"
+                f", got {len(tup)}"
             )
         return tup
 
@@ -186,15 +190,16 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
         type=tuple_from_comma_str,
         help="""
         Fields whose cross spectra to compute.
-        Use spaces to between cross spectra and commas between fields in each cross-spectrim, e.g.
-        u,v v,w""",
+        Use spaces to between cross spectra and commas between fields
+        in each cross-spectrum, e.g. u,v v,w""",
     )
 
     spectra.add_argument(
         "--radial_smooth_factor",
         default=1,
         type=int,
-        help="""Radial binning of radial horizontal spectrum in units of delta_kx spacings""",
+        help="""Radial binning of radial horizontal spectrum
+                in units of delta_kx spacings""",
     )
 
     spectra.add_argument(
@@ -210,7 +215,8 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
         "--hspectra_fname_out",
         default=BASE_NAME,
         type=str,
-        help="""**Core** filename where to save the generated horisontal spectra. relative to output_path.
+        help="""**Core** filename where to save the generated horisontal spectra.
+                relative to output_path.
                 Will add an '.nc' extension (so don't give one).
               """,
     )
@@ -229,9 +235,10 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
         default=[],
         type=float,
         help="""
-        Anisotropy box filter and coarse-graining scales in fraction of the horizontal domain size.
-        Will round to nearest integer number of horizontal grid cells.
-        Will combine all box scales and ignore entries which are less than `2 delta` apart.
+        Anisotropy box filter and coarse-graining scales in fraction of
+        the horizontal domain size. Will round to nearest integer number
+        of horizontal grid cells. Will combine all box scales and ignore
+        entries which are less than `2 delta` apart.
         """,
     )
 
@@ -243,7 +250,8 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
         help="""
         Anisotropy box filter and coarse-graining scales in meters.
         Will round to nearest integer number of horizontal grid cells.
-        Will combine all box scales and ignore entries which are less than `2 delta` apart
+        Will combine all box scales and ignore entries which are
+        less than `2 delta` apart.
         """,
     )
 
@@ -253,8 +261,9 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
         default=[],
         type=int,
         help="""
-        Anisotropy box filter and coarse-graining scales in units of horizontal grid spacing `delta`.
-        Will combine all box scales and ignore entries which are less than `2 delta` apart.
+        Anisotropy box filter and coarse-graining scales
+        in units of horizontal grid spacing `delta`. Will combine all box scales
+        and ignore entries which are less than `2 delta` apart.
         """,
     )
     anisotropy.add_argument(
@@ -262,7 +271,8 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
         nargs="+",
         default=[],
         type=int,
-        help="""Anisotropy Gaussian filter scales in  units of horizontal grid spacing. Support 2 and 4""",
+        help="""Anisotropy Gaussian filter scales in  units of horizontal grid spacing.
+          Support 2 and 4""",
     )
     anisotropy.add_argument(
         "--filter_shapes",
@@ -277,7 +287,8 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
         default=BASE_NAME,
         type=str,
         help="""
-        **Core** filename where to save the generated anisotropy eigen values. relative to output_path.
+        **Core** filename where to save the generated anisotropy eigen values.
+        relative to output_path.
         Will append the filter label. Will add an '.nc' extension (so don't give one).
         """,
     )
@@ -477,7 +488,7 @@ def choose_filter_set(
     )
 
     # dictionary of filters
-    filter_dic: Dict[str, Filter | CoarseGrain] = {}
+    filter_dic: dict[str, Filter | CoarseGrain] = {}
 
     # Box-cart scales
     meter_scales = [int(res / dx) for res in box_meter_scales]
@@ -486,9 +497,10 @@ def choose_filter_set(
     # only allows scales at least 2 (delta_<x>) apart
     # order of loop determines precedence
     for x in set(domain_scales + meter_scales + list(box_delta_scales)):
-        if x > 1 and x <= hminsize:
-            if not box_scales or np.min(np.abs([x - y for y in box_scales])) >= 2:
-                box_scales += [x]
+        if (x > 1 and x <= hminsize) and (
+            not box_scales or np.min(np.abs([x - y for y in box_scales])) >= 2
+        ):
+            box_scales += [x]
 
     # sort from fast to slow to compute coarse grain(small to large scales)
     box_scales = sorted(box_scales)
@@ -505,7 +517,8 @@ def choose_filter_set(
         }
 
     # Box filters
-    # stencil size is (filter_scale + 1)delta under finite-difference data interpretation
+    # stencil size is (filter_scale + 1)delta
+    # under finite-difference data interpretation
     if "box" in filter_shapes:
         box_scales = [x for x in box_scales if x <= hminsize // 10]
         filter_dic = filter_dic | {
@@ -528,13 +541,14 @@ def choose_filter_set(
                 )
             else:
                 warnings.warn(
-                    f"Skipping unsupported Gauss scale {s}. Support only 2 and 4."
+                    f"Skipping unsupported Gauss scale {s}. Support only 2 and 4.",
+                    stacklevel=2,
                 )
 
     return filter_dic
 
 
-def run(args: Dict[str, Any]) -> None:
+def run(args: dict[str, Any]) -> None:
     with (
         timer("Read and Preprocess", "s"),
         TerminalProgressBar(),
@@ -599,7 +613,8 @@ def run(args: Dict[str, Any]) -> None:
                 )
                 with timer(f"write {output_path}", "s"):
                     # rechunk for IO optimisation??
-                    # have to do explicit rechunking because UM date-time coordinate is an object
+                    # have to do explicit rechunking because
+                    # UM date-time coordinate is an object
                     profile = chunk_ds(profile, {"z": "auto"})
                     profile.attrs.update(git_attrs)
                     writer.write(profile, output_path)
@@ -616,7 +631,7 @@ def run(args: Dict[str, Any]) -> None:
                 for s in args["cross_spectra_fields"]
                 if s[0] in simulation and s[1] in simulation
             ]
-            cross_fields_set = set([f for fl in cspec_fields for f in fl])
+            cross_fields_set = {f for fl in cspec_fields for f in fl}
             spec_fields = cross_fields_set.union(pspec_fields)
             # get the missing fields from the power-spectra fields
             # since they contain all the cross-spectra fields
@@ -643,7 +658,8 @@ def run(args: Dict[str, Any]) -> None:
 
                 with timer(f"write {output_path}", "s"):
                     # rechunk for IO optimisation ??
-                    # have to do explicit rechunking because UM date-time coordinate is an object
+                    # have to do explicit rechunking because
+                    # UM date-time coordinate is an object
                     spec_ds = chunk_ds(
                         spec_ds,
                         {dim: "auto" for dim in ["x", "y", "z"] if dim in spec_ds.dims},

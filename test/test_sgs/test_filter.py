@@ -18,7 +18,9 @@ def test_coarse_grain_filter():
     expected_2d = np.array([[3.5, 5.5], [11.5, 13.5]])
     expected_1d = np.array([[3, 11], [4, 12], [5, 13], [6, 14]]).T
 
-    for cg, expected_data in zip([cg_2d, cg_1d], [expected_2d, expected_1d]):
+    for cg, expected_data in zip(
+        [cg_2d, cg_1d], [expected_2d, expected_1d], strict=False
+    ):
         # Apply the filter
         result = cg.filter(field)
         #

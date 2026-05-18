@@ -1,7 +1,8 @@
 import json
 from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
+from collections.abc import Iterable, Mapping, Sequence
 from pathlib import Path
-from typing import Any, Dict, Iterable, Mapping, Sequence
+from typing import Any
 
 import matplotlib.pyplot as plt
 import xarray as xr
@@ -100,7 +101,7 @@ prof_fields = (
 cloud_fields = ("q_l", "q_i", "q_g")
 
 
-def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
+def parse_args(arguments: Sequence[str] | None = None) -> dict[str, Any]:
     parser = ArgumentParser(
         description="""
                     Create (and optionally save) standard diagnostic plots for
@@ -119,8 +120,10 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
         nargs="+",
         help="""
             Location of a set NetCDF simulation file(s).
-            Recognizes glob patterns and walks directory trees, e.g. './my_file_p[br]*nc'
-            Can have multiple files per simulation, but only one glob pattern per simulation.
+            Recognizes glob patterns and walks directory trees,
+            e.g. './my_file_p[br]*nc'
+            Can have multiple files per simulation,
+            but only one glob pattern per simulation.
             All files in a glob pattern should belong to the same simulation.
             """,
     )
@@ -129,7 +132,9 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
         "input_format",
         type=str,
         choices=["um", "monc", "sgs"],
-        help="Type of 'input_files'. Only support different NetCDF flavours from various production codes. 'sgs' refers to files produced by sgs_tools. All simulations must have the same format",
+        help="Type of 'input_files'. Only support different NetCDF flavours from"
+        " various production codes. 'sgs' refers to files produced by sgs_tools. "
+        "All simulations must have the same format",
     )
 
     fname.add_argument(
@@ -139,7 +144,8 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
         default=[0],
         help="""
         horizontal resolution in meters.
-        *ONLY* used for UM ideal simulations(will use to overwrite horizontal coordinates).
+        *ONLY* used for UM ideal simulations
+        (will use to overwrite horizontal coordinates).
         If a single resolution is given, assume it applies to all input files.
         Else, must give as many resolutions as inpu_file glob patterns.
         """,
@@ -162,7 +168,8 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
         type=float,
         nargs=2,
         default=[-1, -1],
-        help="vertical interval to consider, in code coordinates, negative values are interpreted as take the min/max respectively",
+        help="vertical interval to consider, in code coordinates, "
+        "negative values are interpreted as take the min/max respectively",
     )
 
     plotting = add_plotting_group(parser)
@@ -171,9 +178,11 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
         type=Path,
         default=None,
         help="""
-                Configuration file describing a list of plot style and decorations to matched sequentially to each simulation.
+                Configuration file describing a list of plot style and decorations
+                to matched sequentially to each simulation.
                 See plot_config_template.json for a template.
-                If absent, will use ``default_plotting_style`` and cycle through different colors.
+                If absent, will use ``default_plotting_style`` and
+                cycle through different colors.
             """,
     )
 
@@ -243,19 +252,17 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
     if args["z_range"][1] < 0:
         args["z_range"][1] = inf
     assert all(
-        [
-            args["z_range"][0] <= z <= args["z_range"][1]
-            for z in args["hor_slice_levels"]
-        ]
+        args["z_range"][0] <= z <= args["z_range"][1] for z in args["hor_slice_levels"]
     ), (
-        f"hor_slice_levels {args['hor_slice_levels']} aren't contained in z_range {args['z_range']}"
+        f"hor_slice_levels {args['hor_slice_levels']} aren't "
+        f"contained in z_range {args['z_range']}"
     )
     return args
 
 
 def preprocess_dataset(
     ds: xr.Dataset, args: dict[str, Any]
-) -> tuple[xr.Dataset, Dict[str, field_plot_kwargs]]:
+) -> tuple[xr.Dataset, dict[str, field_plot_kwargs]]:
     """preprocess data:
        fix coordinates, take time/z constraints, add offline fields
 
@@ -270,18 +277,17 @@ def preprocess_dataset(
     ds, offline_field_map = add_offline_fields(ds)
 
     # unify time dimension
-    if "t_0" in ds:
-        if "t" in ds:
-            # pad missing ICs with nans --FIXME (hack)
-            # vars that live on t (drop the t_0-dim stuff)
-            ds_t = ds.drop_dims("t_0").reindex(t=ds["t_0"].values, fill_value=nan)
-            # vars that live on t_0 (drop the t-dim stuff)
-            ds_t0 = ds.drop_dims("t").rename({"t_0": "t"})
-            # now both subsets use dim t_0 → safe to merge
-            ds = xr.merge([ds_t, ds_t0], compat="no_conflicts")
-            # drop initial condition
-            # ds = ds.sel(t_0=ds["t"].data).drop_vars("t_0")
-        # ds = ds.rename({"t_0": "t"})
+    if "t_0" in ds and "t" in ds:
+        # pad missing ICs with nans --FIXME (hack)
+        # vars that live on t (drop the t_0-dim stuff)
+        ds_t = ds.drop_dims("t_0").reindex(t=ds["t_0"].values, fill_value=nan)
+        # vars that live on t_0 (drop the t-dim stuff)
+        ds_t0 = ds.drop_dims("t").rename({"t_0": "t"})
+        # now both subsets use dim t_0 → safe to merge
+        ds = xr.merge([ds_t, ds_t0], compat="no_conflicts")
+        # drop initial condition
+        # ds = ds.sel(t_0=ds["t"].data).drop_vars("t_0")
+    # ds = ds.rename({"t_0": "t"})
 
     # take z-range
     for z in "z", "z_rho", "z_theta", "z_face", "z_centre", "thlev_bl_zsea_theta":
@@ -299,17 +305,16 @@ def preprocess_dataset(
         ds = ds.sel({"t": times}, method="nearest").drop_duplicates(dim="t")
 
     # drop top level to align tke to z_theta
-    if "thlev_bl_zsea_theta" in ds:
-        if "z_theta" in ds:
-            ds = ds.sel(z_theta=ds["thlev_bl_zsea_theta"].data).drop_vars("z_theta")
-            ds = ds.rename({"thlev_bl_zsea_theta": "z_theta"})
+    if "thlev_bl_zsea_theta" in ds and "z_theta" in ds:
+        ds = ds.sel(z_theta=ds["thlev_bl_zsea_theta"].data).drop_vars("z_theta")
+        ds = ds.rename({"thlev_bl_zsea_theta": "z_theta"})
 
     return ds, offline_field_map
 
 
 def add_offline_fields(
     ds: xr.Dataset,
-) -> tuple[xr.Dataset, Dict[str, field_plot_kwargs]]:
+) -> tuple[xr.Dataset, dict[str, field_plot_kwargs]]:
     # add offline fields
     offline_field_map = {}
     # velocity squared
@@ -421,8 +426,8 @@ def plot_horiz_slices(
     zlevels: Iterable[float],
     field_plot_map,
     verbose: bool = False,
-) -> Dict[float, Dict[str, Figure]]:
-    hor_slice: Dict[float, Dict[str, Figure]] = {}
+) -> dict[float, dict[str, Figure]]:
+    hor_slice: dict[float, dict[str, Figure]] = {}
     for z in zlevels:
         hor_slice[z] = {}
         for field in fields:
@@ -453,9 +458,9 @@ def plot_vert_profiles(
     reductions: Iterable[str],
     plot_map,
     verbose: bool = False,
-) -> Dict[str, Dict[str, Figure]]:
-    vert_prof: Dict[str, Dict[str, Figure]] = {}
-    red_coords = set(coord for f in fields for coord in field_plot_map[f].hcoords)
+) -> dict[str, dict[str, Figure]]:
+    vert_prof: dict[str, dict[str, Figure]] = {}
+    red_coords = {coord for f in fields for coord in field_plot_map[f].hcoords}
     dred_collection = {}
     for sim in ds_collection:
         local_flist = [f for f in fields if f in ds_collection[sim]]
@@ -505,7 +510,7 @@ def plot_clouds(
     fig, _ = plt.subplots(len(ds_collection), 1, figsize=(6, len(ds_collection) * 6))
     axes = fig.axes
     empty = True
-    for ax, k in zip(axes, ds_collection):
+    for ax, k in zip(axes, ds_collection, strict=False):
         if "q_t" in ds_collection[k]:
             data = ds_collection[k]["q_t"].mean(field_plot_map["q_t"].hcoords) * 1000
             if len(field_plot_map["q_t"].tcoord) > 1:
@@ -584,7 +589,7 @@ def plot(
 
     # plot vertical profiles
     # transpose plot map and match to dataset labels
-    plot_map: Dict[str, Dict[str, Any]] = {
+    plot_map: dict[str, dict[str, Any]] = {
         "color_map": {},
         "linestyle_map": {},
         "linewidth_map": {},
@@ -633,13 +638,13 @@ def plot(
     plt.close()
 
 
-def io(args) -> tuple[Dict[str, xr.Dataset], Dict[str, field_plot_kwargs]]:
+def io(args) -> tuple[dict[str, xr.Dataset], dict[str, field_plot_kwargs]]:
     # read UM stasth files: data
-    ds_collection: Dict[str, xr.Dataset] = {}
+    ds_collection: dict[str, xr.Dataset] = {}
     requested_fields = list(slice_fields + prof_fields + cloud_fields)
     with timer("Read Dataset", "s"):
         for f, res, plot_map in zip(
-            args["input_files"], args["h_resolution"], args["plot_map"]
+            args["input_files"], args["h_resolution"], args["plot_map"], strict=False
         ):
             ds = read(
                 f,
@@ -668,7 +673,7 @@ def io(args) -> tuple[Dict[str, xr.Dataset], Dict[str, field_plot_kwargs]]:
     return ds_collection, field_plot_map
 
 
-def run(args: Dict[str, Any]) -> None:
+def run(args: dict[str, Any]) -> None:
     ds_collection, field_plot_map = io(args)
 
     # make plots

@@ -21,7 +21,10 @@ def add_version_group(parser: ArgumentParser) -> _ArgumentGroup:
         choices=range(4),
         default=0,
         action=VersionAction,
-        help="show package version (0=installed, 1=+last commit, 2=+modified files, 3=+ full file difference) and exit",
+        help=(
+            "show package version (0=installed, 1=+last commit, 2=+modified files,"
+            " 3=+ full file difference) and exit"
+        ),
     )
     return version
 
@@ -42,7 +45,8 @@ def add_input_group(parser: ArgumentParser) -> _ArgumentGroup:
         "input_format",
         type=str,
         choices=["um", "monc", "sgs"],
-        help="Type of 'input_files'. Only support different NetCDF flavours from various production codes. 'sgs' refers to files produced by sgs_tools.",
+        help="Type of 'input_files'. Only support different NetCDF flavours "
+        "from various production codes. 'sgs' refers to files produced by sgs_tools.",
     )
 
     fname.add_argument(
@@ -50,8 +54,8 @@ def add_input_group(parser: ArgumentParser) -> _ArgumentGroup:
         type=float,
         default=0,
         help="""
-        horizontal resolution in meters.
-        *ONLY* used for UM ideal simulations(will use to overwrite horizontal coordinates).
+        horizontal resolution in meters. *ONLY* used for UM ideal simulations
+        (will use to overwrite horizontal coordinates).
         """,
     )
 
@@ -60,7 +64,8 @@ def add_input_group(parser: ArgumentParser) -> _ArgumentGroup:
         type=float,
         nargs=2,
         default=[-1, -1],
-        help="time interval to consider, in code coordinates, negative value are interpreted as min/max respectively",
+        help="time interval to consider, in code coordinates,"
+        " negative value are interpreted as min/max respectively",
     )
 
     fname.add_argument(
@@ -68,7 +73,8 @@ def add_input_group(parser: ArgumentParser) -> _ArgumentGroup:
         type=float,
         nargs=2,
         default=[-1, -1],
-        help="vertical interval to consider, in code coordinates, negative values are interpreted as take the min/max respectively",
+        help="vertical interval to consider, in code coordinates, "
+        "negative values are interpreted as take the min/max respectively",
     )
 
     return fname
@@ -101,9 +107,10 @@ def add_dask_group(parser: ArgumentParser) -> _ArgumentGroup:
         type=int,
         default=None,
         help="""
-      Size of dask array chunks in the vertical direction. Should divide the total number of levels.
+      Size of dask array chunks in the vertical direction.
+      Should divide the total number of levels.
       Smaller size leads to smaller memory footprint, but may penalize walltime.
-""",
+      """,
     )
 
     dask.add_argument(
@@ -111,7 +118,8 @@ def add_dask_group(parser: ArgumentParser) -> _ArgumentGroup:
         type=int,
         default=None,
         help="""
-      Size of dask array chunks in the time direction. Should divide the total number time snapshots.
+      Size of dask array chunks in the time direction.
+      Should divide the total number time snapshots.
       Smaller size leads to smaller memory footprint, but may penalize walltime.
     """,
     )
@@ -120,10 +128,12 @@ def add_dask_group(parser: ArgumentParser) -> _ArgumentGroup:
         type=int,
         default=-1,
         help="""
-      Size of dask array chunks in the "horizontal" directions. Should divide into the domain size.
-      Smaller size leads to smaller memory footprint, but can penalize walltime heavily (building DAGs).
-      Default -1 means don't chunk, keep dimesions together -- useful for horizontal filtering.
-      If it doesn't fit in memory try 1/2 to 1/4 of domain size.
+      Size of dask array chunks in the "horizontal" directions.
+      Should divide into the domain size.
+      Smaller size leads to smaller memory footprint, but can penalize walltime heavily
+      (building DAGs). Default -1 means don't chunk, keep dimesions together --
+      useful for horizontal filtering. If it doesn't fit in memory
+      try 1/2 to 1/4 of domain size.
     """,
     )
 

@@ -1,7 +1,8 @@
 import json
 from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
+from collections.abc import Sequence
 from pathlib import Path
-from typing import Any, Dict, Sequence
+from typing import Any
 
 import matplotlib.pyplot as plt
 from numpy import array, inf
@@ -39,7 +40,7 @@ plot_styles = [
 ]
 
 
-def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
+def parse_args(arguments: Sequence[str] | None = None) -> dict[str, Any]:
     parser = ArgumentParser(
         description="""
                     Create (and optionally save) standard diagnostic plots for
@@ -57,7 +58,8 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
         type=Path,
         help="""
             Location of target simulation outputs -- UM NetCDF diagnostic files.
-            Recognizes glob patterns and walks directory trees, e.g. './my_file_p[br]*nc'
+            Recognizes glob patterns and walks directory trees,
+            e.g. './my_file_p[br]*nc'
             Can have multiple files, but only one glob pattern.
             (All files in a glob pattern should belong to the simulation). """,
     )
@@ -67,7 +69,8 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
         type=Path,
         help="""
             Location of reference simulation outputs -- UM NetCDF diagnostic files.
-            Recognizes glob patterns and walks directory trees, e.g. './my_file_p[br]*nc'
+            Recognizes glob patterns and walks directory trees,
+            e.g. './my_file_p[br]*nc'.
             Can have multiple files, but only one glob pattern.
             (All files in a glob pattern should belong to the simulation). """,
     )
@@ -76,7 +79,9 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
         "input_format",
         type=str,
         choices=["um", "monc", "sgs"],
-        help="Type of 'input_files'. Only support different NetCDF flavours from various production codes. 'sgs' refers to files produced by sgs_tools. All simulations must have the same format",
+        help="Type of 'input_files'. Only support different NetCDF flavours from "
+        "various production codes. 'sgs' refers to files produced by sgs_tools. "
+        "All simulations must have the same format",
     )
 
     fname.add_argument(
@@ -86,7 +91,8 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
         default=[0],
         help="""
         horizontal resolution in meters.
-        *ONLY* used for UM ideal simulations(will use to overwrite horizontal coordinates).
+        *ONLY* used for UM ideal simulations
+        (will use to overwrite horizontal coordinates).
         If a single resolution is given, assume it applies to all input files.
         Else, must give as many resolutions as inpu_file glob patterns.
         """,
@@ -109,7 +115,8 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
         type=float,
         nargs=2,
         default=[-1, -1],
-        help="vertical interval to consider, in code coordinates, negative values are interpreted as take the min/max respectively",
+        help="vertical interval to consider, in code coordinates, "
+        "negative values are interpreted as take the min/max respectively",
     )
 
     plotting = add_plotting_group(parser)
@@ -118,9 +125,11 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
         type=Path,
         default=None,
         help="""
-                Configuration file describing a list of plot style and decorations to matched sequentially to each simulation.
+                Configuration file describing a list of plot style and decorations
+                to matched sequentially to each simulation.
                 See plot_config_template.json for a template.
-                If absent, will use ``default_plotting_style`` and cycle through different colors.
+                If absent, will use ``default_plotting_style`` and
+                cycle through different colors.
             """,
     )
 
@@ -191,12 +200,10 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
     if args["z_range"][1] < 0:
         args["z_range"][1] = inf
     assert all(
-        [
-            args["z_range"][0] <= z <= args["z_range"][1]
-            for z in args["hor_slice_levels"]
-        ]
+        args["z_range"][0] <= z <= args["z_range"][1] for z in args["hor_slice_levels"]
     ), (
-        f"hor_slice_levels {args['hor_slice_levels']} aren't contained in z_range {args['z_range']}"
+        f"hor_slice_levels {args['hor_slice_levels']} aren't"
+        f" contained in z_range {args['z_range']}"
     )
     return args
 

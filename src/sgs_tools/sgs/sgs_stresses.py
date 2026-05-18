@@ -1,4 +1,4 @@
-from typing import Sequence
+from collections.abc import Sequence
 
 import xarray as xr
 
@@ -20,12 +20,15 @@ def momentum_stresses(
     the sgs stress: `:math: \tau = \widetile { u v} - \widetile { u} \widetilde{v}`;
     the Reynolds stress: `:math: \widetile { u' v'}`, where the "'" indicates
     fluctuation with respect to the filter, i.e. `:math: u' = u -  \widetile {u}`;
-    the filtered rate-of-strain: `:math: S = (\widetilde{u}_{i,j} + \widetilde{u}_{j,i}) / 2`;
+    the filtered rate-of-strain:
+    `:math: S = (\widetilde{u}_{i,j} + \widetilde{u}_{j,i}) / 2`;
 
     :param vel: input velocity array (on collocated grid)
     :param filter: filtering operator that defines the `:math: \widetilde{}`
-    :param vec_dim: dimension holding the vector components of vel -- will use as the first tensor dimension of the output
-    :param new_dim: new dimension to use fo the second tensor dimension of the output. must not be present in vel
+    :param vec_dim: dimension holding the vector components of vel --
+      will use as the first tensor dimension of the output
+    :param new_dim: new dimension to use fo the second tensor dimension of the output.
+      Must not be present in vel.
     """
 
     assert new_dim not in vel.dims
@@ -39,7 +42,7 @@ def momentum_stresses(
     covariance = tensor_self_outer_product(vel, vec_dim=vec_dim, new_dim=new_dim)
     filtered = filter.filter(covariance)
     filtered.name = "filt_v_stress"
-    filtered.attrs["long_name"] = r"$ \langle  u_i u_j \rangle $"
+    filtered.attrs["long_name"] = r"$ \\langle  u_i u_j \\rangle $"
     output.append(filtered)
 
     # tau
@@ -47,7 +50,7 @@ def momentum_stresses(
     resolved = tensor_self_outer_product(vel_mean, vec_dim=vec_dim, new_dim=new_dim)
     sgs = filtered - resolved
     sgs.name = "sgs_v_stress"
-    sgs.attrs["long_name"] = r"$\tau$"
+    sgs.attrs["long_name"] = r"$\\tau$"
     output.append(sgs)
 
     # reynolds
@@ -58,7 +61,7 @@ def momentum_stresses(
     fluct_cov = tensor_self_outer_product(vel_prime, vec_dim=vec_dim, new_dim=new_dim)
     reynolds = filter.filter(fluct_cov)
     reynolds.name = "Reynolds_stress"
-    reynolds.attrs["long_name"] = r"$ \langle u_i' u_j' \rangle $"
+    reynolds.attrs["long_name"] = r"$ \\langle u_i' u_j' \\rangle $"
     output.append(reynolds)
 
     return chunk_ds(xr.merge(output, compat="no_conflicts"), {vec_dim: -1, new_dim: -1})

@@ -3,11 +3,14 @@ from pathlib import Path
 
 def build_output_fname(base: str | Path, *tags: str, ext: str = ".nc") -> Path:
     """
-    Constructs a standardized output filename by '_'.join a base name and optional ordered list of tags.
+    Constructs a standardized output filename by '_'.join a base name
+     and optional ordered list of tags.
 
-    :param base: The core name of the file, can include directory structure but better not.
-    :param tags: Additional string components to include in the filename (e.g., script tag, version, context).
-                Any empty tags will be discarded, everything else is turned to string via str().
+    :param base: The core name of the file, can include directory structure
+      but better not.
+    :param tags: Additional string components to include in the filename
+      (e.g., script tag, version, context).
+      Any empty tags will be discarded, everything else is turned to string via str().
     :param ext: The file extension to use.
     :return: A Path object representing the constructed filename.
     """

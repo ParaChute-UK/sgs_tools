@@ -1,5 +1,5 @@
+from collections.abc import Hashable, Sequence
 from dataclasses import dataclass
-from typing import Hashable, Sequence
 
 import dask.array as da
 import numpy as np

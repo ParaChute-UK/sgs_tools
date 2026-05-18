@@ -1,5 +1,5 @@
+from collections.abc import Hashable
 from dataclasses import dataclass
-from typing import Dict, Hashable
 
 import numpy as np
 import xarray as xr
@@ -17,7 +17,7 @@ class CoarseGrain:
         notably 'trim' and 'exact'
     """
 
-    window: Dict[Hashable, int]
+    window: dict[Hashable, int]
     bc: str = "exact"
 
     @property
@@ -34,7 +34,7 @@ class CoarseGrain:
         if not field.chunks:
             return field
         else:
-            chunksizes = dict(zip(field.dims, field.chunks))
+            chunksizes = dict(zip(field.dims, field.chunks, strict=False))
             new_chunksizes = {}
             for d in self.window:
                 orig = chunksizes[d][0]
@@ -54,7 +54,8 @@ class CoarseGrain:
 
     def filter(self, field: xr.DataArray) -> xr.DataArray:
         """coarse grain `field`;
-        Note: unlike Filter.filter, here the output size is different from the input size
+        Note: unlike Filter.filter, here the output size is different
+        from the input size
 
         :param field: array to be filtered; must contain all of `filter_dims`
         """

@@ -27,25 +27,26 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
-<link href="_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+  <link href="_static/styles/theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
-    <link rel="stylesheet" type="text/css" href="_static/custom.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx_argparse_cli.css" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
   
   <!-- So that users can add custom icons -->
-  <script src="_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <script defer src="_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
-<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
     <script src="_static/documentation_options.js?v=5929fcd5"></script>
-    <script src="_static/doctools.js?v=9bcbadda"></script>
-    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="_static/copybutton.js?v=f281be69"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'scripts';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Plotting" href="plotting.html" />
@@ -53,20 +54,26 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="0.0.0" />
+  
+    
+    <script src="_static/searchtools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <script src="searchindex.js"></script>
+  
   </head>
-  
-  
-  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
-
+  <body data-default-mode="">
   
   
   <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
   
   <div id="pst-scroll-pixel-helper"></div>
   
   <button type="button" class="btn rounded-pill" id="pst-back-to-top">
     <i class="fa-solid fa-arrow-up"></i>Back to top</button>
-
+  
+  
+  
   
   <dialog id="pst-search-dialog">
     
@@ -95,7 +102,7 @@
 </aside>
 
   
-    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
 <div class="bd-header__inner bd-page-width">
   <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
     <span class="fa-solid fa-bars"></span>
@@ -361,7 +368,14 @@
   </div>
   
     <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item pst-sidebar-collapse"><button id="pst-collapse-sidebar-button" aria-expanded="true" aria-controls="pst-primary-sidebar"><svg class="pst-icon svg-inline--fa" role="img" aria-hidden="true" focusable="false" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+    <path fill="currentColor" d="M3 15.5C2.36232 15.5 1.74874 15.2564 1.28478 14.8189C0.820828 14.3815 0.541576 13.7832 0.504167 13.1467L0.5 13L0.5 3C0.499965 2.36232 0.743605 1.74874 1.18107 1.28478C1.61854 0.820828 2.21676 0.541576 2.85333 0.504167L3 0.5L13 0.5C13.6377 0.499965 14.2513 0.743605 14.7152 1.18107C15.1792 1.61854 15.4584 2.21676 15.4958 2.85333L15.5 3L15.5 13C15.5 13.6377 15.2564 14.2513 14.8189 14.7152C14.3815 15.1792 13.7832 15.4584 13.1467 15.4958L13 15.5L3 15.5ZM3 13.8333L10.5 13.8333L10.5 2.16667L3 2.16667C2.79589 2.16669 2.59889 2.24163 2.44636 2.37726C2.29383 2.5129 2.19638 2.69979 2.1725 2.9025L2.16667 3L2.16667 13C2.16669 13.2041 2.24163 13.4011 2.37726 13.5536C2.5129 13.7062 2.69979 13.8036 2.9025 13.8275L3 13.8333ZM6.65583 10.325L6.5775 10.2558L4.91083 8.58917C4.76735 8.44567 4.68116 8.25476 4.66843 8.05223C4.65569 7.84971 4.71729 7.6495 4.84167 7.48917L4.91083 7.41083L6.5775 5.74417C6.72747 5.59471 6.9287 5.50794 7.14032 5.50148C7.35194 5.49502 7.55809 5.56935 7.7169 5.70937C7.8757 5.8494 7.97525 6.04463 7.99533 6.25539C8.01541 6.46616 7.95451 6.67667 7.825 6.84417L7.75583 6.9225L6.67917 8L7.75583 9.0775C7.89931 9.22099 7.98551 9.41191 7.99824 9.61443C8.01097 9.81695 7.94938 10.0172 7.825 10.1775L7.75583 10.2558C7.61234 10.3993 7.42142 10.4855 7.2189 10.4982C7.01638 10.511 6.81617 10.4494 6.65583 10.325Z"/>
+  </svg>
+  <span class="pst-collapse-sidebar-label">Collapse Sidebar</span>
+  <span class="pst-expand-sidebar-label">Expand Sidebar</span>
+</button></div>
         <div class="sidebar-primary-item">
+
 <nav class="bd-docs-nav bd-links"
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
@@ -427,26 +441,28 @@
 <h2>Post-Processing<a class="headerlink" href="#post-processing" title="Link to this heading">#</a></h2>
 <section id="CS_calculation_genmodel.py">
 <h3>CS_calculation_genmodel.py<a class="headerlink" href="#CS_calculation_genmodel.py" title="Link to this heading">#</a></h3>
-<p>
+<div class="sphinx-argparse-cli-wrap highlight-none notranslate"><div class="highlight"><pre><span></span>
         CS Dynamic Workflow
 
         A unified interface for computing and analyzing dynamic model coefficients.
 
         This tool provides three independent but interoperable sub-commands.
-          - ‘compute’ — compute dynamic coefficient fields
+          - &#39;compute&#39; — compute dynamic coefficient fields
              for selected SGS models and store them as NetCDF output files. (default)
 
-          - ‘vprof’ — compute vertical profiles by reading the coefficient
-             datasets produced by ‘compute’ and writing the results back to disk.
+          - &#39;vprof&#39; — compute vertical profiles by reading the coefficient
+             datasets produced by &#39;compute&#39; and writing the results back to disk.
 
-          - ‘plot’ — generate basic diagnostic plots from the outputs of ‘compute’;
+          - &#39;plot&#39; — generate basic diagnostic plots from the outputs of &#39;compute&#39;;
              plots can be shown interactively or saved to disk.
 
         Can run the sub-command individually or together, provided the necessary
         input or intermediate files exist on disk. If no sub-command is given
-        will run just ‘compute’
-        </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cs_dynamic</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">V</span> <span class="p">{</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">}]</span> <span class="p">[</span><span class="o">--</span><span class="n">h_resolution</span> <span class="n">H_RESOLUTION</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">t_range</span> <span class="n">T_RANGE</span> <span class="n">T_RANGE</span><span class="p">]</span>
+        will run just &#39;compute&#39;
+        
+</pre></div>
+</div>
+<div class="sphinx-argparse-cli-wrap highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cs_dynamic</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">V</span> <span class="p">{</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">}]</span> <span class="p">[</span><span class="o">--</span><span class="n">h_resolution</span> <span class="n">H_RESOLUTION</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">t_range</span> <span class="n">T_RANGE</span> <span class="n">T_RANGE</span><span class="p">]</span>
            <span class="p">[</span><span class="o">--</span><span class="n">z_range</span> <span class="n">Z_RANGE</span> <span class="n">Z_RANGE</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">v</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">fname_suffix</span> <span class="n">FNAME_SUFFIX</span><span class="p">]</span>
            <span class="p">[</span><span class="o">--</span><span class="n">z_chunk_size</span> <span class="n">Z_CHUNK_SIZE</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">t_chunk_size</span> <span class="n">T_CHUNK_SIZE</span><span class="p">]</span>
            <span class="p">[</span><span class="o">--</span><span class="n">h_chunk_size</span> <span class="n">H_CHUNK_SIZE</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">mem_limit_MB</span> <span class="n">MEM_LIMIT_MB</span><span class="p">]</span>
@@ -483,8 +499,8 @@
 <li><p id="cs_dynamic-input_files"><a class="reference internal" href="#cs_dynamic-input_files" title="cs_dynamic input_files"><strong><code class="docutils literal notranslate"><span class="pre">input_files</span></code></strong></a> - <p>Location of NetCDF diagnostic file(s).
 Recognizes glob patterns and walks directory trees, e.g. <code class="docutils literal notranslate"><span class="pre">'./my_file_p[br]*nc'</span></code>
 All files in a glob pattern should belong to the same simulation.</p>
- (default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
-<li><p id="cs_dynamic-input_format"><a class="reference internal" href="#cs_dynamic-input_format" title="cs_dynamic input_format"><strong><code class="docutils literal notranslate"><span class="pre">input_format</span></code></strong></a> - Type of <code class="docutils literal notranslate"><span class="pre">'input_files'</span></code>. Only support different NetCDF flavours from various production codes. <code class="docutils literal notranslate"><span class="pre">'sgs'</span></code> refers to files produced by sgs_tools. (default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
+</p></li>
+<li><p id="cs_dynamic-input_format"><a class="reference internal" href="#cs_dynamic-input_format" title="cs_dynamic input_format"><strong><code class="docutils literal notranslate"><span class="pre">input_format</span></code></strong></a> - Type of <code class="docutils literal notranslate"><span class="pre">'input_files'</span></code>. Only support different NetCDF flavours from various production codes. <code class="docutils literal notranslate"><span class="pre">'sgs'</span></code> refers to files produced by sgs_tools.</p></li>
 <li><p id="cs_dynamic---h_resolution"><a class="reference internal" href="#cs_dynamic---h_resolution" title="cs_dynamic --h_resolution"><strong><code class="docutils literal notranslate"><span class="pre">--h_resolution</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">H_RESOLUTION</span></code> - <p>horizontal resolution in meters.
 <em>ONLY</em> used for UM ideal simulations(will use to overwrite horizontal coordinates).</p>
  (default: <code class="docutils literal notranslate"><span class="pre">0</span></code>)</p></li>
@@ -499,7 +515,7 @@ All files in a glob pattern should belong to the same simulation.</p>
 <li><p id="cs_dynamic-output_path"><a class="reference internal" href="#cs_dynamic-output_path" title="cs_dynamic output_path"><strong><code class="docutils literal notranslate"><span class="pre">output_path</span></code></strong></a> - <p>Output directory, where to write netcdf output files.
 Will create/overwrite existing file and
 create any missing intermediate directories</p>
- (default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
+</p></li>
 <li><p id="cs_dynamic---fname_suffix"><a class="reference internal" href="#cs_dynamic---fname_suffix" title="cs_dynamic --fname_suffix"><strong><code class="docutils literal notranslate"><span class="pre">--fname_suffix</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">FNAME_SUFFIX</span></code> - Optional suffix appended to output filenames. Final pattern: <a href="#id1"><span class="problematic" id="id2">``</span></a>{model_name}``_``{fname_suffix}``_pp.nc (default: <code class="docutils literal notranslate"></code>)</p></li>
 </ul>
 </section>
@@ -508,10 +524,10 @@ create any missing intermediate directories</p>
 <ul class="simple">
 <li><p id="cs_dynamic---z_chunk_size"><a class="reference internal" href="#cs_dynamic---z_chunk_size" title="cs_dynamic --z_chunk_size"><strong><code class="docutils literal notranslate"><span class="pre">--z_chunk_size</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">Z_CHUNK_SIZE</span></code> - <p>Size of dask array chunks in the vertical direction. Should divide the total number of levels.
 Smaller size leads to smaller memory footprint, but may penalize walltime.</p>
- (default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
+</p></li>
 <li><p id="cs_dynamic---t_chunk_size"><a class="reference internal" href="#cs_dynamic---t_chunk_size" title="cs_dynamic --t_chunk_size"><strong><code class="docutils literal notranslate"><span class="pre">--t_chunk_size</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">T_CHUNK_SIZE</span></code> - <p>Size of dask array chunks in the time direction. Should divide the total number time snapshots.
 Smaller size leads to smaller memory footprint, but may penalize walltime.</p>
- (default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
+</p></li>
 <li><p id="cs_dynamic---h_chunk_size"><a class="reference internal" href="#cs_dynamic---h_chunk_size" title="cs_dynamic --h_chunk_size"><strong><code class="docutils literal notranslate"><span class="pre">--h_chunk_size</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">H_CHUNK_SIZE</span></code> - <p>Size of dask array chunks in the <code class="docutils literal notranslate"><span class="pre">&quot;horizontal&quot;</span></code> directions. Should divide into the domain size.
 Smaller size leads to smaller memory footprint, but can penalize walltime heavily (building DAGs).
 Default -1 means don’t chunk, keep dimesions together – useful for horizontal filtering.
@@ -521,7 +537,7 @@ If it doesn’t fit in memory try 1/2 to 1/4 of domain size.</p>
 If on a dask cluster it is
 May not be fully enforced by this CLI.
 Smaller size leads to smaller memory footprint, but may penalize walltime.</p>
- (default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
+</p></li>
 </ul>
 </section>
 <section id="cs_dynamic-Compute-dynamic-coefficients-fields">
@@ -539,7 +555,7 @@ Smaller size leads to smaller memory footprint, but may penalize walltime.</p>
 <p>Generate basic diagnostic plots from the compute output. Plots can be shown interactively or saved to disk.</p>
 <ul class="simple">
 <li><p id="cs_dynamic---plot_show"><a class="reference internal" href="#cs_dynamic---plot_show" title="cs_dynamic --plot_show"><strong><code class="docutils literal notranslate"><span class="pre">--plot_show</span></code></strong></a> - flag to display generated plots</p></li>
-<li><p id="cs_dynamic---plot_path"><a class="reference internal" href="#cs_dynamic---plot_path" title="cs_dynamic --plot_path"><strong><code class="docutils literal notranslate"><span class="pre">--plot_path</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">PLOT_PATH</span></code> - output directory, for storing generated plots (default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
+<li><p id="cs_dynamic---plot_path"><a class="reference internal" href="#cs_dynamic---plot_path" title="cs_dynamic --plot_path"><strong><code class="docutils literal notranslate"><span class="pre">--plot_path</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">PLOT_PATH</span></code> - output directory, for storing generated plots</p></li>
 </ul>
 </section>
 </section>
@@ -547,7 +563,7 @@ Smaller size leads to smaller memory footprint, but may penalize walltime.</p>
 <h3>post_process.py<a class="headerlink" href="#post_process.py" title="Link to this heading">#</a></h3>
 <p>Post process a simulation and save result as NetCDF files
                 </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">post_process</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">V</span> <span class="p">{</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">}]</span> <span class="p">[</span><span class="o">--</span><span class="n">h_resolution</span> <span class="n">H_RESOLUTION</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">t_range</span> <span class="n">T_RANGE</span> <span class="n">T_RANGE</span><span class="p">]</span>
+<div class="sphinx-argparse-cli-wrap highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">post_process</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">V</span> <span class="p">{</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">}]</span> <span class="p">[</span><span class="o">--</span><span class="n">h_resolution</span> <span class="n">H_RESOLUTION</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">t_range</span> <span class="n">T_RANGE</span> <span class="n">T_RANGE</span><span class="p">]</span>
              <span class="p">[</span><span class="o">--</span><span class="n">z_range</span> <span class="n">Z_RANGE</span> <span class="n">Z_RANGE</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">v</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">overwrite_existing</span><span class="p">]</span>
              <span class="p">[</span><span class="o">--</span><span class="n">fname_suffix</span> <span class="n">FNAME_SUFFIX</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">hdims</span> <span class="n">HDIMS</span> <span class="p">[</span><span class="n">HDIMS</span> <span class="o">...</span><span class="p">]]</span> <span class="p">[</span><span class="o">--</span><span class="n">vertical_profiles</span><span class="p">]</span>
              <span class="p">[</span><span class="o">--</span><span class="n">vprofile_fields</span> <span class="n">VPROFILE_FIELDS</span> <span class="p">[</span><span class="n">VPROFILE_FIELDS</span> <span class="o">...</span><span class="p">]]</span>
@@ -587,8 +603,8 @@ Smaller size leads to smaller memory footprint, but may penalize walltime.</p>
 <li><p id="post_process-input_files"><a class="reference internal" href="#post_process-input_files" title="post_process input_files"><strong><code class="docutils literal notranslate"><span class="pre">input_files</span></code></strong></a> - <p>Location of NetCDF diagnostic file(s).
 Recognizes glob patterns and walks directory trees, e.g. <code class="docutils literal notranslate"><span class="pre">'./my_file_p[br]*nc'</span></code>
 All files in a glob pattern should belong to the same simulation.</p>
- (default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
-<li><p id="post_process-input_format"><a class="reference internal" href="#post_process-input_format" title="post_process input_format"><strong><code class="docutils literal notranslate"><span class="pre">input_format</span></code></strong></a> - Type of <code class="docutils literal notranslate"><span class="pre">'input_files'</span></code>. Only support different NetCDF flavours from various production codes. <code class="docutils literal notranslate"><span class="pre">'sgs'</span></code> refers to files produced by sgs_tools. (default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
+</p></li>
+<li><p id="post_process-input_format"><a class="reference internal" href="#post_process-input_format" title="post_process input_format"><strong><code class="docutils literal notranslate"><span class="pre">input_format</span></code></strong></a> - Type of <code class="docutils literal notranslate"><span class="pre">'input_files'</span></code>. Only support different NetCDF flavours from various production codes. <code class="docutils literal notranslate"><span class="pre">'sgs'</span></code> refers to files produced by sgs_tools.</p></li>
 <li><p id="post_process---h_resolution"><a class="reference internal" href="#post_process---h_resolution" title="post_process --h_resolution"><strong><code class="docutils literal notranslate"><span class="pre">--h_resolution</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">H_RESOLUTION</span></code> - <p>horizontal resolution in meters.
 <em>ONLY</em> used for UM ideal simulations(will use to overwrite horizontal coordinates).</p>
  (default: <code class="docutils literal notranslate"><span class="pre">0</span></code>)</p></li>
@@ -602,7 +618,7 @@ All files in a glob pattern should belong to the same simulation.</p>
 <li><p id="post_process--v"><span id="post_process---verbosity"></span><a class="reference internal" href="#post_process--v" title="post_process -v"><strong><code class="docutils literal notranslate"><span class="pre">-v</span></code></strong></a>, <a class="reference internal" href="#post_process---verbosity" title="post_process --verbosity"><strong><code class="docutils literal notranslate"><span class="pre">--verbosity</span></code></strong></a> - verbosity level. Increase by -v , -vv, etc. (default: <code class="docutils literal notranslate"><span class="pre">0</span></code>)</p></li>
 <li><p id="post_process-output_path"><a class="reference internal" href="#post_process-output_path" title="post_process output_path"><strong><code class="docutils literal notranslate"><span class="pre">output_path</span></code></strong></a> - <p>output directory, where to store post-processed results
 will create any missing intermediate directories</p>
- (default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
+</p></li>
 <li><p id="post_process---overwrite_existing"><a class="reference internal" href="#post_process---overwrite_existing" title="post_process --overwrite_existing"><strong><code class="docutils literal notranslate"><span class="pre">--overwrite_existing</span></code></strong></a> - behaviour if diagnostic file already exists. default: skip</p></li>
 <li><p id="post_process---fname_suffix"><a class="reference internal" href="#post_process---fname_suffix" title="post_process --fname_suffix"><strong><code class="docutils literal notranslate"><span class="pre">--fname_suffix</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">FNAME_SUFFIX</span></code> - Optional suffix appended to output filenames. Final pattern: <code class="docutils literal notranslate"><span class="pre">{base_name}``_``{fname_suffix}``_``{statistics_tag}</span></code>.nc, where <code class="docutils literal notranslate"><span class="pre">base_name</span></code> is one of <code class="docutils literal notranslate"><span class="pre">vprofile_fname_out``|</span> <span class="pre">``hspectra_fname_out</span></code> | <code class="docutils literal notranslate"><span class="pre">aniso_fname_out</span></code> (default: <code class="docutils literal notranslate"></code>)</p></li>
 </ul>
@@ -663,10 +679,10 @@ Will combine all box scales and ignore entries which are less than <cite>2 delta
 <ul class="simple">
 <li><p id="post_process---z_chunk_size"><a class="reference internal" href="#post_process---z_chunk_size" title="post_process --z_chunk_size"><strong><code class="docutils literal notranslate"><span class="pre">--z_chunk_size</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">Z_CHUNK_SIZE</span></code> - <p>Size of dask array chunks in the vertical direction. Should divide the total number of levels.
 Smaller size leads to smaller memory footprint, but may penalize walltime.</p>
- (default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
+</p></li>
 <li><p id="post_process---t_chunk_size"><a class="reference internal" href="#post_process---t_chunk_size" title="post_process --t_chunk_size"><strong><code class="docutils literal notranslate"><span class="pre">--t_chunk_size</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">T_CHUNK_SIZE</span></code> - <p>Size of dask array chunks in the time direction. Should divide the total number time snapshots.
 Smaller size leads to smaller memory footprint, but may penalize walltime.</p>
- (default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
+</p></li>
 <li><p id="post_process---h_chunk_size"><a class="reference internal" href="#post_process---h_chunk_size" title="post_process --h_chunk_size"><strong><code class="docutils literal notranslate"><span class="pre">--h_chunk_size</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">H_CHUNK_SIZE</span></code> - <p>Size of dask array chunks in the <code class="docutils literal notranslate"><span class="pre">&quot;horizontal&quot;</span></code> directions. Should divide into the domain size.
 Smaller size leads to smaller memory footprint, but can penalize walltime heavily (building DAGs).
 Default -1 means don’t chunk, keep dimesions together – useful for horizontal filtering.
@@ -676,7 +692,7 @@ If it doesn’t fit in memory try 1/2 to 1/4 of domain size.</p>
 If on a dask cluster it is
 May not be fully enforced by this CLI.
 Smaller size leads to smaller memory footprint, but may penalize walltime.</p>
- (default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
+</p></li>
 </ul>
 </section>
 </section>
@@ -688,7 +704,7 @@ Smaller size leads to smaller memory footprint, but may penalize walltime.</p>
                     Best-suited to one-parameter suite of simulations,
                     but can handle several varying parameters through plot_style_file
                 </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sim_comparison</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">V</span> <span class="p">{</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">}]</span> <span class="p">[</span><span class="o">--</span><span class="n">h_resolution</span> <span class="n">H_RESOLUTION</span> <span class="p">[</span><span class="n">H_RESOLUTION</span> <span class="o">...</span><span class="p">]]</span>
+<div class="sphinx-argparse-cli-wrap highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sim_comparison</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">V</span> <span class="p">{</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">}]</span> <span class="p">[</span><span class="o">--</span><span class="n">h_resolution</span> <span class="n">H_RESOLUTION</span> <span class="p">[</span><span class="n">H_RESOLUTION</span> <span class="o">...</span><span class="p">]]</span>
                <span class="p">[</span><span class="o">--</span><span class="n">times</span> <span class="p">[</span><span class="n">TIMES</span> <span class="o">...</span><span class="p">]]</span> <span class="p">[</span><span class="o">--</span><span class="n">z_range</span> <span class="n">Z_RANGE</span> <span class="n">Z_RANGE</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">plot_show</span><span class="p">]</span>
                <span class="p">[</span><span class="o">--</span><span class="n">plot_path</span> <span class="n">PLOT_PATH</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">plot_style_file</span> <span class="n">PLOT_STYLE_FILE</span><span class="p">]</span>
                <span class="p">[</span><span class="o">--</span><span class="n">hor_slice_levels</span> <span class="p">[</span><span class="n">HOR_SLICE_LEVELS</span> <span class="o">...</span><span class="p">]]</span> <span class="p">[</span><span class="o">--</span><span class="n">skip_vert_profiles</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">verbose</span><span class="p">]</span>
@@ -717,8 +733,8 @@ Smaller size leads to smaller memory footprint, but may penalize walltime.</p>
 Recognizes glob patterns and walks directory trees, e.g. <code class="docutils literal notranslate"><span class="pre">'./my_file_p[br]*nc'</span></code>
 Can have multiple files per simulation, but only one glob pattern per simulation.
 All files in a glob pattern should belong to the same simulation.</p>
- (default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
-<li><p id="sim_comparison-input_format"><a class="reference internal" href="#sim_comparison-input_format" title="sim_comparison input_format"><strong><code class="docutils literal notranslate"><span class="pre">input_format</span></code></strong></a> - Type of <code class="docutils literal notranslate"><span class="pre">'input_files'</span></code>. Only support different NetCDF flavours from various production codes. <code class="docutils literal notranslate"><span class="pre">'sgs'</span></code> refers to files produced by sgs_tools. All simulations must have the same format (default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
+</p></li>
+<li><p id="sim_comparison-input_format"><a class="reference internal" href="#sim_comparison-input_format" title="sim_comparison input_format"><strong><code class="docutils literal notranslate"><span class="pre">input_format</span></code></strong></a> - Type of <code class="docutils literal notranslate"><span class="pre">'input_files'</span></code>. Only support different NetCDF flavours from various production codes. <code class="docutils literal notranslate"><span class="pre">'sgs'</span></code> refers to files produced by sgs_tools. All simulations must have the same format</p></li>
 <li><p id="sim_comparison---h_resolution"><a class="reference internal" href="#sim_comparison---h_resolution" title="sim_comparison --h_resolution"><strong><code class="docutils literal notranslate"><span class="pre">--h_resolution</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">H_RESOLUTION</span></code> - <p>horizontal resolution in meters.
 <em>ONLY</em> used for UM ideal simulations(will use to overwrite horizontal coordinates).
 If a single resolution is given, assume it applies to all input files.
@@ -735,11 +751,11 @@ default (which is empty) means the full data range at 1h intervals.</p>
 <h4>Plotting parameters<a class="headerlink" href="#sim_comparison-Plotting-parameters" title="Link to this heading">#</a></h4>
 <ul class="simple">
 <li><p id="sim_comparison---plot_show"><a class="reference internal" href="#sim_comparison---plot_show" title="sim_comparison --plot_show"><strong><code class="docutils literal notranslate"><span class="pre">--plot_show</span></code></strong></a> - flag to display generated plots</p></li>
-<li><p id="sim_comparison---plot_path"><a class="reference internal" href="#sim_comparison---plot_path" title="sim_comparison --plot_path"><strong><code class="docutils literal notranslate"><span class="pre">--plot_path</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">PLOT_PATH</span></code> - output directory, for storing generated plots (default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
+<li><p id="sim_comparison---plot_path"><a class="reference internal" href="#sim_comparison---plot_path" title="sim_comparison --plot_path"><strong><code class="docutils literal notranslate"><span class="pre">--plot_path</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">PLOT_PATH</span></code> - output directory, for storing generated plots</p></li>
 <li><p id="sim_comparison---plot_style_file"><a class="reference internal" href="#sim_comparison---plot_style_file" title="sim_comparison --plot_style_file"><strong><code class="docutils literal notranslate"><span class="pre">--plot_style_file</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">PLOT_STYLE_FILE</span></code> - <p>Configuration file describing a list of plot style and decorations to matched sequentially to each simulation.
 See plot_config_template.json for a template.
 If absent, will use <code class="docutils literal notranslate"><span class="pre">default_plotting_style</span></code> and cycle through different colors.</p>
- (default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
+</p></li>
 <li><p id="sim_comparison---hor_slice_levels"><a class="reference internal" href="#sim_comparison---hor_slice_levels" title="sim_comparison --hor_slice_levels"><strong><code class="docutils literal notranslate"><span class="pre">--hor_slice_levels</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">HOR_SLICE_LEVELS</span></code> - <p>Vertical height at which to plot horizontal slices.
 If not given will omit these plots.</p>
  (default: <code class="docutils literal notranslate"><span class="pre">[]</span></code>)</p></li>
@@ -751,10 +767,10 @@ If not given will omit these plots.</p>
 <ul class="simple">
 <li><p id="sim_comparison---z_chunk_size"><a class="reference internal" href="#sim_comparison---z_chunk_size" title="sim_comparison --z_chunk_size"><strong><code class="docutils literal notranslate"><span class="pre">--z_chunk_size</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">Z_CHUNK_SIZE</span></code> - <p>Size of dask array chunks in the vertical direction. Should divide the total number of levels.
 Smaller size leads to smaller memory footprint, but may penalize walltime.</p>
- (default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
+</p></li>
 <li><p id="sim_comparison---t_chunk_size"><a class="reference internal" href="#sim_comparison---t_chunk_size" title="sim_comparison --t_chunk_size"><strong><code class="docutils literal notranslate"><span class="pre">--t_chunk_size</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">T_CHUNK_SIZE</span></code> - <p>Size of dask array chunks in the time direction. Should divide the total number time snapshots.
 Smaller size leads to smaller memory footprint, but may penalize walltime.</p>
- (default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
+</p></li>
 <li><p id="sim_comparison---h_chunk_size"><a class="reference internal" href="#sim_comparison---h_chunk_size" title="sim_comparison --h_chunk_size"><strong><code class="docutils literal notranslate"><span class="pre">--h_chunk_size</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">H_CHUNK_SIZE</span></code> - <p>Size of dask array chunks in the <code class="docutils literal notranslate"><span class="pre">&quot;horizontal&quot;</span></code> directions. Should divide into the domain size.
 Smaller size leads to smaller memory footprint, but can penalize walltime heavily (building DAGs).
 Default -1 means don’t chunk, keep dimesions together – useful for horizontal filtering.
@@ -764,7 +780,7 @@ If it doesn’t fit in memory try 1/2 to 1/4 of domain size.</p>
 If on a dask cluster it is
 May not be fully enforced by this CLI.
 Smaller size leads to smaller memory footprint, but may penalize walltime.</p>
- (default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
+</p></li>
 </ul>
 </section>
 </section>
@@ -776,7 +792,7 @@ Smaller size leads to smaller memory footprint, but may penalize walltime.</p>
                     Best-suited to one-parameter suite of simulations,
                     but can handle several varying parameters through plot_style_file
                 </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ref_comparison</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">V</span> <span class="p">{</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">}]</span> <span class="p">[</span><span class="o">--</span><span class="n">h_resolution</span> <span class="n">H_RESOLUTION</span> <span class="p">[</span><span class="n">H_RESOLUTION</span> <span class="o">...</span><span class="p">]]</span>
+<div class="sphinx-argparse-cli-wrap highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ref_comparison</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">V</span> <span class="p">{</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">}]</span> <span class="p">[</span><span class="o">--</span><span class="n">h_resolution</span> <span class="n">H_RESOLUTION</span> <span class="p">[</span><span class="n">H_RESOLUTION</span> <span class="o">...</span><span class="p">]]</span>
                <span class="p">[</span><span class="o">--</span><span class="n">times</span> <span class="p">[</span><span class="n">TIMES</span> <span class="o">...</span><span class="p">]]</span> <span class="p">[</span><span class="o">--</span><span class="n">z_range</span> <span class="n">Z_RANGE</span> <span class="n">Z_RANGE</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">plot_show</span><span class="p">]</span>
                <span class="p">[</span><span class="o">--</span><span class="n">plot_path</span> <span class="n">PLOT_PATH</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">plot_style_file</span> <span class="n">PLOT_STYLE_FILE</span><span class="p">]</span>
                <span class="p">[</span><span class="o">--</span><span class="n">hor_slice_levels</span> <span class="p">[</span><span class="n">HOR_SLICE_LEVELS</span> <span class="o">...</span><span class="p">]]</span> <span class="p">[</span><span class="o">--</span><span class="n">skip_vert_profiles</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">verbose</span><span class="p">]</span>
@@ -805,13 +821,13 @@ Smaller size leads to smaller memory footprint, but may penalize walltime.</p>
 Recognizes glob patterns and walks directory trees, e.g. <code class="docutils literal notranslate"><span class="pre">'./my_file_p[br]*nc'</span></code>
 Can have multiple files, but only one glob pattern.
 (All files in a glob pattern should belong to the simulation).</p>
- (default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
+</p></li>
 <li><p id="ref_comparison-reference"><a class="reference internal" href="#ref_comparison-reference" title="ref_comparison reference"><strong><code class="docutils literal notranslate"><span class="pre">reference</span></code></strong></a> - <p>Location of reference simulation outputs – UM NetCDF diagnostic files.
 Recognizes glob patterns and walks directory trees, e.g. <code class="docutils literal notranslate"><span class="pre">'./my_file_p[br]*nc'</span></code>
 Can have multiple files, but only one glob pattern.
 (All files in a glob pattern should belong to the simulation).</p>
- (default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
-<li><p id="ref_comparison-input_format"><a class="reference internal" href="#ref_comparison-input_format" title="ref_comparison input_format"><strong><code class="docutils literal notranslate"><span class="pre">input_format</span></code></strong></a> - Type of <code class="docutils literal notranslate"><span class="pre">'input_files'</span></code>. Only support different NetCDF flavours from various production codes. <code class="docutils literal notranslate"><span class="pre">'sgs'</span></code> refers to files produced by sgs_tools. All simulations must have the same format (default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
+</p></li>
+<li><p id="ref_comparison-input_format"><a class="reference internal" href="#ref_comparison-input_format" title="ref_comparison input_format"><strong><code class="docutils literal notranslate"><span class="pre">input_format</span></code></strong></a> - Type of <code class="docutils literal notranslate"><span class="pre">'input_files'</span></code>. Only support different NetCDF flavours from various production codes. <code class="docutils literal notranslate"><span class="pre">'sgs'</span></code> refers to files produced by sgs_tools. All simulations must have the same format</p></li>
 <li><p id="ref_comparison---h_resolution"><a class="reference internal" href="#ref_comparison---h_resolution" title="ref_comparison --h_resolution"><strong><code class="docutils literal notranslate"><span class="pre">--h_resolution</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">H_RESOLUTION</span></code> - <p>horizontal resolution in meters.
 <em>ONLY</em> used for UM ideal simulations(will use to overwrite horizontal coordinates).
 If a single resolution is given, assume it applies to all input files.
@@ -828,11 +844,11 @@ default (which is empty) means the full data range at 1h intervals.</p>
 <h4>Plotting parameters<a class="headerlink" href="#ref_comparison-Plotting-parameters" title="Link to this heading">#</a></h4>
 <ul class="simple">
 <li><p id="ref_comparison---plot_show"><a class="reference internal" href="#ref_comparison---plot_show" title="ref_comparison --plot_show"><strong><code class="docutils literal notranslate"><span class="pre">--plot_show</span></code></strong></a> - flag to display generated plots</p></li>
-<li><p id="ref_comparison---plot_path"><a class="reference internal" href="#ref_comparison---plot_path" title="ref_comparison --plot_path"><strong><code class="docutils literal notranslate"><span class="pre">--plot_path</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">PLOT_PATH</span></code> - output directory, for storing generated plots (default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
+<li><p id="ref_comparison---plot_path"><a class="reference internal" href="#ref_comparison---plot_path" title="ref_comparison --plot_path"><strong><code class="docutils literal notranslate"><span class="pre">--plot_path</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">PLOT_PATH</span></code> - output directory, for storing generated plots</p></li>
 <li><p id="ref_comparison---plot_style_file"><a class="reference internal" href="#ref_comparison---plot_style_file" title="ref_comparison --plot_style_file"><strong><code class="docutils literal notranslate"><span class="pre">--plot_style_file</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">PLOT_STYLE_FILE</span></code> - <p>Configuration file describing a list of plot style and decorations to matched sequentially to each simulation.
 See plot_config_template.json for a template.
 If absent, will use <code class="docutils literal notranslate"><span class="pre">default_plotting_style</span></code> and cycle through different colors.</p>
- (default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
+</p></li>
 <li><p id="ref_comparison---hor_slice_levels"><a class="reference internal" href="#ref_comparison---hor_slice_levels" title="ref_comparison --hor_slice_levels"><strong><code class="docutils literal notranslate"><span class="pre">--hor_slice_levels</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">HOR_SLICE_LEVELS</span></code> - <p>Vertical height at which to plot horizontal slices.
 If not given will omit these plots.</p>
  (default: <code class="docutils literal notranslate"><span class="pre">[]</span></code>)</p></li>
@@ -844,10 +860,10 @@ If not given will omit these plots.</p>
 <ul class="simple">
 <li><p id="ref_comparison---z_chunk_size"><a class="reference internal" href="#ref_comparison---z_chunk_size" title="ref_comparison --z_chunk_size"><strong><code class="docutils literal notranslate"><span class="pre">--z_chunk_size</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">Z_CHUNK_SIZE</span></code> - <p>Size of dask array chunks in the vertical direction. Should divide the total number of levels.
 Smaller size leads to smaller memory footprint, but may penalize walltime.</p>
- (default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
+</p></li>
 <li><p id="ref_comparison---t_chunk_size"><a class="reference internal" href="#ref_comparison---t_chunk_size" title="ref_comparison --t_chunk_size"><strong><code class="docutils literal notranslate"><span class="pre">--t_chunk_size</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">T_CHUNK_SIZE</span></code> - <p>Size of dask array chunks in the time direction. Should divide the total number time snapshots.
 Smaller size leads to smaller memory footprint, but may penalize walltime.</p>
- (default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
+</p></li>
 <li><p id="ref_comparison---h_chunk_size"><a class="reference internal" href="#ref_comparison---h_chunk_size" title="ref_comparison --h_chunk_size"><strong><code class="docutils literal notranslate"><span class="pre">--h_chunk_size</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">H_CHUNK_SIZE</span></code> - <p>Size of dask array chunks in the <code class="docutils literal notranslate"><span class="pre">&quot;horizontal&quot;</span></code> directions. Should divide into the domain size.
 Smaller size leads to smaller memory footprint, but can penalize walltime heavily (building DAGs).
 Default -1 means don’t chunk, keep dimesions together – useful for horizontal filtering.
@@ -857,7 +873,7 @@ If it doesn’t fit in memory try 1/2 to 1/4 of domain size.</p>
 If on a dask cluster it is
 May not be fully enforced by this CLI.
 Smaller size leads to smaller memory footprint, but may penalize walltime.</p>
- (default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
+</p></li>
 </ul>
 </section>
 </section>
@@ -867,15 +883,15 @@ Smaller size leads to smaller memory footprint, but may penalize walltime.</p>
 <section id="make_UM_level_sets.py">
 <h3>make_UM_level_sets.py<a class="headerlink" href="#make_UM_level_sets.py" title="Link to this heading">#</a></h3>
 <p>Create a constant level set namelist for the UM from given model top height and number of levels</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">um_levels</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">V</span> <span class="p">{</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">}]</span> <span class="n">output_file</span> <span class="n">z_top_of_model</span> <span class="n">n_z_rho</span>
+<div class="sphinx-argparse-cli-wrap highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">um_levels</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">V</span> <span class="p">{</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">}]</span> <span class="n">output_file</span> <span class="n">z_top_of_model</span> <span class="n">n_z_rho</span>
 </pre></div>
 </div>
 <section id="um_levels-positional-arguments">
 <h4>positional arguments<a class="headerlink" href="#um_levels-positional-arguments" title="Link to this heading">#</a></h4>
 <ul class="simple">
-<li><p id="um_levels-output_file"><a class="reference internal" href="#um_levels-output_file" title="um_levels output_file"><strong><code class="docutils literal notranslate"><span class="pre">output_file</span></code></strong></a> - output path, will create/overwrite existing file and create any missing intermediate directories (default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
-<li><p id="um_levels-z_top_of_model"><a class="reference internal" href="#um_levels-z_top_of_model" title="um_levels z_top_of_model"><strong><code class="docutils literal notranslate"><span class="pre">z_top_of_model</span></code></strong></a> - top of model a.k.a. last theta level in meters (default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
-<li><p id="um_levels-n_z_rho"><a class="reference internal" href="#um_levels-n_z_rho" title="um_levels n_z_rho"><strong><code class="docutils literal notranslate"><span class="pre">n_z_rho</span></code></strong></a> - number of rho-levels, will have one more theta level (default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
+<li><p id="um_levels-output_file"><a class="reference internal" href="#um_levels-output_file" title="um_levels output_file"><strong><code class="docutils literal notranslate"><span class="pre">output_file</span></code></strong></a> - output path, will create/overwrite existing file and create any missing intermediate directories</p></li>
+<li><p id="um_levels-z_top_of_model"><a class="reference internal" href="#um_levels-z_top_of_model" title="um_levels z_top_of_model"><strong><code class="docutils literal notranslate"><span class="pre">z_top_of_model</span></code></strong></a> - top of model a.k.a. last theta level in meters</p></li>
+<li><p id="um_levels-n_z_rho"><a class="reference internal" href="#um_levels-n_z_rho" title="um_levels n_z_rho"><strong><code class="docutils literal notranslate"><span class="pre">n_z_rho</span></code></strong></a> - number of rho-levels, will have one more theta level</p></li>
 </ul>
 </section>
 <section id="um_levels-options">
@@ -939,8 +955,8 @@ Smaller size leads to smaller memory footprint, but may penalize walltime.</p>
     class="page-toc tocsection onthispage">
     <i class="fa-solid fa-list"></i> On this page
   </div>
-  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
-    <ul class="visible nav section-nav flex-column">
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#post-processing">Post-Processing</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#CS_calculation_genmodel.py">CS_calculation_genmodel.py</a><ul class="nav section-nav flex-column">
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#cs_dynamic-positional-arguments">positional arguments</a></li>
@@ -995,13 +1011,13 @@ Smaller size leads to smaller memory footprint, but may penalize walltime.</p>
   </nav></div>
 
   <div class="sidebar-secondary-item">
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="_sources/scripts.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div></div>
+
+  <div class="tocsection sourcelink">
+    <a href="_sources/scripts.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
 
 </div></div>
               
@@ -1016,8 +1032,8 @@ Smaller size leads to smaller memory footprint, but may penalize walltime.</p>
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
-<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+  <script defer src="_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -1037,7 +1053,7 @@ Smaller size leads to smaller memory footprint, but may penalize walltime.</p>
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.0.4.
     <br/>
   </p>
 </div>
@@ -1051,7 +1067,7 @@ Smaller size leads to smaller memory footprint, but may penalize walltime.</p>
         <div class="footer-item">
 <p class="theme-version">
   <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.17.1.
 </p></div>
       
     </div>

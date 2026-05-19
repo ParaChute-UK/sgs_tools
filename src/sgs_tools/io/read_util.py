@@ -1,3 +1,4 @@
+import glob
 from collections.abc import Iterable
 from pathlib import Path
 
@@ -10,11 +11,8 @@ def parse_fname_pattern(fname_pattern: str | Path) -> list[Path]:
     return a list of concrete Paths
     """
     print(f"Parsing {fname_pattern}")
-    fpattern = Path(fname_pattern)
     # return list because of incomplete typehints of xr.open_mfdataset
-    return list(
-        Path(fpattern.root).glob(str(Path(*fpattern.parts[fpattern.is_absolute() :])))
-    )
+    return [Path(p) for p in glob.glob(str(fname_pattern), recursive=True)]
 
 
 def standardize_varnames(

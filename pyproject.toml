@@ -64,6 +64,7 @@ classifiers = [
   pydata-sphinx-theme = "*"
   sphinx_copybutton = "*"
   sphinxemoji="*"
+  poethepoet = "^0.46.0"
 
 
 [tool.poetry.scripts]

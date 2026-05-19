@@ -4,10 +4,10 @@ import sgs_tools.scripts.CS_calculation_genmodel as cs_gen
 
 
 @pytest.fixture
-def test_args(output_dir):
+def test_args(output_dir, testing_rootdir):
     output = output_dir
     return [
-        "test/test_script/df667_800m_L63_Slicea_p*.nc",
+        str(testing_rootdir / "test_script/df667_800m_L63_Slicea_p*.nc"),
         "um",
         str(output),
         "--h_resolution",

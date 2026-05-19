@@ -5,9 +5,9 @@ from sgs_tools.scripts.fname_out import build_output_fname
 
 
 @pytest.fixture
-def test_args(output_dir):
+def test_args(output_dir, testing_rootdir):
     return [
-        "test/test_script/df667_800m_L63_Slicea_pr.nc",
+        str(testing_rootdir / "test_script/df667_800m_L63_Slicea_pr.nc"),
         "um",
         str(output_dir),
         "--fname_suffix",

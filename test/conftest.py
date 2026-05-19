@@ -14,6 +14,11 @@ def pytest_addoption(parser):
 
 
 @pytest.fixture(scope="session")
+def testing_rootdir() -> Path:
+    return Path(__file__).parent
+
+
+@pytest.fixture(scope="session")
 def master_output_dir():
     OUTPUT_DIR.mkdir(exist_ok=True)
     print(f"==== [pytest] output dir: {OUTPUT_DIR} ====")
@@ -28,6 +33,8 @@ def _safe_name(nodeid):
 def output_dir(master_output_dir, request):
     name = _safe_name(request.node.nodeid)  # unique per test
     path = master_output_dir / name
+    if path.exists():
+        shutil.rmtree(path)
     path.mkdir(exist_ok=False)
     return path
 
@@ -37,7 +44,7 @@ def pytest_sessionfinish(session):
     tests_failed = session.testsfailed > 0
 
     if not keep and not tests_failed and OUTPUT_DIR.exists():
-        shutil.rmtree(OUTPUT_DIR)
-        print(f"Deleted output directory: {OUTPUT_DIR}")
+        shutil.rmtree(OUTPUT_DIR.resolve())
+        print(f"Deleted output directory: {OUTPUT_DIR.resolve()}")
     else:
-        print(f"Kept output directory: {OUTPUT_DIR} for manual clean-up.")
+        print(f"Kept output directory: {OUTPUT_DIR.resolve()} for manual clean-up.")

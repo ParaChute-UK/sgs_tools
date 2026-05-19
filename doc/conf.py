@@ -35,7 +35,7 @@ extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.mathjax",
     "sphinx_autodoc_typehints",
-    "sphinx_mdinclude",
+    "myst_parser",
     "sphinx.ext.viewcode",
     "sphinx_argparse_cli",
     "sphinx_copybutton",
@@ -61,6 +61,19 @@ templates_path = ["_templates"]
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
+
+# Ensure .md files are parsed as Markdown (MyST)
+source_suffix = {
+    ".rst": "restructuredtext",
+    ".md": "markdown",
+}
+
+# Enable GitHub-style alerts (and optionally ::: fences)
+myst_enable_extensions = [
+    "alert",  # enables > [!NOTE] style GitHub alerts [4](https://myst-parser.readthedocs.io/en/latest/syntax/optional.html)[3](https://myst-parser.readthedocs.io/en/latest/syntax/admonitions.html)
+    "colon_fence",  # if you want ::::{note} ... syntax [3](https://myst-parser.readthedocs.io/en/latest/syntax/admonitions.html)[4](https://myst-parser.readthedocs.io/en/latest/syntax/optional.html)
+]
+myst_heading_anchors = 4
 
 # -- Options for HTML output -------------------------------------------------
 

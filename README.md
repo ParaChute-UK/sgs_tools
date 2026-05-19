@@ -4,8 +4,13 @@ Python tools for sub-grid scale (SGS) fluid dynamics analysis.
 
 ## 🚀 Install
 
-> ⚠️ This package is under active development. Interfaces, features and dependencies may change without notice.
+> [!Caution]
+> This package is under active development. Interfaces, features and dependencies may change with little notice.
+>
+---
+> [!Important]
 > The `devel` branch is the actively maintained branch containing the latest features and fixes.
+>
 
 ### 🏗️ Development Version
 
@@ -15,7 +20,8 @@ Python tools for sub-grid scale (SGS) fluid dynamics analysis.
   pip install git+https://github.com/parachute-uk/sgs_tools.git@devel
   ```
 
-  > **Requires Python >=3.11**. Installation on older versions will fail with possibly unclear error messages.
+  > [!Note]
+   **Requires Python >=3.11**. Installation on older versions will fail with possibly unclear error messages.
 
 ## ▶️ Usage
 
@@ -38,53 +44,47 @@ Python tools for sub-grid scale (SGS) fluid dynamics analysis.
 
 ## 📚 Documentation
 
-The documentation is hosted [here](https://parachute-uk.github.io/sgs_tools/).
+The documentation is hosted [on GitHub](https://parachute-uk.github.io/sgs_tools/).
 (It is updated via GitHub Actions, so may be a few minutes behind the latest PR merge.)
 
 To build the documentation locally:
 
-  1. Install the package with documentation extras ([sphinx](https://www.sphinx-doc.org/en/master/) and addons)
+  1. Install the package with suppor for building the documentation ([sphinx](https://www.sphinx-doc.org/en/master/) and addons)
 
        ```console
-         pip install git+https://github.com/parachute-uk/sgs_tools.git@devel#egg=sgs_tools[doc]
+       pip install git+https://github.com/parachute-uk/sgs_tools.git@devel#egg=sgs_tools[doc]
        ```
 
      Or, if you're using Poetry
 
        ```console
-          poetry install --with doc
+       poetry install --with doc
        ```
 
   2. Generate
 
         ```console
-        make doc
+        poetry run poe doc
         ```
 
   3. The rendered documentation can be accessed from `<repo_directory>/documentation/index.html`.
 
 ## 🤝 Contributing
 
-We welcome contributions of all kinds — bug reports, feature requests, documentation improvements, and pull requests.
+Contributions of all kinds are wellcome — bug reports, feature requests, documentation improvements, and pull requests.
 
-> Open [issues](https://github.com/parachute-uk/sgs_tools) for questions, ideas, or feedback. We appreciate your input!
+> Open an [Issue](https://github.com/parachute-uk/sgs_tools/issues) for questions, ideas, or feedback. We appreciate your input!
+> See the [Development](#-development) for PR instructions.
 
-> To get started on a pull request follow the Development Setup instructions below.
-
-- Clone the repository and create a feature branch from `devel`
-- Use `make pre_commit` or `tox -e pre_commit` to fix common formatting/style issues
-- Use `make test` or `tox` to run checks before submitting a PR
-- Submit your PR to the `devel` branch
-
-## 🧪 Development Setup & Tooling
+## 🧪 Development
 
 The dev tools are managed using [Poetry](https://python-poetry.org/docs/).
 
-> If you're unfamiliar with [Poetry](https://python-poetry.org/docs/), it's a Python packaging and publishing tool for dependency management and development workflows.
+> [!Note]
+> In case you are not familiar, [Poetry](https://python-poetry.org/docs/), is a Python packaging and publishing tool for dependency management and development workflows.
 You can still use `pip` for user installations, but we recommend Poetry for contributing to this project.
 
-
-### 🥼 Setup
+### 🥼 Dev Installation
 
   1. Clone the repository
 
@@ -93,7 +93,7 @@ You can still use `pip` for user installations, but we recommend Poetry for cont
       cd sgs_tools
       ```
 
-  2. Create and activate a virtual environment in the preferred way (venv, conda, ...) [Optional, Recommended]
+  2. Create and activate a virtual environment in the preferred way (venv, conda, ...) **[Optional but Recommended]**
 
   3. [Install Poetry](https://python-poetry.org/docs/#installation) (if not already installed), e.g.
 
@@ -101,60 +101,77 @@ You can still use `pip` for user installations, but we recommend Poetry for cont
       curl -sSL https://install.python-poetry.org | python3 -
       ```
 
-  4. Install all dependencies including dev tools:
+  4. Install dependencies including dev tools. This adds dev tools including `poethepoet`, `tox`, `pytest`, `ruff`, `mypy`, and `pre-commit` to the dependencies.
 
       ```console
       poetry install --with dev
       ```
 
-      > This adds dev tools like `tox`, `pytest`, `ruff`, `mypy`, and `pre-commit` to the dependencies.
-
-      ```console
-      poetry self add poetry-dynamic-versioning@latest
-      ```
-
-      > Install Poetry Dynamic Versioning plugin.
-        Make sure to run this inside the Poetry environment of the git repo, not from 'conda', 'pip', etc.
-        Check with ```poetry version``` that the Git tags, commit hashes / dirty markers are detected correctly.
-
-  5. Activate Git hooks to help clean up formatting etc. on commit (this may slow down the commit somewhat).
+  5. Activate Git pre-commit hooks to help clean up formatting etc. on commit.
 
       ```console
       pre-commit install
       ```
 
-### 🔬 Testing & Style
+        This will slow down commits somewhat. You can add `--no-verify` to the `git commit`  commands, but this is not advised, and the commit may be rejected by the remote on `push`.
 
-  Testing and code style is managed via [tox](https://tox.wiki/en/4.28.1/) or a convenience `make` targets defined in the `Makefile`.
+### 🔬 Testing tools
 
--	Run all checks (formatting, linting, type checks, tests, and coverage) across the repo with
-
-      ``` console
-      make test
-      ```
-
-  or
-      ``` console
-      tox
-      ```
-
-- Apply standard formatting fixes and checks (that would be applied anyway for PRs) with
-      ``` console
-      make pre_commit
-      ```
-  or
-      ``` console
-      tox pre_commit
-      ```
-
-  See the `Makefile` or `tox.ini` for more grannular options.
-
-### 🔧 Tooling Overview
-
-- **Virtual environment for testing**: [`tox`](https://tox.wiki/en/4.28.1/)
 - **Unit/Integration Tests**: [`pytest`](https://docs.pytest.org/)
   - Will look for tests as `test/test_*.py`
 - **Code Style**:
   - [`ruff`](https://github.com/charliermarsh/ruff): formatting and linting
   - [`mypy`](http://mypy-lang.org/): static type checking
   - [`pre-commit`](https://pre-commit.com/): wraps up `ruff` and `mypy` and cleans-up staged files before commit. Automatically used in PRs to `devel`.
+- **Virtual environment mamagement**: [`tox`](https://tox.wiki/en/4.28.1/)
+- **Dev task orchestration**: [PoethePoet](https://poethepoet.natn.io)
+
+> [!Note]
+>
+> All the tools are automatically installed with the [Dev installation](#-dev-installation).
+>
+
+### 🧷 Code check utilities
+
+The following `poe` tasks are available (see `pyproject.toml:tool.poe.tasks`):
+
+- `poetry run poe style`  &mdash; basic `ruff` formatting;
+
+- `poetry run poe lint` &mdash; standard pre-commit checks run on **all files** (not just the staged ones). This  includes `ruff` formatting, linting and basic `mypy` type-hint checks. These gets automatically run before each commit on the staged files.
+
+- `poetry run poe mypy`  &mdash; more comprehensive type checks with `--install-type`
+
+- `poetry run poe test`  &mdash; the (unit/integration) testing suite, should take a few minutes. Should be run before a PR.
+
+- `poetry run poe check`  &mdash; equivalent to `[lint, mypy, test]`
+
+> [!TIP] For brevity you may want to set-up the alias
+> `poe=poetry run poe`
+
+#### Compatibility testing
+
+Support across python versions is mamanged with [tox](https://tox.wiki/en/4.28.1/). Call
+
+``` console
+tox
+```
+
+to run the standard tests in isolated environments for each supported python version. See e.g. `tox.ini` for supported versions. This assumes that the corresponding python interpreter can be found in the `PATH`. For install with a simple source script
+
+``` sh
+# activate-dev.sh
+conda activate sgs_tools # main env with all the dev tools
+# only add interpreters, don't override main env
+export PATH="$HOME/.conda/envs/py311/bin:$PATH"
+export PATH="$HOME/.conda/envs/py312/bin:$PATH"
+export PATH="$HOME/.conda/envs/py313/bin:$PATH"
+export PATH="$HOME/.conda/envs/py314/bin:$PATH"
+```
+
+#### 🔀 Contirbuting & Pull Requests
+
+> [!NOTE]
+>
+> PRs should be submitted to the `devel` branch.
+>
+> Consider adding a test for any new functinonality. Place new tests in `test/test_*.py`

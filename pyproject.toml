@@ -80,9 +80,10 @@ classifiers = [
 [tool.poe.tasks.docs]
 script = "build_docs:build_docs"
 
+#check code
 [tool.poe.tasks]
   test = "pytest"
-  style = "ruff ./"
+  style = "ruff check --fix"
   lint = "pre-commit run --all-files"
   mypy = "mypy src/ --install-type --non-interactive"
 

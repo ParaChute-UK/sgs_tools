@@ -1,28 +1,21 @@
+# build system
 [build-system]
-  requires = ["poetry-core>=1.0.0", "poetry-dynamic-versioning>=1.0.0<2.0.0"]
+  requires = ["poetry-core>=1.0.0", "poetry-dynamic-versioning>=1.0.0,<2.0.0"]
   build-backend = "poetry_dynamic_versioning.backend"
 
-[tool.poetry.requires-plugins]
-  poetry-dynamic-versioning = { version = ">=1.0.0,<2.0.0", extras = ["plugin"] }
+# standard metadata
+[project]
+name = "sgs_tools"
+version = "0.0.0"  # placeholder, replaced dynamically
 
-[tool.poetry-dynamic-versioning]
-  enable = true
-  style = "semver"        # expects tags v?.?.?; otherwise "pep440" takes it without the "v"
-  vcs = "git"
-
-[tool.poetry-dynamic-versioning.substitution]
-  files = ["src/sgs_tools/__init__.py"]
-
-[tool.poetry]
-  name = "sgs_tools"
-  version = "0.0.0" # placeholder replaced dynamically
-  description = "Python tools for sub-grid scale fluid analyis"
-  authors = ["Dimtar Vlaykov <d.vlaykov@exeter.ac.uk>"]
-  readme="README.md"
-  repository = "https://github.com/dvlaykov/sgs_tools.git"
-  packages = [
-  { include = "sgs_tools", from = "src" }
+description = "Python tools for sub-grid scale fluid analyis"
+readme = "README.md"
+requires-python = ">=3.11"
+authors = [
+  { name = "Dimitar Vlaykov", email = "d.vlaykov@exeter.ac.uk" }
 ]
+
+urls = { "Repository" = "https://github.com/dvlaykov/sgs_tools.git"}
 
 classifiers = [
   "Development Status :: 2 - Pre-Alpha",
@@ -34,16 +27,60 @@ classifiers = [
   "Programming Language :: Python :: 3.11"
 ]
 
+dependencies = [
+  "matplotlib>=3.6",
+  "xarray[io,accel,parallel]>=2023.9",
+  "xrft",
+  "xarray-einstats",
+  "f90nml",
+  "netcdf4",
+  "h5netcdf",
+  "pint"
+]
+
+# optional dependencies for docs
+[project.optional-dependencies]
+  doc = [
+    "sphinx",
+    "pydata-sphinx-theme",
+    "myst-parser",
+    "sphinx-autodoc-typehints",
+    "sphinx-copybutton",
+    "sphinxemoji",
+    "sphinx-argparse-cli"
+  ]
+
+# dynamic versioning
+[tool.poetry-dynamic-versioning]
+  enable = false
+  style = "semver"        # expects tags v?.?.?; otherwise "pep440" takes it without the "v"
+  vcs = "git"
+
+[tool.poetry-dynamic-versioning.substitution]
+  files = ["src/sgs_tools/__init__.py"]
+
+# CLI scripts
+[project.scripts]
+  cs_dynamic = "sgs_tools.scripts.CS_calculation_genmodel:main"
+  sim_comparison = "sgs_tools.scripts.BasicComparisonSimAnalysis:main"
+  ref_comparison = "sgs_tools.scripts.ReferenceComparisonSimAnalysis:main"
+  um_levels = "sgs_tools.scripts.make_UM_level_sets:main"
+  post_process = "sgs_tools.scripts.post_process:main"
+  sgs_tools_version = "sgs_tools.scripts.version:main"
+
+# for Devs -- poetry env.
+[tool.poetry]
+  name = "sgs_tools"
+  version = "0.1.0-post.112+a66f9bb" # placeholder replaced dynamically
+  packages = [
+    { include = "sgs_tools", from = "src" }
+  ]
+
 [tool.poetry.dependencies]
   python = ">=3.11,<4.0"
-  matplotlib = ">=3.6"
-  xarray = {version = ">=2023.9", extras = ["io","accel","parallel"]}
-  xrft = "*"
-  xarray-einstats = "*"
-  f90nml = "*"
-  netcdf4= "*"
-  h5netcdf="*"
-  pint = "*"
+
+[tool.poetry.requires-plugins]
+  poetry-dynamic-versioning = { version = ">=1.0.0,<2.0.0", extras = ["plugin"] }
 
 [tool.poetry.group.dev.dependencies]
   tox = "*"
@@ -55,41 +92,19 @@ classifiers = [
   poethepoet = "^0.46.0"
 
 
-
-[tool.poetry.group.doc.dependencies]
-  sphinx  = "*"
-  sphinx_autodoc_typehints = "*"
-  sphinx_argparse_cli = "*"
-  myst-parser="*"
-  pydata-sphinx-theme = "*"
-  sphinx_copybutton = "*"
-  sphinxemoji="*"
-  poethepoet = "^0.46.0"
-
-
-[tool.poetry.scripts]
-  cs_dynamic = "sgs_tools.scripts.CS_calculation_genmodel:main"
-  sim_comparison = "sgs_tools.scripts.BasicComparisonSimAnalysis:main"
-  ref_comparison = "sgs_tools.scripts.ReferenceComparisonSimAnalysis:main"
-  um_levels = "sgs_tools.scripts.make_UM_level_sets:main"
-  post_process = "sgs_tools.scripts.post_process:main"
-  sgs_tools_version = "sgs_tools.scripts.version:main"
-
-
-# build docs
-[tool.poe.tasks.docs]
-script = "build_docs:build_docs"
-
-#check code
+# task orchestrator -- for docs and code check
 [tool.poe.tasks]
+  doc = "python build_doc.py"
   test = "pytest"
   style = "ruff check --fix"
   lint = "pre-commit run --all-files"
-  mypy = "mypy src/ --install-type --non-interactive"
+  mypy = "mypy src/ --install-types --non-interactive"
 
   check = ["lint", "mypy", "test"]
   ci = ["check"]
 
+
+# Tool configs
 [tool.mypy]
   # python_version = "3.11"
   strict = false
@@ -97,7 +112,6 @@ script = "build_docs:build_docs"
   show_error_codes = true
   exclude = ".*ipynb"
 
-# run pytest with coverage
 [tool.pytest.ini_options]
   testpaths = ["test"]
   addopts = "-rs --cov=sgs_tools --cov-report=term-missing"

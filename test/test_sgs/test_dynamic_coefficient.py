@@ -1,4 +1,5 @@
 import numpy as np
+import pytest
 import xarray as xr  # only used for type hints
 
 from sgs_tools.sgs.dynamic_coefficient import (
@@ -33,6 +34,8 @@ def linear():
     )
 
 
+@pytest.mark.unit
+@pytest.mark.fast
 def test_LillyMinimisation():
     scale = np.random.rand()
     id = IdentityFilter(None, ["x", "y"])
@@ -44,6 +47,8 @@ def test_LillyMinimisation():
         assert np.allclose(scale, coeff.squeeze().data)
 
 
+@pytest.mark.unit
+@pytest.mark.fast
 def test_LinComb2ModelLillyMinimisation():
     id = IdentityFilter(None, ["x", "y"])
     min = LillyMinimisation2Model(["c1", "c2"], "cdim")
@@ -62,6 +67,9 @@ def test_LinComb2ModelLillyMinimisation():
             )
 
 
+# Fixme!!!
+@pytest.mark.unit
+@pytest.mark.fast
 def LinComb3ModelLillyMinimisation():
     id = IdentityFilter(None, ["x", "y"])
     min = LillyMinimisation3Model(["c1", "c2"], "cdim")
@@ -89,6 +97,8 @@ def LinComb3ModelLillyMinimisation():
             )
 
 
+@pytest.mark.unit
+@pytest.mark.slow
 def test_LinCombModelLillyMinimisation():
     id = IdentityFilter(None, ["x", "y"])
     min = LillyMinimisationNModel(["c1", "c2"], "cdim")

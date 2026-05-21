@@ -34,6 +34,8 @@ def test_args(output_dir, testing_rootdir):
     ]
 
 
+@pytest.mark.slow
+@pytest.mark.integration
 def test_main_full_pipeline(test_args):
     # parse clargss
     args = cs_gen.parse_args(test_args)

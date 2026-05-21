@@ -21,7 +21,6 @@ def testing_rootdir() -> Path:
 @pytest.fixture(scope="session")
 def master_output_dir():
     OUTPUT_DIR.mkdir(exist_ok=True)
-    print(f"==== [pytest] output dir: {OUTPUT_DIR} ====")
     return OUTPUT_DIR
 
 

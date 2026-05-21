@@ -95,7 +95,6 @@ dependencies = [
 # task orchestrator -- for docs and code check
 [tool.poe.tasks]
   doc = "python build_doc.py"
-  test = "pytest"
   style = "ruff check --fix"
   lint = "pre-commit run --all-files"
   mypy = "mypy src/ --install-types --non-interactive"
@@ -103,6 +102,20 @@ dependencies = [
   check = ["lint", "mypy", "test"]
   ci = ["check"]
 
+# set up explicit cwd
+# for tox tests in virtual environments
+# expect to run poe test from project root
+# or point --rootdir to project root
+[tool.poe.tasks.test]
+  cmd = 'pytest'
+  cwd = "$POE_PWD"
+
+#check for the POE cwd
+[tool.poe.tasks.cwd]
+  cwd = "$POE_PWD"
+  shell = """
+  echo Poe PWD: $(pwd)
+  """
 
 # Tool configs
 [tool.mypy]

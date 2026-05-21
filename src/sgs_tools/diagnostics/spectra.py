@@ -15,22 +15,24 @@ def radial_spectrum(
     bin_anchor: str = "center",
     truncate: bool = True,
     scaling: str = "spectrum",
-    prefix="freq_",
+    prefix: str = "freq_",
 ) -> xr.DataArray:
     r"""Isotropize a 2D power spectrum or cross spectrum
     by taking an "spherical" average over the specified dimensions.
 
     .. math::
-        \mathbb{F}_\text{iso}(k_r) &= \sum_{k_r: |k_r| \in [kr_0, kr_1]}
-        |\mathbb{F}(\mathbf{k})|^2 * w(\mathbf{k})  \\
-        k_r &= \langle k \rangle_{|k| \in [kr_0, kr_1]}
+      \mathbb{F}_\text{iso}(k_r) &= \sum_{k_r: |k_r| \in [kr_0, kr_1]}
+      |\mathbb{F}(\mathbf{k})|^2 * w(\mathbf{k})  \\
+      k_r &= \langle k \rangle_{|k| \in [kr_0, kr_1]}
 
-    where :math:`kr` is the radial wavenumber and the weights :math:`w`
-      are defined implicitly through the scaling.
+    where :math:`k_r` is the radial wavenumber and the weights :math:`w`
+    are defined implicitly through the ``scaling``.
+
     Always :math:`\sum_\mathbf{k} |\mathbb{F}(\mathbf{k})|^2 =
-    \sum \mathbb{F}_\text{iso}(k_r) *  w(k_r)`.
-    This satisfies Parseval assuming :math:`\sum_\mathbf{k} |\mathbb{F}(\mathbf{k})|^2 =
-      \sum real\_data^2 * dx * dy`.
+    \sum \mathbb{F}_\text{iso}(k_r) * w(k_r)`.
+    This satisfies Parseval assuming
+    :math:`\sum_\mathbf{k} |\mathbb{F}(\mathbf{k})|^2 =
+    \sum \mathbb{F}(\mathbf{x})^2 * dx * dy` .
 
     :param ps:
         The power spectrum or cross spectrum to be isotropized.
@@ -42,25 +44,30 @@ def radial_spectrum(
     :param truncate:
         If True, the spectrum will be truncated for
         wavenumbers larger than min(max(ps[fftdim].size)).
+
     :param bin_anchor:
         Where to place the radial wavenumber within the bin.
-        Choices {'left', 'right', 'centre', 'com'}.
-        If `com` : compute as the centre-of-mass radius :
-        :math:`k_r = \sum_{|k| \in [kr_0, kr_1]} (\mathbb{F} * |\mathbf{k}|) /
-            \mathbb{F}_\text{iso}(k_r)` before rescaling.
-        Default: `com`.
-    :param scaling:
-        Rescale the power spectrum to satisfy
+        Choices ``left``, ``right``, ``centre``, ``com``.
+        If ``com``: compute as the centre-of-mass radius
+        :math:`k_r = \sum_{|k| \in [kr_0, kr_1]} (\mathbb{F} * |\mathbf{k}|)
+        / \mathbb{F}_\text{iso}(k_r)` before rescaling.
+        Default: ``com``.
+
+    :param scaling: Rescale the power spectrum to satisfy
         :math:`\sum ps = \sum \mathbb{F}_\text{iso} * w(k_r)`
 
-        * `density`: set :math:`w(k_r) = \pi * ((k_r^{top})^2 - (k_r^{bottom})^2)`,
+        * ``density``:
+          set :math:`w(k_r) = \pi * ((k_r^{top})^2 - (k_r^{bottom})^2)`,
           where :math:`k_r^{top}` and :math:`k_r^{bottom}` are the bin edges.
 
-        * `spectrum`: set :math:`w(k_r) = 1`
+        * ``spectrum``:
+          set :math:`w(k_r) = 1`
 
+    :param prefix:
+        Prefix for the name of the new spectral dimension.
     :return: an `xarray.DataArray` with the isotropic spectrum
         coordinates for the radial wavenumber ( `prefix` r), bin width ( `prefix` dr)
-          and corresponding weigths ( `prefix` dA), i.e. :math:`w(k_r)`.
+        and corresponding weigths ( `prefix` dA), i.e. :math:`w(k_r)`.
     """
     # name of new spectral dimension
     dim_name = prefix + "r"

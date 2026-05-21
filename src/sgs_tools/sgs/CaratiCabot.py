@@ -199,7 +199,7 @@ def DynamicCaratiCabotModel(
     minimisation: Minimisation = __default_min,
 ) -> LinCombDynamicModel:
     r"""Dynamic version of the model by
-    Carati & Cabot Proceedings of the 1996 Summer Program --
+      Carati & Cabot Proceedings of the 1996 Summer Program --
       Center for Turbulence Research
 
     :param sij: grid-scale rate-of-strain tensor

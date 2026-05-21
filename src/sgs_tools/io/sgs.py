@@ -24,7 +24,7 @@ def data_ingest_SGS(
     Will not rename any fields, assume they are in local convention.
 
     :param fname_pattern: NetCDF diagnostic file to read. can be a glob pattern.
-    (should belong to the same simulation)
+      (should belong to the same simulation)
     :param requested_fields: list of fields to retain in ds, if falsy will retain all.
     :param chunks: chunking for data
     """

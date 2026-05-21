@@ -14,19 +14,23 @@ def install_doc():
         subprocess.run(["pip", "install", ".[doc]"], check=True)
 
 
-def build_doc():
+def build_doc(args):
     """compile the documentations"""
 
     print("Generating documentation...")
     doc_path = Path("documentation")
-    subprocess.run(["sphinx-build", "-b", "html", "doc", doc_path], check=True)
+    command = ["sphinx-build", "-b", "html", "doc", str(doc_path)] + args
+    print(" ".join(command))
+    subprocess.run(command, check=True)
     print(f"Documentation generated at: {(doc_path / 'index.html').resolve()}")
 
 
 if __name__ == "__main__":
     import sys
 
-    if sys.argv[1] == "--setup":
+    args = sys.argv[1:]
+    if "--setup" in args:
         install_doc()
+        args.remove("--setup")
 
-    build_doc()
+    build_doc(args)

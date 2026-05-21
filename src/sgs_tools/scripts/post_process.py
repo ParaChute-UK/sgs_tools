@@ -112,9 +112,10 @@ def parse_args(arguments: Sequence[str] | None = None) -> dict[str, Any]:
         default="",
         help=(
             "Optional suffix appended to output filenames. "
-            r"Final pattern: {base_name}_{fname_suffix}_{statistics_tag}.nc, "
-            "where ``base_name`` is one of ``vprofile_fname_out``| "
-            "``hspectra_fname_out`` | ``aniso_fname_out``"
+            "Final pattern: ``<base_name>_<fname_suffix>_<statistics_tag>.nc``, "
+            "where <base_name> and <statistics_tag> are detemined in "
+            "the respective statistics group: ``Vertical profiles`` | "
+            "``Horizontal spectra`` | ``Anisotropy diagnostics``"
         ),
     )
     parser.add_argument(
@@ -152,9 +153,11 @@ def parse_args(arguments: Sequence[str] | None = None) -> dict[str, Any]:
         "--vprofile_fname_out",
         default=BASE_NAME,
         type=str,
-        help="""**Core** filename where to save the generated vertical profile.
+        help=f"""**Core** filename where to save the generated vertical profile.
                 relative to output_path.
                 Will add an '.nc' extension (so don't give one).
+                The final pattern will be
+                ``<vprofile_fname_out>_<fname_suffix>_{VPROF_TAG}.nc``
               """,
     )
 
@@ -215,9 +218,11 @@ def parse_args(arguments: Sequence[str] | None = None) -> dict[str, Any]:
         "--hspectra_fname_out",
         default=BASE_NAME,
         type=str,
-        help="""**Core** filename where to save the generated horisontal spectra.
+        help=f"""**Core** filename where to save the generated horisontal spectra.
                 relative to output_path.
                 Will add an '.nc' extension (so don't give one).
+                The final pattern will be
+                ``<hspectra_fname_out>_<fname_suffix>_{SPECTRA_TAG}.nc``
               """,
     )
 
@@ -282,14 +287,17 @@ def parse_args(arguments: Sequence[str] | None = None) -> dict[str, Any]:
         help=f"""Anisotropy filter shapes. Support any of {filter_shapes}""",
     )
 
-    spectra.add_argument(
+    anisotropy.add_argument(
         "--aniso_fname_out",
         default=BASE_NAME,
         type=str,
-        help="""
+        help=f"""
         **Core** filename where to save the generated anisotropy eigen values.
         relative to output_path.
-        Will append the filter label. Will add an '.nc' extension (so don't give one).
+        Will append the filter label.
+        Will add an '.nc' extension (so don't give one).
+        The final pattern will be
+        ``<aniso_fname_out>_<fname_suffix>_{ANISOTROPY_TAG}.nc``
         """,
     )
 

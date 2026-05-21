@@ -117,9 +117,9 @@ def Reynolds_fluct_stress(
         w.r.t which to compute the fluctuations. Subset of ``target_dims``.
 
     Note: First performs an interpolation to ``target_dims``
-      and then computes the fluctuations
-    w.r.t. ``fluctuation_axes``. There can be a commutation error when the
-    interpolation happens along dimensions other than ``fluctuation_axes``.
+      and then computes the fluctuations w.r.t. ``fluctuation_axes``.
+      There can be a commutation error when the interpolation happens
+      along dimensions other than ``fluctuation_axes``.
     """
     # first interpolate
     vel = compose_vector_components_on_grid(

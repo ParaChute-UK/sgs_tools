@@ -68,6 +68,13 @@ source_suffix = {
     ".md": "markdown",
 }
 
+# suppress warnigns from upstream packages (iris, pandas)
+suppress_warnings = [
+    "sphinx_autodoc_typehints.guarded_import",
+    "sphinx_autodoc_typehints.forward_reference",
+]
+
+
 # Enable GitHub-style alerts (and optionally ::: fences)
 myst_enable_extensions = [
     "alert",  # enables > [!NOTE] style GitHub alerts [4](https://myst-parser.readthedocs.io/en/latest/syntax/optional.html)[3](https://myst-parser.readthedocs.io/en/latest/syntax/admonitions.html)

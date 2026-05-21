@@ -122,10 +122,11 @@ def parse_args(arguments: Sequence[str] | None = None) -> dict[str, Any]:
         "--fname_suffix",
         type=str,
         default="",
-        help=(
-            "Optional suffix appended to output filenames. "
-            r"Final pattern: {model_name}_{fname_suffix}_pp.nc"
-        ),
+        help="""
+            Optional suffix appended to output filenames.
+            Final pattern: ``<model_name>_<fname_suffix>_pp.nc``
+            where <model_name> is detemined by the ``sgs_model``
+            """,
     )
 
     add_dask_group(parser)

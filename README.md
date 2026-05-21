@@ -40,51 +40,68 @@ Python tools for sub-grid scale (SGS) fluid dynamics analysis.
     print (sgs_tools.__version__)
   ```
 
-  See [documentation](https://parachute-uk.github.io/sgs_tools/) for available module and functionality and CLI scripts for sample usage.
+  See the [Documentation](https://parachute-uk.github.io/sgs_tools/) for available module and functionality and CLI scripts for sample usage.
 
 ## 📚 Documentation
 
 The documentation is hosted [on GitHub](https://parachute-uk.github.io/sgs_tools/).
-(It is updated via GitHub Actions, so may be a few minutes behind the latest PR merge.)
+It is updated via GitHub Actions, so may be a few minutes behind the latest PR merge.
 
-To build the documentation locally:
+To build the documentation locally, call
 
-  1. Install the package with suppor for building the documentation ([sphinx](https://www.sphinx-doc.org/en/master/) and addons)
+```console
+python build_doc.py --setup
+```
 
-       ```console
-       pip install git+https://github.com/parachute-uk/sgs_tools.git@devel#egg=sgs_tools[doc]
-       ```
+for the first time, to install additional dependencies to your environment.
+Thereafter, you can drop the `--setup` argument.
+This will automatically pickup your regular installation (with `pip` or `poetry`).
 
-     Or, if you're using Poetry
+>[!Note] The rendered documentation can be accessed from the entry point
+> `<repo_directory>/documentation/index.html`
 
-       ```console
-       poetry install --with doc
-       ```
+The documentation is auto-generaged with [Sphinx](https://www.sphinx-doc.org/en/master/).
+The setup is found in `<repo_directory>/doc`.
 
-  2. Generate
-
-        ```console
-        poetry run poe doc
-        ```
-
-  3. The rendered documentation can be accessed from `<repo_directory>/documentation/index.html`.
+>[!Note] If you are using the [dev installation](#-dev-installation) you can also call `poe doc` or `poe doc -- --setup`
 
 ## 🤝 Contributing
 
-Contributions of all kinds are wellcome — bug reports, feature requests, documentation improvements, and pull requests.
+All contributions are wellcome — bug reports, feature requests, documentation improvements, and pull requests.
 
-> Open an [Issue](https://github.com/parachute-uk/sgs_tools/issues) for questions, ideas, or feedback. We appreciate your input!
-> See the [Development](#-development) for PR instructions.
+> [!Note]
+> Open an [Issue](https://github.com/parachute-uk/sgs_tools/issues) for questions, ideas, or feedback.
+> See  [Development](#-development) for PR instructions.
+
+We appreciate your input!
 
 ## 🧪 Development
 
-The dev tools are managed using [Poetry](https://python-poetry.org/docs/).
+### 🔬 Dev tools
+
+
+- **Environment management**: [Poetry](https://python-poetry.org/docs/)
+- **Dev task orchestration**: [PoethePoet](https://poethepoet.natn.io), used as a Poetry plugin.
+- **Unit/Integration Tests**: [`pytest`](https://docs.pytest.org/)
+  - Will look for tests as `test/test_*.py`
+- **Code Styling**:
+  - [`ruff`](https://github.com/charliermarsh/ruff): formatting and linting
+  - [`mypy`](http://mypy-lang.org/): static type checking
+  - [`pre-commit`](https://pre-commit.com/): wraps up `ruff` and `mypy` and cleans-up staged files before commit. Automatically used in PRs to `devel`.
+- **Multi-environment testing**: [`tox`](https://tox.wiki/en/4.28.1/)
+  - use this for any changes that touch the project management, e.g. dependencies, etc.
 
 > [!Note]
-> In case you are not familiar, [Poetry](https://python-poetry.org/docs/), is a Python packaging and publishing tool for dependency management and development workflows.
-You can still use `pip` for user installations, but we recommend Poetry for contributing to this project.
+>
+> All the tools apart from Poetry are automatically installed with the [Dev installation](#-dev-installation).
+>
 
 ### 🥼 Dev Installation
+
+  The dev tools are managed with [Poetry](https://python-poetry.org/docs/) and the dev tasks &mdash; with [PoethePoet](https://poethepoet.natn.io).
+
+  > [!Note]
+  > You can still use `pip` for user installations, but Poetry is prefered for codebase dev.
 
   1. Clone the repository
 
@@ -95,11 +112,7 @@ You can still use `pip` for user installations, but we recommend Poetry for cont
 
   2. Create and activate a virtual environment in the preferred way (venv, conda, ...) **[Optional but Recommended]**
 
-  3. [Install Poetry](https://python-poetry.org/docs/#installation) (if not already installed), e.g.
-
-      ```console
-      curl -sSL https://install.python-poetry.org | python3 -
-      ```
+  3. [Install Poetry](https://python-poetry.org/docs/#installation), if not already installed (preferably in a separate environment.)
 
   4. Install dependencies including dev tools. This adds dev tools including `poethepoet`, `tox`, `pytest`, `ruff`, `mypy`, and `pre-commit` to the dependencies.
 
@@ -115,25 +128,14 @@ You can still use `pip` for user installations, but we recommend Poetry for cont
 
         This will slow down commits somewhat. You can add `--no-verify` to the `git commit`  commands, but this is not advised, and the commit may be rejected by the remote on `push`.
 
-### 🔬 Testing tools
-
-- **Unit/Integration Tests**: [`pytest`](https://docs.pytest.org/)
-  - Will look for tests as `test/test_*.py`
-- **Code Style**:
-  - [`ruff`](https://github.com/charliermarsh/ruff): formatting and linting
-  - [`mypy`](http://mypy-lang.org/): static type checking
-  - [`pre-commit`](https://pre-commit.com/): wraps up `ruff` and `mypy` and cleans-up staged files before commit. Automatically used in PRs to `devel`.
-- **Virtual environment mamagement**: [`tox`](https://tox.wiki/en/4.28.1/)
-- **Dev task orchestration**: [PoethePoet](https://poethepoet.natn.io)
-
-> [!Note]
->
-> All the tools are automatically installed with the [Dev installation](#-dev-installation).
->
-
 ### 🧷 Code check utilities
 
-The following `poe` tasks are available (see `pyproject.toml:tool.poe.tasks`):
+If you don't have an independent [poe](https://poethepoet.natn.io) installation, the following assumes the alias `poe=poetry run poe`
+
+> [!TIP]
+> For brevity you may want to place that in your `$HOME/.bashrc` or analogous location.
+
+Either way, the following `poe` code-hygiene tasks are available (see `pyproject.toml:tool.poe.tasks`):
 
 - `poetry run poe style`  &mdash; basic `ruff` formatting;
 
@@ -145,18 +147,15 @@ The following `poe` tasks are available (see `pyproject.toml:tool.poe.tasks`):
 
 - `poetry run poe check`  &mdash; equivalent to `[lint, mypy, test]`
 
-> [!TIP] For brevity you may want to set-up the alias
-> `poe=poetry run poe`
+- `poe doc` &mdash; re-generate the docs (run with `-- --setup` the first time to install dependencies)
 
-#### Compatibility testing
+### Multi-environment testing
 
-Support across python versions is mamanged with [tox](https://tox.wiki/en/4.28.1/). Call
-
-``` console
-tox
-```
-
-to run the standard tests in isolated environments for each supported python version. See e.g. `tox.ini` for supported versions. This assumes that the corresponding python interpreter can be found in the `PATH`. For install with a simple source script
+Support across python versions is mamanged with [tox](https://tox.wiki/en/4.28.1/).
+Call `tox ` or better yet `tox -p` to run the standard environment matrix.
+See `tox.ini` for the test environments.
+This assumes that the corresponding python interpreter can be found in the `PATH`.
+A simple source script can help with that, e.g. if the interpreters are managed with `conda`,
 
 ``` sh
 # activate-dev.sh
@@ -168,10 +167,18 @@ export PATH="$HOME/.conda/envs/py313/bin:$PATH"
 export PATH="$HOME/.conda/envs/py314/bin:$PATH"
 ```
 
-#### 🔀 Contirbuting & Pull Requests
+followed by
+
+``` console
+source activate-dev.sh
+```
+
+### 🔀 Contirbuting & Pull Requests
 
 > [!NOTE]
 >
 > PRs should be submitted to the `devel` branch.
 >
-> Consider adding a test for any new functinonality. Place new tests in `test/test_*.py`
+> Consider adding a test for any new functinonality.
+> The test directory `test/*` structure mirrors the `src/sgs_tools`.
+> with each module being tested in `test_<module_name>.py`

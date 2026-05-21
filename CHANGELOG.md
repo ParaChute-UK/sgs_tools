@@ -1,10 +1,11 @@
-## Changelog
+<!-- markdownlint-disable MD024 -->
+# Changelog
 
 All notable changes to this project are documented in this file.
 
-### [Under development]
+## [WIP]
 
-#### Added
+### Added
 
 - dynamic version CL arg and tags in netcdf outputs of CLIs
 - Debug utility to track memory usage
@@ -15,16 +16,16 @@ All notable changes to this project are documented in this file.
 - update packaging and testing environment management
 
 
-#### Fixes
+### Fixes
 
 - turn geometry and diagnostics into sub-packages (#34)
 - dynamic versioning (instructions and docs)
 - enhancements to post_process
 - unify output filename convention
 
-### [0.1.0] - 2025-08-22
+## [0.1.0] - 2025-08-22
 
-#### Added
+### Added
 
 - Auto-deployment of docs on GitHub pages (#28, #30)
 - packaging manager setuptools -> poetry (#27)
@@ -33,7 +34,7 @@ All notable changes to this project are documented in this file.
 - Extra diagnostics tools: (anistropy, spectra, profiles) with a CLI entrypoint (#9, #15)
 - New SGS models and upgraded CS calculation script (#4)
 
-#### Changes and Fixes
+### Fixes
 
 - temporary IO depependency change to netcdf4+h5netcdf (#16)
 - Refactor core modules, use Protocol, improve dynamic model logic (#5, #9, #15)
@@ -41,7 +42,7 @@ All notable changes to this project are documented in this file.
 - Improved test coverage
 - Partial update of Readme and Docs
 
-### [0.0.1]
+## [0.0.1]
 
 - dynamic version
 - fixes to packaging and dependencies

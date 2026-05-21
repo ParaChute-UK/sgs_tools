@@ -27,7 +27,7 @@ def data_ingest_MONC(
     Any unknown fields will retain their original names.
 
     :param fname_pattern: MONC NetCDF diagnostic file to read. can be a glob pattern.
-    (should belong to the same simulation)
+      (should belong to the same simulation)
     :param  requested_fields: list of fields to retain in ds, if falsy will retain all.
     :param chunks: chunking of datasets "auto" or a dictionary of {coordinate: chunks}.
     :return: metadata dictionary, xarray Dataset of fields.
@@ -69,7 +69,7 @@ def data_ingest_MONC_on_single_grid(
     chunks: Any = "auto",
 ) -> tuple[dict[str, str], xr.Dataset]:
     """read pre-process MONC data and interpolate to a cell-centred grid
-    Any unknown fields will retain their original names.
+       Any unknown fields will retain their original names.
 
     :param fname_pattern: MONC NetCDF diagnostic file(s) to read.
       will be interpreted as a glob pattern. (should belong to the same simulation)

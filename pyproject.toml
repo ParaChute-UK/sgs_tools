@@ -95,7 +95,7 @@ dependencies = [
 # task orchestrator -- for docs and code check
 [tool.poe.tasks]
   doc = "python build_doc.py"
-  style = "ruff check --fix"
+  style = "env SKIP=mypy pre-commit run --all-files"
   lint = "pre-commit run --all-files"
   mypy = "mypy src/ --install-types --non-interactive"
   check = ["lint", "mypy", "test"]

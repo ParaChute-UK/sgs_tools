@@ -12,6 +12,8 @@ All notable changes to this project are documented in this file.
   - a central read dispatcher (#33)
   - on empty requested_fields, retain all available fields (#40)
   - accept strings (#42)
+- update packaging and testing environment management
+
 
 #### Fixes
 

@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>sgs_tools.sgs.dynamic_coefficient &#8212; SGS_tools 0.0.0 documentation</title>
+    <title>sgs_tools.sgs.dynamic_coefficient &#8212; SGS_tools  documentation</title>
   
   
   
@@ -26,44 +26,51 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
-<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+  <link href="../../../_static/styles/theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sphinx_argparse_cli.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
   
   <!-- So that users can add custom icons -->
-  <script src="../../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <script defer src="../../../_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
-<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../../_static/documentation_options.js?v=7026087e"></script>
-    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../../_static/copybutton.js?v=f281be69"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/sgs_tools/sgs/dynamic_coefficient';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="0.0.0" />
+  
+    
+    <script src="../../../_static/searchtools.js"></script>
+    <script src="../../../_static/language_data.js"></script>
+    <script src="../../../searchindex.js"></script>
+  
   </head>
-  
-  
-  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
-
+  <body data-default-mode="">
   
   
   <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
   
   <div id="pst-scroll-pixel-helper"></div>
   
   <button type="button" class="btn rounded-pill" id="pst-back-to-top">
     <i class="fa-solid fa-arrow-up"></i>Back to top</button>
-
+  
+  
+  
   
   <dialog id="pst-search-dialog">
     
@@ -87,9 +94,12 @@
   <div class="pst-async-banner-revealer d-none">
   <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
 </div>
+<aside class="bd-header-announcement" aria-label="Announcement">
+  <div class="bd-header-announcement__content">Version: 0.0.0</div>
+</aside>
 
   
-    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
 <div class="bd-header__inner bd-page-width">
   <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
     <span class="fa-solid fa-bars"></span>
@@ -111,7 +121,7 @@
   
   
   
-    <p class="title logo__title">SGS_tools 0.0.0 documentation</p>
+    <p class="title logo__title">SGS_tools  documentation</p>
   
 </a></div>
     
@@ -409,8 +419,9 @@
                   
   <h1>Source code for sgs_tools.sgs.dynamic_coefficient</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Sequence</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Protocol</span><span class="p">,</span> <span class="n">Sequence</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Protocol</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
@@ -443,7 +454,8 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">compute</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">L</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">Mi</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">],</span> <span class="n">reg_filter</span><span class="p">:</span> <span class="n">Filter</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;solve for :math:`{c_i}` the over-determined system :math:`L = \sum_i(c_i M_i)`.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;solve for :math:`{c_i}` the over-determined system</span>
+<span class="sd">          :math:`L = \sum_i(c_i M_i)`.</span>
 
 <span class="sd">        :param L: LHS tensor</span>
 <span class="sd">        :param M: a sequence of RHS tensors</span>
@@ -459,10 +471,13 @@
 <span class="k">class</span><span class="w"> </span><span class="nc">LillyMinimisation1Model</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Lilly Minimisation (least square error) for a 1-global-coefficient model using</span>
 <span class="sd">       the Lilly identity as :math:`\overline{L \cdot M} / \overline{M \cdot M}`.</span>
-<span class="sd">       where :math:`\cdot` means  tensor contraction, :math:`\overline{*}` means regularisation filtering</span>
+<span class="sd">       where :math:`\cdot` means  tensor contraction, :math:`\overline{*}` means</span>
+<span class="sd">       regularisation filtering</span>
 
-<span class="sd">    :param contraction_dims: labels of dimensions to be contracted to form :math:`L M_i` and :math:`M_i M_j` products.</span>
-<span class="sd">    :param coeff_dim: label of dimension along which to concatenate the arrays :math:`c_i`</span>
+<span class="sd">    :param contraction_dims: labels of dimensions to be contracted to form</span>
+<span class="sd">      :math:`L M_i` and :math:`M_i M_j` products.</span>
+<span class="sd">    :param coeff_dim: label of dimension along which to concatenate the arrays</span>
+<span class="sd">      :math:`c_i`</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">contraction_dims</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
@@ -502,8 +517,10 @@
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Lilly Minimisation (least square error) for a 2-coefficient model using</span>
 <span class="sd">    the Lilly identity as :math:`L = \sum_i^2 c_i M_i`.</span>
 
-<span class="sd">    :param contraction_dims: labels of dimensions to be contracted to form :math:`L M_i` and :math:`M_i M_j` products.</span>
-<span class="sd">    :param coeff_dim: label of dimension along which to concatenate the arrays :math:`c_i`</span>
+<span class="sd">    :param contraction_dims: labels of dimensions to be contracted to form</span>
+<span class="sd">      :math:`L M_i` and :math:`M_i M_j` products.</span>
+<span class="sd">    :param coeff_dim: label of dimension along which to concatenate the arrays</span>
+<span class="sd">      :math:`c_i`</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">contraction_dims</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
@@ -566,8 +583,10 @@
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Lilly Minimisation (least square error) for a 3-coefficient model using</span>
 <span class="sd">       the Lilly identity as :math:`L = \sum_i^3 c_i M_i`.</span>
 
-<span class="sd">    :param contraction_dims: labels of dimensions to be contracted to form :math:`L M_i` and :math:`M_i M_j` products.</span>
-<span class="sd">    :param coeff_dim: label of dimension along which to concatenate the arrays :math:`c_i`</span>
+<span class="sd">    :param contraction_dims: labels of dimensions to be contracted to form</span>
+<span class="sd">      :math:`L M_i` and :math:`M_i M_j` products.</span>
+<span class="sd">    :param coeff_dim: label of dimension along which to concatenate the arrays</span>
+<span class="sd">      :math:`c_i`</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">contraction_dims</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
@@ -579,7 +598,8 @@
         <span class="bp">self</span><span class="p">,</span> <span class="n">L</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">Mi</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">],</span> <span class="n">reg_filter</span><span class="p">:</span> <span class="n">Filter</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compute dynamic coefficients of a 3-component models using Germano identity</span>
-<span class="sd">        as :math:`L = C_1 M_1 + C_2 M_2 + C_3 M_3` using regularized least-square minimisation</span>
+<span class="sd">        as :math:`L = C_1 M_1 + C_2 M_2 + C_3 M_3` using</span>
+<span class="sd">        regularized least-square minimisation</span>
 <span class="sd">        (inverting the :math:`M_i M_j` matrix explicitly).</span>
 
 <span class="sd">        :param L: LHS tensor</span>
@@ -655,8 +675,10 @@
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Lilly Minimisation (least square error) for an N-coefficient model using</span>
 <span class="sd">       the Lilly identity as :math:`L = \sum_i^N c_i M_i`.</span>
 
-<span class="sd">    :param contraction_dims: labels of dimensions to be contracted to form :math:`L M_i` and :math:`M_i M_j` products.</span>
-<span class="sd">    :param coeff_dim: label of dimension along which to concatenate the arrays :math:`c_i`</span>
+<span class="sd">    :param contraction_dims: labels of dimensions to be contracted to form</span>
+<span class="sd">      :math:`L M_i` and :math:`M_i M_j` products.</span>
+<span class="sd">    :param coeff_dim: label of dimension along which to concatenate the arrays</span>
+<span class="sd">      :math:`c_i`</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">contraction_dims</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
@@ -667,8 +689,10 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">compute</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">L</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">Mi</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">],</span> <span class="n">reg_filter</span><span class="p">:</span> <span class="n">Filter</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">:</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Solve the system  :math:`\overline{L \cdot M_i} = \sum_i^N c_j \overline{M_i \cdot M_j}`</span>
-<span class="sd">        using np.linalg.SVD, where :math:`L \cdot M_i` and :math:`M_i \cdot M_j` are scalar fields</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Solve the system</span>
+<span class="sd">        :math:`\overline{L \cdot M_i} = \sum_i^N c_j \overline{M_i \cdot M_j}`</span>
+<span class="sd">        using np.linalg.SVD, where</span>
+<span class="sd">        :math:`L \cdot M_i` and :math:`M_i \cdot M_j` are scalar fields</span>
 
 <span class="sd">        :param L: LHS tensor</span>
 <span class="sd">        :param M: a sequence of RHS tensors</span>
@@ -712,8 +736,11 @@
         <span class="p">)</span>
 
         <span class="k">if</span> <span class="n">mm_condition</span> <span class="o">&gt;</span> <span class="mf">1e15</span><span class="p">:</span>
-            <span class="n">s</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Warning: Large condtion number max=</span><span class="si">{</span><span class="n">mm_condition</span><span class="si">:</span><span class="s2">g</span><span class="si">}</span><span class="s2"> for the MM tensor. May degrade accuracy of coefficients&quot;</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Warning: Large condtion number max=</span><span class="si">{</span><span class="n">mm_condition</span><span class="si">:</span><span class="s2">g</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="s2">&quot; for the MM tensor. May degrade accuracy of coefficients&quot;</span>
+            <span class="p">)</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
         <span class="n">coefficients</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">apply_ufunc</span><span class="p">(</span>
             <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">solve</span><span class="p">,</span>
@@ -761,8 +788,8 @@
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
-<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+  <script defer src="../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb"></script>
+<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -782,7 +809,7 @@
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.0.4.
     <br/>
   </p>
 </div>
@@ -796,7 +823,7 @@
         <div class="footer-item">
 <p class="theme-version">
   <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.17.1.
 </p></div>
       
     </div>

@@ -1,9 +1,11 @@
 import warnings
-from typing import Sequence
+from collections.abc import Sequence
 
 import numpy as np
 import xarray as xr
 import xrft  # type: ignore
+
+from sgs_tools.util.dask_adapt_chunking import chunk_ds
 
 
 def radial_spectrum(
@@ -13,40 +15,59 @@ def radial_spectrum(
     bin_anchor: str = "center",
     truncate: bool = True,
     scaling: str = "spectrum",
-    prefix="freq_",
+    prefix: str = "freq_",
 ) -> xr.DataArray:
     r"""Isotropize a 2D power spectrum or cross spectrum
     by taking an "spherical" average over the specified dimensions.
 
     .. math::
-        \mathbb{F}_\text{iso}(k_r) &= \sum_{k_r: |k_r| \in [kr_0, kr_1]} |\mathbb{F}(\mathbf{k})|^2 * w(\mathbf{k})  \\
-        k_r &= \langle k \rangle_{|k| \in [kr_0, kr_1]}
+      \mathbb{F}_\text{iso}(k_r) &= \sum_{k_r: |k_r| \in [kr_0, kr_1]}
+      |\mathbb{F}(\mathbf{k})|^2 * w(\mathbf{k})  \\
+      k_r &= \langle k \rangle_{|k| \in [kr_0, kr_1]}
 
-    where :math:`kr` is the radial wavenumber and the weights :math:`w` are defined implicitly through the scaling.
-    Always :math:`\sum_\mathbf{k} |\mathbb{F}(\mathbf{k})|^2 = \sum \mathbb{F}_\text{iso}(k_r) *  w(k_r)`.
-    This satisfies Parseval assuming :math:`\sum_\mathbf{k} |\mathbb{F}(\mathbf{k})|^2 = \sum real\_data^2 * dx * dy`.
+    where :math:`k_r` is the radial wavenumber and the weights :math:`w`
+    are defined implicitly through the ``scaling``.
+
+    Always :math:`\sum_\mathbf{k} |\mathbb{F}(\mathbf{k})|^2 =
+    \sum \mathbb{F}_\text{iso}(k_r) * w(k_r)`.
+    This satisfies Parseval assuming
+    :math:`\sum_\mathbf{k} |\mathbb{F}(\mathbf{k})|^2 =
+    \sum \mathbb{F}(\mathbf{x})^2 * dx * dy` .
 
     :param ps:
         The power spectrum or cross spectrum to be isotropized.
     :param fftdim:
         The fft dimensions overwhich the isotropization must be performed.
     :param radial_bin_width:
-        Width of radial bins in units of inverse length (or whatever the 2d power spectrum is in)
+        Width of radial bins in units of inverse length
+        (or whatever the 2d power spectrum is in)
     :param truncate:
-        If True, the spectrum will be truncated for wavenumbers larger than min(max(ps[fftdim].size)).
+        If True, the spectrum will be truncated for
+        wavenumbers larger than min(max(ps[fftdim].size)).
+
     :param bin_anchor:
-        Where to place the radial wavenumber within the bin. Choices {'left', 'right', 'centre', 'com'}.
-        If `com` : compute as the centre-of-mass radius : :math:`k_r = \sum_{|k| \in [kr_0, kr_1]} (\mathbb{F} * |\mathbf{k}|) /  \mathbb{F}_\text{iso}(k_r)` before rescaling.
-        Default: `com`.
-    :param scaling:
-        Rescale the power spectrum to satisfy :math:`\sum ps = \sum \mathbb{F}_\text{iso} * w(k_r)`
+        Where to place the radial wavenumber within the bin.
+        Choices ``left``, ``right``, ``centre``, ``com``.
+        If ``com``: compute as the centre-of-mass radius
+        :math:`k_r = \sum_{|k| \in [kr_0, kr_1]} (\mathbb{F} * |\mathbf{k}|)
+        / \mathbb{F}_\text{iso}(k_r)` before rescaling.
+        Default: ``com``.
 
-        * `density`: set :math:`w(k_r) = \pi * ((k_r^{top})^2 - (k_r^{bottom})^2)`, where :math:`k_r^{top}` and :math:`k_r^{bottom}` are the bin edges.
+    :param scaling: Rescale the power spectrum to satisfy
+        :math:`\sum ps = \sum \mathbb{F}_\text{iso} * w(k_r)`
 
-        * `spectrum`: set :math:`w(k_r) = 1`
+        * ``density``:
+          set :math:`w(k_r) = \pi * ((k_r^{top})^2 - (k_r^{bottom})^2)`,
+          where :math:`k_r^{top}` and :math:`k_r^{bottom}` are the bin edges.
 
+        * ``spectrum``:
+          set :math:`w(k_r) = 1`
+
+    :param prefix:
+        Prefix for the name of the new spectral dimension.
     :return: an `xarray.DataArray` with the isotropic spectrum
-        coordinates for the radial wavenumber ( `prefix` r), bin width ( `prefix` dr) and corresponding weigths ( `prefix` dA), i.e. :math:`w(k_r)`.
+        coordinates for the radial wavenumber ( `prefix` r), bin width ( `prefix` dr)
+        and corresponding weigths ( `prefix` dA), i.e. :math:`w(k_r)`.
     """
     # name of new spectral dimension
     dim_name = prefix + "r"
@@ -56,13 +77,14 @@ def radial_spectrum(
         {f"d{i}": (d, ps.coords[d].values) for i, d in enumerate(fftdim)}
     )
     freq_r = ((fftcoords**2).to_dataarray().sum("variable") ** 0.5).rename(dim_name)
-
-    if radial_bin_width <= max([ps.coords[d].attrs["spacing"] for d in fftdim]):
+    max_linear_freq_space = max([ps.coords[d].attrs["spacing"] for d in fftdim])
+    if radial_bin_width <= max_linear_freq_space:
         msg = (
-            f"radial_bin_width {radial_bin_width} <= max linear frequency spacing"
+            f"radial_bin_width {radial_bin_width} <= "
+            f"max linear frequency spacing {max_linear_freq_space}"
             ", likely to have empty bins with nan values"
         )
-        warnings.warn(UserWarning(msg))
+        warnings.warn(UserWarning(msg), stacklevel=2)
 
     # select radial bins
     if truncate:
@@ -114,8 +136,11 @@ def radial_spectrum(
         iso_ps = iso_ps.assign_coords({prefix + "dA": (dim_name, annulus_area)})
         iso_ps[prefix + "dA"].attrs["description"] = "pi * (rmax^2 - rmin^2)"
         if not truncate:
-            msg = "Energy density scaling is inconsistent beyond the min(max(linear frequency)). Interpete with caution!"
-            warnings.warn(msg)
+            msg = (
+                "Energy density scaling is inconsistent beyond"
+                "the min(max(linear frequency)). Interpete with caution!"
+            )
+            warnings.warn(msg, stacklevel=2)
     elif scaling == "spectrum":
         iso_ps = iso_ps.assign_coords({prefix + "dA": (dim_name, np.ones_like(iso_ps))})
         iso_ps[prefix + "dA"].attrs["description"] = "trivial"
@@ -137,24 +162,37 @@ def spectra_1d_radial(
     fillnan: float = 0.0,
 ) -> xr.Dataset:
     r"""
-    Compute a 1d directional and radial power and cross spectra of all fields in the `simultation` Dataset.
-    Notes: resulting spectral cooordinates are in units of inverse length, not radians/length.
+    Compute a 1d directional and radial power and cross spectra of all fields
+    in the `simultation` Dataset.
+    Notes: resulting spectral cooordinates are in units of inverse length,
+    not radians/length.
 
-    :param simulation: xarray Dataset of multidimensional fields. must contain the set of `power_spectra_fields` and `cross_spectra_fields`
+    :param simulation: xarray Dataset of multidimensional fields.
+      must contain the set of `power_spectra_fields` and `cross_spectra_fields`
 
-    :param hdims:  horizonal dimensions along which to compute linear spectra. The radial spectrum is computed along the Euclidean radius along vector spanned by these dimensions.
+    :param hdims:  horizonal dimensions along which to compute linear spectra.
+       The radial spectrum is computed along the Euclidean radius
+       along vector spanned by these dimensions.
 
     :param power_spectra_fields: sequence of fields whose power spectrum to compute
 
-    :param cross_spectra_fields: sequence of tuples of fields whose cross-spectrum to compute
+    :param cross_spectra_fields: sequence of tuples of fields
+      whose cross-spectrum to compute
 
-    :param radial_smooth_factor: smoothing factor for radial spectral bins. If 2 will have radial bin widht is 2*linear wavenumber.
+    :param radial_smooth_factor: smoothing factor for radial spectral bins.
+      If 2 will have radial bin widht is 2*linear wavenumber.
 
-    :param radial_truncation: switch to include/exclude aliased wavenumber beyond the max. 1d freqeuncy in the radial spectrum. If **True** the result won't respect Parseval exactly.
+    :param radial_truncation: switch to include/exclude aliased wavenumber beyond max.
+      1d freqeuncy in the radial spectrum.
+      If **True** the result won't respect Parseval exactly.
 
-    :param fillnan: value to fill nans with in order to compute spectrum of dirty date. If set to a nan value (e.g. np.nan) will produce nan spectra globally.  Defaults to 0.
+    :param fillnan: value to fill nans with in order to compute spectrum of dirty date.
+      If set to a nan value (e.g. np.nan) will produce nan spectra globally.
+      Defaults to 0.
 
-    :return: an xarray Dataset with the requested 1d and radial power and co-spectra. The number of physical-space grid size and cell size along hdims is included in the attributes along with the fourier normalization convention.
+    :return: an xarray Dataset with the requested 1d and radial power and co-spectra.
+      The number of physical-space grid size and cell size along hdims is included
+      in the attributes along with the fourier normalization convention.
 
     """
     spec = {}
@@ -168,9 +206,17 @@ def spectra_1d_radial(
         "'r' dimension found in hdims, but it is reserved for radial spectra"
     )
 
+    all_fields = set(power_spectra_fields)
+    for cfields in cross_spectra_fields:
+        all_fields.update(cfields)
+    # xrft doesn't play well with nans and chunking in to-be-spectral directions
+    prepped_data = chunk_ds(sim[list(all_fields)], dict.fromkeys(hdims, -1)).fillna(
+        fillnan
+    )
+
     # power spectra
     for field in power_spectra_fields:
-        data = sim[field].fillna(fillnan)  # xrft doesn't play well with nan
+        data = prepped_data[field]
         for x in hdims:
             spec[f"{field}_F{x}"] = xrft.power_spectrum(
                 data,
@@ -200,8 +246,8 @@ def spectra_1d_radial(
 
     # cross spectra
     for field1, field2 in cross_spectra_fields:
-        data1 = sim[field1].fillna(fillnan)  # xrft doesn't play well with nan
-        data2 = sim[field2].fillna(fillnan)  # xrft doesn't play well with nan
+        data1 = prepped_data[field1]
+        data2 = prepped_data[field2]
         for x in hdims:
             spec[f"{field1}_{field2}_F{x}"] = xrft.cross_spectrum(
                 data1,

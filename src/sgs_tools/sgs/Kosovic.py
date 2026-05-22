@@ -1,6 +1,6 @@
 import warnings
+from collections.abc import Sequence
 from dataclasses import dataclass
-from typing import Sequence
 
 import xarray as xr
 
@@ -18,7 +18,8 @@ from .util import _assert_coord_dx
 @dataclass(frozen=True)
 class SSquaredVelocityModel:
     r"""Kosovic JFM 1997, 336 and Speziale 1991 Ann Rev Fluid Mech 23
-    compoment :math:`\tau = (c_s \Delta)^2 \mathrm{Traceless}(\overline{S_{ik}} \overline{S_{kj}})`
+    compoment :math:`\tau =
+    (c_s \Delta)^2 \mathrm{Traceless}(\overline{S_{ik}} \overline{S_{kj}})`
 
     :ivar strain: grid-scale rate-of-strain
     :ivar cs: Smagorinsky coefficient
@@ -55,7 +56,8 @@ class SSquaredVelocityModel:
 @dataclass(frozen=True)
 class SOmegaVelocityModel:
     r"""Kosovic JFM 1997, 336 / Speziale 1991 Ann Rev Fluid Mech 23
-    component :math:`\tau = (c_s \Delta) ^2 \mathrm{Sym}[\overline{S_{ik}}\overline{\Omega_{kj}}]`
+    component :math:`\tau =
+    (c_s \Delta) ^2 \mathrm{Sym}[\overline{S_{ik}}\overline{\Omega_{kj}}]`
 
     :ivar strain: grid-scale rate-of-strain
     :ivar rot: grid-scale rate-of-rotation
@@ -72,7 +74,8 @@ class SOmegaVelocityModel:
 
     def sgs_tensor(self, filter: Filter) -> xr.DataArray:
         r"""compute model for SGS tensor
-            :math:`\tau = (c_s \Delta) ^2 \mathrm{Sym}[\overline{S_{ik}}\overline{\Omega_{kj}}]`
+            :math:`\tau =
+            (c_s \Delta) ^2 \mathrm{Sym}[\overline{S_{ik}}\overline{\Omega_{kj}}]`
             for a given `filter` (which can be trivial, i.e. ``IdentityFilter``)
 
         :param filter: Filter used to separate "large" and "small" scales
@@ -83,8 +86,9 @@ class SOmegaVelocityModel:
         _assert_coord_dx(filter.filter_dims, self.strain, self.dx)
         _assert_coord_dx(filter.filter_dims, self.rot, self.dx)
         warnings.warn(
-            """Warning: No check that self.strain is symmetric and self.rot is antisymmetric.
-          If false will produce trace-full result"""
+            "Warning: No check that self.strain is symmetric and"
+            "self.rot is antisymmetric.If false will produce trace-full result",
+            stacklevel=2,
         )
 
         sij = filter.filter(self.strain).rename({self.tensor_dims[1]: "dummy1"})
@@ -96,6 +100,9 @@ class SOmegaVelocityModel:
         return tau
 
 
+__default_min = LillyMinimisation2Model(contraction_dims=["c1", "c2"], coeff_dim="cdim")
+
+
 def DynamicKosovicModel(
     sij: xr.DataArray,
     omegaij: xr.DataArray,
@@ -103,19 +110,20 @@ def DynamicKosovicModel(
     res: float,
     compoment_coeff: Sequence[float],
     tensor_dims: tuple[str, str] = ("c1", "c2"),
-    minimisation: Minimisation = LillyMinimisation2Model(
-        contraction_dims=["c1", "c2"], coeff_dim="cdim"
-    ),
+    minimisation: Minimisation = __default_min,
 ) -> LinCombDynamicModel:
     r"""Dynamic version of the model by
-    Carati & Cabot Proceedings of the 1996 Summer Program -- Center for Turbulence Research
+    Carati & Cabot Proceedings of the 1996 Summer Program --
+    Center for Turbulence Research
 
     :param sij: grid-scale rate-of-strain tensor
     :param omegaij: grid-scale rate-of-rotation tensor
     :param vel: velocity field used for dynamic coefficient computation
     :param res: constant resolution with respect to dimension to-be-filtered
-    :param compoment_coeff: tuple of three Smagorinsky coefficients for parallel, perpendicular, and normal components
-    :param tensor_dims: labels of dimensions indexing tensor components, defaults to ("c1", "c2")
+    :param compoment_coeff: tuple of three Smagorinsky coefficients for parallel,
+      perpendicular, and normal components
+    :param tensor_dims: labels of dimensions indexing tensor components,
+      defaults to ("c1", "c2")
     :return: Combined SGS model with dynamically computed coefficients
     """
     static_model = LinCombSGSModel(

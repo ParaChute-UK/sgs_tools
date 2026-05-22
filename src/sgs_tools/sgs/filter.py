@@ -1,5 +1,5 @@
+from collections.abc import Hashable, Sequence
 from dataclasses import dataclass
-from typing import Hashable, Sequence
 
 import dask.array as da
 import numpy as np
@@ -64,6 +64,16 @@ class Filter:
         shape = self.scales()
         return np.prod(shape) ** (1 / len(shape))
 
+    @property
+    def window(self) -> dict[Hashable, int]:
+        dic_dims = self._filter_kernel_map()
+        dic_roll = {}
+        for d in self.filter_dims:
+            axnum = self.kernel.get_axis_num(dic_dims[d])
+            assert isinstance(axnum, int)  # appease xarray typing
+            dic_roll[d] = self.kernel.shape[axnum]
+        return dic_roll
+
     def _filter_kernel_map(self) -> dict[Hashable, str]:
         """matches the dimesions of the `kernel` against `self.filter_dims`"""
         assert len(self.filter_dims) == len(self.kernel.dims)
@@ -84,13 +94,7 @@ class Filter:
         """
         assert (d in field.dims for d in self.filter_dims)
         dic_dims = self._filter_kernel_map()
-        dic_roll: dict[Hashable, int] = {}
-        for d in self.filter_dims:
-            axnum = self.kernel.get_axis_num(dic_dims[d])
-            assert isinstance(axnum, int)  # appease xarray typing
-            dic_roll[d] = self.kernel.shape[axnum]
-
-        filtered = field.rolling(dic_roll).construct(dic_dims).dot(self.kernel)
+        filtered = field.rolling(self.window).construct(dic_dims).dot(self.kernel)
         # arr.rolling().construct.() blows up the underlying chunksizes -- restore
         filtered = filtered.chunk(
             {k: field.chunks[i] for i, k in enumerate(field.dims)}  # type: ignore

@@ -1,4 +1,5 @@
 import numpy as np
+import pytest
 import xarray as xr  # only used for type hints
 
 from sgs_tools.sgs.dynamic_coefficient import (
@@ -33,6 +34,8 @@ def linear():
     )
 
 
+@pytest.mark.unit
+@pytest.mark.fast
 def test_LillyMinimisation():
     scale = np.random.rand()
     id = IdentityFilter(None, ["x", "y"])
@@ -44,6 +47,8 @@ def test_LillyMinimisation():
         assert np.allclose(scale, coeff.squeeze().data)
 
 
+@pytest.mark.unit
+@pytest.mark.fast
 def test_LinComb2ModelLillyMinimisation():
     id = IdentityFilter(None, ["x", "y"])
     min = LillyMinimisation2Model(["c1", "c2"], "cdim")
@@ -53,13 +58,18 @@ def test_LinComb2ModelLillyMinimisation():
             M = [arr, arr**2]
             coeff = min.compute(L, M, id)
             assert np.allclose(scale1, coeff.isel(cdim=0)), (
-                f"scales: {scale1}, {scale2}, coeff mean: {np.mean(coeff.isel(cdim=0))}, std: {np.std(coeff.isel(cdim=0))}"
+                f"scales: {scale1}, {scale2}, coeff mean: {np.mean(coeff.isel(cdim=0))}"
+                f", std: {np.std(coeff.isel(cdim=0))}"
             )
             assert np.allclose(scale2, coeff.isel(cdim=1)), (
-                f"scales: {scale2}, {scale2}, coeff mean: {np.mean(coeff.isel(cdim=1))}, std: {np.std(coeff.isel(cdim=1))}"
+                f"scales: {scale2}, {scale2}, coeff mean: {np.mean(coeff.isel(cdim=1))}"
+                f", std: {np.std(coeff.isel(cdim=1))}"
             )
 
 
+# Fixme!!!
+@pytest.mark.unit
+@pytest.mark.fast
 def LinComb3ModelLillyMinimisation():
     id = IdentityFilter(None, ["x", "y"])
     min = LillyMinimisation3Model(["c1", "c2"], "cdim")
@@ -74,16 +84,21 @@ def LinComb3ModelLillyMinimisation():
             M = [arr, arr**2, arr**3]
             coeff = min.compute(L, M, id)
             assert np.allclose(scale1, coeff.isel(cdim=0)), (
-                f"scale1: {scale1}, coeff mean: {np.mean(coeff.isel(cdim=0))}, std: {np.std(coeff.isel(cdim=0))}"
+                f"scale1: {scale1}, coeff mean: {np.mean(coeff.isel(cdim=0))}"
+                f", std: {np.std(coeff.isel(cdim=0))}"
             )
             assert np.allclose(scale2, coeff.isel(cdim=1)), (
-                f"scale1: {scale2}, coeff mean: {np.mean(coeff.isel(cdim=1))}, std: {np.std(coeff.isel(cdim=1))}"
+                f"scale1: {scale2}, coeff mean: {np.mean(coeff.isel(cdim=1))}"
+                f", std: {np.std(coeff.isel(cdim=1))}"
             )
             assert np.allclose(scale3, coeff.isel(cdim=2)), (
-                f"scale1: {scale3}, coeff mean: {np.mean(coeff.isel(cdim=2))}, std: {np.std(coeff.isel(cdim=2))}"
+                f"scale1: {scale3}, coeff mean: {np.mean(coeff.isel(cdim=2))}"
+                f",  std: {np.std(coeff.isel(cdim=2))}"
             )
 
 
+@pytest.mark.unit
+@pytest.mark.slow
 def test_LinCombModelLillyMinimisation():
     id = IdentityFilter(None, ["x", "y"])
     min = LillyMinimisationNModel(["c1", "c2"], "cdim")

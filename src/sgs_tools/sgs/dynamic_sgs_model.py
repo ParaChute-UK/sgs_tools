@@ -107,7 +107,8 @@ class DynamicModel:
     :ivar leonard: Leonard tensor for the large-scale equation
     :ivar minimisation: Minimisation method to compute coefficients
     :meth compute_coeff: computes the amplitude coefficients for the SGS model
-    :meth sgs_tensor: computes the SGS tensor for a given test and regularisation filters
+    :meth sgs_tensor: computes the SGS tensor for a given
+      test and regularisation filters
     """
 
     static_model: SGSModel
@@ -174,7 +175,8 @@ class LinCombDynamicModel:
 
         tau_list = self.static_model.sgs_tensor_list(test_filter)
         coeff = self.compute_coeff(test_filter, reg_filter)
-        # ensure alignment of coefficient index label between static_model and minimisation
+        # ensure alignment of coefficient index label
+        # between static_model and minimisation
         cdim = self.minimisation.coeff_dim
         if cdim in tau_list[0].dims:
             coeff = coeff.rename({cdim: cdim + "_dummy"})

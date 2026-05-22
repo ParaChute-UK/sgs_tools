@@ -40,7 +40,7 @@ jobs:
           ${{ runner.os }}-poetry-
 
     - name: Install doc dependencies
-      run: poetry install --with doc
+      run: poetry install --extras doc
 
     - name: Build Sphinx docs
       run: |

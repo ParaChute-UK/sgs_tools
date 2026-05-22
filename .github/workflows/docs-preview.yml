@@ -38,7 +38,7 @@ jobs:
           ${{ runner.os }}-poetry-
 
     - name: Install doc dependencies
-      run: poetry install --with doc
+      run: poetry install --no-interaction --extras doc
 
     - name: Build Sphinx docs
       run: |

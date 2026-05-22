@@ -418,7 +418,7 @@
                 <article class="bd-article">
                   
   <h1>Source code for sgs_tools.geometry.tensor_algebra</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Sequence</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Sequence</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">dask.array</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">da</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
@@ -436,10 +436,13 @@
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Tensor product :math:`a_i a_j` from vector field ``arr``.</span>
 <span class="sd">    Assumes that ``arr`` has dimensions ``vec_dim`` but not dimension ``new_dim``.</span>
 
-<span class="sd">    :param arr: xarray Dataset with dimension `vec_dim` which will be used for the tensor product</span>
-<span class="sd">    :param vec_dim: the dimension of the vector field to be used to form the tensor product</span>
+<span class="sd">    :param arr: xarray Dataset with dimension `vec_dim` which will be used</span>
+<span class="sd">      for the tensor product</span>
+<span class="sd">    :param vec_dim: the dimension of the vector field to be used to form</span>
+<span class="sd">      the tensor product</span>
 <span class="sd">    :param new_dim: the name of the new dimension to be created for the tensor product</span>
-<span class="sd">    :param returns: xarray DataArray with the ``vec_dim`` and ``new_dim`` dimensions sorted to the front.</span>
+<span class="sd">    :param returns: xarray DataArray with the ``vec_dim`` and ``new_dim``</span>
+<span class="sd">      dimensions sorted to the front.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">assert</span> <span class="n">vec_dim</span> <span class="ow">in</span> <span class="n">arr</span><span class="o">.</span><span class="n">dims</span>
     <span class="k">assert</span> <span class="n">new_dim</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">arr</span><span class="o">.</span><span class="n">dims</span>
@@ -544,7 +547,7 @@
         <span class="p">)</span>
         <span class="c1"># xr.align(tensor[dims[0]], tensor[c], join=&quot;exact&quot;)</span>
 
-    <span class="n">transpose_map</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">dims</span><span class="p">,</span> <span class="n">dims</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+    <span class="n">transpose_map</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">dims</span><span class="p">,</span> <span class="n">dims</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
     <span class="n">sij</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">tensor</span> <span class="o">+</span> <span class="n">tensor</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">transpose_map</span><span class="p">))</span>
     <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">sij</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
@@ -573,7 +576,7 @@
             <span class="s2">&quot;Coordinates must match&quot;</span>
         <span class="p">)</span>
 
-    <span class="n">transpose_map</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">dims</span><span class="p">,</span> <span class="n">dims</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+    <span class="n">transpose_map</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">dims</span><span class="p">,</span> <span class="n">dims</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
     <span class="n">omij</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">tensor</span> <span class="o">-</span> <span class="n">tensor</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">transpose_map</span><span class="p">))</span>
     <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">omij</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>

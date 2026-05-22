@@ -432,7 +432,8 @@
 <span class="k">class</span><span class="w"> </span><span class="nc">Grid</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Abstract base grid object.</span>
 
-<span class="sd">    * :meth:`mesh`: return a dictionary of type {axis_name : `np.meshgrid` of coordinate}</span>
+<span class="sd">    * :meth:`mesh`: return a dictionary of type</span>
+<span class="sd">       {axis_name : `np.meshgrid` of coordinate}</span>
 <span class="sd">    * :meth:`coords`: return a dictionary of type {axis_name : 1d coordinate values}</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -482,7 +483,7 @@
         <span class="n">axes</span> <span class="o">=</span> <span class="n">coords</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
 
         <span class="n">coord_mesh</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="o">*</span><span class="n">axes</span><span class="p">,</span> <span class="n">indexing</span><span class="o">=</span><span class="s2">&quot;ij&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">lbls</span><span class="p">,</span> <span class="n">coord_mesh</span><span class="p">))</span></div>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">lbls</span><span class="p">,</span> <span class="n">coord_mesh</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span></div>
 
 
 

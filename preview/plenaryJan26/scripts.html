@@ -501,8 +501,8 @@ Recognizes glob patterns and walks directory trees, e.g. <code class="docutils l
 All files in a glob pattern should belong to the same simulation.</p>
 </p></li>
 <li><p id="cs_dynamic-input_format"><a class="reference internal" href="#cs_dynamic-input_format" title="cs_dynamic input_format"><strong><code class="docutils literal notranslate"><span class="pre">input_format</span></code></strong></a> - Type of <code class="docutils literal notranslate"><span class="pre">'input_files'</span></code>. Only support different NetCDF flavours from various production codes. <code class="docutils literal notranslate"><span class="pre">'sgs'</span></code> refers to files produced by sgs_tools.</p></li>
-<li><p id="cs_dynamic---h_resolution"><a class="reference internal" href="#cs_dynamic---h_resolution" title="cs_dynamic --h_resolution"><strong><code class="docutils literal notranslate"><span class="pre">--h_resolution</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">H_RESOLUTION</span></code> - <p>horizontal resolution in meters.
-<em>ONLY</em> used for UM ideal simulations(will use to overwrite horizontal coordinates).</p>
+<li><p id="cs_dynamic---h_resolution"><a class="reference internal" href="#cs_dynamic---h_resolution" title="cs_dynamic --h_resolution"><strong><code class="docutils literal notranslate"><span class="pre">--h_resolution</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">H_RESOLUTION</span></code> - <p>horizontal resolution in meters. <em>ONLY</em> used for UM ideal simulations
+(will use to overwrite horizontal coordinates).</p>
  (default: <code class="docutils literal notranslate"><span class="pre">0</span></code>)</p></li>
 <li><p id="cs_dynamic---t_range"><a class="reference internal" href="#cs_dynamic---t_range" title="cs_dynamic --t_range"><strong><code class="docutils literal notranslate"><span class="pre">--t_range</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">T_RANGE</span></code> - time interval to consider, in code coordinates, negative value are interpreted as min/max respectively (default: <code class="docutils literal notranslate"><span class="pre">[-1,</span> <span class="pre">-1]</span></code>)</p></li>
 <li><p id="cs_dynamic---z_range"><a class="reference internal" href="#cs_dynamic---z_range" title="cs_dynamic --z_range"><strong><code class="docutils literal notranslate"><span class="pre">--z_range</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">Z_RANGE</span></code> - vertical interval to consider, in code coordinates, negative values are interpreted as take the min/max respectively (default: <code class="docutils literal notranslate"><span class="pre">[-1,</span> <span class="pre">-1]</span></code>)</p></li>
@@ -516,22 +516,29 @@ All files in a glob pattern should belong to the same simulation.</p>
 Will create/overwrite existing file and
 create any missing intermediate directories</p>
 </p></li>
-<li><p id="cs_dynamic---fname_suffix"><a class="reference internal" href="#cs_dynamic---fname_suffix" title="cs_dynamic --fname_suffix"><strong><code class="docutils literal notranslate"><span class="pre">--fname_suffix</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">FNAME_SUFFIX</span></code> - Optional suffix appended to output filenames. Final pattern: <a href="#id1"><span class="problematic" id="id2">``</span></a>{model_name}``_``{fname_suffix}``_pp.nc (default: <code class="docutils literal notranslate"></code>)</p></li>
+<li><p id="cs_dynamic---fname_suffix"><a class="reference internal" href="#cs_dynamic---fname_suffix" title="cs_dynamic --fname_suffix"><strong><code class="docutils literal notranslate"><span class="pre">--fname_suffix</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">FNAME_SUFFIX</span></code> - <p>Optional suffix appended to output filenames.
+Final pattern: <code class="docutils literal notranslate"><span class="pre">&lt;model_name&gt;_&lt;fname_suffix&gt;_pp.nc</span></code>
+where &lt;model_name&gt; is detemined by the <code class="docutils literal notranslate"><span class="pre">sgs_model</span></code></p>
+ (default: <code class="docutils literal notranslate"></code>)</p></li>
 </ul>
 </section>
 <section id="cs_dynamic-Dask-parameters">
 <h4>Dask parameters<a class="headerlink" href="#cs_dynamic-Dask-parameters" title="Link to this heading">#</a></h4>
 <ul class="simple">
-<li><p id="cs_dynamic---z_chunk_size"><a class="reference internal" href="#cs_dynamic---z_chunk_size" title="cs_dynamic --z_chunk_size"><strong><code class="docutils literal notranslate"><span class="pre">--z_chunk_size</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">Z_CHUNK_SIZE</span></code> - <p>Size of dask array chunks in the vertical direction. Should divide the total number of levels.
+<li><p id="cs_dynamic---z_chunk_size"><a class="reference internal" href="#cs_dynamic---z_chunk_size" title="cs_dynamic --z_chunk_size"><strong><code class="docutils literal notranslate"><span class="pre">--z_chunk_size</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">Z_CHUNK_SIZE</span></code> - <p>Size of dask array chunks in the vertical direction.
+Should divide the total number of levels.
 Smaller size leads to smaller memory footprint, but may penalize walltime.</p>
 </p></li>
-<li><p id="cs_dynamic---t_chunk_size"><a class="reference internal" href="#cs_dynamic---t_chunk_size" title="cs_dynamic --t_chunk_size"><strong><code class="docutils literal notranslate"><span class="pre">--t_chunk_size</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">T_CHUNK_SIZE</span></code> - <p>Size of dask array chunks in the time direction. Should divide the total number time snapshots.
+<li><p id="cs_dynamic---t_chunk_size"><a class="reference internal" href="#cs_dynamic---t_chunk_size" title="cs_dynamic --t_chunk_size"><strong><code class="docutils literal notranslate"><span class="pre">--t_chunk_size</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">T_CHUNK_SIZE</span></code> - <p>Size of dask array chunks in the time direction.
+Should divide the total number time snapshots.
 Smaller size leads to smaller memory footprint, but may penalize walltime.</p>
 </p></li>
-<li><p id="cs_dynamic---h_chunk_size"><a class="reference internal" href="#cs_dynamic---h_chunk_size" title="cs_dynamic --h_chunk_size"><strong><code class="docutils literal notranslate"><span class="pre">--h_chunk_size</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">H_CHUNK_SIZE</span></code> - <p>Size of dask array chunks in the <code class="docutils literal notranslate"><span class="pre">&quot;horizontal&quot;</span></code> directions. Should divide into the domain size.
-Smaller size leads to smaller memory footprint, but can penalize walltime heavily (building DAGs).
-Default -1 means don’t chunk, keep dimesions together – useful for horizontal filtering.
-If it doesn’t fit in memory try 1/2 to 1/4 of domain size.</p>
+<li><p id="cs_dynamic---h_chunk_size"><a class="reference internal" href="#cs_dynamic---h_chunk_size" title="cs_dynamic --h_chunk_size"><strong><code class="docutils literal notranslate"><span class="pre">--h_chunk_size</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">H_CHUNK_SIZE</span></code> - <p>Size of dask array chunks in the <code class="docutils literal notranslate"><span class="pre">&quot;horizontal&quot;</span></code> directions.
+Should divide into the domain size.
+Smaller size leads to smaller memory footprint, but can penalize walltime heavily
+(building DAGs). Default -1 means don’t chunk, keep dimesions together –
+useful for horizontal filtering. If it doesn’t fit in memory
+try 1/2 to 1/4 of domain size.</p>
  (default: <code class="docutils literal notranslate"><span class="pre">-1</span></code>)</p></li>
 <li><p id="cs_dynamic---mem_limit_MB"><a class="reference internal" href="#cs_dynamic---mem_limit_MB" title="cs_dynamic --mem_limit_MB"><strong><code class="docutils literal notranslate"><span class="pre">--mem_limit_MB</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">MEM_LIMIT_MB</span></code> - <p>Target memory limit in MB used to control chunk size of dask array chunks.
 If on a dask cluster it is
@@ -545,7 +552,7 @@ Smaller size leads to smaller memory footprint, but may penalize walltime.</p>
 <p>Compute dynamic coefficient fields for the selected SGS models, filtering and regularization kernels and scale. Save each model to separate NetCDF file.</p>
 <ul class="simple">
 <li><p id="cs_dynamic---filter_type"><a class="reference internal" href="#cs_dynamic---filter_type" title="cs_dynamic --filter_type"><strong><code class="docutils literal notranslate"><span class="pre">--filter_type</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">FILTER_TYPE</span></code> - Shape of filter kernel to use for scale separation. (default: <code class="docutils literal notranslate"><span class="pre">box</span></code>)</p></li>
-<li><p id="cs_dynamic---filter_scales"><a class="reference internal" href="#cs_dynamic---filter_scales" title="cs_dynamic --filter_scales"><strong><code class="docutils literal notranslate"><span class="pre">--filter_scales</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">FILTER_SCALES</span></code> - Scales to perform filter at, in number of cells. If a single value is given, it will be used for all <cite>regularize_filter_scales</cite>. Otherwise, must provide as many values as for <cite>regularize_filter_scales</cite> (default: <code class="docutils literal notranslate"><span class="pre">(2,)</span></code>)</p></li>
+<li><p id="cs_dynamic---filter_scales"><a class="reference internal" href="#cs_dynamic---filter_scales" title="cs_dynamic --filter_scales"><strong><code class="docutils literal notranslate"><span class="pre">--filter_scales</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">FILTER_SCALES</span></code> - Scales to perform filter at, in number of cells. If a single value is given, it will be usedfor all <cite>regularize_filter_scales</cite>. Otherwise, must provide as many values as for <cite>regularize_filter_scales</cite> (default: <code class="docutils literal notranslate"><span class="pre">(2,)</span></code>)</p></li>
 <li><p id="cs_dynamic---regularize_filter_type"><a class="reference internal" href="#cs_dynamic---regularize_filter_type" title="cs_dynamic --regularize_filter_type"><strong><code class="docutils literal notranslate"><span class="pre">--regularize_filter_type</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">REGULARIZE_FILTER_TYPE</span></code> - Shape of filter kernel used for coefficient regularization. (default: <code class="docutils literal notranslate"><span class="pre">box</span></code>)</p></li>
 <li><p id="cs_dynamic---regularize_filter_scales"><a class="reference internal" href="#cs_dynamic---regularize_filter_scales" title="cs_dynamic --regularize_filter_scales"><strong><code class="docutils literal notranslate"><span class="pre">--regularize_filter_scales</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">REGULARIZE_FILTER_SCALES</span></code> - Scales to perform regularization at, in number of cells. If a single value is given, it will be used for all <cite>filter_scale</cite>. Otherwise, must provide as many values as for <cite>filter_scale</cite> (default: <code class="docutils literal notranslate"><span class="pre">(2,)</span></code>)</p></li>
 </ul>
@@ -605,8 +612,8 @@ Recognizes glob patterns and walks directory trees, e.g. <code class="docutils l
 All files in a glob pattern should belong to the same simulation.</p>
 </p></li>
 <li><p id="post_process-input_format"><a class="reference internal" href="#post_process-input_format" title="post_process input_format"><strong><code class="docutils literal notranslate"><span class="pre">input_format</span></code></strong></a> - Type of <code class="docutils literal notranslate"><span class="pre">'input_files'</span></code>. Only support different NetCDF flavours from various production codes. <code class="docutils literal notranslate"><span class="pre">'sgs'</span></code> refers to files produced by sgs_tools.</p></li>
-<li><p id="post_process---h_resolution"><a class="reference internal" href="#post_process---h_resolution" title="post_process --h_resolution"><strong><code class="docutils literal notranslate"><span class="pre">--h_resolution</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">H_RESOLUTION</span></code> - <p>horizontal resolution in meters.
-<em>ONLY</em> used for UM ideal simulations(will use to overwrite horizontal coordinates).</p>
+<li><p id="post_process---h_resolution"><a class="reference internal" href="#post_process---h_resolution" title="post_process --h_resolution"><strong><code class="docutils literal notranslate"><span class="pre">--h_resolution</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">H_RESOLUTION</span></code> - <p>horizontal resolution in meters. <em>ONLY</em> used for UM ideal simulations
+(will use to overwrite horizontal coordinates).</p>
  (default: <code class="docutils literal notranslate"><span class="pre">0</span></code>)</p></li>
 <li><p id="post_process---t_range"><a class="reference internal" href="#post_process---t_range" title="post_process --t_range"><strong><code class="docutils literal notranslate"><span class="pre">--t_range</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">T_RANGE</span></code> - time interval to consider, in code coordinates, negative value are interpreted as min/max respectively (default: <code class="docutils literal notranslate"><span class="pre">[-1,</span> <span class="pre">-1]</span></code>)</p></li>
 <li><p id="post_process---z_range"><a class="reference internal" href="#post_process---z_range" title="post_process --z_range"><strong><code class="docutils literal notranslate"><span class="pre">--z_range</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">Z_RANGE</span></code> - vertical interval to consider, in code coordinates, negative values are interpreted as take the min/max respectively (default: <code class="docutils literal notranslate"><span class="pre">[-1,</span> <span class="pre">-1]</span></code>)</p></li>
@@ -620,7 +627,7 @@ All files in a glob pattern should belong to the same simulation.</p>
 will create any missing intermediate directories</p>
 </p></li>
 <li><p id="post_process---overwrite_existing"><a class="reference internal" href="#post_process---overwrite_existing" title="post_process --overwrite_existing"><strong><code class="docutils literal notranslate"><span class="pre">--overwrite_existing</span></code></strong></a> - behaviour if diagnostic file already exists. default: skip</p></li>
-<li><p id="post_process---fname_suffix"><a class="reference internal" href="#post_process---fname_suffix" title="post_process --fname_suffix"><strong><code class="docutils literal notranslate"><span class="pre">--fname_suffix</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">FNAME_SUFFIX</span></code> - Optional suffix appended to output filenames. Final pattern: <code class="docutils literal notranslate"><span class="pre">{base_name}``_``{fname_suffix}``_``{statistics_tag}</span></code>.nc, where <code class="docutils literal notranslate"><span class="pre">base_name</span></code> is one of <code class="docutils literal notranslate"><span class="pre">vprofile_fname_out``|</span> <span class="pre">``hspectra_fname_out</span></code> | <code class="docutils literal notranslate"><span class="pre">aniso_fname_out</span></code> (default: <code class="docutils literal notranslate"></code>)</p></li>
+<li><p id="post_process---fname_suffix"><a class="reference internal" href="#post_process---fname_suffix" title="post_process --fname_suffix"><strong><code class="docutils literal notranslate"><span class="pre">--fname_suffix</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">FNAME_SUFFIX</span></code> - Optional suffix appended to output filenames. Final pattern: <code class="docutils literal notranslate"><span class="pre">&lt;base_name&gt;_&lt;fname_suffix&gt;_&lt;statistics_tag&gt;.nc</span></code>, where &lt;base_name&gt; and &lt;statistics_tag&gt; are detemined in the respective statistics group: <code class="docutils literal notranslate"><span class="pre">Vertical</span> <span class="pre">profiles</span></code> | <code class="docutils literal notranslate"><span class="pre">Horizontal</span> <span class="pre">spectra</span></code> | <code class="docutils literal notranslate"><span class="pre">Anisotropy</span> <span class="pre">diagnostics</span></code> (default: <code class="docutils literal notranslate"></code>)</p></li>
 </ul>
 </section>
 <section id="post_process-Vertical-Profiles">
@@ -629,7 +636,10 @@ will create any missing intermediate directories</p>
 <li><p id="post_process---vertical_profiles"><a class="reference internal" href="#post_process---vertical_profiles" title="post_process --vertical_profiles"><strong><code class="docutils literal notranslate"><span class="pre">--vertical_profiles</span></code></strong></a> - Swtitch for computing vertical profiles.</p></li>
 <li><p id="post_process---vprofile_fields"><a class="reference internal" href="#post_process---vprofile_fields" title="post_process --vprofile_fields"><strong><code class="docutils literal notranslate"><span class="pre">--vprofile_fields</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">VPROFILE_FIELDS</span></code> - List of fields whose vertical profile to compute. (default: <code class="docutils literal notranslate"><span class="pre">['vel',</span> <span class="pre">'vel_horiz',</span> <span class="pre">'theta',</span> <span class="pre">'s',</span> <span class="pre">'vert_heat_flux',</span> <span class="pre">'vert_mom_flux',</span> <span class="pre">'fluct_ke',</span> <span class="pre">'tke',</span> <span class="pre">'smag_visc_m',</span> <span class="pre">'smag_visc_h',</span> <span class="pre">'smag_visc_m_vert',</span> <span class="pre">'smag_visc_h_vert',</span> <span class="pre">'csDelta',</span> <span class="pre">'cs_theta',</span> <span class="pre">'cs_diag',</span> <span class="pre">'cs_theta_diag']</span></code>)</p></li>
 <li><p id="post_process---vprofile_stats"><a class="reference internal" href="#post_process---vprofile_stats" title="post_process --vprofile_stats"><strong><code class="docutils literal notranslate"><span class="pre">--vprofile_stats</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">VPROFILE_STATS</span></code> - Statistics to generate vertical profiles with. (default: <code class="docutils literal notranslate"><span class="pre">['mean',</span> <span class="pre">'std',</span> <span class="pre">'median']</span></code>)</p></li>
-<li><p id="post_process---vprofile_fname_out"><a class="reference internal" href="#post_process---vprofile_fname_out" title="post_process --vprofile_fname_out"><strong><code class="docutils literal notranslate"><span class="pre">--vprofile_fname_out</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">VPROFILE_FNAME_OUT</span></code> - <dt><a href="#id3"><span class="problematic" id="id4">**</span></a>Core filename where to save the generated vertical profile. relative to output_path.</dt><dd><p>Will add an <code class="docutils literal notranslate"><span class="pre">'.nc'</span></code> extension (so don’t give one).</p>
+<li><p id="post_process---vprofile_fname_out"><a class="reference internal" href="#post_process---vprofile_fname_out" title="post_process --vprofile_fname_out"><strong><code class="docutils literal notranslate"><span class="pre">--vprofile_fname_out</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">VPROFILE_FNAME_OUT</span></code> - <dt><strong>Core</strong> filename where to save the generated vertical profile.</dt><dd><p>relative to output_path.
+Will add an <code class="docutils literal notranslate"><span class="pre">'.nc'</span></code> extension (so don’t give one).
+The final pattern will be
+<code class="docutils literal notranslate"><span class="pre">&lt;vprofile_fname_out&gt;_&lt;fname_suffix&gt;_vprof.nc</span></code></p>
 </dd>
  (default: <code class="docutils literal notranslate"><span class="pre">post_proc</span></code>)</p></li>
 </ul>
@@ -640,18 +650,20 @@ will create any missing intermediate directories</p>
 <li><p id="post_process---horizontal_spectra"><a class="reference internal" href="#post_process---horizontal_spectra" title="post_process --horizontal_spectra"><strong><code class="docutils literal notranslate"><span class="pre">--horizontal_spectra</span></code></strong></a> - Horizontal power spectra and cross spectra.</p></li>
 <li><p id="post_process---power_spectra_fields"><a class="reference internal" href="#post_process---power_spectra_fields" title="post_process --power_spectra_fields"><strong><code class="docutils literal notranslate"><span class="pre">--power_spectra_fields</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">POWER_SPECTRA_FIELDS</span></code> - Fields whose power spectra to compute. (default: <code class="docutils literal notranslate"><span class="pre">['u',</span> <span class="pre">'v',</span> <span class="pre">'w',</span> <span class="pre">'theta']</span></code>)</p></li>
 <li><p id="post_process---cross_spectra_fields"><a class="reference internal" href="#post_process---cross_spectra_fields" title="post_process --cross_spectra_fields"><strong><code class="docutils literal notranslate"><span class="pre">--cross_spectra_fields</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">CROSS_SPECTRA_FIELDS</span></code> - <p>Fields whose cross spectra to compute.
-Use spaces to between cross spectra and commas between fields in each cross-spectrim, e.g.
-u,v v,w</p>
+Use spaces to between cross spectra and commas between fields
+in each cross-spectrum, e.g. u,v v,w</p>
  (default: <code class="docutils literal notranslate"><span class="pre">[('u',</span> <span class="pre">'w'),</span> <span class="pre">('v',</span> <span class="pre">'w'),</span> <span class="pre">('u',</span> <span class="pre">'v'),</span> <span class="pre">('theta',</span> <span class="pre">'w')]</span></code>)</p></li>
-<li><p id="post_process---radial_smooth_factor"><a class="reference internal" href="#post_process---radial_smooth_factor" title="post_process --radial_smooth_factor"><strong><code class="docutils literal notranslate"><span class="pre">--radial_smooth_factor</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">RADIAL_SMOOTH_FACTOR</span></code> - Radial binning of radial horizontal spectrum in units of delta_kx spacings (default: <code class="docutils literal notranslate"><span class="pre">1</span></code>)</p></li>
+<li><p id="post_process---radial_smooth_factor"><a class="reference internal" href="#post_process---radial_smooth_factor" title="post_process --radial_smooth_factor"><strong><code class="docutils literal notranslate"><span class="pre">--radial_smooth_factor</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">RADIAL_SMOOTH_FACTOR</span></code> - <dt>Radial binning of radial horizontal spectrum</dt><dd><p>in units of delta_kx spacings</p>
+</dd>
+ (default: <code class="docutils literal notranslate"><span class="pre">1</span></code>)</p></li>
 <li><p id="post_process---radial_truncation"><a class="reference internal" href="#post_process---radial_truncation" title="post_process --radial_truncation"><strong><code class="docutils literal notranslate"><span class="pre">--radial_truncation</span></code></strong></a> - <p>Truncation of radial horizontal spectrum.
 If True will disregard wavenumbers above the maximum linear wavenumber.</p>
 </p></li>
-<li><p id="post_process---hspectra_fname_out"><a class="reference internal" href="#post_process---hspectra_fname_out" title="post_process --hspectra_fname_out"><strong><code class="docutils literal notranslate"><span class="pre">--hspectra_fname_out</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">HSPECTRA_FNAME_OUT</span></code> - <dt><strong>Core</strong> filename where to save the generated horisontal spectra. relative to output_path.</dt><dd><p>Will add an <code class="docutils literal notranslate"><span class="pre">'.nc'</span></code> extension (so don’t give one).</p>
+<li><p id="post_process---hspectra_fname_out"><a class="reference internal" href="#post_process---hspectra_fname_out" title="post_process --hspectra_fname_out"><strong><code class="docutils literal notranslate"><span class="pre">--hspectra_fname_out</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">HSPECTRA_FNAME_OUT</span></code> - <dt><strong>Core</strong> filename where to save the generated horisontal spectra.</dt><dd><p>relative to output_path.
+Will add an <code class="docutils literal notranslate"><span class="pre">'.nc'</span></code> extension (so don’t give one).
+The final pattern will be
+<code class="docutils literal notranslate"><span class="pre">&lt;hspectra_fname_out&gt;_&lt;fname_suffix&gt;_spectra.nc</span></code></p>
 </dd>
- (default: <code class="docutils literal notranslate"><span class="pre">post_proc</span></code>)</p></li>
-<li><p id="post_process---aniso_fname_out"><a class="reference internal" href="#post_process---aniso_fname_out" title="post_process --aniso_fname_out"><strong><code class="docutils literal notranslate"><span class="pre">--aniso_fname_out</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">ANISO_FNAME_OUT</span></code> - <p><strong>Core</strong> filename where to save the generated anisotropy eigen values. relative to output_path.
-Will append the filter label. Will add an <code class="docutils literal notranslate"><span class="pre">'.nc'</span></code> extension (so don’t give one).</p>
  (default: <code class="docutils literal notranslate"><span class="pre">post_proc</span></code>)</p></li>
 </ul>
 </section>
@@ -659,34 +671,50 @@ Will append the filter label. Will add an <code class="docutils literal notransl
 <h4>Anisotropy diagnostics<a class="headerlink" href="#post_process-Anisotropy-diagnostics" title="Link to this heading">#</a></h4>
 <ul class="simple">
 <li><p id="post_process---anisotropy"><a class="reference internal" href="#post_process---anisotropy" title="post_process --anisotropy"><strong><code class="docutils literal notranslate"><span class="pre">--anisotropy</span></code></strong></a> - Anisotropy of velocity strain and stress</p></li>
-<li><p id="post_process---box_domain_scales"><a class="reference internal" href="#post_process---box_domain_scales" title="post_process --box_domain_scales"><strong><code class="docutils literal notranslate"><span class="pre">--box_domain_scales</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">BOX_DOMAIN_SCALES</span></code> - <p>Anisotropy box filter and coarse-graining scales in fraction of the horizontal domain size.
-Will round to nearest integer number of horizontal grid cells.
-Will combine all box scales and ignore entries which are less than <cite>2 delta</cite> apart.</p>
+<li><p id="post_process---box_domain_scales"><a class="reference internal" href="#post_process---box_domain_scales" title="post_process --box_domain_scales"><strong><code class="docutils literal notranslate"><span class="pre">--box_domain_scales</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">BOX_DOMAIN_SCALES</span></code> - <p>Anisotropy box filter and coarse-graining scales in fraction of
+the horizontal domain size. Will round to nearest integer number
+of horizontal grid cells. Will combine all box scales and ignore
+entries which are less than <cite>2 delta</cite> apart.</p>
  (default: <code class="docutils literal notranslate"><span class="pre">[]</span></code>)</p></li>
 <li><p id="post_process---box_meter_scales"><a class="reference internal" href="#post_process---box_meter_scales" title="post_process --box_meter_scales"><strong><code class="docutils literal notranslate"><span class="pre">--box_meter_scales</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">BOX_METER_SCALES</span></code> - <p>Anisotropy box filter and coarse-graining scales in meters.
 Will round to nearest integer number of horizontal grid cells.
-Will combine all box scales and ignore entries which are less than <cite>2 delta</cite> apart</p>
+Will combine all box scales and ignore entries which are
+less than <cite>2 delta</cite> apart.</p>
  (default: <code class="docutils literal notranslate"><span class="pre">[]</span></code>)</p></li>
-<li><p id="post_process---box_delta_scales"><a class="reference internal" href="#post_process---box_delta_scales" title="post_process --box_delta_scales"><strong><code class="docutils literal notranslate"><span class="pre">--box_delta_scales</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">BOX_DELTA_SCALES</span></code> - <p>Anisotropy box filter and coarse-graining scales in units of horizontal grid spacing <cite>delta</cite>.
-Will combine all box scales and ignore entries which are less than <cite>2 delta</cite> apart.</p>
+<li><p id="post_process---box_delta_scales"><a class="reference internal" href="#post_process---box_delta_scales" title="post_process --box_delta_scales"><strong><code class="docutils literal notranslate"><span class="pre">--box_delta_scales</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">BOX_DELTA_SCALES</span></code> - <p>Anisotropy box filter and coarse-graining scales
+in units of horizontal grid spacing <cite>delta</cite>. Will combine all box scales
+and ignore entries which are less than <cite>2 delta</cite> apart.</p>
  (default: <code class="docutils literal notranslate"><span class="pre">[]</span></code>)</p></li>
-<li><p id="post_process---gauss_scales"><a class="reference internal" href="#post_process---gauss_scales" title="post_process --gauss_scales"><strong><code class="docutils literal notranslate"><span class="pre">--gauss_scales</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">GAUSS_SCALES</span></code> - Anisotropy Gaussian filter scales in  units of horizontal grid spacing. Support 2 and 4 (default: <code class="docutils literal notranslate"><span class="pre">[]</span></code>)</p></li>
+<li><p id="post_process---gauss_scales"><a class="reference internal" href="#post_process---gauss_scales" title="post_process --gauss_scales"><strong><code class="docutils literal notranslate"><span class="pre">--gauss_scales</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">GAUSS_SCALES</span></code> - <dt>Anisotropy Gaussian filter scales in  units of horizontal grid spacing.</dt><dd><p>Support 2 and 4</p>
+</dd>
+ (default: <code class="docutils literal notranslate"><span class="pre">[]</span></code>)</p></li>
 <li><p id="post_process---filter_shapes"><a class="reference internal" href="#post_process---filter_shapes" title="post_process --filter_shapes"><strong><code class="docutils literal notranslate"><span class="pre">--filter_shapes</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">FILTER_SHAPES</span></code> - Anisotropy filter shapes. Support any of [<code class="docutils literal notranslate"><span class="pre">'gauss'</span></code>, <code class="docutils literal notranslate"><span class="pre">'box'</span></code>, <code class="docutils literal notranslate"><span class="pre">'coarse'</span></code>] (default: <code class="docutils literal notranslate"><span class="pre">['gauss',</span> <span class="pre">'box',</span> <span class="pre">'coarse']</span></code>)</p></li>
+<li><p id="post_process---aniso_fname_out"><a class="reference internal" href="#post_process---aniso_fname_out" title="post_process --aniso_fname_out"><strong><code class="docutils literal notranslate"><span class="pre">--aniso_fname_out</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">ANISO_FNAME_OUT</span></code> - <p><strong>Core</strong> filename where to save the generated anisotropy eigen values.
+relative to output_path.
+Will append the filter label.
+Will add an <code class="docutils literal notranslate"><span class="pre">'.nc'</span></code> extension (so don’t give one).
+The final pattern will be
+<code class="docutils literal notranslate"><span class="pre">&lt;aniso_fname_out&gt;_&lt;fname_suffix&gt;_anisotropy.nc</span></code></p>
+ (default: <code class="docutils literal notranslate"><span class="pre">post_proc</span></code>)</p></li>
 </ul>
 </section>
 <section id="post_process-Dask-parameters">
 <h4>Dask parameters<a class="headerlink" href="#post_process-Dask-parameters" title="Link to this heading">#</a></h4>
 <ul class="simple">
-<li><p id="post_process---z_chunk_size"><a class="reference internal" href="#post_process---z_chunk_size" title="post_process --z_chunk_size"><strong><code class="docutils literal notranslate"><span class="pre">--z_chunk_size</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">Z_CHUNK_SIZE</span></code> - <p>Size of dask array chunks in the vertical direction. Should divide the total number of levels.
+<li><p id="post_process---z_chunk_size"><a class="reference internal" href="#post_process---z_chunk_size" title="post_process --z_chunk_size"><strong><code class="docutils literal notranslate"><span class="pre">--z_chunk_size</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">Z_CHUNK_SIZE</span></code> - <p>Size of dask array chunks in the vertical direction.
+Should divide the total number of levels.
 Smaller size leads to smaller memory footprint, but may penalize walltime.</p>
 </p></li>
-<li><p id="post_process---t_chunk_size"><a class="reference internal" href="#post_process---t_chunk_size" title="post_process --t_chunk_size"><strong><code class="docutils literal notranslate"><span class="pre">--t_chunk_size</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">T_CHUNK_SIZE</span></code> - <p>Size of dask array chunks in the time direction. Should divide the total number time snapshots.
+<li><p id="post_process---t_chunk_size"><a class="reference internal" href="#post_process---t_chunk_size" title="post_process --t_chunk_size"><strong><code class="docutils literal notranslate"><span class="pre">--t_chunk_size</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">T_CHUNK_SIZE</span></code> - <p>Size of dask array chunks in the time direction.
+Should divide the total number time snapshots.
 Smaller size leads to smaller memory footprint, but may penalize walltime.</p>
 </p></li>
-<li><p id="post_process---h_chunk_size"><a class="reference internal" href="#post_process---h_chunk_size" title="post_process --h_chunk_size"><strong><code class="docutils literal notranslate"><span class="pre">--h_chunk_size</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">H_CHUNK_SIZE</span></code> - <p>Size of dask array chunks in the <code class="docutils literal notranslate"><span class="pre">&quot;horizontal&quot;</span></code> directions. Should divide into the domain size.
-Smaller size leads to smaller memory footprint, but can penalize walltime heavily (building DAGs).
-Default -1 means don’t chunk, keep dimesions together – useful for horizontal filtering.
-If it doesn’t fit in memory try 1/2 to 1/4 of domain size.</p>
+<li><p id="post_process---h_chunk_size"><a class="reference internal" href="#post_process---h_chunk_size" title="post_process --h_chunk_size"><strong><code class="docutils literal notranslate"><span class="pre">--h_chunk_size</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">H_CHUNK_SIZE</span></code> - <p>Size of dask array chunks in the <code class="docutils literal notranslate"><span class="pre">&quot;horizontal&quot;</span></code> directions.
+Should divide into the domain size.
+Smaller size leads to smaller memory footprint, but can penalize walltime heavily
+(building DAGs). Default -1 means don’t chunk, keep dimesions together –
+useful for horizontal filtering. If it doesn’t fit in memory
+try 1/2 to 1/4 of domain size.</p>
  (default: <code class="docutils literal notranslate"><span class="pre">-1</span></code>)</p></li>
 <li><p id="post_process---mem_limit_MB"><a class="reference internal" href="#post_process---mem_limit_MB" title="post_process --mem_limit_MB"><strong><code class="docutils literal notranslate"><span class="pre">--mem_limit_MB</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">MEM_LIMIT_MB</span></code> - <p>Target memory limit in MB used to control chunk size of dask array chunks.
 If on a dask cluster it is
@@ -730,13 +758,16 @@ Smaller size leads to smaller memory footprint, but may penalize walltime.</p>
 <h4>I/O datasets on disk<a class="headerlink" href="#sim_comparison-I/O-datasets-on-disk" title="Link to this heading">#</a></h4>
 <ul class="simple">
 <li><p id="sim_comparison-input_files"><a class="reference internal" href="#sim_comparison-input_files" title="sim_comparison input_files"><strong><code class="docutils literal notranslate"><span class="pre">input_files</span></code></strong></a> - <p>Location of a set NetCDF simulation file(s).
-Recognizes glob patterns and walks directory trees, e.g. <code class="docutils literal notranslate"><span class="pre">'./my_file_p[br]*nc'</span></code>
-Can have multiple files per simulation, but only one glob pattern per simulation.
+Recognizes glob patterns and walks directory trees,
+e.g. <code class="docutils literal notranslate"><span class="pre">'./my_file_p[br]*nc'</span></code>
+Can have multiple files per simulation,
+but only one glob pattern per simulation.
 All files in a glob pattern should belong to the same simulation.</p>
 </p></li>
 <li><p id="sim_comparison-input_format"><a class="reference internal" href="#sim_comparison-input_format" title="sim_comparison input_format"><strong><code class="docutils literal notranslate"><span class="pre">input_format</span></code></strong></a> - Type of <code class="docutils literal notranslate"><span class="pre">'input_files'</span></code>. Only support different NetCDF flavours from various production codes. <code class="docutils literal notranslate"><span class="pre">'sgs'</span></code> refers to files produced by sgs_tools. All simulations must have the same format</p></li>
 <li><p id="sim_comparison---h_resolution"><a class="reference internal" href="#sim_comparison---h_resolution" title="sim_comparison --h_resolution"><strong><code class="docutils literal notranslate"><span class="pre">--h_resolution</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">H_RESOLUTION</span></code> - <p>horizontal resolution in meters.
-<em>ONLY</em> used for UM ideal simulations(will use to overwrite horizontal coordinates).
+<em>ONLY</em> used for UM ideal simulations
+(will use to overwrite horizontal coordinates).
 If a single resolution is given, assume it applies to all input files.
 Else, must give as many resolutions as inpu_file glob patterns.</p>
  (default: <code class="docutils literal notranslate"><span class="pre">[0]</span></code>)</p></li>
@@ -752,9 +783,11 @@ default (which is empty) means the full data range at 1h intervals.</p>
 <ul class="simple">
 <li><p id="sim_comparison---plot_show"><a class="reference internal" href="#sim_comparison---plot_show" title="sim_comparison --plot_show"><strong><code class="docutils literal notranslate"><span class="pre">--plot_show</span></code></strong></a> - flag to display generated plots</p></li>
 <li><p id="sim_comparison---plot_path"><a class="reference internal" href="#sim_comparison---plot_path" title="sim_comparison --plot_path"><strong><code class="docutils literal notranslate"><span class="pre">--plot_path</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">PLOT_PATH</span></code> - output directory, for storing generated plots</p></li>
-<li><p id="sim_comparison---plot_style_file"><a class="reference internal" href="#sim_comparison---plot_style_file" title="sim_comparison --plot_style_file"><strong><code class="docutils literal notranslate"><span class="pre">--plot_style_file</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">PLOT_STYLE_FILE</span></code> - <p>Configuration file describing a list of plot style and decorations to matched sequentially to each simulation.
+<li><p id="sim_comparison---plot_style_file"><a class="reference internal" href="#sim_comparison---plot_style_file" title="sim_comparison --plot_style_file"><strong><code class="docutils literal notranslate"><span class="pre">--plot_style_file</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">PLOT_STYLE_FILE</span></code> - <p>Configuration file describing a list of plot style and decorations
+to matched sequentially to each simulation.
 See plot_config_template.json for a template.
-If absent, will use <code class="docutils literal notranslate"><span class="pre">default_plotting_style</span></code> and cycle through different colors.</p>
+If absent, will use <code class="docutils literal notranslate"><span class="pre">default_plotting_style</span></code> and
+cycle through different colors.</p>
 </p></li>
 <li><p id="sim_comparison---hor_slice_levels"><a class="reference internal" href="#sim_comparison---hor_slice_levels" title="sim_comparison --hor_slice_levels"><strong><code class="docutils literal notranslate"><span class="pre">--hor_slice_levels</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">HOR_SLICE_LEVELS</span></code> - <p>Vertical height at which to plot horizontal slices.
 If not given will omit these plots.</p>
@@ -765,16 +798,20 @@ If not given will omit these plots.</p>
 <section id="sim_comparison-Dask-parameters">
 <h4>Dask parameters<a class="headerlink" href="#sim_comparison-Dask-parameters" title="Link to this heading">#</a></h4>
 <ul class="simple">
-<li><p id="sim_comparison---z_chunk_size"><a class="reference internal" href="#sim_comparison---z_chunk_size" title="sim_comparison --z_chunk_size"><strong><code class="docutils literal notranslate"><span class="pre">--z_chunk_size</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">Z_CHUNK_SIZE</span></code> - <p>Size of dask array chunks in the vertical direction. Should divide the total number of levels.
+<li><p id="sim_comparison---z_chunk_size"><a class="reference internal" href="#sim_comparison---z_chunk_size" title="sim_comparison --z_chunk_size"><strong><code class="docutils literal notranslate"><span class="pre">--z_chunk_size</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">Z_CHUNK_SIZE</span></code> - <p>Size of dask array chunks in the vertical direction.
+Should divide the total number of levels.
 Smaller size leads to smaller memory footprint, but may penalize walltime.</p>
 </p></li>
-<li><p id="sim_comparison---t_chunk_size"><a class="reference internal" href="#sim_comparison---t_chunk_size" title="sim_comparison --t_chunk_size"><strong><code class="docutils literal notranslate"><span class="pre">--t_chunk_size</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">T_CHUNK_SIZE</span></code> - <p>Size of dask array chunks in the time direction. Should divide the total number time snapshots.
+<li><p id="sim_comparison---t_chunk_size"><a class="reference internal" href="#sim_comparison---t_chunk_size" title="sim_comparison --t_chunk_size"><strong><code class="docutils literal notranslate"><span class="pre">--t_chunk_size</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">T_CHUNK_SIZE</span></code> - <p>Size of dask array chunks in the time direction.
+Should divide the total number time snapshots.
 Smaller size leads to smaller memory footprint, but may penalize walltime.</p>
 </p></li>
-<li><p id="sim_comparison---h_chunk_size"><a class="reference internal" href="#sim_comparison---h_chunk_size" title="sim_comparison --h_chunk_size"><strong><code class="docutils literal notranslate"><span class="pre">--h_chunk_size</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">H_CHUNK_SIZE</span></code> - <p>Size of dask array chunks in the <code class="docutils literal notranslate"><span class="pre">&quot;horizontal&quot;</span></code> directions. Should divide into the domain size.
-Smaller size leads to smaller memory footprint, but can penalize walltime heavily (building DAGs).
-Default -1 means don’t chunk, keep dimesions together – useful for horizontal filtering.
-If it doesn’t fit in memory try 1/2 to 1/4 of domain size.</p>
+<li><p id="sim_comparison---h_chunk_size"><a class="reference internal" href="#sim_comparison---h_chunk_size" title="sim_comparison --h_chunk_size"><strong><code class="docutils literal notranslate"><span class="pre">--h_chunk_size</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">H_CHUNK_SIZE</span></code> - <p>Size of dask array chunks in the <code class="docutils literal notranslate"><span class="pre">&quot;horizontal&quot;</span></code> directions.
+Should divide into the domain size.
+Smaller size leads to smaller memory footprint, but can penalize walltime heavily
+(building DAGs). Default -1 means don’t chunk, keep dimesions together –
+useful for horizontal filtering. If it doesn’t fit in memory
+try 1/2 to 1/4 of domain size.</p>
  (default: <code class="docutils literal notranslate"><span class="pre">-1</span></code>)</p></li>
 <li><p id="sim_comparison---mem_limit_MB"><a class="reference internal" href="#sim_comparison---mem_limit_MB" title="sim_comparison --mem_limit_MB"><strong><code class="docutils literal notranslate"><span class="pre">--mem_limit_MB</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">MEM_LIMIT_MB</span></code> - <p>Target memory limit in MB used to control chunk size of dask array chunks.
 If on a dask cluster it is
@@ -818,18 +855,21 @@ Smaller size leads to smaller memory footprint, but may penalize walltime.</p>
 <h4>I/O datasets on disk<a class="headerlink" href="#ref_comparison-I/O-datasets-on-disk" title="Link to this heading">#</a></h4>
 <ul class="simple">
 <li><p id="ref_comparison-target"><a class="reference internal" href="#ref_comparison-target" title="ref_comparison target"><strong><code class="docutils literal notranslate"><span class="pre">target</span></code></strong></a> - <p>Location of target simulation outputs – UM NetCDF diagnostic files.
-Recognizes glob patterns and walks directory trees, e.g. <code class="docutils literal notranslate"><span class="pre">'./my_file_p[br]*nc'</span></code>
+Recognizes glob patterns and walks directory trees,
+e.g. <code class="docutils literal notranslate"><span class="pre">'./my_file_p[br]*nc'</span></code>
 Can have multiple files, but only one glob pattern.
 (All files in a glob pattern should belong to the simulation).</p>
 </p></li>
 <li><p id="ref_comparison-reference"><a class="reference internal" href="#ref_comparison-reference" title="ref_comparison reference"><strong><code class="docutils literal notranslate"><span class="pre">reference</span></code></strong></a> - <p>Location of reference simulation outputs – UM NetCDF diagnostic files.
-Recognizes glob patterns and walks directory trees, e.g. <code class="docutils literal notranslate"><span class="pre">'./my_file_p[br]*nc'</span></code>
+Recognizes glob patterns and walks directory trees,
+e.g. <code class="docutils literal notranslate"><span class="pre">'./my_file_p[br]*nc'</span></code>.
 Can have multiple files, but only one glob pattern.
 (All files in a glob pattern should belong to the simulation).</p>
 </p></li>
 <li><p id="ref_comparison-input_format"><a class="reference internal" href="#ref_comparison-input_format" title="ref_comparison input_format"><strong><code class="docutils literal notranslate"><span class="pre">input_format</span></code></strong></a> - Type of <code class="docutils literal notranslate"><span class="pre">'input_files'</span></code>. Only support different NetCDF flavours from various production codes. <code class="docutils literal notranslate"><span class="pre">'sgs'</span></code> refers to files produced by sgs_tools. All simulations must have the same format</p></li>
 <li><p id="ref_comparison---h_resolution"><a class="reference internal" href="#ref_comparison---h_resolution" title="ref_comparison --h_resolution"><strong><code class="docutils literal notranslate"><span class="pre">--h_resolution</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">H_RESOLUTION</span></code> - <p>horizontal resolution in meters.
-<em>ONLY</em> used for UM ideal simulations(will use to overwrite horizontal coordinates).
+<em>ONLY</em> used for UM ideal simulations
+(will use to overwrite horizontal coordinates).
 If a single resolution is given, assume it applies to all input files.
 Else, must give as many resolutions as inpu_file glob patterns.</p>
  (default: <code class="docutils literal notranslate"><span class="pre">[0]</span></code>)</p></li>
@@ -845,9 +885,11 @@ default (which is empty) means the full data range at 1h intervals.</p>
 <ul class="simple">
 <li><p id="ref_comparison---plot_show"><a class="reference internal" href="#ref_comparison---plot_show" title="ref_comparison --plot_show"><strong><code class="docutils literal notranslate"><span class="pre">--plot_show</span></code></strong></a> - flag to display generated plots</p></li>
 <li><p id="ref_comparison---plot_path"><a class="reference internal" href="#ref_comparison---plot_path" title="ref_comparison --plot_path"><strong><code class="docutils literal notranslate"><span class="pre">--plot_path</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">PLOT_PATH</span></code> - output directory, for storing generated plots</p></li>
-<li><p id="ref_comparison---plot_style_file"><a class="reference internal" href="#ref_comparison---plot_style_file" title="ref_comparison --plot_style_file"><strong><code class="docutils literal notranslate"><span class="pre">--plot_style_file</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">PLOT_STYLE_FILE</span></code> - <p>Configuration file describing a list of plot style and decorations to matched sequentially to each simulation.
+<li><p id="ref_comparison---plot_style_file"><a class="reference internal" href="#ref_comparison---plot_style_file" title="ref_comparison --plot_style_file"><strong><code class="docutils literal notranslate"><span class="pre">--plot_style_file</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">PLOT_STYLE_FILE</span></code> - <p>Configuration file describing a list of plot style and decorations
+to matched sequentially to each simulation.
 See plot_config_template.json for a template.
-If absent, will use <code class="docutils literal notranslate"><span class="pre">default_plotting_style</span></code> and cycle through different colors.</p>
+If absent, will use <code class="docutils literal notranslate"><span class="pre">default_plotting_style</span></code> and
+cycle through different colors.</p>
 </p></li>
 <li><p id="ref_comparison---hor_slice_levels"><a class="reference internal" href="#ref_comparison---hor_slice_levels" title="ref_comparison --hor_slice_levels"><strong><code class="docutils literal notranslate"><span class="pre">--hor_slice_levels</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">HOR_SLICE_LEVELS</span></code> - <p>Vertical height at which to plot horizontal slices.
 If not given will omit these plots.</p>
@@ -858,16 +900,20 @@ If not given will omit these plots.</p>
 <section id="ref_comparison-Dask-parameters">
 <h4>Dask parameters<a class="headerlink" href="#ref_comparison-Dask-parameters" title="Link to this heading">#</a></h4>
 <ul class="simple">
-<li><p id="ref_comparison---z_chunk_size"><a class="reference internal" href="#ref_comparison---z_chunk_size" title="ref_comparison --z_chunk_size"><strong><code class="docutils literal notranslate"><span class="pre">--z_chunk_size</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">Z_CHUNK_SIZE</span></code> - <p>Size of dask array chunks in the vertical direction. Should divide the total number of levels.
+<li><p id="ref_comparison---z_chunk_size"><a class="reference internal" href="#ref_comparison---z_chunk_size" title="ref_comparison --z_chunk_size"><strong><code class="docutils literal notranslate"><span class="pre">--z_chunk_size</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">Z_CHUNK_SIZE</span></code> - <p>Size of dask array chunks in the vertical direction.
+Should divide the total number of levels.
 Smaller size leads to smaller memory footprint, but may penalize walltime.</p>
 </p></li>
-<li><p id="ref_comparison---t_chunk_size"><a class="reference internal" href="#ref_comparison---t_chunk_size" title="ref_comparison --t_chunk_size"><strong><code class="docutils literal notranslate"><span class="pre">--t_chunk_size</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">T_CHUNK_SIZE</span></code> - <p>Size of dask array chunks in the time direction. Should divide the total number time snapshots.
+<li><p id="ref_comparison---t_chunk_size"><a class="reference internal" href="#ref_comparison---t_chunk_size" title="ref_comparison --t_chunk_size"><strong><code class="docutils literal notranslate"><span class="pre">--t_chunk_size</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">T_CHUNK_SIZE</span></code> - <p>Size of dask array chunks in the time direction.
+Should divide the total number time snapshots.
 Smaller size leads to smaller memory footprint, but may penalize walltime.</p>
 </p></li>
-<li><p id="ref_comparison---h_chunk_size"><a class="reference internal" href="#ref_comparison---h_chunk_size" title="ref_comparison --h_chunk_size"><strong><code class="docutils literal notranslate"><span class="pre">--h_chunk_size</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">H_CHUNK_SIZE</span></code> - <p>Size of dask array chunks in the <code class="docutils literal notranslate"><span class="pre">&quot;horizontal&quot;</span></code> directions. Should divide into the domain size.
-Smaller size leads to smaller memory footprint, but can penalize walltime heavily (building DAGs).
-Default -1 means don’t chunk, keep dimesions together – useful for horizontal filtering.
-If it doesn’t fit in memory try 1/2 to 1/4 of domain size.</p>
+<li><p id="ref_comparison---h_chunk_size"><a class="reference internal" href="#ref_comparison---h_chunk_size" title="ref_comparison --h_chunk_size"><strong><code class="docutils literal notranslate"><span class="pre">--h_chunk_size</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">H_CHUNK_SIZE</span></code> - <p>Size of dask array chunks in the <code class="docutils literal notranslate"><span class="pre">&quot;horizontal&quot;</span></code> directions.
+Should divide into the domain size.
+Smaller size leads to smaller memory footprint, but can penalize walltime heavily
+(building DAGs). Default -1 means don’t chunk, keep dimesions together –
+useful for horizontal filtering. If it doesn’t fit in memory
+try 1/2 to 1/4 of domain size.</p>
  (default: <code class="docutils literal notranslate"><span class="pre">-1</span></code>)</p></li>
 <li><p id="ref_comparison---mem_limit_MB"><a class="reference internal" href="#ref_comparison---mem_limit_MB" title="ref_comparison --mem_limit_MB"><strong><code class="docutils literal notranslate"><span class="pre">--mem_limit_MB</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">MEM_LIMIT_MB</span></code> - <p>Target memory limit in MB used to control chunk size of dask array chunks.
 If on a dask cluster it is

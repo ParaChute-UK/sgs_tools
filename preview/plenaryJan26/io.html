@@ -454,7 +454,8 @@
 <code class="docutils literal notranslate"><span class="pre">sgs</span></code>, <code class="docutils literal notranslate"><span class="pre">um</span></code>, <code class="docutils literal notranslate"><span class="pre">monc</span></code></p></li>
 <li><p><strong>requested_fields</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span>) – List of variable names to extract from the input data.</p></li>
 <li><p><strong>kwargs</strong> – Additional keyword arguments depending on the input format.
-The <code class="docutils literal notranslate"><span class="pre">um</span></code> format, requires <code class="docutils literal notranslate"><span class="pre">resolution</span></code> (float) specifying horizontal grid spacing.</p></li>
+The <code class="docutils literal notranslate"><span class="pre">um</span></code> format, requires <code class="docutils literal notranslate"><span class="pre">resolution</span></code> (float)
+specifying horizontal grid spacing.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
@@ -468,9 +469,17 @@ the horizontal resolution stored in <code class="docutils literal notranslate"><
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <ul class="simple">
-<li><p>For <code class="docutils literal notranslate"><span class="pre">monc</span></code> format, resolution is inferred from metadata and assumed isotropic in x and y</p></li>
+<li><dl class="simple">
+<dt>For <code class="docutils literal notranslate"><span class="pre">monc</span></code> format, resolution is inferred from metadata and assumed</dt><dd><p>isotropic in x and y</p>
+</dd>
+</dl>
+</li>
 <li><p>For <code class="docutils literal notranslate"><span class="pre">um</span></code> format, resolution must be explicitly provided via <cite>kwargs</cite>.</p></li>
-<li><p>For <code class="docutils literal notranslate"><span class="pre">sgs</span></code> format, if h_resolution is not a dataset attribute it is guessed by the spacing in “x” and “y” coordinates</p></li>
+<li><dl class="simple">
+<dt>For <code class="docutils literal notranslate"><span class="pre">sgs</span></code> format, if h_resolution is not a dataset attribute</dt><dd><p>it is guessed by the spacing in “x” and “y” coordinates</p>
+</dd>
+</dl>
+</li>
 </ul>
 </div>
 </dd></dl>
@@ -529,10 +538,10 @@ the horizontal resolution stored in <code class="docutils literal notranslate"><
 <dt class="sig sig-object py" id="sgs_tools.io.um.rename_variables">
 <span class="sig-name descname"><span class="pre">rename_variables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/io/um.html#rename_variables"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.io.um.rename_variables" title="Link to this definition">#</a></dt>
 <dd><dl class="simple">
-<dt>rename STASH variables:</dt><dd><p>UM STASH varaibles adopt their <cite>long_name</cite> with special characters replaced by ‘_’.
-The stash code is retained as an attribute for back-searches.
-Spacial coordinates/dimesions are renamed to <code class="docutils literal notranslate"><span class="pre">z_{theta|rho}</span></code> and <code class="docutils literal notranslate"><span class="pre">{x|y}_{face|centre}</span></code>.
-Time coordinate becomes <code class="docutils literal notranslate"><span class="pre">t</span></code> and <code class="docutils literal notranslate"><span class="pre">t_0</span></code>.</p>
+<dt>rename STASH variables:</dt><dd><p>UM STASH varaibles adopt their <cite>long_name</cite> with special characters
+replaced by ‘_’. The stash code is retained as an attribute for back-searches.
+Spacial coordinates/dimesions are renamed to <code class="docutils literal notranslate"><span class="pre">z_{theta|rho}</span></code> and
+<code class="docutils literal notranslate"><span class="pre">{x|y}_{face|centre}</span></code>. Time coordinate becomes <code class="docutils literal notranslate"><span class="pre">t</span></code> and <code class="docutils literal notranslate"><span class="pre">t_0</span></code>.</p>
 </dd>
 </dl>
 <dl class="field-list simple">
@@ -552,13 +561,15 @@ Time coordinate becomes <code class="docutils literal notranslate"><span class="
 <dt class="sig sig-object py" id="sgs_tools.io.um.unify_coords">
 <span class="sig-name descname"><span class="pre">unify_coords</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">res</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/io/um.html#unify_coords"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.io.um.unify_coords" title="Link to this definition">#</a></dt>
 <dd><p>unify coordinate names</p>
-<p>implement correct x-spacing using <code class="docutils literal notranslate"><span class="pre">res</span></code>, assume <code class="docutils literal notranslate"><span class="pre">res</span></code> is given in the correct units
+<p>implement correct x-spacing using <code class="docutils literal notranslate"><span class="pre">res</span></code>, assume <code class="docutils literal notranslate"><span class="pre">res</span></code> is given in
+the correct units
 rename coordinates with reference to a logically-cartesian grid</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>ds</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></span>) – input dataset</p></li>
-<li><p><strong>res</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></span>) – resolution of dataset – to create correct x-y grid for idealised runs (the existing one is in lat-lon coords)</p></li>
+<li><p><strong>res</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></span>) – resolution of dataset – to create correct x-y grid for idealised runs
+(the existing one is in lat-lon coords)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
@@ -578,8 +589,10 @@ Any unknown fields will retain their original names.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>fname_pattern</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – UM NetCDF diagnostic file(s) to read. will be interpreted as a glob pattern. (should belong to the same simulation)</p></li>
-<li><p><strong>res</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></span>) – horizontal resolution (will use to overwrite horizontal coordinates). <strong>NB</strong> works for ideal simulations</p></li>
+<li><p><strong>fname_pattern</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – UM NetCDF diagnostic file(s) to read.
+will be interpreted as a glob pattern. (should belong to the same simulation)</p></li>
+<li><p><strong>res</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></span>) – horizontal resolution (will use to overwrite horizontal coordinates).
+<strong>NB</strong> works for ideal simulations</p></li>
 <li><p><strong>requested_fields</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span>) – list of fields to retain in ds, if falsy will retain all.</p></li>
 </ul>
 </dd>
@@ -597,8 +610,10 @@ Any unknown fields will retain their original names.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>fname_pattern</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – UM NetCDF diagnostic file(s) to read. will be interpreted as a glob pattern. (should belong to the same simulation)</p></li>
-<li><p><strong>res</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></span>) – horizontal resolution (will use to overwrite horizontal coordinates). <strong>NB</strong> works for ideal simulations</p></li>
+<li><p><strong>fname_pattern</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – UM NetCDF diagnostic file(s) to read.
+will be interpreted as a glob pattern. (should belong to the same simulation)</p></li>
+<li><p><strong>res</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></span>) – horizontal resolution (will use to overwrite horizontal coordinates).
+<strong>NB</strong> works for ideal simulations</p></li>
 <li><p><strong>requested_fields</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span>) – list of fields to retain in ds, if falsy will retain all.</p></li>
 </ul>
 </dd>
@@ -619,7 +634,8 @@ Any unknown fields will retain their original names.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>fname_pattern</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – MONC NetCDF diagnostic file to read. can be a glob pattern. (should belong to the same simulation)</p></li>
+<li><p><strong>fname_pattern</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – MONC NetCDF diagnostic file to read. can be a glob pattern.
+(should belong to the same simulation)</p></li>
 <li><p><strong>requested_fields</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span>) – list of fields to retain in ds, if falsy will retain all.</p></li>
 <li><p><strong>chunks</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></span>) – chunking of datasets “auto” or a dictionary of {coordinate: chunks}.</p></li>
 </ul>
@@ -633,18 +649,21 @@ Any unknown fields will retain their original names.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="sgs_tools.io.monc.data_ingest_MONC_on_single_grid">
 <span class="sig-name descname"><span class="pre">data_ingest_MONC_on_single_grid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname_pattern</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">requested_fields</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['u',</span> <span class="pre">'v',</span> <span class="pre">'w',</span> <span class="pre">'theta']</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chunks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'auto'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/io/monc.html#data_ingest_MONC_on_single_grid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.io.monc.data_ingest_MONC_on_single_grid" title="Link to this definition">#</a></dt>
-<dd><p>read pre-process MONC data and interpolate to a cell-centred grid
-Any unknown fields will retain their original names.</p>
+<dd><dl class="simple">
+<dt>read pre-process MONC data and interpolate to a cell-centred grid</dt><dd><p>Any unknown fields will retain their original names.</p>
+</dd>
+</dl>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>fname_pattern</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – MONC NetCDF diagnostic file(s) to read. will be interpreted as a glob pattern. (should belong to the same simulation)</p></li>
+<li><p><strong>fname_pattern</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – MONC NetCDF diagnostic file(s) to read.
+will be interpreted as a glob pattern. (should belong to the same simulation)</p></li>
 <li><p><strong>requested_fields</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span>) – list of fields to retain in ds, if falsy will retain all.</p></li>
 <li><p><strong>chunks</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></span>) – chunking of datasets “auto” or a dictionary of {coordinate: chunks}.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code>]</span></p>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code>]</span></p>
 </dd>
 </dl>
 </dd></dl>
@@ -655,12 +674,14 @@ Any unknown fields will retain their original names.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="sgs_tools.io.sgs.data_ingest_SGS">
 <span class="sig-name descname"><span class="pre">data_ingest_SGS</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname_pattern</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">requested_fields</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['u',</span> <span class="pre">'v',</span> <span class="pre">'w',</span> <span class="pre">'theta']</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chunks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'auto'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/io/sgs.html#data_ingest_SGS"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.io.sgs.data_ingest_SGS" title="Link to this definition">#</a></dt>
-<dd><p>read and pre-process local-convention (sgs_tools) NetCDF data using sgs_tools naming convention.
+<dd><p>read and pre-process local-convention (sgs_tools) NetCDF data
+using sgs_tools naming convention.
 Will not rename any fields, assume they are in local convention.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>fname_pattern</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – NetCDF diagnostic file to read. can be a glob pattern. (should belong to the same simulation)</p></li>
+<li><p><strong>fname_pattern</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – NetCDF diagnostic file to read. can be a glob pattern.
+(should belong to the same simulation)</p></li>
 <li><p><strong>requested_fields</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span>) – list of fields to retain in ds, if falsy will retain all.</p></li>
 <li><p><strong>chunks</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></span>) – chunking for data</p></li>
 </ul>
@@ -677,7 +698,8 @@ Will not rename any fields, assume they are in local convention.</p>
 <dd><p>A class to write xarray datasets to NetCDF files.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Variables<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>overwrite</strong> – overwrite existing files if set to True. If False, raises an OSError if the file already exists.</p>
+<dd class="field-odd"><p><strong>overwrite</strong> – overwrite existing files if set to True.
+If False, raises an OSError if the file already exists.</p>
 </dd>
 </dl>
 <dl class="py method">

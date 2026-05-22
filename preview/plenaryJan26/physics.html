@@ -447,12 +447,13 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>vel</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code>]]</span>) – input velocity array (on collocated grid)</p></li>
+<li><p><strong>vel</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code>]</span>) – input velocity array (on collocated grid)</p></li>
 <li><p><strong>space_dims</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span>) – labels of spacial dimensions</p></li>
 <li><p><strong>vec_dim</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – label of vector dimension</p></li>
 <li><p><strong>new_dim</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – label of new dimension indexing derivatives</p></li>
 <li><p><strong>make_traceless</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></span>) – should we make the strain traceless</p></li>
-<li><p><strong>grad_operator</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code></span>) – operator that computes vector gradient (To be replaced by a grid)</p></li>
+<li><p><strong>grad_operator</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Callable</span></code></span>) – operator that computes vector gradient
+(To be replaced by a grid)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
@@ -468,11 +469,12 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>vel</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code>]]</span>) – input velocity array (on collocated grid)</p></li>
+<li><p><strong>vel</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code>]</span>) – input velocity array (on collocated grid)</p></li>
 <li><p><strong>space_dims</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span>) – labels of spacial dimensions</p></li>
 <li><p><strong>vec_dim</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – label of vector dimension</p></li>
 <li><p><strong>new_dim</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – label of new dimension indexing derivatives</p></li>
-<li><p><strong>grad_operator</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code></span>) – operator that computes vector gradient (To be replaced by a grid)</p></li>
+<li><p><strong>grad_operator</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Callable</span></code></span>) – operator that computes vector gradient
+(To be replaced by a grid)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
@@ -520,9 +522,12 @@ w.r.t which to compute the fluctuations. Subset of <code class="docutils literal
 <dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code></span></p>
 </dd>
 </dl>
-<p>Note: First performs an interpolation to <code class="docutils literal notranslate"><span class="pre">target_dims</span></code> and then computes the fluctuations
-w.r.t. <code class="docutils literal notranslate"><span class="pre">fluctuation_axes</span></code>. There can be a commutation error when the
-interpolation happens along dimensions other than <code class="docutils literal notranslate"><span class="pre">fluctuation_axes</span></code>.</p>
+<dl class="simple">
+<dt>Note: First performs an interpolation to <code class="docutils literal notranslate"><span class="pre">target_dims</span></code></dt><dd><p>and then computes the fluctuations w.r.t. <code class="docutils literal notranslate"><span class="pre">fluctuation_axes</span></code>.
+There can be a commutation error when the interpolation happens
+along dimensions other than <code class="docutils literal notranslate"><span class="pre">fluctuation_axes</span></code>.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -545,10 +550,12 @@ w.r.t which to compute the fluctuations. Subset of <code class="docutils literal
 <dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code></span></p>
 </dd>
 </dl>
-<p>Note: First performs an interpolation to <code class="docutils literal notranslate"><span class="pre">target_dims</span></code> and then computes the fluctuations
-w.r.t. <code class="docutils literal notranslate"><span class="pre">fluctuation_axes</span></code> and then square. There can be a commutation error when the
+<p>Note: First performs an interpolation to <code class="docutils literal notranslate"><span class="pre">target_dims</span></code>
+and then computes the fluctuations w.r.t. <code class="docutils literal notranslate"><span class="pre">fluctuation_axes</span></code> and then square.
+There can be a commutation error when the
 interpolation happens along dimensions other than <code class="docutils literal notranslate"><span class="pre">fluctuation_axes</span></code>.
-There is uncertainty from whether the interpolation happens before/after the squaring.</p>
+There is uncertainty from whether the interpolation happens
+before/after the squaring.</p>
 </dd></dl>
 
 </section>

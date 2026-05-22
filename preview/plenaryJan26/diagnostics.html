@@ -452,27 +452,42 @@
 <dd><p>Isotropize a 2D power spectrum or cross spectrum
 by taking an “spherical” average over the specified dimensions.</p>
 <div class="math notranslate nohighlight">
-\[\begin{split}\mathbb{F}_\text{iso}(k_r) &amp;= \sum_{k_r: |k_r| \in [kr_0, kr_1]} |\mathbb{F}(\mathbf{k})|^2 * w(\mathbf{k})  \\
+\[\begin{split}\mathbb{F}_\text{iso}(k_r) &amp;= \sum_{k_r: |k_r| \in [kr_0, kr_1]}
+|\mathbb{F}(\mathbf{k})|^2 * w(\mathbf{k})  \\
 k_r &amp;= \langle k \rangle_{|k| \in [kr_0, kr_1]}\end{split}\]</div>
-<p>where <span class="math notranslate nohighlight">\(kr\)</span> is the radial wavenumber and the weights <span class="math notranslate nohighlight">\(w\)</span> are defined implicitly through the scaling.
-Always <span class="math notranslate nohighlight">\(\sum_\mathbf{k} |\mathbb{F}(\mathbf{k})|^2 = \sum \mathbb{F}_\text{iso}(k_r) *  w(k_r)\)</span>.
-This satisfies Parseval assuming <span class="math notranslate nohighlight">\(\sum_\mathbf{k} |\mathbb{F}(\mathbf{k})|^2 = \sum real\_data^2 * dx * dy\)</span>.</p>
+<p>where <span class="math notranslate nohighlight">\(k_r\)</span> is the radial wavenumber and the weights <span class="math notranslate nohighlight">\(w\)</span>
+are defined implicitly through the <code class="docutils literal notranslate"><span class="pre">scaling</span></code>.</p>
+<p>Always <span class="math notranslate nohighlight">\(\sum_\mathbf{k} |\mathbb{F}(\mathbf{k})|^2 =
+\sum \mathbb{F}_\text{iso}(k_r) * w(k_r)\)</span>.
+This satisfies Parseval assuming
+<span class="math notranslate nohighlight">\(\sum_\mathbf{k} |\mathbb{F}(\mathbf{k})|^2 =
+\sum \mathbb{F}(\mathbf{x})^2 * dx * dy\)</span> .</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>ps</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code></span>) – The power spectrum or cross spectrum to be isotropized.</p></li>
 <li><p><strong>fftdim</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span>) – The fft dimensions overwhich the isotropization must be performed.</p></li>
-<li><p><strong>radial_bin_width</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></span>) – Width of radial bins in units of inverse length (or whatever the 2d power spectrum is in)</p></li>
-<li><p><strong>truncate</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></span>) – If True, the spectrum will be truncated for wavenumbers larger than min(max(ps[fftdim].size)).</p></li>
-<li><p><strong>bin_anchor</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – Where to place the radial wavenumber within the bin. Choices {‘left’, ‘right’, ‘centre’, ‘com’}.
-If <cite>com</cite> : compute as the centre-of-mass radius : <span class="math notranslate nohighlight">\(k_r = \sum_{|k| \in [kr_0, kr_1]} (\mathbb{F} * |\mathbf{k}|) /  \mathbb{F}_\text{iso}(k_r)\)</span> before rescaling.
-Default: <cite>com</cite>.</p></li>
-<li><p><strong>scaling</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – <p>Rescale the power spectrum to satisfy <span class="math notranslate nohighlight">\(\sum ps = \sum \mathbb{F}_\text{iso} * w(k_r)\)</span></p>
+<li><p><strong>radial_bin_width</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></span>) – Width of radial bins in units of inverse length
+(or whatever the 2d power spectrum is in)</p></li>
+<li><p><strong>truncate</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></span>) – If True, the spectrum will be truncated for
+wavenumbers larger than min(max(ps[fftdim].size)).</p></li>
+<li><p><strong>bin_anchor</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – Where to place the radial wavenumber within the bin.
+Choices <code class="docutils literal notranslate"><span class="pre">left</span></code>, <code class="docutils literal notranslate"><span class="pre">right</span></code>, <code class="docutils literal notranslate"><span class="pre">centre</span></code>, <code class="docutils literal notranslate"><span class="pre">com</span></code>.
+If <code class="docutils literal notranslate"><span class="pre">com</span></code>: compute as the centre-of-mass radius
+<span class="math notranslate nohighlight">\(k_r = \sum_{|k| \in [kr_0, kr_1]} (\mathbb{F} * |\mathbf{k}|)
+/ \mathbb{F}_\text{iso}(k_r)\)</span> before rescaling.
+Default: <code class="docutils literal notranslate"><span class="pre">com</span></code>.</p></li>
+<li><p><strong>scaling</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – <p>Rescale the power spectrum to satisfy
+<span class="math notranslate nohighlight">\(\sum ps = \sum \mathbb{F}_\text{iso} * w(k_r)\)</span></p>
 <ul>
-<li><p><cite>density</cite>: set <span class="math notranslate nohighlight">\(w(k_r) = \pi * ((k_r^{top})^2 - (k_r^{bottom})^2)\)</span>, where <span class="math notranslate nohighlight">\(k_r^{top}\)</span> and <span class="math notranslate nohighlight">\(k_r^{bottom}\)</span> are the bin edges.</p></li>
-<li><p><cite>spectrum</cite>: set <span class="math notranslate nohighlight">\(w(k_r) = 1\)</span></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">density</span></code>:
+set <span class="math notranslate nohighlight">\(w(k_r) = \pi * ((k_r^{top})^2 - (k_r^{bottom})^2)\)</span>,
+where <span class="math notranslate nohighlight">\(k_r^{top}\)</span> and <span class="math notranslate nohighlight">\(k_r^{bottom}\)</span> are the bin edges.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">spectrum</span></code>:
+set <span class="math notranslate nohighlight">\(w(k_r) = 1\)</span></p></li>
 </ul>
 </p></li>
+<li><p><strong>prefix</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – Prefix for the name of the new spectral dimension.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
@@ -480,7 +495,8 @@ Default: <cite>com</cite>.</p></li>
 </dd>
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>an <cite>xarray.DataArray</cite> with the isotropic spectrum
-coordinates for the radial wavenumber ( <cite>prefix</cite> r), bin width ( <cite>prefix</cite> dr) and corresponding weigths ( <cite>prefix</cite> dA), i.e. <span class="math notranslate nohighlight">\(w(k_r)\)</span>.</p>
+coordinates for the radial wavenumber ( <cite>prefix</cite> r), bin width ( <cite>prefix</cite> dr)
+and corresponding weigths ( <cite>prefix</cite> dA), i.e. <span class="math notranslate nohighlight">\(w(k_r)\)</span>.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -488,25 +504,38 @@ coordinates for the radial wavenumber ( <cite>prefix</cite> r), bin width ( <cit
 <dl class="py function">
 <dt class="sig sig-object py" id="sgs_tools.diagnostics.spectra.spectra_1d_radial">
 <span class="sig-name descname"><span class="pre">spectra_1d_radial</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">simulation</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hdims</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">power_spectra_fields</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cross_spectra_fields</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radial_smooth_factor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radial_truncation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fillnan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/diagnostics/spectra.html#spectra_1d_radial"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.diagnostics.spectra.spectra_1d_radial" title="Link to this definition">#</a></dt>
-<dd><p>Compute a 1d directional and radial power and cross spectra of all fields in the <cite>simultation</cite> Dataset.
-Notes: resulting spectral cooordinates are in units of inverse length, not radians/length.</p>
+<dd><p>Compute a 1d directional and radial power and cross spectra of all fields
+in the <cite>simultation</cite> Dataset.
+Notes: resulting spectral cooordinates are in units of inverse length,
+not radians/length.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>simulation</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></span>) – xarray Dataset of multidimensional fields. must contain the set of <cite>power_spectra_fields</cite> and <cite>cross_spectra_fields</cite></p></li>
-<li><p><strong>hdims</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span>) – horizonal dimensions along which to compute linear spectra. The radial spectrum is computed along the Euclidean radius along vector spanned by these dimensions.</p></li>
+<li><p><strong>simulation</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></span>) – xarray Dataset of multidimensional fields.
+must contain the set of <cite>power_spectra_fields</cite> and <cite>cross_spectra_fields</cite></p></li>
+<li><p><strong>hdims</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span>) – horizonal dimensions along which to compute linear spectra.
+The radial spectrum is computed along the Euclidean radius
+along vector spanned by these dimensions.</p></li>
 <li><p><strong>power_spectra_fields</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span>) – sequence of fields whose power spectrum to compute</p></li>
-<li><p><strong>cross_spectra_fields</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]</span>) – sequence of tuples of fields whose cross-spectrum to compute</p></li>
-<li><p><strong>radial_smooth_factor</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></span>) – smoothing factor for radial spectral bins. If 2 will have radial bin widht is 2*linear wavenumber.</p></li>
-<li><p><strong>radial_truncation</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></span>) – switch to include/exclude aliased wavenumber beyond the max. 1d freqeuncy in the radial spectrum. If <strong>True</strong> the result won’t respect Parseval exactly.</p></li>
-<li><p><strong>fillnan</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></span>) – value to fill nans with in order to compute spectrum of dirty date. If set to a nan value (e.g. np.nan) will produce nan spectra globally.  Defaults to 0.</p></li>
+<li><p><strong>cross_spectra_fields</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]</span>) – sequence of tuples of fields
+whose cross-spectrum to compute</p></li>
+<li><p><strong>radial_smooth_factor</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></span>) – smoothing factor for radial spectral bins.
+If 2 will have radial bin widht is 2*linear wavenumber.</p></li>
+<li><p><strong>radial_truncation</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></span>) – switch to include/exclude aliased wavenumber beyond max.
+1d freqeuncy in the radial spectrum.
+If <strong>True</strong> the result won’t respect Parseval exactly.</p></li>
+<li><p><strong>fillnan</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></span>) – value to fill nans with in order to compute spectrum of dirty date.
+If set to a nan value (e.g. np.nan) will produce nan spectra globally.
+Defaults to 0.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></span></p>
 </dd>
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>an xarray Dataset with the requested 1d and radial power and co-spectra. The number of physical-space grid size and cell size along hdims is included in the attributes along with the fourier normalization convention.</p>
+<dd class="field-odd"><p>an xarray Dataset with the requested 1d and radial power and co-spectra.
+The number of physical-space grid size and cell size along hdims is included
+in the attributes along with the fourier normalization convention.</p>
 </dd>
 </dl>
 </dd></dl>

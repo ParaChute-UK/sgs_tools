@@ -550,7 +550,8 @@
 <span class="sd">    :ivar leonard: Leonard tensor for the large-scale equation</span>
 <span class="sd">    :ivar minimisation: Minimisation method to compute coefficients</span>
 <span class="sd">    :meth compute_coeff: computes the amplitude coefficients for the SGS model</span>
-<span class="sd">    :meth sgs_tensor: computes the SGS tensor for a given test and regularisation filters</span>
+<span class="sd">    :meth sgs_tensor: computes the SGS tensor for a given</span>
+<span class="sd">      test and regularisation filters</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">static_model</span><span class="p">:</span> <span class="n">SGSModel</span>
@@ -631,7 +632,8 @@
 
         <span class="n">tau_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">static_model</span><span class="o">.</span><span class="n">sgs_tensor_list</span><span class="p">(</span><span class="n">test_filter</span><span class="p">)</span>
         <span class="n">coeff</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_coeff</span><span class="p">(</span><span class="n">test_filter</span><span class="p">,</span> <span class="n">reg_filter</span><span class="p">)</span>
-        <span class="c1"># ensure alignment of coefficient index label between static_model and minimisation</span>
+        <span class="c1"># ensure alignment of coefficient index label</span>
+        <span class="c1"># between static_model and minimisation</span>
         <span class="n">cdim</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">minimisation</span><span class="o">.</span><span class="n">coeff_dim</span>
         <span class="k">if</span> <span class="n">cdim</span> <span class="ow">in</span> <span class="n">tau_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">dims</span><span class="p">:</span>
             <span class="n">coeff</span> <span class="o">=</span> <span class="n">coeff</span><span class="o">.</span><span class="n">rename</span><span class="p">({</span><span class="n">cdim</span><span class="p">:</span> <span class="n">cdim</span> <span class="o">+</span> <span class="s2">&quot;_dummy&quot;</span><span class="p">})</span>

@@ -418,8 +418,8 @@
                 <article class="bd-article">
                   
   <h1>Source code for sgs_tools.sgs.coarse_grain</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Hashable</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Hashable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
@@ -439,7 +439,7 @@
 <span class="sd">        notably &#39;trim&#39; and &#39;exact&#39;</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">window</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Hashable</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span>
+    <span class="n">window</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Hashable</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span>
     <span class="n">bc</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;exact&quot;</span>
 
     <span class="nd">@property</span>
@@ -456,7 +456,7 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="n">field</span><span class="o">.</span><span class="n">chunks</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">field</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">chunksizes</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">field</span><span class="o">.</span><span class="n">dims</span><span class="p">,</span> <span class="n">field</span><span class="o">.</span><span class="n">chunks</span><span class="p">))</span>
+            <span class="n">chunksizes</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">field</span><span class="o">.</span><span class="n">dims</span><span class="p">,</span> <span class="n">field</span><span class="o">.</span><span class="n">chunks</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
             <span class="n">new_chunksizes</span> <span class="o">=</span> <span class="p">{}</span>
             <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">window</span><span class="p">:</span>
                 <span class="n">orig</span> <span class="o">=</span> <span class="n">chunksizes</span><span class="p">[</span><span class="n">d</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
@@ -478,7 +478,8 @@
 <a class="viewcode-back" href="../../../sgs.html#sgs_tools.sgs.coarse_grain.CoarseGrain.filter">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">field</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;coarse grain `field`;</span>
-<span class="sd">        Note: unlike Filter.filter, here the output size is different from the input size</span>
+<span class="sd">        Note: unlike Filter.filter, here the output size is different</span>
+<span class="sd">        from the input size</span>
 
 <span class="sd">        :param field: array to be filtered; must contain all of `filter_dims`</span>
 <span class="sd">        &quot;&quot;&quot;</span>

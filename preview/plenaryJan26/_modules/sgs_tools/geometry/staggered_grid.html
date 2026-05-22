@@ -442,8 +442,8 @@
 <a class="viewcode-back" href="../../../geometry.html#sgs_tools.geometry.staggered_grid.interpolate_to_grid">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">interpolate_to_grid</span><span class="p">(</span>
     <span class="n">ds</span><span class="p">:</span> <span class="n">T_Xarray</span><span class="p">,</span>
-    <span class="n">target_dims</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[],</span>
-    <span class="n">coord_map</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">]</span> <span class="o">=</span> <span class="p">{},</span>
+    <span class="n">target_dims</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">coord_map</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">drop_coords</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T_Xarray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Spatial interpolation to a target_grid</span>
@@ -451,12 +451,16 @@
 <span class="sd">    :param ds: input data array or dataset. Needs to have dimensions with coordinates</span>
 <span class="sd">        that are labelled ``x*``, ``y*``, ``z*`` etc. or</span>
 
-<span class="sd">    :param target_dims: list of dimension names  to interpolate to, in the order xdim, ydim, zdim.</span>
-<span class="sd">        They must exist in ds as DataArry/coordinates</span>
-<span class="sd">    :param coord_map: dictionary of {existing_dimension_in_ds : target_coordinate_as_DataArray}</span>
-<span class="sd">    :param drop_coords: flag to exclude spatial coordinates relying on removed dims from output</span>
+<span class="sd">    :param target_dims: dimension or a list of dimension names to interpolate to,</span>
+<span class="sd">         in the order xdim, ydim, zdim. They must exist in ds as DataArry/coordinates.</span>
+<span class="sd">    :param coord_map: dictionary of</span>
+<span class="sd">      {existing_dimension_in_ds : target_coordinate_as_DataArray}.</span>
+<span class="sd">      If None, use an empty dict.</span>
+<span class="sd">    :param drop_coords: flag to exclude spatial coordinates relying on</span>
+<span class="sd">      removed dims from output</span>
 <span class="sd">    :return: the input data interpolated to the target coordinates</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">target_dims</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
         <span class="n">target_dims</span> <span class="o">=</span> <span class="p">[</span><span class="n">target_dims</span><span class="p">]</span>
 
@@ -494,7 +498,7 @@
 
     <span class="k">else</span><span class="p">:</span>
         <span class="k">assert</span> <span class="n">coord_map</span><span class="p">,</span> <span class="s2">&quot;Should specify one of target_dims or coord_map&quot;</span>
-        <span class="n">missing_dims</span> <span class="o">=</span> <span class="p">[</span><span class="n">dim</span> <span class="k">for</span> <span class="n">dim</span> <span class="ow">in</span> <span class="n">coord_map</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">if</span> <span class="n">dim</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ds</span><span class="o">.</span><span class="n">dims</span><span class="p">]</span>
+        <span class="n">missing_dims</span> <span class="o">=</span> <span class="p">[</span><span class="n">dim</span> <span class="k">for</span> <span class="n">dim</span> <span class="ow">in</span> <span class="n">coord_map</span> <span class="k">if</span> <span class="n">dim</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ds</span><span class="o">.</span><span class="n">dims</span><span class="p">]</span>
         <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">missing_dims</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="p">(</span>
             <span class="sa">f</span><span class="s2">&quot;missing input dimensions </span><span class="si">{</span><span class="n">missing_dims</span><span class="si">}</span><span class="s2"> from input data&quot;</span>
         <span class="p">)</span>
@@ -529,7 +533,7 @@
 <a class="viewcode-back" href="../../../geometry.html#sgs_tools.geometry.staggered_grid.compose_vector_components_on_grid">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">compose_vector_components_on_grid</span><span class="p">(</span>
     <span class="n">components</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">],</span>
-    <span class="n">target_dims</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[],</span>
+    <span class="n">target_dims</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">vector_dim</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;c1&quot;</span><span class="p">,</span>
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
     <span class="n">long_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
@@ -538,15 +542,17 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;turn a list of arrays into a vector field</span>
 
 <span class="sd">    :param components: list of vector components</span>
-<span class="sd">    :param target_dims: if target_dims is given, it will interpolate onto it first, otherwise all componets must have the same dimesions and coordinates</span>
+<span class="sd">    :param target_dims: if target_dims is given, it will interpolate onto it first,</span>
+<span class="sd">      otherwise all componets must have the same dimesions and coordinates</span>
 <span class="sd">    :param vector_dim: label of dimension indexing vector components</span>
 <span class="sd">    :param name: name of new array</span>
 <span class="sd">    :param lon_name: long_name of new array</span>
-<span class="sd">    :param drop_coords: flag picked up by :meth:`interpolate_to_grid` to exclude spatial coordinates relying on removed dims from output</span>
+<span class="sd">    :param drop_coords: flag picked up by :meth:`interpolate_to_grid`</span>
+<span class="sd">      to exclude spatial coordinates relying on removed dims from output</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># interpolate</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">target_dims</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">assert</span> <span class="nb">all</span><span class="p">([</span><span class="n">components</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">dims</span> <span class="o">==</span> <span class="n">x</span><span class="o">.</span><span class="n">dims</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">components</span><span class="p">[</span><span class="mi">1</span><span class="p">:]]),</span> <span class="p">(</span>
+    <span class="k">if</span> <span class="n">target_dims</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">target_dims</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="nb">all</span><span class="p">(</span><span class="n">components</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">dims</span> <span class="o">==</span> <span class="n">x</span><span class="o">.</span><span class="n">dims</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">components</span><span class="p">[</span><span class="mi">1</span><span class="p">:]),</span> <span class="p">(</span>
             <span class="s2">&quot;The components&#39; dimensions don&#39;t match. &quot;</span>
             <span class="s2">&quot;Choose a set of dimensions to interpolate to!&quot;</span>
         <span class="p">)</span>
@@ -555,7 +561,7 @@
             <span class="n">dim</span><span class="o">=</span><span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">components</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dims</span><span class="o">=</span><span class="p">[</span><span class="n">vector_dim</span><span class="p">]),</span>
         <span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">assert</span> <span class="nb">all</span><span class="p">([</span><span class="n">c</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">components</span><span class="p">])</span>
+        <span class="k">assert</span> <span class="nb">all</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">components</span><span class="p">)</span>
         <span class="n">vec_ds</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">({</span><span class="n">c</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">components</span><span class="p">})</span>
         <span class="n">vec_arr</span> <span class="o">=</span> <span class="n">interpolate_to_grid</span><span class="p">(</span>
             <span class="n">vec_ds</span><span class="p">,</span> <span class="n">target_dims</span><span class="p">,</span> <span class="n">drop_coords</span><span class="o">=</span><span class="n">drop_coords</span>
@@ -594,8 +600,8 @@
 <span class="sd">    :param periodic_field: boundary condition treatment; if `False` will</span>
 <span class="sd">      fill boundary values with NaN. Note that only 1 boundary is undefined\:</span>
 <span class="sd">      upper boundary for face-coordinates, and lower boundary for centre-coordinates.</span>
-<span class="sd">    :return: the derivative on the grid with offset staggering in the differentiated dimension</span>
-<span class="sd">      face -&gt; centre and v.v.</span>
+<span class="sd">    :return: the derivative on the grid with offset staggering in the</span>
+<span class="sd">      differentiated dimension face -&gt; centre and v.v.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">delta</span><span class="p">(</span><span class="n">coord</span><span class="p">,</span> <span class="n">shift</span><span class="p">):</span>
@@ -617,10 +623,10 @@
     <span class="n">coord</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>  <span class="c1"># just in case</span>
     <span class="n">val</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">dim</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;_face&quot;</span><span class="p">):</span>
-        <span class="n">new_dim</span> <span class="o">=</span> <span class="n">dim</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">&quot;_face&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;_centre&quot;</span>
+        <span class="n">new_dim</span> <span class="o">=</span> <span class="n">dim</span><span class="p">[:</span> <span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="s2">&quot;_face&quot;</span><span class="p">)]</span> <span class="o">+</span> <span class="s2">&quot;_centre&quot;</span>
         <span class="n">shift</span> <span class="o">=</span> <span class="mi">1</span>
     <span class="k">elif</span> <span class="n">dim</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;_centre&quot;</span><span class="p">):</span>
-        <span class="n">new_dim</span> <span class="o">=</span> <span class="n">dim</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">&quot;_centre&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;_face&quot;</span>
+        <span class="n">new_dim</span> <span class="o">=</span> <span class="n">dim</span><span class="p">[:</span> <span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="s2">&quot;_centre&quot;</span><span class="p">)]</span> <span class="o">+</span> <span class="s2">&quot;_face&quot;</span>
         <span class="n">shift</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unrecognizable coordinate staggering for dimension </span><span class="si">{</span><span class="n">dim</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -634,7 +640,7 @@
     <span class="n">deriv</span> <span class="o">=</span> <span class="n">deriv</span><span class="o">.</span><span class="n">rename</span><span class="p">({</span><span class="n">dim</span><span class="p">:</span> <span class="n">new_dim</span><span class="p">})</span>
     <span class="n">deriv</span><span class="p">[</span><span class="n">new_dim</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_coord</span><span class="o">.</span><span class="n">rename</span><span class="p">({</span><span class="n">dim</span><span class="p">:</span> <span class="n">new_dim</span><span class="p">})</span>
     <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">deriv</span><span class="o">.</span><span class="n">coords</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">deriv</span><span class="p">[</span><span class="n">c</span><span class="p">]</span><span class="o">.</span><span class="n">dims</span> <span class="ow">and</span> <span class="n">deriv</span><span class="p">[</span><span class="n">c</span><span class="p">]</span><span class="o">.</span><span class="n">dims</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">new_dim</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">c</span> <span class="o">==</span> <span class="n">new_dim</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">deriv</span><span class="p">[</span><span class="n">c</span><span class="p">]</span><span class="o">.</span><span class="n">dims</span> <span class="ow">and</span> <span class="n">deriv</span><span class="p">[</span><span class="n">c</span><span class="p">]</span><span class="o">.</span><span class="n">dims</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">new_dim</span> <span class="ow">and</span> <span class="n">c</span> <span class="o">!=</span> <span class="n">new_dim</span><span class="p">:</span>
             <span class="n">deriv</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="o">=</span> <span class="n">centre_point</span><span class="p">(</span><span class="n">deriv</span><span class="p">[</span><span class="n">c</span><span class="p">],</span> <span class="n">shift</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">deriv</span></div>
 
@@ -645,14 +651,18 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">grad_on_cart_grid</span><span class="p">(</span>
     <span class="n">ds</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span>
     <span class="n">space_dims</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
-    <span class="n">periodic_field</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">],</span>
+    <span class="n">periodic_field</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;differentiate a scalar with respect to given space dims on staggered grid</span>
 
 <span class="sd">    :param ds: input array to be differentiated</span>
-<span class="sd">    :param space_dims: labels for the spatial dimensions (to be differentiated against)</span>
-<span class="sd">    :param periodic_field: boundary condition treatment; passed to :meth:`diff_lin_on_grid`</span>
+<span class="sd">    :param space_dims: labels for the spatial dimensions (to be differentiated against).</span>
+<span class="sd">      If None, use [False, False, False]</span>
+<span class="sd">    :param periodic_field: boundary condition treatment;</span>
+<span class="sd">      passed to :meth:`diff_lin_on_grid`</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">periodic_field</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">periodic_field</span> <span class="o">=</span> <span class="p">[</span><span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">]</span>
     <span class="n">name</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">name</span>
     <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;d&quot;</span>
@@ -673,28 +683,31 @@
 <a class="viewcode-back" href="../../../geometry.html#sgs_tools.geometry.staggered_grid.grad_vec_on_grid">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">grad_vec_on_grid</span><span class="p">(</span>
     <span class="n">ds</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">,</span>
-    <span class="n">target_dims</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;x_centre&quot;</span><span class="p">,</span> <span class="s2">&quot;y_centre&quot;</span><span class="p">,</span> <span class="s2">&quot;z_centre&quot;</span><span class="p">],</span>
-    <span class="n">new_dim_name</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;c1&quot;</span><span class="p">,</span> <span class="s2">&quot;c2&quot;</span><span class="p">],</span>
+    <span class="n">target_dims</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+    <span class="n">new_dim_name</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;c1&quot;</span><span class="p">,</span> <span class="s2">&quot;c2&quot;</span><span class="p">),</span>
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;computes gradient of a vector described onto target dimensions</span>
 
-<span class="sd">    :param ds: should be a dataset which only contains the components of the vector in sorted order and target coordinates.</span>
-<span class="sd">    :param target_dims: the dimensions to compute the derivative on (must be coordinates in input dataset)</span>
-<span class="sd">    :param new_dim_name: the names of the new dimensions: [vector component, differential component]</span>
+<span class="sd">    :param ds: should be a dataset which only contains the components of the vector</span>
+<span class="sd">      in sorted order and target coordinates.</span>
+<span class="sd">    :param target_dims: the dimensions to compute the derivative on</span>
+<span class="sd">      (must be coordinates in input dataset)</span>
+<span class="sd">    :param new_dim_name: the names of the new dimensions:</span>
+<span class="sd">      [vector component, differential component]</span>
 <span class="sd">    :param name: name for output dataarray (optional)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># unpack new_dim_name</span>
     <span class="n">vec_name</span><span class="p">,</span> <span class="n">d_name</span> <span class="o">=</span> <span class="n">new_dim_name</span>
     <span class="n">gradvec_comp</span> <span class="o">=</span> <span class="p">{}</span>
 
-    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ds</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ds</span><span class="p">):</span>
         <span class="c1"># individual space dimensions for each staggered field</span>
         <span class="n">space_dims</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">ds</span><span class="p">[</span><span class="n">f</span><span class="p">]</span><span class="o">.</span><span class="n">dims</span> <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">d</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="s2">&quot;xyz&quot;</span><span class="p">])</span>
         <span class="n">grad_f</span> <span class="o">=</span> <span class="n">grad_on_cart_grid</span><span class="p">(</span><span class="n">ds</span><span class="p">[</span><span class="n">f</span><span class="p">],</span> <span class="n">space_dims</span><span class="p">)</span>
         <span class="c1"># interpolate onto target coordinates from original ds (must exist)</span>
-        <span class="c1"># careful grad_on_cart_grid will create coordinates with possibly classhing names</span>
-        <span class="c1"># so make an explicit coordinate map</span>
+        <span class="c1"># careful grad_on_cart_grid will create coordinates</span>
+        <span class="c1"># with possibly classhing names, so make an explicit coordinate map</span>
         <span class="n">coord_map</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">grad_f</span><span class="o">.</span><span class="n">dims</span><span class="p">:</span>
             <span class="c1"># xr.Dataset.dims is a Hashable and interpolate expects a str</span>

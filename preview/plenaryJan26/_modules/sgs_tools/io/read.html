@@ -446,15 +446,18 @@
 
 <span class="sd">    :param requested_fields: List of variable names to extract from the input data.</span>
 <span class="sd">    :param kwargs: Additional keyword arguments depending on the input format.</span>
-<span class="sd">      The ``um`` format, requires ``resolution`` (float) specifying horizontal grid spacing.</span>
+<span class="sd">      The ``um`` format, requires ``resolution`` (float)</span>
+<span class="sd">      specifying horizontal grid spacing.</span>
 
 <span class="sd">    :return: xarray Dataset containing the requested fields and metadata, including</span>
 <span class="sd">      the horizontal resolution stored in ``attrs[&quot;h_resolution&quot;]``.</span>
 
 <span class="sd">    .. note::</span>
-<span class="sd">        - For ``monc`` format, resolution is inferred from metadata and assumed isotropic in x and y</span>
+<span class="sd">        - For ``monc`` format, resolution is inferred from metadata and assumed</span>
+<span class="sd">            isotropic in x and y</span>
 <span class="sd">        - For ``um`` format, resolution must be explicitly provided via `kwargs`.</span>
-<span class="sd">        - For ``sgs`` format, if h_resolution is not a dataset attribute it is guessed by the spacing in &quot;x&quot; and &quot;y&quot; coordinates</span>
+<span class="sd">        - For ``sgs`` format, if h_resolution is not a dataset attribute</span>
+<span class="sd">            it is guessed by the spacing in &quot;x&quot; and &quot;y&quot; coordinates</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">input_format</span> <span class="o">==</span> <span class="s2">&quot;sgs&quot;</span><span class="p">:</span>
         <span class="n">simulation</span> <span class="o">=</span> <span class="n">data_ingest_SGS</span><span class="p">(</span>

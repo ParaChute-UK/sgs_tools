@@ -550,10 +550,10 @@
 <a class="viewcode-back" href="../../../io.html#sgs_tools.io.um.rename_variables">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">rename_variables</span><span class="p">(</span><span class="n">ds</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;rename STASH variables:</span>
-<span class="sd">       UM STASH varaibles adopt their `long_name` with special characters replaced by &#39;_&#39;.</span>
-<span class="sd">       The stash code is retained as an attribute for back-searches.</span>
-<span class="sd">       Spacial coordinates/dimesions are renamed to ``z_{theta|rho}`` and ``{x|y}_{face|centre}``.</span>
-<span class="sd">       Time coordinate becomes ``t`` and ``t_0``.</span>
+<span class="sd">       UM STASH varaibles adopt their `long_name` with special characters</span>
+<span class="sd">       replaced by &#39;_&#39;. The stash code is retained as an attribute for back-searches.</span>
+<span class="sd">       Spacial coordinates/dimesions are renamed to ``z_{theta|rho}`` and</span>
+<span class="sd">       ``{x|y}_{face|centre}``. Time coordinate becomes ``t`` and ``t_0``.</span>
 
 <span class="sd">    :param ds: input dataset</span>
 <span class="sd">    :return: dataset with renamed variables</span>
@@ -571,7 +571,8 @@
             <span class="n">varname_dict</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="n">varname_str</span><span class="p">(</span><span class="n">lname</span><span class="p">)</span>
     <span class="n">ds</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">varname_dict</span><span class="p">)</span>
 
-    <span class="c1"># swap vertical dimension to height about sea level (in m) to better compare across simulations</span>
+    <span class="c1"># swap vertical dimension to height about sea level (in m)</span>
+    <span class="c1"># to better compare across simulations</span>
     <span class="n">vertical_dim_map</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s2">&quot;thlev_eta_theta&quot;</span><span class="p">:</span> <span class="s2">&quot;thlev_zsea_theta&quot;</span><span class="p">,</span>
         <span class="s2">&quot;thlev_bl_eta_theta&quot;</span><span class="p">:</span> <span class="s2">&quot;thlev_bl_zsea_theta&quot;</span><span class="p">,</span>
@@ -598,10 +599,7 @@
 
     <span class="c1"># swap to an easy time-dimension</span>
     <span class="n">tname</span> <span class="o">=</span> <span class="s2">&quot;min15T0&quot;</span>
-    <span class="k">if</span> <span class="s2">&quot;min15T0_0&quot;</span> <span class="ow">in</span> <span class="n">ds</span><span class="p">:</span>
-        <span class="n">torigin</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;min15T0_0&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">torigin</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;min15T0&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">torigin</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;min15T0_0&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="s2">&quot;min15T0_0&quot;</span> <span class="ow">in</span> <span class="n">ds</span> <span class="k">else</span> <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;min15T0&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
     <span class="k">for</span> <span class="n">tsuffix</span> <span class="ow">in</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;_0&quot;</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">tname</span> <span class="o">+</span> <span class="n">tsuffix</span> <span class="ow">in</span> <span class="n">ds</span><span class="p">:</span>
             <span class="n">delta_t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">rint</span><span class="p">(</span>
@@ -625,11 +623,13 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">unify_coords</span><span class="p">(</span><span class="n">ds</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">,</span> <span class="n">res</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;unify coordinate names</span>
 
-<span class="sd">    implement correct x-spacing using ``res``, assume ``res`` is given in the correct units</span>
+<span class="sd">    implement correct x-spacing using ``res``, assume ``res`` is given in</span>
+<span class="sd">    the correct units</span>
 <span class="sd">    rename coordinates with reference to a logically-cartesian grid</span>
 
 <span class="sd">    :param ds: input dataset</span>
-<span class="sd">    :param res: resolution of dataset -- to create correct x-y grid for idealised runs (the existing one is in lat-lon coords)</span>
+<span class="sd">    :param res: resolution of dataset -- to create correct x-y grid for idealised runs</span>
+<span class="sd">      (the existing one is in lat-lon coords)</span>
 <span class="sd">    :return: dataset with renamed variables</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -708,18 +708,23 @@
     <span class="k">return</span> <span class="n">ds</span>
 
 
+<span class="n">__default_req_fields</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;u&quot;</span><span class="p">,</span> <span class="s2">&quot;v&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="s2">&quot;theta&quot;</span><span class="p">]</span>
+
+
 <div class="viewcode-block" id="data_ingest_UM">
 <a class="viewcode-back" href="../../../io.html#sgs_tools.io.um.data_ingest_UM">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">data_ingest_UM</span><span class="p">(</span>
     <span class="n">fname_pattern</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">res</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-    <span class="n">requested_fields</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;u&quot;</span><span class="p">,</span> <span class="s2">&quot;v&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="s2">&quot;theta&quot;</span><span class="p">],</span>
+    <span class="n">requested_fields</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">__default_req_fields</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;read and pre-process UM data using sgs_tools naming convention.</span>
 <span class="sd">    Any unknown fields will retain their original names.</span>
 
-<span class="sd">    :param fname_pattern: UM NetCDF diagnostic file(s) to read. will be interpreted as a glob pattern. (should belong to the same simulation)</span>
-<span class="sd">    :param res: horizontal resolution (will use to overwrite horizontal coordinates). **NB** works for ideal simulations</span>
+<span class="sd">    :param fname_pattern: UM NetCDF diagnostic file(s) to read.</span>
+<span class="sd">      will be interpreted as a glob pattern. (should belong to the same simulation)</span>
+<span class="sd">    :param res: horizontal resolution (will use to overwrite horizontal coordinates).</span>
+<span class="sd">      **NB** works for ideal simulations</span>
 <span class="sd">    :param requested_fields: list of fields to retain in ds, if falsy will retain all.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -744,13 +749,15 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">data_ingest_UM_on_single_grid</span><span class="p">(</span>
     <span class="n">fname_pattern</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">res</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-    <span class="n">requested_fields</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;u&quot;</span><span class="p">,</span> <span class="s2">&quot;v&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="s2">&quot;theta&quot;</span><span class="p">],</span>
+    <span class="n">requested_fields</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">__default_req_fields</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;read, pre-process UM data and interpolate to a cell-centred grid</span>
 <span class="sd">    Any unknown fields will retain their original names.</span>
 
-<span class="sd">    :param fname_pattern: UM NetCDF diagnostic file(s) to read. will be interpreted as a glob pattern. (should belong to the same simulation)</span>
-<span class="sd">    :param res: horizontal resolution (will use to overwrite horizontal coordinates). **NB** works for ideal simulations</span>
+<span class="sd">    :param fname_pattern: UM NetCDF diagnostic file(s) to read.</span>
+<span class="sd">      will be interpreted as a glob pattern. (should belong to the same simulation)</span>
+<span class="sd">    :param res: horizontal resolution (will use to overwrite horizontal coordinates).</span>
+<span class="sd">       **NB** works for ideal simulations</span>
 <span class="sd">    :param  requested_fields: list of fields to retain in ds, if falsy will retain all.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># read, constrain fields, unify grids</span>
@@ -761,7 +768,7 @@
     <span class="n">simulation</span> <span class="o">=</span> <span class="n">interpolate_to_grid</span><span class="p">(</span><span class="n">simulation</span><span class="p">,</span> <span class="n">centre_dims</span><span class="p">,</span> <span class="n">drop_coords</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="c1"># rename spatial dimensions to &#39;xyz&#39;</span>
     <span class="n">simple_dims</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;z&quot;</span><span class="p">]</span>
-    <span class="n">dim_names</span> <span class="o">=</span> <span class="p">{</span><span class="n">d_new</span><span class="p">:</span> <span class="n">d_old</span> <span class="k">for</span> <span class="n">d_new</span><span class="p">,</span> <span class="n">d_old</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">centre_dims</span><span class="p">,</span> <span class="n">simple_dims</span><span class="p">)}</span>
+    <span class="n">dim_names</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">centre_dims</span><span class="p">,</span> <span class="n">simple_dims</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
     <span class="n">simulation</span> <span class="o">=</span> <span class="n">simulation</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">dim_names</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">simulation</span></div>

@@ -590,7 +590,8 @@ notably ‘trim’ and ‘exact’</p></li>
 <dt class="sig sig-object py" id="sgs_tools.sgs.coarse_grain.CoarseGrain.filter">
 <span class="sig-name descname"><span class="pre">filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">field</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/coarse_grain.html#CoarseGrain.filter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.coarse_grain.CoarseGrain.filter" title="Link to this definition">#</a></dt>
 <dd><p>coarse grain <cite>field</cite>;
-Note: unlike Filter.filter, here the output size is different from the input size</p>
+Note: unlike Filter.filter, here the output size is different
+from the input size</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>field</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code></span>) – array to be filtered; must contain all of <cite>filter_dims</cite></p>
@@ -755,7 +756,8 @@ and <span class="math notranslate nohighlight">\(\Delta\)</span> is the filter s
 <dd class="field-even"><p>computes the amplitude coefficients for the SGS model</p>
 </dd>
 <dt class="field-odd">Meth sgs_tensor<span class="colon">:</span></dt>
-<dd class="field-odd"><p>computes the SGS tensor for a given test and regularisation filters</p>
+<dd class="field-odd"><p>computes the SGS tensor for a given
+test and regularisation filters</p>
 </dd>
 </dl>
 <dl class="py method">
@@ -868,7 +870,10 @@ tensor products <span class="math notranslate nohighlight">\(L M_i\)</span> and 
 <dl class="py method">
 <dt class="sig sig-object py" id="sgs_tools.sgs.dynamic_coefficient.Minimisation.compute">
 <span class="sig-name descname"><span class="pre">compute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">L</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Mi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_filter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/dynamic_coefficient.html#Minimisation.compute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.dynamic_coefficient.Minimisation.compute" title="Link to this definition">#</a></dt>
-<dd><p>solve for <span class="math notranslate nohighlight">\({c_i}\)</span> the over-determined system <span class="math notranslate nohighlight">\(L = \sum_i(c_i M_i)\)</span>.</p>
+<dd><dl class="simple">
+<dt>solve for <span class="math notranslate nohighlight">\({c_i}\)</span> the over-determined system</dt><dd><p><span class="math notranslate nohighlight">\(L = \sum_i(c_i M_i)\)</span>.</p>
+</dd>
+</dl>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -890,14 +895,17 @@ tensor products <span class="math notranslate nohighlight">\(L M_i\)</span> and 
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">LillyMinimisation1Model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">contraction_dims</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coeff_dim</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/dynamic_coefficient.html#LillyMinimisation1Model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.dynamic_coefficient.LillyMinimisation1Model" title="Link to this definition">#</a></dt>
 <dd><dl class="simple">
 <dt>Lilly Minimisation (least square error) for a 1-global-coefficient model using</dt><dd><p>the Lilly identity as <span class="math notranslate nohighlight">\(\overline{L \cdot M} / \overline{M \cdot M}\)</span>.
-where <span class="math notranslate nohighlight">\(\cdot\)</span> means  tensor contraction, <span class="math notranslate nohighlight">\(\overline{*}\)</span> means regularisation filtering</p>
+where <span class="math notranslate nohighlight">\(\cdot\)</span> means  tensor contraction, <span class="math notranslate nohighlight">\(\overline{*}\)</span> means
+regularisation filtering</p>
 </dd>
 </dl>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>contraction_dims</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span>) – labels of dimensions to be contracted to form <span class="math notranslate nohighlight">\(L M_i\)</span> and <span class="math notranslate nohighlight">\(M_i M_j\)</span> products.</p></li>
-<li><p><strong>coeff_dim</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – label of dimension along which to concatenate the arrays <span class="math notranslate nohighlight">\(c_i\)</span></p></li>
+<li><p><strong>contraction_dims</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span>) – labels of dimensions to be contracted to form
+<span class="math notranslate nohighlight">\(L M_i\)</span> and <span class="math notranslate nohighlight">\(M_i M_j\)</span> products.</p></li>
+<li><p><strong>coeff_dim</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – label of dimension along which to concatenate the arrays
+<span class="math notranslate nohighlight">\(c_i\)</span></p></li>
 </ul>
 </dd>
 </dl>
@@ -930,8 +938,10 @@ the Lilly identity as <span class="math notranslate nohighlight">\(L = \sum_i^2 
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>contraction_dims</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span>) – labels of dimensions to be contracted to form <span class="math notranslate nohighlight">\(L M_i\)</span> and <span class="math notranslate nohighlight">\(M_i M_j\)</span> products.</p></li>
-<li><p><strong>coeff_dim</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – label of dimension along which to concatenate the arrays <span class="math notranslate nohighlight">\(c_i\)</span></p></li>
+<li><p><strong>contraction_dims</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span>) – labels of dimensions to be contracted to form
+<span class="math notranslate nohighlight">\(L M_i\)</span> and <span class="math notranslate nohighlight">\(M_i M_j\)</span> products.</p></li>
+<li><p><strong>coeff_dim</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – label of dimension along which to concatenate the arrays
+<span class="math notranslate nohighlight">\(c_i\)</span></p></li>
 </ul>
 </dd>
 </dl>
@@ -967,8 +977,10 @@ Inverting the <span class="math notranslate nohighlight">\(\overline{M_i M_j}\)<
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>contraction_dims</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span>) – labels of dimensions to be contracted to form <span class="math notranslate nohighlight">\(L M_i\)</span> and <span class="math notranslate nohighlight">\(M_i M_j\)</span> products.</p></li>
-<li><p><strong>coeff_dim</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – label of dimension along which to concatenate the arrays <span class="math notranslate nohighlight">\(c_i\)</span></p></li>
+<li><p><strong>contraction_dims</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span>) – labels of dimensions to be contracted to form
+<span class="math notranslate nohighlight">\(L M_i\)</span> and <span class="math notranslate nohighlight">\(M_i M_j\)</span> products.</p></li>
+<li><p><strong>coeff_dim</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – label of dimension along which to concatenate the arrays
+<span class="math notranslate nohighlight">\(c_i\)</span></p></li>
 </ul>
 </dd>
 </dl>
@@ -976,7 +988,8 @@ Inverting the <span class="math notranslate nohighlight">\(\overline{M_i M_j}\)<
 <dt class="sig sig-object py" id="sgs_tools.sgs.dynamic_coefficient.LillyMinimisation3Model.compute">
 <span class="sig-name descname"><span class="pre">compute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">L</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Mi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_filter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/dynamic_coefficient.html#LillyMinimisation3Model.compute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.dynamic_coefficient.LillyMinimisation3Model.compute" title="Link to this definition">#</a></dt>
 <dd><p>Compute dynamic coefficients of a 3-component models using Germano identity
-as <span class="math notranslate nohighlight">\(L = C_1 M_1 + C_2 M_2 + C_3 M_3\)</span> using regularized least-square minimisation
+as <span class="math notranslate nohighlight">\(L = C_1 M_1 + C_2 M_2 + C_3 M_3\)</span> using
+regularized least-square minimisation
 (inverting the <span class="math notranslate nohighlight">\(M_i M_j\)</span> matrix explicitly).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1004,16 +1017,20 @@ as <span class="math notranslate nohighlight">\(L = C_1 M_1 + C_2 M_2 + C_3 M_3\
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>contraction_dims</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span>) – labels of dimensions to be contracted to form <span class="math notranslate nohighlight">\(L M_i\)</span> and <span class="math notranslate nohighlight">\(M_i M_j\)</span> products.</p></li>
-<li><p><strong>coeff_dim</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – label of dimension along which to concatenate the arrays <span class="math notranslate nohighlight">\(c_i\)</span></p></li>
+<li><p><strong>contraction_dims</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span>) – labels of dimensions to be contracted to form
+<span class="math notranslate nohighlight">\(L M_i\)</span> and <span class="math notranslate nohighlight">\(M_i M_j\)</span> products.</p></li>
+<li><p><strong>coeff_dim</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – label of dimension along which to concatenate the arrays
+<span class="math notranslate nohighlight">\(c_i\)</span></p></li>
 </ul>
 </dd>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="sgs_tools.sgs.dynamic_coefficient.LillyMinimisationNModel.compute">
 <span class="sig-name descname"><span class="pre">compute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">L</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Mi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_filter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/dynamic_coefficient.html#LillyMinimisationNModel.compute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.dynamic_coefficient.LillyMinimisationNModel.compute" title="Link to this definition">#</a></dt>
-<dd><p>Solve the system  <span class="math notranslate nohighlight">\(\overline{L \cdot M_i} = \sum_i^N c_j \overline{M_i \cdot M_j}\)</span>
-using np.linalg.SVD, where <span class="math notranslate nohighlight">\(L \cdot M_i\)</span> and <span class="math notranslate nohighlight">\(M_i \cdot M_j\)</span> are scalar fields</p>
+<dd><p>Solve the system
+<span class="math notranslate nohighlight">\(\overline{L \cdot M_i} = \sum_i^N c_j \overline{M_i \cdot M_j}\)</span>
+using np.linalg.SVD, where
+<span class="math notranslate nohighlight">\(L \cdot M_i\)</span> and <span class="math notranslate nohighlight">\(M_i \cdot M_j\)</span> are scalar fields</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -1086,7 +1103,8 @@ for a given <cite>filter</cite> (which can be trivial, i.e. <code class="docutil
 <dt class="sig sig-object py" id="sgs_tools.sgs.Smagorinsky.SmagorinskyHeatModel.sgs_tensor">
 <span class="sig-name descname"><span class="pre">sgs_tensor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/Smagorinsky.html#SmagorinskyHeatModel.sgs_tensor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.Smagorinsky.SmagorinskyHeatModel.sgs_tensor" title="Link to this definition">#</a></dt>
 <dd><dl class="simple">
-<dt>compute model for SGS tensor</dt><dd><p><span class="math notranslate nohighlight">\(\tau =  c_\theta \Delta^2 |\overline{S_{ij}}| \overline{\nabla \theta}\)</span>
+<dt>compute model for SGS tensor</dt><dd><p><span class="math notranslate nohighlight">\(\tau =  c_\theta \Delta^2
+|\overline{S_{ij}}| \overline{\nabla \theta}\)</span>
 for a given filter (which can be trivial, i.e. IdentityFilter)</p>
 </dd>
 </dl>
@@ -1103,7 +1121,8 @@ for a given filter (which can be trivial, i.e. IdentityFilter)</p>
 <dt class="sig sig-object py" id="sgs_tools.sgs.Kosovic.SSquaredVelocityModel">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">SSquaredVelocityModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">strain</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tensor_dims</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/Kosovic.html#SSquaredVelocityModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.Kosovic.SSquaredVelocityModel" title="Link to this definition">#</a></dt>
 <dd><p>Kosovic JFM 1997, 336 and Speziale 1991 Ann Rev Fluid Mech 23
-compoment <span class="math notranslate nohighlight">\(\tau = (c_s \Delta)^2 \mathrm{Traceless}(\overline{S_{ik}} \overline{S_{kj}})\)</span></p>
+compoment <span class="math notranslate nohighlight">\(\tau =
+(c_s \Delta)^2 \mathrm{Traceless}(\overline{S_{ik}} \overline{S_{kj}})\)</span></p>
 <dl class="field-list simple">
 <dt class="field-odd">Variables<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -1138,7 +1157,8 @@ for a given <cite>filter</cite> (which can be trivial, i.e. <code class="docutil
 <dt class="sig sig-object py" id="sgs_tools.sgs.Kosovic.SOmegaVelocityModel">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">SOmegaVelocityModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">strain</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rot</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tensor_dims</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/Kosovic.html#SOmegaVelocityModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.Kosovic.SOmegaVelocityModel" title="Link to this definition">#</a></dt>
 <dd><p>Kosovic JFM 1997, 336 / Speziale 1991 Ann Rev Fluid Mech 23
-component <span class="math notranslate nohighlight">\(\tau = (c_s \Delta) ^2 \mathrm{Sym}[\overline{S_{ik}}\overline{\Omega_{kj}}]\)</span></p>
+component <span class="math notranslate nohighlight">\(\tau =
+(c_s \Delta) ^2 \mathrm{Sym}[\overline{S_{ik}}\overline{\Omega_{kj}}]\)</span></p>
 <dl class="field-list simple">
 <dt class="field-odd">Variables<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -1154,7 +1174,8 @@ component <span class="math notranslate nohighlight">\(\tau = (c_s \Delta) ^2 \m
 <dt class="sig sig-object py" id="sgs_tools.sgs.Kosovic.SOmegaVelocityModel.sgs_tensor">
 <span class="sig-name descname"><span class="pre">sgs_tensor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/Kosovic.html#SOmegaVelocityModel.sgs_tensor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.Kosovic.SOmegaVelocityModel.sgs_tensor" title="Link to this definition">#</a></dt>
 <dd><dl class="simple">
-<dt>compute model for SGS tensor</dt><dd><p><span class="math notranslate nohighlight">\(\tau = (c_s \Delta) ^2 \mathrm{Sym}[\overline{S_{ik}}\overline{\Omega_{kj}}]\)</span>
+<dt>compute model for SGS tensor</dt><dd><p><span class="math notranslate nohighlight">\(\tau =
+(c_s \Delta) ^2 \mathrm{Sym}[\overline{S_{ik}}\overline{\Omega_{kj}}]\)</span>
 for a given <cite>filter</cite> (which can be trivial, i.e. <code class="docutils literal notranslate"><span class="pre">IdentityFilter</span></code>)</p>
 </dd>
 </dl>
@@ -1174,7 +1195,8 @@ for a given <cite>filter</cite> (which can be trivial, i.e. <code class="docutil
 <dt class="sig sig-object py" id="sgs_tools.sgs.Kosovic.DynamicKosovicModel">
 <span class="sig-name descname"><span class="pre">DynamicKosovicModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sij</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">omegaij</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">res</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compoment_coeff</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tensor_dims</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">('c1',</span> <span class="pre">'c2')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minimisation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">LillyMinimisation2Model(contraction_dims=['c1',</span> <span class="pre">'c2'],</span> <span class="pre">coeff_dim='cdim')</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/Kosovic.html#DynamicKosovicModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.Kosovic.DynamicKosovicModel" title="Link to this definition">#</a></dt>
 <dd><p>Dynamic version of the model by
-Carati &amp; Cabot Proceedings of the 1996 Summer Program – Center for Turbulence Research</p>
+Carati &amp; Cabot Proceedings of the 1996 Summer Program –
+Center for Turbulence Research</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -1182,8 +1204,10 @@ Carati &amp; Cabot Proceedings of the 1996 Summer Program – Center for Turbule
 <li><p><strong>omegaij</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code></span>) – grid-scale rate-of-rotation tensor</p></li>
 <li><p><strong>vel</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code></span>) – velocity field used for dynamic coefficient computation</p></li>
 <li><p><strong>res</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></span>) – constant resolution with respect to dimension to-be-filtered</p></li>
-<li><p><strong>compoment_coeff</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]</span>) – tuple of three Smagorinsky coefficients for parallel, perpendicular, and normal components</p></li>
-<li><p><strong>tensor_dims</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span>) – labels of dimensions indexing tensor components, defaults to (“c1”, “c2”)</p></li>
+<li><p><strong>compoment_coeff</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]</span>) – tuple of three Smagorinsky coefficients for parallel,
+perpendicular, and normal components</p></li>
+<li><p><strong>tensor_dims</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span>) – labels of dimensions indexing tensor components,
+defaults to (“c1”, “c2”)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
@@ -1198,7 +1222,8 @@ Carati &amp; Cabot Proceedings of the 1996 Summer Program – Center for Turbule
 <dl class="py function" id="module-sgs_tools.sgs.CaratiCabot">
 <dt class="sig sig-object py" id="sgs_tools.sgs.CaratiCabot.s_parallel">
 <span class="sig-name descname"><span class="pre">s_parallel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tensor_dims</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/CaratiCabot.html#s_parallel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.CaratiCabot.s_parallel" title="Link to this definition">#</a></dt>
-<dd><p>Projection of s in the n-direction: <span class="math notranslate nohighlight">\(s^{\parallel}=(n_i (s.n)_j + (s.n)_i n_j - \frac{2}{3} \delta_{ij} (n.s.n) )\)</span></p>
+<dd><p>Projection of s in the n-direction:
+<span class="math notranslate nohighlight">\(s^{\parallel}=(n_i (s.n)_j + (s.n)_i n_j - \frac{2}{3} \delta_{ij} (n.s.n) )\)</span></p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code></span></p>
@@ -1220,7 +1245,8 @@ Carati &amp; Cabot Proceedings of the 1996 Summer Program – Center for Turbule
 <dl class="py class">
 <dt class="sig sig-object py" id="sgs_tools.sgs.CaratiCabot.SparallelVelocityModel">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">SparallelVelocityModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">strain</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tensor_dims</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/CaratiCabot.html#SparallelVelocityModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.CaratiCabot.SparallelVelocityModel" title="Link to this definition">#</a></dt>
-<dd><p>Carati &amp; Cabot Proceedings of the 1996 Summer Program – Center for Turbulence Research
+<dd><p>Carati &amp; Cabot Proceedings of the 1996 Summer Program –
+Center for Turbulence Research
 S_parallel component = <span class="math notranslate nohighlight">\(|S| Traceless[Symmetric[(S.n)n]]\)</span></p>
 <dl class="field-list simple">
 <dt class="field-odd">Variables<span class="colon">:</span></dt>
@@ -1228,7 +1254,8 @@ S_parallel component = <span class="math notranslate nohighlight">\(|S| Traceles
 <li><p><strong>strain</strong> – grid-scale rate-of-strain</p></li>
 <li><p><strong>cs</strong> – Smagorinsky coefficient</p></li>
 <li><p><strong>dx</strong> – constant resolution with respect to dimension to-be-filtered</p></li>
-<li><p><strong>n</strong> – triple of floats to be coerce as a 3d constant vector along one of the tensor dimensions</p></li>
+<li><p><strong>n</strong> – triple of floats to be coerce as a 3d constant vector
+along one of the tensor dimensions</p></li>
 <li><p><strong>tensor_dims</strong> – labels of dimensions indexing tensor components</p></li>
 </ul>
 </dd>
@@ -1255,7 +1282,8 @@ S_parallel component = <span class="math notranslate nohighlight">\(|S| Traceles
 <dl class="py class">
 <dt class="sig sig-object py" id="sgs_tools.sgs.CaratiCabot.SperpVelocityModel">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">SperpVelocityModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">strain</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tensor_dims</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/CaratiCabot.html#SperpVelocityModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.CaratiCabot.SperpVelocityModel" title="Link to this definition">#</a></dt>
-<dd><p>Carati &amp; Cabot Proceedings of the 1996 Summer Program – Center for Turbulence Research
+<dd><p>Carati &amp; Cabot Proceedings of the 1996 Summer Program –
+Center for Turbulence Research
 <span class="math notranslate nohighlight">\(S_{\textrm{perp component}} = |S| Traceless(S - (S.n + n.S))\)</span></p>
 <dl class="field-list simple">
 <dt class="field-odd">Variables<span class="colon">:</span></dt>
@@ -1263,7 +1291,8 @@ S_parallel component = <span class="math notranslate nohighlight">\(|S| Traceles
 <li><p><strong>strain</strong> – grid-scale rate-of-strain</p></li>
 <li><p><strong>cs</strong> – Smagorinsky coefficient</p></li>
 <li><p><strong>dx</strong> – constant resolution with respect to dimension to-be-filtered</p></li>
-<li><p><strong>n</strong> – triple of floats to be coerce as a 3d constant vector along one of the tensor dimensions</p></li>
+<li><p><strong>n</strong> – triple of floats to be coerce as a 3d constant vector
+along one of the tensor dimensions</p></li>
 <li><p><strong>tensor_dims</strong> – labels of dimensions indexing tensor components</p></li>
 </ul>
 </dd>
@@ -1291,7 +1320,8 @@ for a given <cite>filter</cite> (which can be trivial, i.e. <code class="docutil
 <dl class="py class">
 <dt class="sig sig-object py" id="sgs_tools.sgs.CaratiCabot.NVelocityModel">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">NVelocityModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">strain</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tensor_dims</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/CaratiCabot.html#NVelocityModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.CaratiCabot.NVelocityModel" title="Link to this definition">#</a></dt>
-<dd><p>Carati &amp; Cabot Proceedings of the 1996 Summer Program – Center for Turbulence Research
+<dd><p>Carati &amp; Cabot Proceedings of the 1996 Summer Program –
+Center for Turbulence Research
 <span class="math notranslate nohighlight">\(N component = |S|(n.s.n) Traceless(n * n)\)</span></p>
 <dl class="field-list simple">
 <dt class="field-odd">Variables<span class="colon">:</span></dt>
@@ -1299,7 +1329,8 @@ for a given <cite>filter</cite> (which can be trivial, i.e. <code class="docutil
 <li><p><strong>strain</strong> – grid-scale rate-of-strain</p></li>
 <li><p><strong>cs</strong> – Smagorinsky coefficient</p></li>
 <li><p><strong>dx</strong> – constant resolution with respect to dimension to-be-filtered</p></li>
-<li><p><strong>n</strong> – triple of floats to be coerce as a 3d constant vector along one of the tensor dimensions</p></li>
+<li><p><strong>n</strong> – triple of floats to be coerce as a 3d constant vector
+along one of the tensor dimensions</p></li>
 <li><p><strong>tensor_dims</strong> – labels of dimensions indexing tensor components</p></li>
 </ul>
 </dd>
@@ -1327,17 +1358,23 @@ for a given <cite>filter</cite> (which can be trivial, i.e. <code class="docutil
 <dl class="py function">
 <dt class="sig sig-object py" id="sgs_tools.sgs.CaratiCabot.DynamicCaratiCabotModel">
 <span class="sig-name descname"><span class="pre">DynamicCaratiCabotModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sij</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">res</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compoment_coeff</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tensor_dims</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">('c1',</span> <span class="pre">'c2')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minimisation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">LillyMinimisation3Model(contraction_dims=['c1',</span> <span class="pre">'c2'],</span> <span class="pre">coeff_dim='cdim')</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/CaratiCabot.html#DynamicCaratiCabotModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.CaratiCabot.DynamicCaratiCabotModel" title="Link to this definition">#</a></dt>
-<dd><p>Dynamic version of the model by
-Carati &amp; Cabot Proceedings of the 1996 Summer Program – Center for Turbulence Research</p>
+<dd><dl class="simple">
+<dt>Dynamic version of the model by</dt><dd><p>Carati &amp; Cabot Proceedings of the 1996 Summer Program –
+Center for Turbulence Research</p>
+</dd>
+</dl>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>sij</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code></span>) – grid-scale rate-of-strain tensor</p></li>
 <li><p><strong>vel</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code></span>) – velocity field used for dynamic coefficient computation</p></li>
 <li><p><strong>res</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></span>) – constant resolution with respect to dimension to-be-filtered</p></li>
-<li><p><strong>compoment_coeff</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]</span>) – tuple of three Smagorinsky coefficients for parallel, perpendicular, and normal components</p></li>
-<li><p><strong>n</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]</span>) – triple of floats to be coerced as a 3d constant vector along one of the tensor dimensions</p></li>
-<li><p><strong>tensor_dims</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span>) – labels of dimensions indexing tensor components, defaults to (“c1”, “c2”)</p></li>
+<li><p><strong>compoment_coeff</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]</span>) – tuple of three Smagorinsky coefficients for
+parallel, perpendicular, and normal components</p></li>
+<li><p><strong>n</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]</span>) – triple of floats to be coerced as a 3d constant vector
+along one of the tensor dimensions</p></li>
+<li><p><strong>tensor_dims</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span>) – labels of dimensions indexing tensor components,
+defaults to (“c1”, “c2”)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>

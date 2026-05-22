@@ -419,8 +419,8 @@
                   
   <h1>Source code for sgs_tools.sgs.Kosovic</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Sequence</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Sequence</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
 
@@ -440,7 +440,8 @@
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">SSquaredVelocityModel</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Kosovic JFM 1997, 336 and Speziale 1991 Ann Rev Fluid Mech 23</span>
-<span class="sd">    compoment :math:`\tau = (c_s \Delta)^2 \mathrm{Traceless}(\overline{S_{ik}} \overline{S_{kj}})`</span>
+<span class="sd">    compoment :math:`\tau =</span>
+<span class="sd">    (c_s \Delta)^2 \mathrm{Traceless}(\overline{S_{ik}} \overline{S_{kj}})`</span>
 
 <span class="sd">    :ivar strain: grid-scale rate-of-strain</span>
 <span class="sd">    :ivar cs: Smagorinsky coefficient</span>
@@ -483,7 +484,8 @@
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">SOmegaVelocityModel</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Kosovic JFM 1997, 336 / Speziale 1991 Ann Rev Fluid Mech 23</span>
-<span class="sd">    component :math:`\tau = (c_s \Delta) ^2 \mathrm{Sym}[\overline{S_{ik}}\overline{\Omega_{kj}}]`</span>
+<span class="sd">    component :math:`\tau =</span>
+<span class="sd">    (c_s \Delta) ^2 \mathrm{Sym}[\overline{S_{ik}}\overline{\Omega_{kj}}]`</span>
 
 <span class="sd">    :ivar strain: grid-scale rate-of-strain</span>
 <span class="sd">    :ivar rot: grid-scale rate-of-rotation</span>
@@ -502,7 +504,8 @@
 <a class="viewcode-back" href="../../../sgs.html#sgs_tools.sgs.Kosovic.SOmegaVelocityModel.sgs_tensor">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">sgs_tensor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">filter</span><span class="p">:</span> <span class="n">Filter</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;compute model for SGS tensor</span>
-<span class="sd">            :math:`\tau = (c_s \Delta) ^2 \mathrm{Sym}[\overline{S_{ik}}\overline{\Omega_{kj}}]`</span>
+<span class="sd">            :math:`\tau =</span>
+<span class="sd">            (c_s \Delta) ^2 \mathrm{Sym}[\overline{S_{ik}}\overline{\Omega_{kj}}]`</span>
 <span class="sd">            for a given `filter` (which can be trivial, i.e. ``IdentityFilter``)</span>
 
 <span class="sd">        :param filter: Filter used to separate &quot;large&quot; and &quot;small&quot; scales</span>
@@ -513,8 +516,9 @@
         <span class="n">_assert_coord_dx</span><span class="p">(</span><span class="nb">filter</span><span class="o">.</span><span class="n">filter_dims</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">strain</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span><span class="p">)</span>
         <span class="n">_assert_coord_dx</span><span class="p">(</span><span class="nb">filter</span><span class="o">.</span><span class="n">filter_dims</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rot</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span><span class="p">)</span>
         <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-<span class="w">            </span><span class="sd">&quot;&quot;&quot;Warning: No check that self.strain is symmetric and self.rot is antisymmetric.</span>
-<span class="sd">          If false will produce trace-full result&quot;&quot;&quot;</span>
+            <span class="s2">&quot;Warning: No check that self.strain is symmetric and&quot;</span>
+            <span class="s2">&quot;self.rot is antisymmetric.If false will produce trace-full result&quot;</span><span class="p">,</span>
+            <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
         <span class="p">)</span>
 
         <span class="n">sij</span> <span class="o">=</span> <span class="nb">filter</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">strain</span><span class="p">)</span><span class="o">.</span><span class="n">rename</span><span class="p">({</span><span class="bp">self</span><span class="o">.</span><span class="n">tensor_dims</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="s2">&quot;dummy1&quot;</span><span class="p">})</span>
@@ -528,6 +532,9 @@
 
 
 
+<span class="n">__default_min</span> <span class="o">=</span> <span class="n">LillyMinimisation2Model</span><span class="p">(</span><span class="n">contraction_dims</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;c1&quot;</span><span class="p">,</span> <span class="s2">&quot;c2&quot;</span><span class="p">],</span> <span class="n">coeff_dim</span><span class="o">=</span><span class="s2">&quot;cdim&quot;</span><span class="p">)</span>
+
+
 <div class="viewcode-block" id="DynamicKosovicModel">
 <a class="viewcode-back" href="../../../sgs.html#sgs_tools.sgs.Kosovic.DynamicKosovicModel">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">DynamicKosovicModel</span><span class="p">(</span>
@@ -537,19 +544,20 @@
     <span class="n">res</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">compoment_coeff</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
     <span class="n">tensor_dims</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;c1&quot;</span><span class="p">,</span> <span class="s2">&quot;c2&quot;</span><span class="p">),</span>
-    <span class="n">minimisation</span><span class="p">:</span> <span class="n">Minimisation</span> <span class="o">=</span> <span class="n">LillyMinimisation2Model</span><span class="p">(</span>
-        <span class="n">contraction_dims</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;c1&quot;</span><span class="p">,</span> <span class="s2">&quot;c2&quot;</span><span class="p">],</span> <span class="n">coeff_dim</span><span class="o">=</span><span class="s2">&quot;cdim&quot;</span>
-    <span class="p">),</span>
+    <span class="n">minimisation</span><span class="p">:</span> <span class="n">Minimisation</span> <span class="o">=</span> <span class="n">__default_min</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LinCombDynamicModel</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Dynamic version of the model by</span>
-<span class="sd">    Carati &amp; Cabot Proceedings of the 1996 Summer Program -- Center for Turbulence Research</span>
+<span class="sd">    Carati &amp; Cabot Proceedings of the 1996 Summer Program --</span>
+<span class="sd">    Center for Turbulence Research</span>
 
 <span class="sd">    :param sij: grid-scale rate-of-strain tensor</span>
 <span class="sd">    :param omegaij: grid-scale rate-of-rotation tensor</span>
 <span class="sd">    :param vel: velocity field used for dynamic coefficient computation</span>
 <span class="sd">    :param res: constant resolution with respect to dimension to-be-filtered</span>
-<span class="sd">    :param compoment_coeff: tuple of three Smagorinsky coefficients for parallel, perpendicular, and normal components</span>
-<span class="sd">    :param tensor_dims: labels of dimensions indexing tensor components, defaults to (&quot;c1&quot;, &quot;c2&quot;)</span>
+<span class="sd">    :param compoment_coeff: tuple of three Smagorinsky coefficients for parallel,</span>
+<span class="sd">      perpendicular, and normal components</span>
+<span class="sd">    :param tensor_dims: labels of dimensions indexing tensor components,</span>
+<span class="sd">      defaults to (&quot;c1&quot;, &quot;c2&quot;)</span>
 <span class="sd">    :return: Combined SGS model with dynamically computed coefficients</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">static_model</span> <span class="o">=</span> <span class="n">LinCombSGSModel</span><span class="p">(</span>

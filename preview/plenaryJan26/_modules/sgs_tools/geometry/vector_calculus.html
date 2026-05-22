@@ -429,12 +429,14 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">grad_scalar</span><span class="p">(</span>
     <span class="n">sca</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">space_dims</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">new_dim_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;c1&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;gradient vector of a scalar using centred 2nd order difference, reduced to 1st order at  boundaries</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;gradient vector of a scalar using centred 2nd order difference,</span>
+<span class="sd">    reduced to 1st order at  boundaries</span>
 
 <span class="sd">    :param sca: input scalar, with spatial coordinates `space_dims`</span>
 <span class="sd">    :param space_dims: labels for the spatial dimensions (to be differentiated against)</span>
 <span class="sd">    :param new_dim_name: the name of the new dimension (of the differential direction)</span>
-<span class="sd">    :param name: name for output dataarray. If None, the name of the input scalar is used.</span>
+<span class="sd">    :param name: name for output dataarray.</span>
+<span class="sd">       If None, the name of the input scalar is used.</span>
 <span class="sd">    :return: gradient (assuming cartesian geometry)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -455,12 +457,14 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">grad_vector</span><span class="p">(</span>
     <span class="n">vec</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">space_dims</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">new_dim_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;c2&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;gradient tensor of a vector using centred 2nd order difference, reduced to 1st order at  boundaries</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;gradient tensor of a vector using centred 2nd order difference,</span>
+<span class="sd">      reduced to 1st order at  boundaries</span>
 
 <span class="sd">    :param vec: input vector, with spatial coordinates `space_dims`</span>
 <span class="sd">    :param space_dims: labels for the spatial dimensions (to be differentiated against)</span>
 <span class="sd">    :param new_dim_name: the name of the new dimension (of the differential direction)</span>
-<span class="sd">    :param name: name for output dataarray. If None, the name of the input vector is used.</span>
+<span class="sd">    :param name: name for output dataarray.</span>
+<span class="sd">       If None, the name of the input vector is used.</span>
 <span class="sd">    :return: gradient (assuming cartesian geometry)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -486,7 +490,8 @@
 <span class="sd">    :param vec: input vector, with spatial coordinates `space_dims`</span>
 <span class="sd">    :param space_dims: labels for the spatial dimensions (to be differentiated against)</span>
 <span class="sd">    :param new_dim_name: the name of the new dimension (of the differential direction)</span>
-<span class="sd">    :param name: name for output dataarray. If None, the name of the input vector is used.</span>
+<span class="sd">    :param name: name for output dataarray.</span>
+<span class="sd">      If None, the name of the input vector is used.</span>
 <span class="sd">    :return: gradient (assuming cartesian geometry)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">gradvec</span> <span class="o">=</span> <span class="p">[]</span>

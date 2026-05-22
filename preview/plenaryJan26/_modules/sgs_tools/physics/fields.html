@@ -418,7 +418,7 @@
                 <article class="bd-article">
                   
   <h1>Source code for sgs_tools.physics.fields</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Collection</span><span class="p">,</span> <span class="n">Iterable</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Collection</span><span class="p">,</span> <span class="n">Iterable</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
 
@@ -449,7 +449,8 @@
 <span class="sd">    :param vec_dim: label of vector dimension</span>
 <span class="sd">    :param new_dim: label of new dimension indexing derivatives</span>
 <span class="sd">    :param make_traceless: should we make the strain traceless</span>
-<span class="sd">    :param grad_operator: operator that computes vector gradient (To be replaced by a grid)</span>
+<span class="sd">    :param grad_operator: operator that computes vector gradient</span>
+<span class="sd">      (To be replaced by a grid)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">gradvel</span> <span class="o">=</span> <span class="n">grad_operator</span><span class="p">(</span><span class="n">vel</span><span class="p">,</span> <span class="n">space_dims</span><span class="p">,</span> <span class="n">new_dim</span><span class="p">)</span>
     <span class="c1"># perform manual alignment of c1 and c2 indices (assumed sorted)</span>
@@ -480,7 +481,8 @@
 <span class="sd">    :param space_dims: labels of spacial dimensions</span>
 <span class="sd">    :param vec_dim: label of vector dimension</span>
 <span class="sd">    :param new_dim: label of new dimension indexing derivatives</span>
-<span class="sd">    :param grad_operator: operator that computes vector gradient (To be replaced by a grid)</span>
+<span class="sd">    :param grad_operator: operator that computes vector gradient</span>
+<span class="sd">      (To be replaced by a grid)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">gradvel</span> <span class="o">=</span> <span class="n">grad_operator</span><span class="p">(</span><span class="n">vel</span><span class="p">,</span> <span class="n">space_dims</span><span class="p">,</span> <span class="n">new_dim</span><span class="p">)</span>
     <span class="c1"># perform manual alignment of c1 and c2 indices (assumed sorted)</span>
@@ -545,9 +547,10 @@
 <span class="sd">    :param fluctuation_axes: labels of dimensions</span>
 <span class="sd">        w.r.t which to compute the fluctuations. Subset of ``target_dims``.</span>
 
-<span class="sd">    Note: First performs an interpolation to ``target_dims`` and then computes the fluctuations</span>
-<span class="sd">    w.r.t. ``fluctuation_axes``. There can be a commutation error when the</span>
-<span class="sd">    interpolation happens along dimensions other than ``fluctuation_axes``.</span>
+<span class="sd">    Note: First performs an interpolation to ``target_dims``</span>
+<span class="sd">      and then computes the fluctuations w.r.t. ``fluctuation_axes``.</span>
+<span class="sd">      There can be a commutation error when the interpolation happens</span>
+<span class="sd">      along dimensions other than ``fluctuation_axes``.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># first interpolate</span>
     <span class="n">vel</span> <span class="o">=</span> <span class="n">compose_vector_components_on_grid</span><span class="p">(</span>
@@ -585,10 +588,12 @@
 <span class="sd">    :param fluctuation_axes: labels of dimensions</span>
 <span class="sd">        w.r.t which to compute the fluctuations. Subset of ``target_dims``.</span>
 
-<span class="sd">    Note: First performs an interpolation to ``target_dims`` and then computes the fluctuations</span>
-<span class="sd">    w.r.t. ``fluctuation_axes`` and then square. There can be a commutation error when the</span>
+<span class="sd">    Note: First performs an interpolation to ``target_dims``</span>
+<span class="sd">    and then computes the fluctuations w.r.t. ``fluctuation_axes`` and then square.</span>
+<span class="sd">    There can be a commutation error when the</span>
 <span class="sd">    interpolation happens along dimensions other than ``fluctuation_axes``.</span>
-<span class="sd">    There is uncertainty from whether the interpolation happens before/after the squaring.</span>
+<span class="sd">    There is uncertainty from whether the interpolation happens</span>
+<span class="sd">    before/after the squaring.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># first interpolate</span>
     <span class="n">vel</span> <span class="o">=</span> <span class="n">compose_vector_components_on_grid</span><span class="p">(</span>

@@ -9,10 +9,10 @@ import xarray as xr
 from sgs_tools.diagnostics.anisotropy import anisotropy_analysis
 from sgs_tools.diagnostics.directional_profile import directional_profile
 from sgs_tools.diagnostics.spectra import spectra_1d_radial
+from sgs_tools.io.fname_out import build_output_fname
 from sgs_tools.io.netcdf_writer import NetCDFWriter
 from sgs_tools.io.read import read
 from sgs_tools.scripts.cli_helpers import print_args_dict, print_header
-from sgs_tools.scripts.fname_out import build_output_fname
 from sgs_tools.util.dask_adapt_chunking import chunk_ds
 from sgs_tools.util.gitinfo import get_git_state, write_git_diff_file
 from sgs_tools.util.memory import get_mem_limit_MB, memory_watch

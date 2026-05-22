@@ -16,6 +16,7 @@ from sgs_tools.geometry.staggered_grid import (
     compose_vector_components_on_grid,
 )
 from sgs_tools.geometry.vector_calculus import grad_scalar
+from sgs_tools.io.fname_out import build_output_fname
 from sgs_tools.io.read import read
 from sgs_tools.physics.fields import omega_from_vel, strain_from_vel
 from sgs_tools.scripts.arg_parsers import (
@@ -26,7 +27,6 @@ from sgs_tools.scripts.arg_parsers import (
     add_version_group,
 )
 from sgs_tools.scripts.cli_helpers import print_args_dict, print_header
-from sgs_tools.scripts.fname_out import build_output_fname
 from sgs_tools.scripts.post_process import main as vprof_main
 from sgs_tools.sgs.CaratiCabot import DynamicCaratiCabotModel
 from sgs_tools.sgs.dynamic_coefficient import (

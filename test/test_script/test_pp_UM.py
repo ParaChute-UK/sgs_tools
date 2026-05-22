@@ -1,7 +1,7 @@
 import pytest
 
 import sgs_tools.scripts.post_process as pp_um
-from sgs_tools.scripts.fname_out import build_output_fname
+from sgs_tools.io.fname_out import build_output_fname
 
 
 @pytest.fixture

@@ -118,6 +118,7 @@ def vector_components():
     return [u, v]
 
 
+@pytest.mark.unit
 def test_diff_lin_on_grid(scalar_x_gdt, scalar_y_gdt, scalar_z_gdt):
     grad = diff_lin_on_grid(scalar_x_gdt, "x_centre")
     const_nan_right = xr.full_like(grad, 1.0)
@@ -165,6 +166,7 @@ def test_diff_lin_on_grid(scalar_x_gdt, scalar_y_gdt, scalar_z_gdt):
     xr.testing.assert_equal(grad, const_nan_right)
 
 
+@pytest.mark.unit
 def test_interpolate_to_grid(sample_dataset):
     target_dims = ["x_centre", "y_centre"]
     result = interpolate_to_grid(sample_dataset, target_dims)
@@ -188,6 +190,7 @@ def test_interpolate_to_grid(sample_dataset):
     )
 
 
+@pytest.mark.unit
 def test_compose_vector_components_basic(vector_components):
     result = compose_vector_components_on_grid(
         vector_components,
@@ -202,6 +205,7 @@ def test_compose_vector_components_basic(vector_components):
     assert result.shape[0] == 2  # Two components
 
 
+@pytest.mark.unit
 def test_grad_on_cart_grid(sample_dataset):
     result = grad_on_cart_grid(
         sample_dataset.field,
@@ -213,13 +217,14 @@ def test_grad_on_cart_grid(sample_dataset):
     assert len(result.data_vars) == 2  # One derivative per dimension
 
 
+@pytest.mark.unit
 def test_grad_vec_on_grid(vector_components):
     ds = xr.Dataset({comp.name: comp for comp in vector_components})
 
     result = grad_vec_on_grid(
         ds,
-        target_dims=["x_centre", "y_centre"],
-        new_dim_name=["c1", "c2"],
+        target_dims=("x_centre", "y_centre"),
+        new_dim_name=("c1", "c2"),
         name="gradient",
     )
 
@@ -230,12 +235,16 @@ def test_grad_vec_on_grid(vector_components):
 
 
 # Error cases
+@pytest.mark.unit
+@pytest.mark.fast
 def test_interpolate_to_grid_missing_dims():
     ds = xr.Dataset({"field": (["x"], np.random.rand(5))})
     with pytest.raises(AssertionError):
         interpolate_to_grid(ds, target_dims=["y"])
 
 
+@pytest.mark.unit
+@pytest.mark.fast
 def test_compose_vector_components_mismatched_dims():
     # Create components with mismatched dimensions
     u = xr.DataArray(np.random.rand(5), dims=["x"], name="u")

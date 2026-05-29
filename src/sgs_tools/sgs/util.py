@@ -1,4 +1,4 @@
-from typing import Hashable, Sequence
+from collections.abc import Hashable, Sequence
 
 import xarray as xr
 

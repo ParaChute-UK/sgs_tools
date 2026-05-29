@@ -1,4 +1,5 @@
-from typing import Any, Collection, Dict, Iterable, Mapping
+from collections.abc import Collection, Iterable, Mapping
+from typing import Any
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -32,8 +33,8 @@ def plot_vertical_prof_time_slice_compare_sims_slice(
     Plot a row of plots with a different time in each panel.
     Compare simulations from `da_collection` in each panel.
 
-    :param da_collection: a dictionary of 2d xr.DataArrays to be plotted. will use the keys
-                          to pick plotting style from plot_kwargs.
+    :param da_collection: a dictionary of 2d xr.DataArrays to be plotted.
+      Will use the keys to pick plotting style from plot_kwargs.
     :param plot_kwargs: a dictionary of plotting style parameters for each simulation.
     :param x_lbl: a display label for the plotted field, on the x-axis
     :param tcoord: name of time coordinate -- will generate one panel per time index
@@ -51,12 +52,9 @@ def plot_vertical_prof_time_slice_compare_sims_slice(
     # num_sims = len(da_collection)
     fig, _ = plt.subplots(1, len(times), figsize=(6 * len(times), 4), sharey=False)
     axes = fig.axes
-    for time, ax in zip(times, axes):
+    for time, ax in zip(times, axes, strict=False):
         for k, da in da_collection.items():
-            if with_markers:
-                marker = plot_kwargs["marker_map"][k]
-            else:
-                marker = None
+            marker = plot_kwargs["marker_map"][k] if with_markers else None
 
             local_time = {tcoord: da[tcoord].isin(time)}
             data = da.sel(local_time).squeeze()
@@ -88,7 +86,8 @@ def plot_horizontal_slice_tseries(
     each row corresponds to a different simulation
     each column corresponds to a different time.
 
-    :param da_collection: a dictionary of 3d xr.DataArrays to be plotted. One of the dimensions must be `tcoord`
+    :param da_collection: a dictionary of 3d xr.DataArrays to be plotted.
+      One of the dimensions must be `tcoord`
     :param tcoord: name of time coordinate -- will generate one column per time index
     :param cmap: colormap to use for plotting
     :param field_lbl: a display label for the plotted field
@@ -148,7 +147,7 @@ def plot_vertical_prof_time_slice_compare_fields(
     fields: Iterable[str],
     reduction: str,
     zcoord: str,
-    tslice: Dict[str, Collection] = {"t": np.arange(1, 16) * 60},
+    tslice: dict[str, Collection] | None = None,
     field_lbls: list[str] = [""] * 20,
     les_reference=None,
     zmax=1e6,
@@ -158,15 +157,18 @@ def plot_vertical_prof_time_slice_compare_fields(
     Plot a row of plots with a time slice in each panel.
     Compare fields in each panel.
 
-    tslice : selection of times in minutes.
+    tslice : selection of times in minutes. if None will default
+    to hourly schedule from 1 to 16 hours.
     reduction: 'mean' or 'median'
     """
+    if tslice is None:
+        tslice = {"t": np.arange(1, 16) * 60}
     times = list(tslice.values())[0]
     fig, axes = plt.subplots(1, len(times), figsize=(6 * len(times), 5), sharey=False)
 
     tcoord = list(tslice.keys())[0]
 
-    for time, ax in zip(times, axes):
+    for time, ax in zip(times, axes, strict=False):
         # if les_reference is not None and reduction == "mean":
         #     k = "monc_les"
         #     les_reference.sel(time_series_60_60=time).plot(

@@ -4,7 +4,7 @@ import threading
 import time
 
 import psutil
-from dask.distributed import default_client
+from dask.distributed import default_client, get_worker
 
 unit_map = {"GB": 3, "MB": 2, "KB": 1, "B": 0}
 
@@ -114,3 +114,24 @@ def get_client():
         return default_client()
     except ValueError:
         return None
+
+
+def get_mem_limit_MB(
+    worker_fraction: float = 0.2, system_fraction: float = 0.1
+) -> float:
+    """Return a safe target memory in MB, based on Dask worker or system memory.
+
+    Uses a fraction of available memory to avoid oversubscription.
+    - If inside a Dask worker: uses `worker_fraction` of its memory limit.
+    - Otherwise: uses `system_fraction` of total system memory.
+    """
+    try:
+        worker = get_worker()
+        limit_MB = worker.memory_limit / 1024**2
+        print("worker MB", limit_MB, worker_fraction)
+        return limit_MB * worker_fraction
+    except (ValueError, RuntimeError):
+        # Not inside a Dask worker
+        limit_MB = psutil.virtual_memory().total / 1024**2
+        print("system MB", limit_MB, system_fraction)
+        return limit_MB * system_fraction

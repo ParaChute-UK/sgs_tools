@@ -64,7 +64,8 @@ class SmagorinskyHeatModel:
 
     def sgs_tensor(self, filter):
         r"""compute model for SGS tensor
-            :math:`\tau =  c_\theta \Delta^2 |\overline{S_{ij}}| \overline{\nabla \theta}`
+            :math:`\tau =  c_\theta \Delta^2
+            |\overline{S_{ij}}| \overline{\nabla \theta}`
             for a given filter (which can be trivial, i.e. IdentityFilter)
 
         :param filter: Filter used to separate "large" and "small" scales

@@ -143,6 +143,10 @@ anisotropic_plot_map = {
 }
 
 debug_field_plot_map = {
+    "cs2d": field_plot_map["cs"].with_args(label=r"$Cs(2\Delta)$"),
+    "cs4d": field_plot_map["cs"].with_args(label=r"$Cs(4\Delta)$"),
+    "cs_theta_2d": field_plot_map["cs"].with_args(label=r"$C\theta(2\Delta)$"),
+    "cs_theta_4d": field_plot_map["cs"].with_args(label=r"$C\theta(4\Delta)$"),
     "s2d": field_plot_kwargs(
         r"$|\langle S \rangle_{2 \Delta}|$",
         "t",

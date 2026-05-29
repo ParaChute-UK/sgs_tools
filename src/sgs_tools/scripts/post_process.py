@@ -1,6 +1,7 @@
 import warnings
+from collections.abc import Sequence
 from pathlib import Path
-from typing import Any, Dict, Sequence
+from typing import Any
 
 import numpy as np
 import xarray as xr
@@ -8,11 +9,13 @@ import xarray as xr
 from sgs_tools.diagnostics.anisotropy import anisotropy_analysis
 from sgs_tools.diagnostics.directional_profile import directional_profile
 from sgs_tools.diagnostics.spectra import spectra_1d_radial
+from sgs_tools.io.fname_out import build_output_fname
 from sgs_tools.io.netcdf_writer import NetCDFWriter
 from sgs_tools.io.read import read
 from sgs_tools.scripts.cli_helpers import print_args_dict, print_header
-from sgs_tools.scripts.fname_out import build_output_fname
+from sgs_tools.util.dask_adapt_chunking import chunk_ds
 from sgs_tools.util.gitinfo import get_git_state, write_git_diff_file
+from sgs_tools.util.memory import get_mem_limit_MB, memory_watch
 from sgs_tools.util.terminal_progress_bar import TerminalProgressBar
 from sgs_tools.util.timer import timer
 
@@ -68,7 +71,7 @@ filter_shapes = ["gauss", "box", "coarse"]
 ANISOTROPY_TAG = "anisotropy"
 
 
-def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
+def parse_args(arguments: Sequence[str] | None = None) -> dict[str, Any]:
     from argparse import (
         ArgumentDefaultsHelpFormatter,
         ArgumentParser,
@@ -109,8 +112,10 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
         default="",
         help=(
             "Optional suffix appended to output filenames. "
-            r"Final pattern: {base_name}_{fname_suffix}_{statistics_tag}.nc, "
-            "where ``base_name`` is one of ``vprofile_fname_out``| ``hspectra_fname_out`` | ``aniso_fname_out``"
+            "Final pattern: ``<base_name>_<fname_suffix>_<statistics_tag>.nc``, "
+            "where <base_name> and <statistics_tag> are detemined in "
+            "the respective statistics group: ``Vertical profiles`` | "
+            "``Horizontal spectra`` | ``Anisotropy diagnostics``"
         ),
     )
     parser.add_argument(
@@ -148,8 +153,11 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
         "--vprofile_fname_out",
         default=BASE_NAME,
         type=str,
-        help="""**Core filename where to save the generated vertical profile. relative to output_path.
+        help=f"""**Core** filename where to save the generated vertical profile.
+                relative to output_path.
                 Will add an '.nc' extension (so don't give one).
+                The final pattern will be
+                ``<vprofile_fname_out>_<fname_suffix>_{VPROF_TAG}.nc``
               """,
     )
 
@@ -173,7 +181,8 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
         tup = tuple(s.split(","))
         if len(tup) != 2:
             raise ArgumentTypeError(
-                f"Expected only 2 fields for each comma-separated cross-spectrum, got {len(tup)}"
+                "Expected only 2 fields for each comma-separated cross-spectrum"
+                f", got {len(tup)}"
             )
         return tup
 
@@ -184,15 +193,16 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
         type=tuple_from_comma_str,
         help="""
         Fields whose cross spectra to compute.
-        Use spaces to between cross spectra and commas between fields in each cross-spectrim, e.g.
-        u,v v,w""",
+        Use spaces to between cross spectra and commas between fields
+        in each cross-spectrum, e.g. u,v v,w""",
     )
 
     spectra.add_argument(
         "--radial_smooth_factor",
         default=1,
         type=int,
-        help="""Radial binning of radial horizontal spectrum in units of delta_kx spacings""",
+        help="""Radial binning of radial horizontal spectrum
+                in units of delta_kx spacings""",
     )
 
     spectra.add_argument(
@@ -208,8 +218,11 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
         "--hspectra_fname_out",
         default=BASE_NAME,
         type=str,
-        help="""**Core** filename where to save the generated horisontal spectra. relative to output_path.
+        help=f"""**Core** filename where to save the generated horisontal spectra.
+                relative to output_path.
                 Will add an '.nc' extension (so don't give one).
+                The final pattern will be
+                ``<hspectra_fname_out>_<fname_suffix>_{SPECTRA_TAG}.nc``
               """,
     )
 
@@ -227,9 +240,10 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
         default=[],
         type=float,
         help="""
-        Anisotropy box filter and coarse-graining scales in fraction of the horizontal domain size.
-        Will round to nearest integer number of horizontal grid cells.
-        Will combine all box scales and ignore entries which are less than `2 delta` apart.
+        Anisotropy box filter and coarse-graining scales in fraction of
+        the horizontal domain size. Will round to nearest integer number
+        of horizontal grid cells. Will combine all box scales and ignore
+        entries which are less than `2 delta` apart.
         """,
     )
 
@@ -241,7 +255,8 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
         help="""
         Anisotropy box filter and coarse-graining scales in meters.
         Will round to nearest integer number of horizontal grid cells.
-        Will combine all box scales and ignore entries which are less than `2 delta` apart
+        Will combine all box scales and ignore entries which are
+        less than `2 delta` apart.
         """,
     )
 
@@ -251,8 +266,9 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
         default=[],
         type=int,
         help="""
-        Anisotropy box filter and coarse-graining scales in units of horizontal grid spacing `delta`.
-        Will combine all box scales and ignore entries which are less than `2 delta` apart.
+        Anisotropy box filter and coarse-graining scales
+        in units of horizontal grid spacing `delta`. Will combine all box scales
+        and ignore entries which are less than `2 delta` apart.
         """,
     )
     anisotropy.add_argument(
@@ -260,7 +276,8 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
         nargs="+",
         default=[],
         type=int,
-        help="""Anisotropy Gaussian filter scales in  units of horizontal grid spacing. Support 2 and 4""",
+        help="""Anisotropy Gaussian filter scales in  units of horizontal grid spacing.
+          Support 2 and 4""",
     )
     anisotropy.add_argument(
         "--filter_shapes",
@@ -270,13 +287,17 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
         help=f"""Anisotropy filter shapes. Support any of {filter_shapes}""",
     )
 
-    spectra.add_argument(
+    anisotropy.add_argument(
         "--aniso_fname_out",
         default=BASE_NAME,
         type=str,
-        help="""
-        **Core** filename where to save the generated anisotropy eigen values. relative to output_path.
-        Will append the filter label. Will add an '.nc' extension (so don't give one).
+        help=f"""
+        **Core** filename where to save the generated anisotropy eigen values.
+        relative to output_path.
+        Will append the filter label.
+        Will add an '.nc' extension (so don't give one).
+        The final pattern will be
+        ``<aniso_fname_out>_<fname_suffix>_{ANISOTROPY_TAG}.nc``
         """,
     )
 
@@ -357,7 +378,7 @@ def post_process_fields(
     )
 
     supported = []
-    available = set(simulation)
+    available = {str(s) for s in simulation}
     for f in requested_fields:
         dependencies = v_profile_fields_map.get(f, {f})
         missing = dependencies - available
@@ -441,17 +462,17 @@ def pre_process(args: dict[str, Any], req_fields: list[str]) -> xr.Dataset:
     chunks = {
         "z": args["z_chunk_size"],
         "t_0": args["t_chunk_size"],
-        "x": -1,
-        "y": -1,
+        "t": args["t_chunk_size"],
+        "x": args["h_chunk_size"],
+        "y": args["h_chunk_size"],
         "c1": -1,
         "c2": -1,
         "c1_1": -1,
     }
     # add caveat for degenerate t or z-slice that may drop a coordinate
-    simulation = simulation.chunk(
-        chunks={x: y for x, y in chunks.items() if x in simulation.dims}
+    simulation = chunk_ds(
+        simulation, chunks={x: y for x, y in chunks.items() if x in simulation.dims}
     )
-    simulation = simulation.persist()
     return simulation
 
 
@@ -475,7 +496,7 @@ def choose_filter_set(
     )
 
     # dictionary of filters
-    filter_dic: Dict[str, Filter | CoarseGrain] = {}
+    filter_dic: dict[str, Filter | CoarseGrain] = {}
 
     # Box-cart scales
     meter_scales = [int(res / dx) for res in box_meter_scales]
@@ -484,9 +505,10 @@ def choose_filter_set(
     # only allows scales at least 2 (delta_<x>) apart
     # order of loop determines precedence
     for x in set(domain_scales + meter_scales + list(box_delta_scales)):
-        if x > 1 and x <= hminsize:
-            if not box_scales or np.min(np.abs([x - y for y in box_scales])) >= 2:
-                box_scales += [x]
+        if (x > 1 and x <= hminsize) and (
+            not box_scales or np.min(np.abs([x - y for y in box_scales])) >= 2
+        ):
+            box_scales += [x]
 
     # sort from fast to slow to compute coarse grain(small to large scales)
     box_scales = sorted(box_scales)
@@ -503,7 +525,8 @@ def choose_filter_set(
         }
 
     # Box filters
-    # stencil size is (filter_scale + 1)delta under finite-difference data interpretation
+    # stencil size is (filter_scale + 1)delta
+    # under finite-difference data interpretation
     if "box" in filter_shapes:
         box_scales = [x for x in box_scales if x <= hminsize // 10]
         filter_dic = filter_dic | {
@@ -526,14 +549,19 @@ def choose_filter_set(
                 )
             else:
                 warnings.warn(
-                    f"Skipping unsupported Gauss scale {s}. Support only 2 and 4."
+                    f"Skipping unsupported Gauss scale {s}. Support only 2 and 4.",
+                    stacklevel=2,
                 )
 
     return filter_dic
 
 
-def run(args: Dict[str, Any]) -> None:
-    with timer("Read and Preprocess", "s"):
+def run(args: dict[str, Any]) -> None:
+    with (
+        timer("Read and Preprocess", "s"),
+        TerminalProgressBar(),
+        memory_watch("Read and PreProcess", "GB"),
+    ):
         # get the flattened set of args['prof_fields'] and args["cross_spectra_fields"]
         spectra_fields_list = set(
             [f for fl in args["cross_spectra_fields"] for f in fl]
@@ -556,7 +584,7 @@ def run(args: Dict[str, Any]) -> None:
             all_fields = all_fields.union(anisotropy_fields)
             # read and pre-process simulation
 
-        simulation = pre_process(args, list(all_fields))
+        simulation = pre_process(args, list(all_fields))  # .persist()
 
     writer = NetCDFWriter(overwrite=args["overwrite_existing"])
 
@@ -572,6 +600,7 @@ def run(args: Dict[str, Any]) -> None:
         with (
             timer("Vertical profiles", "s"),
             TerminalProgressBar(),
+            memory_watch("Vertical profiles", "GB"),
         ):
             f_pr = [f for f in args["vprofile_fields"] if f in simulation]
             f_missing = [f for f in args["vprofile_fields"] if f not in simulation]
@@ -592,8 +621,9 @@ def run(args: Dict[str, Any]) -> None:
                 )
                 with timer(f"write {output_path}", "s"):
                     # rechunk for IO optimisation??
-                    # have to do explicit rechunking because UM date-time coordinate is an object
-                    profile = profile.chunk({"z": "auto"})
+                    # have to do explicit rechunking because
+                    # UM date-time coordinate is an object
+                    profile = chunk_ds(profile, {"z": "auto"})
                     profile.attrs.update(git_attrs)
                     writer.write(profile, output_path)
 
@@ -601,6 +631,7 @@ def run(args: Dict[str, Any]) -> None:
         with (
             timer("Horizontal spectra"),
             TerminalProgressBar(),
+            memory_watch("Horizontal Spectra", "GB"),
         ):
             pspec_fields = [f for f in args["power_spectra_fields"] if f in simulation]
             cspec_fields = [
@@ -608,7 +639,7 @@ def run(args: Dict[str, Any]) -> None:
                 for s in args["cross_spectra_fields"]
                 if s[0] in simulation and s[1] in simulation
             ]
-            cross_fields_set = set([f for fl in cspec_fields for f in fl])
+            cross_fields_set = {f for fl in cspec_fields for f in fl}
             spec_fields = cross_fields_set.union(pspec_fields)
             # get the missing fields from the power-spectra fields
             # since they contain all the cross-spectra fields
@@ -635,15 +666,17 @@ def run(args: Dict[str, Any]) -> None:
 
                 with timer(f"write {output_path}", "s"):
                     # rechunk for IO optimisation ??
-                    # have to do explicit rechunking because UM date-time coordinate is an object
-                    spec_ds = spec_ds.chunk(
-                        {dim: "auto" for dim in ["x", "y", "z"] if dim in spec_ds.dims}
+                    # have to do explicit rechunking because
+                    # UM date-time coordinate is an object
+                    spec_ds = chunk_ds(
+                        spec_ds,
+                        {dim: "auto" for dim in ["x", "y", "z"] if dim in spec_ds.dims},
                     )
                     spec_ds.attrs.update(git_attrs)
                     writer.write(spec_ds, output_path)
 
     if args["anisotropy"]:
-        with timer("Anisotropy", "s"), TerminalProgressBar():
+        with timer("Anisotropy", "s"):
             # anisotropy diagnostic
 
             # min horizontal number of cells
@@ -664,13 +697,18 @@ def run(args: Dict[str, Any]) -> None:
             )
 
             print(f"Filters: {filter_dic.keys()}")
-
-            # rechunk velocity -- unify filtering and vector dimensions
-            vel = simulation["vel"].chunk({x: -1 for x in hdims + ["c1"]}).persist()
+            mem_limit_MB = args["mem_limit_MB"] or get_mem_limit_MB(0.5, 0.1)
+            print(f"Mem limit {mem_limit_MB:.0g} MB")
             # run analysis
             for filt_lbl, filt in filter_dic.items():
-                with timer(
-                    f"{filt_lbl}:{filt.scales()}", "s", f"{filt_lbl}:{filt.scales()}"
+                with (
+                    timer(
+                        f"{filt_lbl}:{filt.scales()}",
+                        "s",
+                        f"{filt_lbl}:{filt.scales()}",
+                    ),
+                    TerminalProgressBar(),
+                    memory_watch(f"{filt_lbl}:{filt.scales()}", "GB"),
                 ):
                     output_path = build_output_fname(
                         args["output_path"] / args["aniso_fname_out"],
@@ -683,7 +721,9 @@ def run(args: Dict[str, Any]) -> None:
                     if not writer.overwrite and writer.check_filename(output_path):
                         print(f"Warning: Skip existing file {output_path}.")
                     else:
-                        evals = anisotropy_analysis(vel, filt)
+                        evals = anisotropy_analysis(
+                            simulation["vel"], filt, "c1", mem_limit_MB
+                        )
                         evals = evals.expand_dims(
                             {"filter": xr.DataArray([filt_lbl], dims=["filter"])}
                         )

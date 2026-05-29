@@ -6,32 +6,36 @@ import xarray as xr
 from pandas import to_numeric
 
 from sgs_tools.geometry.staggered_grid import interpolate_to_grid
-from sgs_tools.io.um import restrict_ds
+from sgs_tools.io.read_util import (
+    parse_fname_pattern,
+    restrict_ds,
+    standardize_varnames,
+)
 
 base_field_dict = {"th": "theta", "p": "P"}
 
 coord_dict = {"zn": "z_theta"}
+__default_req_fields = ["u", "v", "w", "theta"]
 
 
 def data_ingest_MONC(
-    fname_pattern,
-    requested_fields: list[str] = ["u", "v", "w", "theta"],
+    fname_pattern: Path | str,
+    requested_fields: list[str] = __default_req_fields,
     chunks: Any = "auto",
 ):
-    """read and pre-process MONC data
+    """read and pre-process MONC data using sgs_tools naming convention.
+    Any unknown fields will retain their original names.
 
-    :param fname_pattern: MONC NetCDF diagnostic file to read. can be a glob pattern. (should belong to the same simulation)
-    :param  requested_fields: list of fields to read and pre-process using sgs_tools naming convention.
+    :param fname_pattern: MONC NetCDF diagnostic file to read. can be a glob pattern.
+      (should belong to the same simulation)
+    :param  requested_fields: list of fields to retain in ds, if falsy will retain all.
     :param chunks: chunking of datasets "auto" or a dictionary of {coordinate: chunks}.
+    :return: metadata dictionary, xarray Dataset of fields.
     """
-    fname = list(
-        Path(fname_pattern.root).glob(
-            str(Path(*fname_pattern.parts[fname_pattern.is_absolute() :]))
-        )
-    )
-
+    # parse filename (glob, ~, etc.)
+    fname = parse_fname_pattern(fname_pattern)
+    # open file(s)
     ds = xr.open_mfdataset(fname, chunks=chunks, parallel=True, compat="no_conflicts")
-
     # parse metadata
     metadata = ds["options_database"].load().data
     metadata = dict(np.char.decode(metadata))
@@ -42,11 +46,9 @@ def data_ingest_MONC(
             metadata[k] = to_numeric(v, errors="ignore")  # type: ignore
     metadata = dict(sorted(metadata.items()))
     del ds["options_database"]
-
     ds = ds.squeeze()
     # rename to sgs_tools naming convention
-    field_dict = {k: v for k, v in base_field_dict.items() if k in ds}
-    ds = ds.rename(field_dict)
+    ds = standardize_varnames(ds, base_field_dict)
 
     # standardize coordinate names
     ds = ds.rename(coord_dict)
@@ -55,20 +57,23 @@ def data_ingest_MONC(
 
     for coord in ds.coords:
         ds[coord].attrs.update({"units": "m"})
-    ds, _ = restrict_ds(ds, requested_fields)
+    if requested_fields:
+        ds, _ = restrict_ds(ds, requested_fields)
     assert len(ds) > 0, "None of the requested fields are available"
     return metadata, ds
 
 
 def data_ingest_MONC_on_single_grid(
-    fname_pattern: Path,
-    requested_fields: list[str] = ["u", "v", "w", "theta"],
+    fname_pattern: Path | str,
+    requested_fields: list[str] = __default_req_fields,
     chunks: Any = "auto",
-) -> xr.Dataset:
+) -> tuple[dict[str, str], xr.Dataset]:
     """read pre-process MONC data and interpolate to a cell-centred grid
+       Any unknown fields will retain their original names.
 
-    :param fname_pattern: MONC NetCDF diagnostic file(s) to read. will be interpreted as a glob pattern. (should belong to the same simulation)
-    :param  requested_fields: list of fields to read and pre-process. Defaults to ['u', 'v', 'w', 'theta']
+    :param fname_pattern: MONC NetCDF diagnostic file(s) to read.
+      will be interpreted as a glob pattern. (should belong to the same simulation)
+    :param  requested_fields: list of fields to retain in ds, if falsy will retain all.
     :param chunks: chunking of datasets "auto" or a dictionary of {coordinate: chunks}.
     """
     # read, constrain fields, unify grids

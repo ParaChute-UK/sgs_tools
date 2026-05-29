@@ -3,8 +3,9 @@ from argparse import (
     ArgumentParser,
     RawDescriptionHelpFormatter,
 )
+from collections.abc import Sequence
 from pathlib import Path
-from typing import Any, Dict, Sequence
+from typing import Any
 
 import matplotlib.pyplot as plt
 import xarray as xr
@@ -15,6 +16,7 @@ from sgs_tools.geometry.staggered_grid import (
     compose_vector_components_on_grid,
 )
 from sgs_tools.geometry.vector_calculus import grad_scalar
+from sgs_tools.io.fname_out import build_output_fname
 from sgs_tools.io.read import read
 from sgs_tools.physics.fields import omega_from_vel, strain_from_vel
 from sgs_tools.scripts.arg_parsers import (
@@ -25,7 +27,6 @@ from sgs_tools.scripts.arg_parsers import (
     add_version_group,
 )
 from sgs_tools.scripts.cli_helpers import print_args_dict, print_header
-from sgs_tools.scripts.fname_out import build_output_fname
 from sgs_tools.scripts.post_process import main as vprof_main
 from sgs_tools.sgs.CaratiCabot import DynamicCaratiCabotModel
 from sgs_tools.sgs.dynamic_coefficient import (
@@ -44,6 +45,7 @@ from sgs_tools.sgs.Smagorinsky import (
     SmagorinskyHeatModel,
     SmagorinskyVelocityModel,
 )
+from sgs_tools.util.dask_adapt_chunking import chunk_ds
 from sgs_tools.util.gitinfo import get_git_state, write_git_diff_file
 from sgs_tools.util.terminal_progress_bar import TerminalProgressBar
 from sgs_tools.util.timer import timer
@@ -70,7 +72,7 @@ class CustomFormatter(ArgumentDefaultsHelpFormatter, RawDescriptionHelpFormatter
     pass
 
 
-def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
+def parse_args(arguments: Sequence[str] | None = None) -> dict[str, Any]:
     parser = ArgumentParser(
         description="""
         CS Dynamic Workflow
@@ -120,10 +122,11 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
         "--fname_suffix",
         type=str,
         default="",
-        help=(
-            "Optional suffix appended to output filenames. "
-            r"Final pattern: {model_name}_{fname_suffix}_pp.nc"
-        ),
+        help="""
+            Optional suffix appended to output filenames.
+            Final pattern: ``<model_name>_<fname_suffix>_pp.nc``
+            where <model_name> is detemined by the ``sgs_model``
+            """,
     )
 
     add_dask_group(parser)
@@ -159,8 +162,9 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
         default=(2,),
         nargs="+",
         help="Scales to perform filter at, in number of cells. "
-        "If a single value is given, it will be used for all `regularize_filter_scales`. "
-        "Otherwise, must provide as many values as for `regularize_filter_scales`",
+        "If a single value is given, it will be used"
+        "for all `regularize_filter_scales`. Otherwise, must provide as many values"
+        " as for `regularize_filter_scales`",
     )
 
     compute.add_argument(
@@ -222,11 +226,12 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
 
     # parameter consistency checks
     if args["filter_type"] == "gaussian":
-        assert all([x in [2, 4] for x in args["filter_scales"]]), (
+        assert all(x in [2, 4] for x in args["filter_scales"]), (
             "Gaussian filters only support scales 2 and 4 for now..."
         )
 
-    # singleton filter_scales or regularize_filter_scales means broadcast against the other
+    # singleton filter_scales or regularize_filter_scales
+    #  means broadcast against the other
     if len(args["filter_scales"]) == 1:
         args["filter_scales"] = args["filter_scales"] * len(
             args["regularize_filter_scales"]
@@ -395,16 +400,15 @@ def pre_process(args: dict[str, Any]) -> xr.Dataset:
     if "h_resolution" in simulation.attrs:
         args["h_resolution"] = simulation.attrs["h_resolution"]
 
-    with TerminalProgressBar():
-        with timer("Extract grid-based fields", "s"):
-            # slice to the requested sub-domain
-            simulation = data_slice(simulation, args["t_range"], args["z_range"])
-            model_req_fields = []
-            if args["sgs_model"].intersection(vel_models):
-                model_req_fields += ["vel", "sij", "omegaij"]
-            if args["sgs_model"].intersection(theta_models):
-                model_req_fields += ["theta", "grad_theta"]
-            simulation = gather_model_inputs(simulation, model_req_fields)
+    with TerminalProgressBar(), timer("Extract grid-based fields", "s"):
+        # slice to the requested sub-domain
+        simulation = data_slice(simulation, args["t_range"], args["z_range"])
+        model_req_fields = []
+        if args["sgs_model"].intersection(vel_models):
+            model_req_fields += ["vel", "sij", "omegaij"]
+        if args["sgs_model"].intersection(theta_models):
+            model_req_fields += ["theta", "grad_theta"]
+        simulation = gather_model_inputs(simulation, model_req_fields)
     # chunk
     chunks = {
         "z": args["z_chunk_size"],
@@ -415,8 +419,8 @@ def pre_process(args: dict[str, Any]) -> xr.Dataset:
         "c2": -1,
     }
     # add caveat for degenerate t or z-slice that may drop a coordinate
-    simulation = simulation.chunk(
-        chunks={x: y for x, y in chunks.items() if x in simulation.dims}
+    simulation = chunk_ds(
+        simulation, chunks={x: y for x, y in chunks.items() if x in simulation.dims}
     )
     simulation = simulation.persist()
     return simulation
@@ -507,7 +511,7 @@ def compute_cs(
     reg_filters: list[Filter],
 ) -> xr.DataArray:
     cs_at_scale_ls = []
-    for test_filter, reg_filter in zip(test_filters, reg_filters):
+    for test_filter, reg_filter in zip(test_filters, reg_filters, strict=False):
         # compute Cs
         cs = dyn_model.compute_coeff(test_filter, reg_filter)
         # force execution for timer logging
@@ -622,7 +626,7 @@ def plot(args: dict[str, Any]) -> None:
         plt.show()
 
 
-def compute(args: Dict[str, Any]) -> None:
+def compute(args: dict[str, Any]) -> None:
     # read and pre-process simulation
     # read UM stasth files: data
     with timer("Read Dataset", "s"):
@@ -636,14 +640,15 @@ def compute(args: Dict[str, Any]) -> None:
         )
     for scale in args["regularize_filter_scales"]:
         assert scale in range(1, nhoriz), (
-            f"regularization_scale {scale} must be less than horizontal number of grid cells {nhoriz}"
+            "regularization_scale {scale} must be less than "
+            f"horizontal number of grid cells {nhoriz}"
         )
 
     with timer("Setup filtering operators"):
         test_filters = []
         regularization_filters = []
         for scale, regularization_scale in zip(
-            args["filter_scales"], args["regularize_filter_scales"]
+            args["filter_scales"], args["regularize_filter_scales"], strict=False
         ):
             test_filters.append(make_filter(args["filter_type"], scale, ["x", "y"]))
             regularization_filters.append(
@@ -680,24 +685,28 @@ def compute(args: Dict[str, Any]) -> None:
             coeff.name = m
 
         # trigger computation -- split for time logging
-        with timer(f"Coeff calculation compute for {out_fname.stem} model", "s"):
-            with TerminalProgressBar():
-                coeff.compute()
+        with (
+            timer(f"Coeff calculation compute for {out_fname.stem} model", "s"),
+            TerminalProgressBar(),
+        ):
+            coeff.compute()
 
         # write to disk
-        with timer(f"Coeff calculation write for {out_fname.stem} model", "s"):
-            with TerminalProgressBar():
-                args["output_path"].mkdir(parents=True, exist_ok=True)
-                # tag with git info
-                coeff.attrs.update(git_attrs)
-                # write to disk
-                coeff.to_netcdf(
-                    out_fname,
-                    mode="w",
-                    compute=True,
-                    unlimited_dims=["scale"],
-                    engine="h5netcdf",
-                )
+        with (
+            timer(f"Coeff calculation write for {out_fname.stem} model", "s"),
+            TerminalProgressBar(),
+        ):
+            args["output_path"].mkdir(parents=True, exist_ok=True)
+            # tag with git info
+            coeff.attrs.update(git_attrs)
+            # write to disk
+            coeff.to_netcdf(
+                out_fname,
+                mode="w",
+                compute=True,
+                unlimited_dims=["scale"],
+                engine="h5netcdf",
+            )
 
 
 def main(arguments: Sequence[str] | None = None) -> None:

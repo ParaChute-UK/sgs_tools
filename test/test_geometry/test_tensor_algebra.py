@@ -28,6 +28,8 @@ def sample_tensor():
     return xr.DataArray(data, dims=["c1", "c2"], coords={"c1": coords, "c2": coords})
 
 
+@pytest.mark.unit
+@pytest.mark.fast
 def test_tensor_self_outer_product(sample_vector):
     result = tensor_self_outer_product(sample_vector)
 
@@ -40,6 +42,8 @@ def test_tensor_self_outer_product(sample_vector):
     np.testing.assert_array_equal(result.values, expected)
 
 
+@pytest.mark.unit
+@pytest.mark.fast
 def test_tensor_self_outer_product_custom_dims(sample_vector):
     result = tensor_self_outer_product(
         sample_vector.rename({"c1": "dim1"}), vec_dim="dim1", new_dim="dim2"
@@ -47,6 +51,8 @@ def test_tensor_self_outer_product_custom_dims(sample_vector):
     assert set(result.dims) == {"dim1", "dim2"}
 
 
+@pytest.mark.unit
+@pytest.mark.fast
 def test_trace(sample_tensor):
     result = trace(sample_tensor)
 
@@ -61,12 +67,16 @@ def test_trace(sample_tensor):
     np.testing.assert_almost_equal(result.values, expected)
 
 
+@pytest.mark.unit
+@pytest.mark.fast
 def test_trace_with_name(sample_tensor):
     sample_tensor.name = "test_tensor"
     result = trace(sample_tensor, name="traced_tensor")
     assert result.name == "Tr test_tensor"
 
 
+@pytest.mark.unit
+@pytest.mark.fast
 def test_traceless(sample_tensor):
     result = traceless(sample_tensor)
 
@@ -78,6 +88,8 @@ def test_traceless(sample_tensor):
     np.testing.assert_almost_equal(tr.values, 0.0, decimal=10)
 
 
+@pytest.mark.unit
+@pytest.mark.fast
 def test_Frobenius_norm(sample_tensor):
     result = Frobenius_norm(sample_tensor)
 
@@ -90,6 +102,8 @@ def test_Frobenius_norm(sample_tensor):
     np.testing.assert_almost_equal(result.values, expected)
 
 
+@pytest.mark.unit
+@pytest.mark.fast
 def test_symmetrise(sample_tensor):
     result = symmetrise(sample_tensor)
 
@@ -104,11 +118,15 @@ def test_symmetrise(sample_tensor):
     np.testing.assert_almost_equal(result.values[0, 1], expected_12)
 
 
+@pytest.mark.unit
+@pytest.mark.fast
 def test_symmetrise_with_name(sample_tensor):
     result = symmetrise(sample_tensor, name="symmetric_tensor")
     assert result.name == "symmetric_tensor"
 
 
+@pytest.mark.unit
+@pytest.mark.fast
 def test_antisymmetrise(sample_tensor):
     result = antisymmetrise(sample_tensor)
 
@@ -123,11 +141,15 @@ def test_antisymmetrise(sample_tensor):
     np.testing.assert_almost_equal(result.values[0, 1], expected_12)
 
 
+@pytest.mark.unit
+@pytest.mark.fast
 def test_antisymmetrise_with_name(sample_tensor):
     result = antisymmetrise(sample_tensor, name="antisymmetric_tensor")
     assert result.name == "antisymmetric_tensor"
 
 
+@pytest.mark.unit
+@pytest.mark.fast
 class TestEdgeCases:
     def test_tensor_self_outer_product_invalid_dims(self):
         # Test when new_dim already exists

@@ -1,7 +1,10 @@
+import json
 from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
+from collections.abc import Sequence
 from pathlib import Path
-from typing import Any, Dict, Sequence
+from typing import Any
 
+import matplotlib.pyplot as plt
 from numpy import array, inf
 
 from sgs_tools.scripts.arg_parsers import (
@@ -10,6 +13,7 @@ from sgs_tools.scripts.arg_parsers import (
     add_version_group,
 )
 from sgs_tools.scripts.BasicComparisonSimAnalysis import (
+    default_plotting_style,
     io,
     plot,
     prof_fields,
@@ -18,7 +22,7 @@ from sgs_tools.scripts.BasicComparisonSimAnalysis import (
 from sgs_tools.scripts.cli_helpers import print_args_dict, print_header
 from sgs_tools.util.timer import timer
 
-plotting_styles = [
+plot_styles = [
     {
         "label": "target",
         "linestyle": "--",
@@ -36,7 +40,7 @@ plotting_styles = [
 ]
 
 
-def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
+def parse_args(arguments: Sequence[str] | None = None) -> dict[str, Any]:
     parser = ArgumentParser(
         description="""
                     Create (and optionally save) standard diagnostic plots for
@@ -46,7 +50,6 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
                 """,
         formatter_class=ArgumentDefaultsHelpFormatter,
     )
-    add_version_group(parser)
 
     add_version_group(parser)
     fname = parser.add_argument_group("I/O datasets on disk")
@@ -55,7 +58,8 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
         type=Path,
         help="""
             Location of target simulation outputs -- UM NetCDF diagnostic files.
-            Recognizes glob patterns and walks directory trees, e.g. './my_file_p[br]*nc'
+            Recognizes glob patterns and walks directory trees,
+            e.g. './my_file_p[br]*nc'
             Can have multiple files, but only one glob pattern.
             (All files in a glob pattern should belong to the simulation). """,
     )
@@ -65,19 +69,33 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
         type=Path,
         help="""
             Location of reference simulation outputs -- UM NetCDF diagnostic files.
-            Recognizes glob patterns and walks directory trees, e.g. './my_file_p[br]*nc'
+            Recognizes glob patterns and walks directory trees,
+            e.g. './my_file_p[br]*nc'.
             Can have multiple files, but only one glob pattern.
             (All files in a glob pattern should belong to the simulation). """,
     )
 
     fname.add_argument(
-        "h_resolution",
+        "input_format",
+        type=str,
+        choices=["um", "monc", "sgs"],
+        help="Type of 'input_files'. Only support different NetCDF flavours from "
+        "various production codes. 'sgs' refers to files produced by sgs_tools. "
+        "All simulations must have the same format",
+    )
+
+    fname.add_argument(
+        "--h_resolution",
         type=float,
-        nargs=1,
+        nargs="+",
+        default=[0],
         help="""
-                horizontal resolution (will use to overwrite horizontal coordinates).
-                must apply to both reference and target.
-                **NB** works for ideal simulations""",
+        horizontal resolution in meters.
+        *ONLY* used for UM ideal simulations
+        (will use to overwrite horizontal coordinates).
+        If a single resolution is given, assume it applies to all input files.
+        Else, must give as many resolutions as inpu_file glob patterns.
+        """,
     )
 
     fname.add_argument(
@@ -88,7 +106,7 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
         help="""
               times at which to perform the analysis;
               in code coordinates; will find nearest available match.
-              default (which is empty) means the full data range
+              default (which is empty) means the full data range at 1h intervals.
              """,
     )
 
@@ -97,16 +115,32 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
         type=float,
         nargs=2,
         default=[-1, -1],
-        help="vertical interval to consider, in code coordinates, negative values are interpreted as take the min/max respectively",
+        help="vertical interval to consider, in code coordinates, "
+        "negative values are interpreted as take the min/max respectively",
     )
 
     plotting = add_plotting_group(parser)
     plotting.add_argument(
+        "--plot_style_file",
+        type=Path,
+        default=None,
+        help="""
+                Configuration file describing a list of plot style and decorations
+                to matched sequentially to each simulation.
+                See plot_config_template.json for a template.
+                If absent, will use ``default_plotting_style`` and
+                cycle through different colors.
+            """,
+    )
+
+    plotting.add_argument(
         "--hor_slice_levels",
         type=float,
-        nargs="+",
+        nargs="*",
         default=[],
-        help="""Vertical height at which to plot horizontal slices
+        help="""
+                Vertical height at which to plot horizontal slices.
+                If not given will omit these plots.
             """,
     )
 
@@ -128,16 +162,34 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
 
     # collated input files. Order matters -- should match order in plotting_styles
     args["input_files"] = [args["target"], args["reference"]]
-    # duplicate resolution
-    args["h_resolution"] = [args["h_resolution"][0], args["h_resolution"][0]]
+    if len(args["h_resolution"]) == 1:
+        args["h_resolution"] = [args["h_resolution"][0]] * len(args["input_files"])
+    else:
+        if args["input_format"] == "um":
+            assert len(args["h_resolution"]) == len(args["input_files"])
 
     # initial validation
     assert args["plot_show"] or args["plot_path"], (
         "require at least one of 'plot_show' or  'plot_path'"
     )
 
-    # add a hardcoded plotting style
-    args["plot_map"] = plotting_styles
+    # parse plotting style
+    if args["plot_style_file"] is None:
+        plot_styles = []
+        colors = plt.rcParams["axes.prop_cycle"].by_key()["color"]
+        linestyles = ["-", "--", ":", "-."]
+        for i in range(len(args["input_files"])):
+            plot_styles.append(default_plotting_style.copy())
+            plot_styles[i]["color"] = colors[i % len(colors)]
+            plot_styles[i]["linestyle"] = linestyles[i % len(linestyles)]
+            plot_styles[i]["label"] = f"sim{i}"
+    else:
+        with open(args["plot_style_file"]) as f:
+            plot_styles = json.load(f)
+        # ensure we have enough plotting styles
+        assert len(plot_styles) == len(args["input_files"])
+
+    args["plot_map"] = plot_styles
 
     # parse negative values in the [t,z]_range
     args["times"] = array(args["times"])
@@ -147,6 +199,12 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
         args["z_range"][0] = -inf
     if args["z_range"][1] < 0:
         args["z_range"][1] = inf
+    assert all(
+        args["z_range"][0] <= z <= args["z_range"][1] for z in args["hor_slice_levels"]
+    ), (
+        f"hor_slice_levels {args['hor_slice_levels']} aren't"
+        f" contained in z_range {args['z_range']}"
+    )
     return args
 
 

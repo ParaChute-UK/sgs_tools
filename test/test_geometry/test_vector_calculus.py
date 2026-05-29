@@ -35,6 +35,7 @@ def sample_vector_field():
     )
 
 
+@pytest.mark.unit
 class TestGradientOperations:
     def test_grad_scalar(self, sample_scalar_field):
         """Test gradient of scalar field"""
@@ -124,6 +125,7 @@ class TestGradientOperations:
         assert result.shape[:2] == (2, 2)
 
 
+@pytest.mark.unit
 class TestEdgeCases:
     def test_grad_scalar_single_dim(self):
         """Test gradient of 1D scalar field"""
@@ -141,6 +143,7 @@ class TestEdgeCases:
             grad_vector(invalid_field, space_dims=["x", "y"])
 
 
+@pytest.mark.unit
 class TestNameHandling:
     def test_grad_scalar_naming(self, sample_scalar_field):
         """Test name preservation in gradient"""

@@ -4,16 +4,26 @@ All notable changes to this project are documented in this file.
 
 ### [Under development]
 
-#### Added
+### Added
+
+- Debug utility to track memory usage
+- refactor IO:
   - a central read dispatcher (#33)
-  - dynamic version CL arg and tags in netcdf outputs of CLIs
-  - Debug utility to track memory usage
+  - on empty requested_fields, retain all available fields (#40)
+  - accept strings (#42)
+- update packaging and testing environment management
+- CLI upgrades in
+  - logging;
+  - dynamic version and tags in output and NetCDF products;
+  - can integrate into python scripts (everything from main down)
+  - cs_dynamic can also produce vertical profiles and plots as well.
+  - new sgs_tools_version CLI
 
 #### Fixes
   - turn geometry and diagnostics into sub-packages (#34)
   - dynamic versioning (instructions and docs)
-  - enhancements to post_process
   - unify output filename convention
+  - add missing h_resolution to "sgs" reader
 
 ### [0.1.0] - 2025-08-22
 

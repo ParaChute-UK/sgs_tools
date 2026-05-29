@@ -80,7 +80,17 @@ We welcome contributions of all kinds — bug reports, feature requests, documen
 - Submit your PR to the `devel` branch
 
 
-## 🧪 Development Setup & Tooling
+
+- **Environment management**: [Poetry](https://python-poetry.org/docs/)
+- **Dev task orchestration**: [PoethePoet](https://poethepoet.natn.io), used as a Poetry plugin.
+- **Unit/Integration Tests**: [`pytest`](https://docs.pytest.org/)
+  - Will look for tests as `test/test_*.py`
+- **Code Styling**:
+  - [`ruff`](https://github.com/charliermarsh/ruff): formatting and linting
+  - [`mypy`](http://mypy-lang.org/): static type checking
+  - [`pre-commit`](https://pre-commit.com/): wraps up `ruff` and `mypy` and cleans-up staged files before commit. Automatically used in PRs to `devel`.
+- **Multi-environment testing**: [`tox`](https://tox.wiki/en/4.28.1/)
+  - use this for any changes that touch the project management, e.g. dependencies, etc.
 
 The dev tools are managed using [Poetry](https://python-poetry.org/docs/).
 
@@ -106,7 +116,7 @@ You can still use `pip` for user installations, but we recommend Poetry for cont
       poetry install --with dev
       ```
 
-      > This adds dev tools like `tox`, `pytest`, `ruff`, `mypy`, and `pre-commit` to the dependencies.
+  5. Activate Git pre-commit hooks to help clean up formatting etc. on commit.
 
       ```console
       poetry self add poetry-dynamic-versioning@latest
@@ -144,11 +154,48 @@ You can still use `pip` for user installations, but we recommend Poetry for cont
 
   See the `Makefile` or `tox.ini` for more grannular options.
 
-### 🔧 Tooling Overview
-- **Virtual environment for testing**: [`tox`](https://tox.wiki/en/4.28.1/)
-- **Unit/Integration Tests**: [`pytest`](https://docs.pytest.org/)
-  - Will look for tests as `test/test_*.py`
-- **Code Style**:
-  - [`ruff`](https://github.com/charliermarsh/ruff): formatting and linting
-  - [`mypy`](http://mypy-lang.org/): static type checking
-  - [`pre-commit`](https://pre-commit.com/): wraps up `ruff` and `mypy` and cleans-up staged files before commit. Automatically used in PRs to `devel`.
+- `poetry run poe style`  &mdash; basic `ruff` formatting;
+
+- `poetry run poe lint` &mdash; standard pre-commit checks run on **all files** (not just the staged ones). This  includes `ruff` formatting, linting and basic `mypy` type-hint checks. These gets automatically run before each commit on the staged files.
+
+- `poetry run poe mypy`  &mdash; more comprehensive type checks with `--install-type`
+
+- `poetry run poe test`  &mdash; the (unit/integration) testing suite, should take a few minutes. Should be run before a PR.
+
+- `poetry run poe check`  &mdash; equivalent to `[lint, mypy, test]`
+
+- `poe doc` &mdash; re-generate the docs (run with `-- --setup` the first time to install dependencies)
+
+### Multi-environment testing
+
+Support across python versions is mamanged with [tox](https://tox.wiki/en/4.28.1/).
+Call `tox ` or better yet `tox -p` to run the standard environment matrix.
+See `tox.ini` for the test environments.
+This assumes that the corresponding python interpreter can be found in the `PATH`.
+A simple source script can help with that, e.g. if the interpreters are managed with `conda`,
+
+``` sh
+# activate-dev.sh
+conda activate sgs_tools # main env with all the dev tools
+# only add interpreters, don't override main env
+export PATH="$HOME/.conda/envs/py311/bin:$PATH"
+export PATH="$HOME/.conda/envs/py312/bin:$PATH"
+export PATH="$HOME/.conda/envs/py313/bin:$PATH"
+export PATH="$HOME/.conda/envs/py314/bin:$PATH"
+```
+
+followed by
+
+``` console
+source activate-dev.sh
+```
+
+### 🔀 Contirbuting & Pull Requests
+
+> [!NOTE]
+>
+> PRs should be submitted to the `devel` branch.
+>
+> Consider adding a test for any new functinonality.
+> The test directory `test/*` structure mirrors the `src/sgs_tools`.
+> with each module being tested in `test_<module_name>.py`

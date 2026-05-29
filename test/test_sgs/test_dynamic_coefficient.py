@@ -84,6 +84,8 @@ def LinComb3ModelLillyMinimisation():
             )
 
 
+@pytest.mark.unit
+@pytest.mark.slow
 def test_LinCombModelLillyMinimisation():
     id = IdentityFilter(None, ["x", "y"])
     min = LillyMinimisationNModel(["c1", "c2"], "cdim")

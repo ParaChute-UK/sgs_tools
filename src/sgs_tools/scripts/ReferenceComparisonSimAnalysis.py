@@ -48,6 +48,7 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
     )
     add_version_group(parser)
 
+    add_version_group(parser)
     fname = parser.add_argument_group("I/O datasets on disk")
     fname.add_argument(
         "target",

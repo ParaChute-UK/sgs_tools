@@ -7,14 +7,15 @@ All notable changes to this project are documented in this file.
 
 ### Added
 
-- dynamic version CL arg and tags in netcdf outputs of CLIs
+- update CLI:
+  - accept json strings as inputs for plot_styles
+  - add dynamic version CL arg and tags in netcdf outputs
 - Debug utility to track memory usage
 - refactor IO:
   - a central read dispatcher (#33)
   - on empty requested_fields, retain all available fields (#40)
   - accept strings (#42)
 - update packaging and testing environment management
-
 
 ### Fixes
 

@@ -1,4 +1,3 @@
-import json
 from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
 from collections.abc import Iterable, Mapping, Sequence
 from pathlib import Path
@@ -26,6 +25,7 @@ from sgs_tools.scripts.arg_parsers import (
     add_dask_group,
     add_plotting_group,
     add_version_group,
+    parse_json_or_file,
 )
 from sgs_tools.scripts.cli_helpers import print_args_dict, print_header
 from sgs_tools.util.dask_adapt_chunking import chunk_ds
@@ -132,8 +132,8 @@ def parse_args(arguments: Sequence[str] | None = None) -> dict[str, Any]:
         "input_format",
         type=str,
         choices=["um", "monc", "sgs"],
-        help="Type of 'input_files'. Only support different NetCDF flavours from"
-        " various production codes. 'sgs' refers to files produced by sgs_tools. "
+        help="Type of 'input_files'. Only support different NetCDF flavours from "
+        "various production codes. 'sgs' refers to files produced by sgs_tools. "
         "All simulations must have the same format",
     )
 
@@ -174,12 +174,13 @@ def parse_args(arguments: Sequence[str] | None = None) -> dict[str, Any]:
 
     plotting = add_plotting_group(parser)
     plotting.add_argument(
-        "--plot_style_file",
-        type=Path,
+        "--plot_styles",
+        type=parse_json_or_file,
         default=None,
         help="""
-                Configuration file describing a list of plot style and decorations
-                to matched sequentially to each simulation.
+                JSON configuration describing a list of plot styles and decorations
+                matched sequentially to each input simulation.
+                Can pass as a json-compatible string, but better a path to a JSON file.
                 See plot_config_template.json for a template.
                 If absent, will use ``default_plotting_style`` and
                 cycle through different colors.
@@ -226,7 +227,7 @@ def parse_args(arguments: Sequence[str] | None = None) -> dict[str, Any]:
     )
 
     # parse plotting style
-    if args["plot_style_file"] is None:
+    if args["plot_styles"] is None:
         plot_styles = []
         colors = plt.rcParams["axes.prop_cycle"].by_key()["color"]
         linestyles = ["-", "--", ":", "-."]
@@ -236,8 +237,7 @@ def parse_args(arguments: Sequence[str] | None = None) -> dict[str, Any]:
             plot_styles[i]["linestyle"] = linestyles[i % len(linestyles)]
             plot_styles[i]["label"] = f"sim{i}"
     else:
-        with open(args["plot_style_file"]) as f:
-            plot_styles = json.load(f)
+        plot_styles = args["plot_styles"]
         # ensure we have enough plotting styles
         assert len(plot_styles) >= len(args["input_files"])
 

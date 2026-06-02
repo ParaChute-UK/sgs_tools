@@ -1,19 +1,17 @@
-import json
 from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
 from collections.abc import Sequence
 from pathlib import Path
 from typing import Any
 
-import matplotlib.pyplot as plt
 from numpy import array, inf
 
 from sgs_tools.scripts.arg_parsers import (
     add_dask_group,
     add_plotting_group,
     add_version_group,
+    parse_json_or_file,
 )
 from sgs_tools.scripts.BasicComparisonSimAnalysis import (
-    default_plotting_style,
     io,
     plot,
     prof_fields,
@@ -22,20 +20,20 @@ from sgs_tools.scripts.BasicComparisonSimAnalysis import (
 from sgs_tools.scripts.cli_helpers import print_args_dict, print_header
 from sgs_tools.util.timer import timer
 
-plot_styles = [
+default_plotting_style = [
     {
         "label": "target",
         "linestyle": "--",
         "color": "C1",
         "linewidth": 1,
-        "marker": "x",
+        "marker": "",
     },
     {
         "label": "reference",
         "linestyle": "-",
         "color": "k",
         "linewidth": 1,
-        "marker": "o",
+        "marker": "",
     },
 ]
 
@@ -121,15 +119,15 @@ def parse_args(arguments: Sequence[str] | None = None) -> dict[str, Any]:
 
     plotting = add_plotting_group(parser)
     plotting.add_argument(
-        "--plot_style_file",
-        type=Path,
+        "--plot_styles",
+        type=parse_json_or_file,
         default=None,
         help="""
-                Configuration file describing a list of plot style and decorations
-                to matched sequentially to each simulation.
+                JSON configuration describing a list of plot styles and decorations
+                matched sequentially to the target and reference.
+                Can pass as a json-compatible string, but better a path to a JSON file.
                 See plot_config_template.json for a template.
-                If absent, will use ``default_plotting_style`` and
-                cycle through different colors.
+                If absent, will use ``default_plotting_style``.
             """,
     )
 
@@ -175,17 +173,9 @@ def parse_args(arguments: Sequence[str] | None = None) -> dict[str, Any]:
 
     # parse plotting style
     if args["plot_style_file"] is None:
-        plot_styles = []
-        colors = plt.rcParams["axes.prop_cycle"].by_key()["color"]
-        linestyles = ["-", "--", ":", "-."]
-        for i in range(len(args["input_files"])):
-            plot_styles.append(default_plotting_style.copy())
-            plot_styles[i]["color"] = colors[i % len(colors)]
-            plot_styles[i]["linestyle"] = linestyles[i % len(linestyles)]
-            plot_styles[i]["label"] = f"sim{i}"
+        plot_styles = default_plotting_style
     else:
-        with open(args["plot_style_file"]) as f:
-            plot_styles = json.load(f)
+        plot_styles = args["plot_styles"]
         # ensure we have enough plotting styles
         assert len(plot_styles) == len(args["input_files"])
 
@@ -202,8 +192,8 @@ def parse_args(arguments: Sequence[str] | None = None) -> dict[str, Any]:
     assert all(
         args["z_range"][0] <= z <= args["z_range"][1] for z in args["hor_slice_levels"]
     ), (
-        f"hor_slice_levels {args['hor_slice_levels']} aren't"
-        f" contained in z_range {args['z_range']}"
+        f"hor_slice_levels {args['hor_slice_levels']} aren't "
+        f"contained in z_range {args['z_range']}"
     )
     return args
 

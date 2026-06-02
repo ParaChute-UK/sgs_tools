@@ -8,6 +8,7 @@ All notable changes to this project are documented in this file.
 ### Added
 
 - update CLI:
+  - refactor sim_comparison plotting: close each figure after show/save
   - accept json strings as inputs for plot_styles
   - add dynamic version CL arg and tags in netcdf outputs
 - Debug utility to track memory usage

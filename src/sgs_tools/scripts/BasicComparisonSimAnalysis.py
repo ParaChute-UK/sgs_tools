@@ -1,5 +1,5 @@
 from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
-from collections.abc import Iterable, Mapping, Sequence
+from collections.abc import Iterable, Iterator, Mapping, Sequence
 from pathlib import Path
 from typing import Any
 
@@ -426,10 +426,8 @@ def plot_horiz_slices(
     zlevels: Iterable[float],
     field_plot_map,
     verbose: bool = False,
-) -> dict[float, dict[str, Figure]]:
-    hor_slice: dict[float, dict[str, Figure]] = {}
+) -> Iterator[tuple[float, str, Figure]]:
     for z in zlevels:
-        hor_slice[z] = {}
         for field in fields:
             if verbose:
                 print(f"Plotting {field} at {field_plot_map[field].zcoord} ~ {z}")
@@ -448,8 +446,7 @@ def plot_horiz_slices(
                 )
                 f.suptitle(field_plot_map[field].label)
                 f.tight_layout()
-                hor_slice[z][field] = f.get_figure()
-    return hor_slice
+                yield z, field, f.get_figure()
 
 
 def plot_vert_profiles(
@@ -458,8 +455,7 @@ def plot_vert_profiles(
     reductions: Iterable[str],
     plot_map,
     verbose: bool = False,
-) -> dict[str, dict[str, Figure]]:
-    vert_prof: dict[str, dict[str, Figure]] = {}
+) -> Iterator[tuple[str, str, Figure]]:
     red_coords = {coord for f in fields for coord in field_plot_map[f].hcoords}
     dred_collection = {}
     for sim in ds_collection:
@@ -473,7 +469,6 @@ def plot_vert_profiles(
                 list(reductions),
             )
     for reduction in reductions:
-        vert_prof[reduction] = {}
         for field in fields:
             if verbose:
                 print(f"Plotting {reduction} of {field}")
@@ -496,9 +491,7 @@ def plot_vert_profiles(
                 )
                 # q.suptitle(field_plot_map[field].label)
                 q.tight_layout()
-                vert_prof[reduction][field] = q.get_figure()
-
-    return vert_prof
+                yield reduction, field, q.get_figure()
 
 
 def plot_clouds(
@@ -506,7 +499,7 @@ def plot_clouds(
     clevels: Iterable[float],
     field_plot_map,
     collection_plot_map,
-) -> Figure | None:
+) -> Iterator[Figure]:
     fig, _ = plt.subplots(len(ds_collection), 1, figsize=(6, len(ds_collection) * 6))
     axes = fig.axes
     empty = True
@@ -543,9 +536,17 @@ def plot_clouds(
             empty = False
     if not empty:
         fig.tight_layout()
-        return fig
+        yield fig
     else:
-        return None
+        plt.close(fig)
+
+
+def _handle_fig(fig, path: Path, filename: str, show: bool):
+    if path:
+        fig.savefig(path / filename, dpi=180)
+    if show:
+        plt.show()
+    plt.close(fig)
 
 
 def plot(
@@ -556,36 +557,37 @@ def plot(
     field_plot_map,
 ) -> None:
     """master plotting routine"""
+
+    # parse time range; assume all datasets use the same time scale
+    ureg = UnitRegistry()  # type: ignore
+    ds = next(iter(ds_collection.values()))
+    tunit = ds["t"].unit
+    tmin = ds["t"].min().item() * ureg(tunit)
+    tmax = ds["t"].max().item() * ureg(tunit)
+    tlabel = f"times{tmin.to('h').magnitude:0g}-{tmax.to('h').magnitude:0g}h"
+
     if args["plot_path"] is not None:
         print(f"Saving plots to {args['plot_path']}")
-        # parse time range; assume all datasets use the same time scale
-        ureg = UnitRegistry()  # type: ignore
-        ds = next(iter(ds_collection.values()))
-        tunit = ds["t"].unit
-        tmin = ds["t"].min().item() * ureg(tunit)
-        tmax = ds["t"].max().item() * ureg(tunit)
-        tlabel = f"times{tmin.to('h').magnitude:0g}-{tmax.to('h').magnitude:0g}h"
         args["plot_path"].mkdir(parents=True, exist_ok=True)
 
     # plot horizontal slices
     with timer("Plot horizontal slices", "s"):
         try:
-            hor_slice = plot_horiz_slices(
+            for z, f, fig in plot_horiz_slices(
                 ds_collection,
                 slice_fields,
                 args["hor_slice_levels"],
                 field_plot_map,
                 args["verbose"],
-            )
-            if args["plot_path"] is not None:
-                for z in hor_slice:
-                    for f in hor_slice[z]:
-                        hor_slice[z][f].savefig(
-                            args["plot_path"] / f"Slice_z{z:g}m_{tlabel}_{f}.png",
-                            dpi=180,
-                        )
+            ):
+                _handle_fig(
+                    fig,
+                    path=args["plot_path"],
+                    filename=f"Slice_z{z:g}m_{tlabel}_{f}.png",
+                    show=args["plot_show"],
+                )
         except KeyboardInterrupt:
-            print("Detected Keyboard interrup, proceeding with vertical profiles")
+            print("Detected Keyboard interrupt, proceeding with vertical profiles")
 
     # plot vertical profiles
     # transpose plot map and match to dataset labels
@@ -606,40 +608,34 @@ def plot(
     reductions = ["mean", "var"]
     with timer("Plot vertical profiles", "s"):
         try:
-            if args["skip_vert_profiles"]:
-                prof_fields = []
-            vert_prof = plot_vert_profiles(
-                ds_collection, prof_fields, reductions, plot_map, args["verbose"]
-            )
-            if args["plot_path"] is not None:
-                for red in vert_prof:
-                    for f in vert_prof[red]:
-                        vert_prof[red][f].savefig(
-                            args["plot_path"] / f"Profile_{tlabel}_{red}_{f}.png",
-                            dpi=180,
-                        )
+            if not args["skip_vert_profiles"]:
+                for red, f, fig in plot_vert_profiles(
+                    ds_collection, prof_fields, reductions, plot_map, args["verbose"]
+                ):
+                    _handle_fig(
+                        fig,
+                        path=args["plot_path"],
+                        filename=f"Profile_{tlabel}_{red}_{f}.png",
+                        show=args["plot_show"],
+                    )
 
         except KeyboardInterrupt:
-            print("Detected Keyboard interrup, proceeding with cloud plot.")
+            print("Detected Keyboard interrupt, proceeding with cloud plot.")
 
     # cloud plots
-    cloud_fig = plot_clouds(
+    for fig in plot_clouds(
         ds_collection, arange(0.005, 0.15, 0.005), field_plot_map, plot_map
-    )
-    if args["plot_path"] is not None and cloud_fig:
-        cloud_fig.savefig(args["plot_path"] / f"Clouds_CL_{tlabel}.png", dpi=180)
-
-    # remove spuriously created empty directory
-    if args["plot_path"] and not any(args["plot_path"].iterdir()):
-        args["plot_path"].rmdir()
-    # interactive plotting (out of local timer)
-    if args["plot_show"]:
-        plt.show()
-    plt.close()
+    ):
+        _handle_fig(
+            fig,
+            path=args["plot_path"],
+            filename=f"Clouds_CL_{tlabel}.png",
+            show=args["plot_show"],
+        )
 
 
 def io(args) -> tuple[dict[str, xr.Dataset], dict[str, field_plot_kwargs]]:
-    # read UM stasth files: data
+    # read UM stash files: data
     ds_collection: dict[str, xr.Dataset] = {}
     requested_fields = list(slice_fields + prof_fields + cloud_fields)
     with timer("Read Dataset", "s"):

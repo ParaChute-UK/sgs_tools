@@ -23,8 +23,8 @@ def standardize_varnames(
     :param ds: input dataset
     :return: dataset with renamed variables
     """
-    restricted_dict = {k: v for k, v in field_names_convention.items() if k in ds}
-    return ds.rename(restricted_dict)
+    known_fields = {k: v for k, v in field_names_convention.items() if k in ds}
+    return ds.rename(known_fields)
 
 
 def restrict_ds(ds: xr.Dataset, fields: Iterable[str]) -> tuple[xr.Dataset, set[str]]:

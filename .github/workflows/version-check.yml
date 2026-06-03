@@ -48,7 +48,7 @@ jobs:
     - name: Get package version
       id: pkg
       run: |
-        echo "version=$(sgs_tools_version --raw)" >> $GITHUB_OUTPUT
+        echo "version=$(poetry run sgs_tools_version --raw)" >> $GITHUB_OUTPUT
 
     - name: Get latest tag
       id: tag

@@ -19,6 +19,7 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v6
       with:
+        ref: ${{ github.event.inputs.ref || github.ref }}
         fetch-depth: 0
 
     - name: Set up Python
@@ -47,14 +48,8 @@ jobs:
     - name: Get latest tag
       id: tag
       run: |
-        git fetch --tags
         tag=$(git describe --tags --abbrev=0 --match "v[0-9]*" 2>/dev/null || echo "v0.0.0")
         echo "tag=${tag#v}" >> $GITHUB_OUTPUT
-
-    - name: Debug environment
-      run: |
-        which python
-        which sgs_tools_version || echo "NOT FOUND"
 
     - name: Compare versions
       run: |
@@ -63,7 +58,6 @@ jobs:
 
         pkg = Version("${{ steps.pkg.outputs.version }}")
         tag = Version("${{ steps.tag.outputs.tag }}")
-        print (f"Versions: pkg='{pkg}', tag='{tag}'")
 
         if pkg == Version("0.0.0"):
             raise SystemExit("Version not resolved (dynamic versioning broken)")

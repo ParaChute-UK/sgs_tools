@@ -26,29 +26,23 @@ jobs:
       with:
         python-version: '3.11'
 
-    - name: Install packaging
-      run: pip install packaging
 
-    - name: Install Poetry
-      uses: abatilo/actions-poetry@v4.0.0
-
-    - name: Cache Poetry dependencies
+    - name: Cache pip
       uses: actions/cache@v5
       with:
-        path: |
-          ~/.cache/pypoetry
-          ~/.cache/pip
-        key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/poetry.lock') }}
         restore-keys: |
-          ${{ runner.os }}-poetry-
+          ${{ runner.os }}-pip-
 
     - name: Install package
-      run: poetry install --no-interaction
+      run: pip install packaging .
+
 
     - name: Get package version
       id: pkg
       run: |
-        echo "version=$(poetry run sgs_tools_version --raw)" >> $GITHUB_OUTPUT
+        echo "version=$(sgs_tools_version --raw)" >> $GITHUB_OUTPUT
 
     - name: Get latest tag
       id: tag
@@ -61,7 +55,6 @@ jobs:
       run: |
         which python
         which sgs_tools_version || echo "NOT FOUND"
-        poetry run which sgs_tools_version || echo "NOT FOUND in poetry"
 
     - name: Compare versions
       run: |

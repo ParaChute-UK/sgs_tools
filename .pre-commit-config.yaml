@@ -26,6 +26,6 @@ repos:
     rev: v1.17.0
     hooks:
       - id: mypy
-        # type check
-        # missing --install-types --non-interactive because of pre-commit
-        args: ["--ignore-missing-imports", "--pretty"]
+        files: ^src/ ^test/
+        additional_dependencies:
+          - types-setuptools

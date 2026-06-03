@@ -127,6 +127,7 @@ dependencies = [
   pretty = true
   show_error_codes = true
   exclude = ".*ipynb"
+  cache_dir = "/tmp/mypy-cache"
 
 [tool.pytest.ini_options]
   testpaths = ["test"]

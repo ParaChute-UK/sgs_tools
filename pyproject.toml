@@ -52,7 +52,7 @@ dependencies = [
 
 # dynamic versioning
 [tool.poetry-dynamic-versioning]
-  enable = false
+  enable = true
   style = "semver"        # expects tags v?.?.?; otherwise "pep440" takes it without the "v"
   vcs = "git"
 

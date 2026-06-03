@@ -172,7 +172,7 @@ def parse_args(arguments: Sequence[str] | None = None) -> dict[str, Any]:
     )
 
     # parse plotting style
-    if args["plot_style_file"] is None:
+    if args["plot_styles"] is None:
         plot_styles = default_plotting_style
     else:
         plot_styles = args["plot_styles"]

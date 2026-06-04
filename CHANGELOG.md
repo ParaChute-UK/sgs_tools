@@ -15,6 +15,7 @@ All notable changes to this project are documented in this file.
   - accept strings (#42)
 - update packaging and testing environment management
 - update GH Action workflows -- more commit and PR merge protections
+- update docs
 
 ### Fixes
 

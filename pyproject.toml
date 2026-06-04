@@ -33,16 +33,18 @@ dependencies = [
   "xrft",
   "xarray-einstats",
   "f90nml",
-  "netcdf4",
-  "h5netcdf",
-  "pint"
+  "pint",
+  "numpy",
+  "dask",
+  "pandas",
+  "psutil",
 ]
 
 # optional dependencies for docs
 [project.optional-dependencies]
   doc = [
     "sphinx",
-    "pydata-sphinx-theme",
+    "furo",
     "myst-parser",
     "sphinx-autodoc-typehints",
     "sphinx-copybutton",

@@ -10,7 +10,7 @@ Python tools for sub-grid scale (SGS) fluid dynamics analysis.
 ---
 > [!Important]
 > The `devel` branch is the actively maintained branch containing the latest features and fixes.
->
+> The `main` branch contains tagged releases.
 
 ### 🏗️ Development Version
 
@@ -149,7 +149,7 @@ Either way, the following `poe` code-hygiene tasks are available (see `pyproject
 
 - `poe doc` &mdash; re-generate the docs (run with `-- --setup` the first time to install dependencies)
 
-### Multi-environment testing
+### 🖥️ Multi-environment testing
 
 Support across python versions is mamanged with [tox](https://tox.wiki/en/4.28.1/).
 Call `tox ` or better yet `tox -p` to run the standard environment matrix.
@@ -173,12 +173,13 @@ followed by
 source activate-dev.sh
 ```
 
-### 🔀 Contirbuting & Pull Requests
+### 🔀 Contributing & Pull Requests
+
+All contributions are welcome —  pull requests, bug reports, feature requests, etc.
 
 > [!NOTE]
->
-> PRs should be submitted to the `devel` branch.
->
-> Consider adding a test for any new functinonality.
-> The test directory `test/*` structure mirrors the `src/sgs_tools`.
-> with each module being tested in `test_<module_name>.py`
+> Development happens on the `devel` branch.
+> Pull requests should target `devel` (not `main`).
+
+For full development and release workflow details, see
+`CONTRIBUTING.md`

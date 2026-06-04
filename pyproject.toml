@@ -42,7 +42,7 @@ dependencies = [
 [project.optional-dependencies]
   doc = [
     "sphinx",
-    "pydata-sphinx-theme",
+    "furo",
     "myst-parser",
     "sphinx-autodoc-typehints",
     "sphinx-copybutton",

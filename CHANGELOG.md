@@ -19,6 +19,7 @@ All notable changes to this project are documented in this file.
   - allow custom look-up table when reading UM files
 - update packaging and testing environment management
 - update GH Action workflows -- more commit and PR merge protections
+- update docs
 
 ### Fixes
 

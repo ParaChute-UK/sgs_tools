@@ -1,4 +1,10 @@
-# Development Log
+# Development
+
+```{include} ../CONTRIBUTING.md
+:heading-offset: 1
+```
+
+--------------------------------------------------------------
 
 ```{include} ../TASKLIST.md
 :heading-offset: 1

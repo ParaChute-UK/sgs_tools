@@ -3,6 +3,16 @@
 
 ```{toctree}
 :maxdepth: 1
+:caption: User Guide
+:hidden:
+
+Getting Started <self>
+devlog
+```
+
+```{toctree}
+:maxdepth: 1
+:caption: API
 :hidden:
 
 io
@@ -13,5 +23,4 @@ diagnostics
 simple_flow
 scripts
 plotting
-devlog
 ```

@@ -1,462 +1,272 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="./">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html"><link rel="next" title="Diagnostics" href="diagnostics.html"><link rel="prev" title="Physical Fields" href="physics.html">
 
-<!DOCTYPE html>
-
-
-<html lang="en" data-content_root="./" >
-
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
-
-    <title>Sub-grid scales &#8212; SGS_tools  documentation</title>
-  
-  
-  
-  <script data-cfasync="false">
-    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
-    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
-  </script>
-  <!--
-    this give us a css class that will be invisible only if js is disabled
-  -->
-  <noscript>
-    <style>
-      .pst-js-only { display: none !important; }
-
-    </style>
-  </noscript>
-  
-  <!-- Loaded before other Sphinx assets -->
-  <link href="_static/styles/theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
-<link href="_static/styles/pydata-sphinx-theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
-
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
+    <!-- Generated with Sphinx 9.0.4 and Furo 2025.12.19 -->
+        <title>Sub-grid scales - SGS_toolsv0.0.0</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="_static/sphinx_argparse_cli.css" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
-  
-  <!-- So that users can add custom icons -->
-  <script defer src="_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
-  <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
-<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
-
-    <script src="_static/documentation_options.js?v=5929fcd5"></script>
-    <script src="_static/doctools.js?v=fd6eb6e6"></script>
-    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
-    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
-    <script src="_static/copybutton.js?v=f281be69"></script>
-    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'sgs';</script>
-    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
-    <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Diagnostics" href="diagnostics.html" />
-    <link rel="prev" title="Physical Fields" href="physics.html" />
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.0.0" />
-  
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=8dab3a3b" />
+    <link rel="stylesheet" type="text/css" href="_static/custom.css?v=d74f5c2e" />
     
-    <script src="_static/searchtools.js"></script>
-    <script src="_static/language_data.js"></script>
-    <script src="searchindex.js"></script>
-  
-  </head>
-  <body data-default-mode="">
-  
-  
-  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
-
-  
-  <div id="pst-scroll-pixel-helper"></div>
-  
-  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
-    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
-  
-  
-  
-  
-  <dialog id="pst-search-dialog">
     
-<form class="bd-search d-flex align-items-center"
-      action="search.html"
-      method="get">
-  <i class="fa-solid fa-magnifying-glass"></i>
-  <input type="search"
-         class="form-control"
-         name="q"
-         placeholder="Search the docs ..."
-         aria-label="Search the docs ..."
-         autocomplete="off"
-         autocorrect="off"
-         autocapitalize="off"
-         spellcheck="false"/>
-  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+
+
+<style>
+  body {
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="index.html"><div class="brand">SGS_tools<span class='version-label'>v0.0.0</span></div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
+  
+  <span class="sidebar-brand-text">SGS_tools<span class='version-label'>v0.0.0</span></span>
+  
+</a><form class="sidebar-search-container" method="get" action="search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
 </form>
-  </dialog>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="index.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="devlog.html">Development</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="physics.html">Physical Fields</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Sub-grid scales</a></li>
+<li class="toctree-l1"><a class="reference internal" href="diagnostics.html">Diagnostics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="simple_flow.html">Simple Flow Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="scripts.html">Scripts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plotting.html">Plotting</a></li>
+</ul>
 
-  <div class="pst-async-banner-revealer d-none">
-  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
 </div>
-<aside class="bd-header-announcement" aria-label="Announcement">
-  <div class="bd-header-announcement__content">Version: 0.0.0</div>
-</aside>
+</div>
 
-  
-    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
-<div class="bd-header__inner bd-page-width">
-  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
-    <span class="fa-solid fa-bars"></span>
-  </button>
-  
-  
-  <div class="col-lg-3 navbar-header-items__start">
-    
-      <div class="navbar-item">
-
-  
-    
-  
-
-<a class="navbar-brand logo" href="index.html">
-  
-  
-  
-  
-  
-  
-    <p class="title logo__title">SGS_tools  documentation</p>
-  
-</a></div>
-    
-  </div>
-  
-  <div class="col-lg-9 navbar-header-items">
-    
-    <div class="me-auto navbar-header-items__center">
-      
-        <div class="navbar-item">
-<nav>
-  <ul class="bd-navbar-elements navbar-nav">
-    
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="io.html">
-    IO
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="geometry.html">
-    Geometry
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="physics.html">
-    Physical Fields
-  </a>
-</li>
-
-
-<li class="nav-item current active">
-  <a class="nav-link nav-internal" href="#">
-    Sub-grid scales
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="diagnostics.html">
-    Diagnostics
-  </a>
-</li>
-
-            <li class="nav-item dropdown">
-                <button class="btn dropdown-toggle nav-item" type="button"
-                data-bs-toggle="dropdown" aria-expanded="false"
-                aria-controls="pst-nav-more-links">
-                    More
-                </button>
-                <ul id="pst-nav-more-links" class="dropdown-menu">
-                    
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="simple_flow.html">
-    Simple Flow Examples
-  </a>
-</li>
-
-
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="scripts.html">
-    Scripts
-  </a>
-</li>
-
-
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="plotting.html">
-    Plotting
-  </a>
-</li>
-
-
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="devlog.html">
-    Development Log
-  </a>
-</li>
-
-                </ul>
-            </li>
-            
-  </ul>
-</nav></div>
+      </div>
       
     </div>
-    
-    
-    <div class="navbar-header-items__end">
-      
-        <div class="navbar-item navbar-persistent--container">
-          
-
-<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
- <i class="fa-solid fa-magnifying-glass"></i>
- <span class="search-button__default-text">Search</span>
- <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
-</button>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="_sources/sgs.rst.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
         </div>
-      
-      
-        <div class="navbar-item">
-
-<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
-  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
-  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
-  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
-</button></div>
-      
-    </div>
-    
-  </div>
-  
-  
-    <div class="navbar-persistent--mobile">
-
-<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
- <i class="fa-solid fa-magnifying-glass"></i>
- <span class="search-button__default-text">Search</span>
- <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
-</button>
-    </div>
-  
-
-  
-    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
-      <span class="fa-solid fa-outdent"></span>
-    </button>
-  
-</div>
-
-    </header>
-  
-
-  <div class="bd-container">
-    <div class="bd-container__inner bd-page-width">
-      
-      
-      
-      <dialog id="pst-primary-sidebar-modal"></dialog>
-      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
-        
-
-  
-  <div class="sidebar-header-items sidebar-primary__section">
-    
-    
-      <div class="sidebar-header-items__center">
-        
-          
-          
-            <div class="navbar-item">
-<nav>
-  <ul class="bd-navbar-elements navbar-nav">
-    
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="io.html">
-    IO
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="geometry.html">
-    Geometry
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="physics.html">
-    Physical Fields
-  </a>
-</li>
-
-
-<li class="nav-item current active">
-  <a class="nav-link nav-internal" href="#">
-    Sub-grid scales
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="diagnostics.html">
-    Diagnostics
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="simple_flow.html">
-    Simple Flow Examples
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="scripts.html">
-    Scripts
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="plotting.html">
-    Plotting
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="devlog.html">
-    Development Log
-  </a>
-</li>
-
-  </ul>
-</nav></div>
-          
-        
-      </div>
-    
-    
-    
-      <div class="sidebar-header-items__end">
-        
-          <div class="navbar-item">
-
-<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
-  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
-  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
-  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
-</button></div>
-        
-      </div>
-    
-  </div>
-  
-    <div class="sidebar-primary-items__start sidebar-primary__section">
-        <div class="sidebar-primary-item pst-sidebar-collapse"><button id="pst-collapse-sidebar-button" aria-expanded="true" aria-controls="pst-primary-sidebar"><svg class="pst-icon svg-inline--fa" role="img" aria-hidden="true" focusable="false" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
-    <path fill="currentColor" d="M3 15.5C2.36232 15.5 1.74874 15.2564 1.28478 14.8189C0.820828 14.3815 0.541576 13.7832 0.504167 13.1467L0.5 13L0.5 3C0.499965 2.36232 0.743605 1.74874 1.18107 1.28478C1.61854 0.820828 2.21676 0.541576 2.85333 0.504167L3 0.5L13 0.5C13.6377 0.499965 14.2513 0.743605 14.7152 1.18107C15.1792 1.61854 15.4584 2.21676 15.4958 2.85333L15.5 3L15.5 13C15.5 13.6377 15.2564 14.2513 14.8189 14.7152C14.3815 15.1792 13.7832 15.4584 13.1467 15.4958L13 15.5L3 15.5ZM3 13.8333L10.5 13.8333L10.5 2.16667L3 2.16667C2.79589 2.16669 2.59889 2.24163 2.44636 2.37726C2.29383 2.5129 2.19638 2.69979 2.1725 2.9025L2.16667 3L2.16667 13C2.16669 13.2041 2.24163 13.4011 2.37726 13.5536C2.5129 13.7062 2.69979 13.8036 2.9025 13.8275L3 13.8333ZM6.65583 10.325L6.5775 10.2558L4.91083 8.58917C4.76735 8.44567 4.68116 8.25476 4.66843 8.05223C4.65569 7.84971 4.71729 7.6495 4.84167 7.48917L4.91083 7.41083L6.5775 5.74417C6.72747 5.59471 6.9287 5.50794 7.14032 5.50148C7.35194 5.49502 7.55809 5.56935 7.7169 5.70937C7.8757 5.8494 7.97525 6.04463 7.99533 6.25539C8.01541 6.46616 7.95451 6.67667 7.825 6.84417L7.75583 6.9225L6.67917 8L7.75583 9.0775C7.89931 9.22099 7.98551 9.41191 7.99824 9.61443C8.01097 9.81695 7.94938 10.0172 7.825 10.1775L7.75583 10.2558C7.61234 10.3993 7.42142 10.4855 7.2189 10.4982C7.01638 10.511 6.81617 10.4494 6.65583 10.325Z"/>
-  </svg>
-  <span class="pst-collapse-sidebar-label">Collapse Sidebar</span>
-  <span class="pst-expand-sidebar-label">Expand Sidebar</span>
-</button></div>
-        <div class="sidebar-primary-item">
-
-<nav class="bd-docs-nav bd-links"
-     aria-label="Section Navigation">
-  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
-  <div class="bd-toc-item navbar-nav"></div>
-</nav></div>
-    </div>
-  
-  
-  <div class="sidebar-primary-items__end sidebar-primary__section">
-      <div class="sidebar-primary-item">
-<div id="ethical-ad-placement"
-      class="flat"
-      data-ea-publisher="readthedocs"
-      data-ea-type="readthedocs-sidebar"
-      data-ea-manual="true">
-</div></div>
-  </div>
-
-
-      </div>
-      
-      <main id="main-content" class="bd-main" role="main">
-        
-        
-          <div class="bd-content">
-            <div class="bd-article-container">
-              
-              <div class="bd-header-article d-print-none">
-<div class="header-article-items header-article__inner">
-  
-    <div class="header-article-items__start">
-      
-        <div class="header-article-item">
-
-<nav aria-label="Breadcrumb" class="d-print-none">
-  <ul class="bd-breadcrumbs">
-    
-    <li class="breadcrumb-item breadcrumb-home">
-      <a href="index.html" class="nav-link" aria-label="Home">
-        <i class="fa-solid fa-home"></i>
-      </a>
-    </li>
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Sub-grid scales</span></li>
-  </ul>
-</nav>
-</div>
-      
-    </div>
-  
-  
-</div>
-</div>
-              
-              
-              
-                
-<div id="searchbox"></div>
-                <article class="bd-article">
-                  
-  <section id="sub-grid-scales">
-<h1>Sub-grid scales<a class="headerlink" href="#sub-grid-scales" title="Link to this heading">#</a></h1>
+        <article role="main" id="furo-main-content">
+          <section id="sub-grid-scales">
+<h1>Sub-grid scales<a class="headerlink" href="#sub-grid-scales" title="Link to this heading">¶</a></h1>
 <section id="sgs">
-<h2><a class="reference internal" href="io.html#module-sgs_tools.io.sgs" title="sgs_tools.io.sgs"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sgs</span></code></a><a class="headerlink" href="#sgs" title="Link to this heading">#</a></h2>
+<h2><a class="reference internal" href="io.html#module-sgs_tools.io.sgs" title="sgs_tools.io.sgs"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sgs</span></code></a><a class="headerlink" href="#sgs" title="Link to this heading">¶</a></h2>
 <section id="module-sgs_tools.sgs.filter">
-<span id="filtering"></span><h3>Filtering<a class="headerlink" href="#module-sgs_tools.sgs.filter" title="Link to this heading">#</a></h3>
+<span id="filtering"></span><h3>Filtering<a class="headerlink" href="#module-sgs_tools.sgs.filter" title="Link to this heading">¶</a></h3>
 <dl class="py data">
 <dt class="sig sig-object py" id="sgs_tools.sgs.filter.weight_gauss_3d">
-<span class="sig-name descname"><span class="pre">weight_gauss_3d</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;xarray.DataArray</span> <span class="pre">'truediv-049dc5ac3a49cba1205f46208d5623e9'</span> <span class="pre">(w1:</span> <span class="pre">3,</span> <span class="pre">w2:</span> <span class="pre">3)&gt;</span> <span class="pre">Size:</span> <span class="pre">72B</span> <span class="pre">dask.array&lt;truediv,</span> <span class="pre">shape=(3,</span> <span class="pre">3),</span> <span class="pre">dtype=float64,</span> <span class="pre">chunksize=(3,</span> <span class="pre">3),</span> <span class="pre">chunktype=numpy.ndarray&gt;</span> <span class="pre">Dimensions</span> <span class="pre">without</span> <span class="pre">coordinates:</span> <span class="pre">w1,</span> <span class="pre">w2</span></span><a class="headerlink" href="#sgs_tools.sgs.filter.weight_gauss_3d" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">weight_gauss_3d</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;xarray.DataArray</span> <span class="pre">'truediv-049dc5ac3a49cba1205f46208d5623e9'</span> <span class="pre">(w1:</span> <span class="pre">3,</span> <span class="pre">w2:</span> <span class="pre">3)&gt;</span> <span class="pre">Size:</span> <span class="pre">72B</span> <span class="pre">dask.array&lt;truediv,</span> <span class="pre">shape=(3,</span> <span class="pre">3),</span> <span class="pre">dtype=float64,</span> <span class="pre">chunksize=(3,</span> <span class="pre">3),</span> <span class="pre">chunktype=numpy.ndarray&gt;</span> <span class="pre">Dimensions</span> <span class="pre">without</span> <span class="pre">coordinates:</span> <span class="pre">w1,</span> <span class="pre">w2</span></span><a class="headerlink" href="#sgs_tools.sgs.filter.weight_gauss_3d" title="Link to this definition">¶</a></dt>
 <dd><p>3x3 2d Gaussian filter – binomial approximation</p>
 </dd></dl>
 
 <dl class="py data">
 <dt class="sig sig-object py" id="sgs_tools.sgs.filter.weight_gauss_5d">
-<span class="sig-name descname"><span class="pre">weight_gauss_5d</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;xarray.DataArray</span> <span class="pre">'array-3ff26ea89580fcbc973ad0755922e2c1'</span> <span class="pre">(w1:</span> <span class="pre">5,</span> <span class="pre">w2:</span> <span class="pre">5)&gt;</span> <span class="pre">Size:</span> <span class="pre">200B</span> <span class="pre">dask.array&lt;truediv,</span> <span class="pre">shape=(5,</span> <span class="pre">5),</span> <span class="pre">dtype=float64,</span> <span class="pre">chunksize=(5,</span> <span class="pre">5),</span> <span class="pre">chunktype=numpy.ndarray&gt;</span> <span class="pre">Dimensions</span> <span class="pre">without</span> <span class="pre">coordinates:</span> <span class="pre">w1,</span> <span class="pre">w2</span></span><a class="headerlink" href="#sgs_tools.sgs.filter.weight_gauss_5d" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">weight_gauss_5d</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;xarray.DataArray</span> <span class="pre">'array-3ff26ea89580fcbc973ad0755922e2c1'</span> <span class="pre">(w1:</span> <span class="pre">5,</span> <span class="pre">w2:</span> <span class="pre">5)&gt;</span> <span class="pre">Size:</span> <span class="pre">200B</span> <span class="pre">dask.array&lt;truediv,</span> <span class="pre">shape=(5,</span> <span class="pre">5),</span> <span class="pre">dtype=float64,</span> <span class="pre">chunksize=(5,</span> <span class="pre">5),</span> <span class="pre">chunktype=numpy.ndarray&gt;</span> <span class="pre">Dimensions</span> <span class="pre">without</span> <span class="pre">coordinates:</span> <span class="pre">w1,</span> <span class="pre">w2</span></span><a class="headerlink" href="#sgs_tools.sgs.filter.weight_gauss_5d" title="Link to this definition">¶</a></dt>
 <dd><p>5x5 2d Gaussian filter – binomial approximation</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="sgs_tools.sgs.filter.box_kernel">
-<span class="sig-name descname"><span class="pre">box_kernel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shape</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/filter.html#box_kernel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.filter.box_kernel" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">box_kernel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shape</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/filter.html#box_kernel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.filter.box_kernel" title="Link to this definition">¶</a></dt>
 <dd><p>returns a normalized box kernel with given shape</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -473,7 +283,7 @@
 
 <dl class="py class">
 <dt class="sig sig-object py" id="sgs_tools.sgs.filter.Filter">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">Filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kernel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_dims</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/filter.html#Filter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.filter.Filter" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">Filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kernel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_dims</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/filter.html#Filter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.filter.Filter" title="Link to this definition">¶</a></dt>
 <dd><p>Basic filter class with kernel along dimensions
 the dimensions of kernel and filter_dims are matched one-to-one as given</p>
 <dl class="field-list simple">
@@ -487,17 +297,17 @@ will be paired with dimensions of the kernel.</p></li>
 </dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="sgs_tools.sgs.filter.Filter.kernel">
-<span class="sig-name descname"><span class="pre">kernel</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">DataArray</span></span><a class="headerlink" href="#sgs_tools.sgs.filter.Filter.kernel" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">kernel</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">DataArray</span></span><a class="headerlink" href="#sgs_tools.sgs.filter.Filter.kernel" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="sgs_tools.sgs.filter.Filter.filter_dims">
-<span class="sig-name descname"><span class="pre">filter_dims</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">Hashable</span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#sgs_tools.sgs.filter.Filter.filter_dims" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">filter_dims</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">Hashable</span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#sgs_tools.sgs.filter.Filter.filter_dims" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="sgs_tools.sgs.filter.Filter.scales">
-<span class="sig-name descname"><span class="pre">scales</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/filter.html#Filter.scales"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.filter.Filter.scales" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">scales</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/filter.html#Filter.scales"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.filter.Filter.scales" title="Link to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">...</span></code>]</span></p>
@@ -507,7 +317,7 @@ will be paired with dimensions of the kernel.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="sgs_tools.sgs.filter.Filter.scale">
-<span class="sig-name descname"><span class="pre">scale</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/filter.html#Filter.scale"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.filter.Filter.scale" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">scale</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/filter.html#Filter.scale"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.filter.Filter.scale" title="Link to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></span></p>
@@ -517,12 +327,12 @@ will be paired with dimensions of the kernel.</p></li>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="sgs_tools.sgs.filter.Filter.window">
-<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">window</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">Hashable</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#sgs_tools.sgs.filter.Filter.window" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">window</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">Hashable</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#sgs_tools.sgs.filter.Filter.window" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="sgs_tools.sgs.filter.Filter.with_dims">
-<span class="sig-name descname"><span class="pre">with_dims</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dims</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/filter.html#Filter.with_dims"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.filter.Filter.with_dims" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">with_dims</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dims</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/filter.html#Filter.with_dims"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.filter.Filter.with_dims" title="Link to this definition">¶</a></dt>
 <dd><p>return a new filter with same kernel and updated filter_dims</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -533,7 +343,7 @@ will be paired with dimensions of the kernel.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="sgs_tools.sgs.filter.Filter.filter">
-<span class="sig-name descname"><span class="pre">filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">field</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/filter.html#Filter.filter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.filter.Filter.filter" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">field</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/filter.html#Filter.filter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.filter.Filter.filter" title="Link to this definition">¶</a></dt>
 <dd><p>filterer field</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -549,7 +359,7 @@ will be paired with dimensions of the kernel.</p></li>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="sgs_tools.sgs.filter.IdentityFilter">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">IdentityFilter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kernel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_dims</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/filter.html#IdentityFilter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.filter.IdentityFilter" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">IdentityFilter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kernel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_dims</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/filter.html#IdentityFilter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.filter.IdentityFilter" title="Link to this definition">¶</a></dt>
 <dd><p>identity filter</p>
 <dl class="field-list simple">
 <dt class="field-odd">Variables<span class="colon">:</span></dt>
@@ -558,7 +368,7 @@ will be paired with dimensions of the kernel.</p></li>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="sgs_tools.sgs.filter.IdentityFilter.filter">
-<span class="sig-name descname"><span class="pre">filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">field</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/filter.html#IdentityFilter.filter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.filter.IdentityFilter.filter" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">field</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/filter.html#IdentityFilter.filter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.filter.IdentityFilter.filter" title="Link to this definition">¶</a></dt>
 <dd><p>returns original field</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -574,7 +384,7 @@ will be paired with dimensions of the kernel.</p></li>
 
 <dl class="py class" id="module-sgs_tools.sgs.coarse_grain">
 <dt class="sig sig-object py" id="sgs_tools.sgs.coarse_grain.CoarseGrain">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">CoarseGrain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">window</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'exact'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/coarse_grain.html#CoarseGrain"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.coarse_grain.CoarseGrain" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">CoarseGrain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">window</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'exact'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/coarse_grain.html#CoarseGrain"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.coarse_grain.CoarseGrain" title="Link to this definition">¶</a></dt>
 <dd><p>Coarse-graining filter class with kernel along dimensions
 the dimensions of kernel and filter_dims are matched one-to-one as given</p>
 <dl class="field-list simple">
@@ -588,7 +398,7 @@ notably ‘trim’ and ‘exact’</p></li>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="sgs_tools.sgs.coarse_grain.CoarseGrain.filter">
-<span class="sig-name descname"><span class="pre">filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">field</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/coarse_grain.html#CoarseGrain.filter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.coarse_grain.CoarseGrain.filter" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">field</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/coarse_grain.html#CoarseGrain.filter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.coarse_grain.CoarseGrain.filter" title="Link to this definition">¶</a></dt>
 <dd><p>coarse grain <cite>field</cite>;
 Note: unlike Filter.filter, here the output size is different
 from the input size</p>
@@ -606,17 +416,17 @@ from the input size</p>
 
 </section>
 <section id="module-sgs_tools.sgs.sgs_model">
-<span id="sgs-model-core"></span><h3>SGS Model Core<a class="headerlink" href="#module-sgs_tools.sgs.sgs_model" title="Link to this heading">#</a></h3>
+<span id="sgs-model-core"></span><h3>SGS Model Core<a class="headerlink" href="#module-sgs_tools.sgs.sgs_model" title="Link to this heading">¶</a></h3>
 <dl class="py class">
 <dt class="sig sig-object py" id="sgs_tools.sgs.sgs_model.SGSModel">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">SGSModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/sgs_model.html#SGSModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.sgs_model.SGSModel" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">SGSModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/sgs_model.html#SGSModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.sgs_model.SGSModel" title="Link to this definition">¶</a></dt>
 <dd><p>Base subgrid-scale (SGS) model class</p>
 <ul class="simple">
 <li><p><a class="reference internal" href="#sgs_tools.sgs.sgs_model.SGSModel.sgs_tensor" title="sgs_tools.sgs.sgs_model.SGSModel.sgs_tensor"><code class="xref py py-meth docutils literal notranslate"><span class="pre">sgs_tensor()</span></code></a>: returns the SGS tensor for a given filter</p></li>
 </ul>
 <dl class="py method">
 <dt class="sig sig-object py" id="sgs_tools.sgs.sgs_model.SGSModel.sgs_tensor">
-<span class="sig-name descname"><span class="pre">sgs_tensor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/sgs_model.html#SGSModel.sgs_tensor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.sgs_model.SGSModel.sgs_tensor" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">sgs_tensor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/sgs_model.html#SGSModel.sgs_tensor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.sgs_model.SGSModel.sgs_tensor" title="Link to this definition">¶</a></dt>
 <dd><p>compute model for SGS tensor :math:`    au` for a given filter</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -632,7 +442,7 @@ from the input size</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="sgs_tools.sgs.sgs_model.LinCombSGSModel">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">LinCombSGSModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_components</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/sgs_model.html#LinCombSGSModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.sgs_model.LinCombSGSModel" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">LinCombSGSModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_components</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/sgs_model.html#LinCombSGSModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.sgs_model.LinCombSGSModel" title="Link to this definition">¶</a></dt>
 <dd><p>Linear combination of subgrid-scale (SGS) models</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -643,14 +453,14 @@ from the input size</p>
 
 <dl class="py class" id="module-sgs_tools.sgs.dynamic_sgs_model">
 <dt class="sig sig-object py" id="sgs_tools.sgs.dynamic_sgs_model.LeonardTensor">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">LeonardTensor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/dynamic_sgs_model.html#LeonardTensor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.dynamic_sgs_model.LeonardTensor" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">LeonardTensor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/dynamic_sgs_model.html#LeonardTensor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.dynamic_sgs_model.LeonardTensor" title="Link to this definition">¶</a></dt>
 <dd><p>compute the Leonard tensor for a large-scale equation</p>
 <p><code class="xref py py-meth docutils literal notranslate"><span class="pre">compute()</span></code>: returns the Leonard tensor for a given filter</p>
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="sgs_tools.sgs.dynamic_sgs_model.LeonardVelocityTensor">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">LeonardVelocityTensor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tensor_dims</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/dynamic_sgs_model.html#LeonardVelocityTensor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.dynamic_sgs_model.LeonardVelocityTensor" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">LeonardVelocityTensor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tensor_dims</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/dynamic_sgs_model.html#LeonardVelocityTensor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.dynamic_sgs_model.LeonardVelocityTensor" title="Link to this definition">¶</a></dt>
 <dd><p>Leonard tensor for the velocity</p>
 <dl class="field-list simple">
 <dt class="field-odd">Variables<span class="colon">:</span></dt>
@@ -662,7 +472,7 @@ from the input size</p>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="sgs_tools.sgs.dynamic_sgs_model.LeonardVelocityTensor.compute">
-<span class="sig-name descname"><span class="pre">compute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/dynamic_sgs_model.html#LeonardVelocityTensor.compute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.dynamic_sgs_model.LeonardVelocityTensor.compute" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">compute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/dynamic_sgs_model.html#LeonardVelocityTensor.compute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.dynamic_sgs_model.LeonardVelocityTensor.compute" title="Link to this definition">¶</a></dt>
 <dd><dl class="simple">
 <dt>compute the Leonard tensor as</dt><dd><p><span class="math notranslate nohighlight">\(\overline{v_i v_j} - \overline{v_i} \overline{v_j}\)</span>,
 where <span class="math notranslate nohighlight">\(\overline{\ast}\)</span> means filtering</p>
@@ -682,7 +492,7 @@ where <span class="math notranslate nohighlight">\(\overline{\ast}\)</span> mean
 
 <dl class="py class">
 <dt class="sig sig-object py" id="sgs_tools.sgs.dynamic_sgs_model.LeonardThetaTensor">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">LeonardThetaTensor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tensor_dims</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/dynamic_sgs_model.html#LeonardThetaTensor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.dynamic_sgs_model.LeonardThetaTensor" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">LeonardThetaTensor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tensor_dims</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/dynamic_sgs_model.html#LeonardThetaTensor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.dynamic_sgs_model.LeonardThetaTensor" title="Link to this definition">¶</a></dt>
 <dd><p>Leonard tensor for the (potential) temperature <span class="math notranslate nohighlight">\(\theta\)</span></p>
 <dl class="field-list simple">
 <dt class="field-odd">Variables<span class="colon">:</span></dt>
@@ -694,7 +504,7 @@ where <span class="math notranslate nohighlight">\(\overline{\ast}\)</span> mean
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="sgs_tools.sgs.dynamic_sgs_model.LeonardThetaTensor.compute">
-<span class="sig-name descname"><span class="pre">compute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/dynamic_sgs_model.html#LeonardThetaTensor.compute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.dynamic_sgs_model.LeonardThetaTensor.compute" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">compute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/dynamic_sgs_model.html#LeonardThetaTensor.compute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.dynamic_sgs_model.LeonardThetaTensor.compute" title="Link to this definition">¶</a></dt>
 <dd><dl class="simple">
 <dt>compute the Leonard tensor as</dt><dd><p><span class="math notranslate nohighlight">\(\overline{v_i \theta} - \overline{v_i} \overline{\theta}\)</span>,
 where <span class="math notranslate nohighlight">\(\overline{\ast}\)</span> means filtering</p>
@@ -714,7 +524,7 @@ where <span class="math notranslate nohighlight">\(\overline{\ast}\)</span> mean
 
 <dl class="py function">
 <dt class="sig sig-object py" id="sgs_tools.sgs.dynamic_sgs_model.M_Germano_tensor">
-<span class="sig-name descname"><span class="pre">M_Germano_tensor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sgs_model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/dynamic_sgs_model.html#M_Germano_tensor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.dynamic_sgs_model.M_Germano_tensor" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">M_Germano_tensor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sgs_model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/dynamic_sgs_model.html#M_Germano_tensor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.dynamic_sgs_model.M_Germano_tensor" title="Link to this definition">¶</a></dt>
 <dd><p>compute the Mij Germano model tensor as
 <span class="math notranslate nohighlight">\((&lt;\tau(\matrhm{at grid})&gt; - \alpha^2 \tau(\mathrm{at filter}))\)</span>,
 where <span class="math notranslate nohighlight">\(\Delta * \alpha\)</span> is the area/volume spanned by the filter kernel
@@ -734,7 +544,7 @@ and <span class="math notranslate nohighlight">\(\Delta\)</span> is the filter s
 
 <dl class="py class">
 <dt class="sig sig-object py" id="sgs_tools.sgs.dynamic_sgs_model.DynamicModelProtcol">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">DynamicModelProtcol</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/dynamic_sgs_model.html#DynamicModelProtcol"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.dynamic_sgs_model.DynamicModelProtcol" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">DynamicModelProtcol</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/dynamic_sgs_model.html#DynamicModelProtcol"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.dynamic_sgs_model.DynamicModelProtcol" title="Link to this definition">¶</a></dt>
 <dd><p>compute the Leonard tensor for a large-scale equation</p>
 <p>:meth compute_coeff : returns the SGS tensor for a given filter
 :meth sgs_tensor: returns the SGS tensor for a given test and regularisation filter</p>
@@ -742,7 +552,7 @@ and <span class="math notranslate nohighlight">\(\Delta\)</span> is the filter s
 
 <dl class="py class">
 <dt class="sig sig-object py" id="sgs_tools.sgs.dynamic_sgs_model.DynamicModel">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">DynamicModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">static_model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">leonard</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minimisation</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/dynamic_sgs_model.html#DynamicModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.dynamic_sgs_model.DynamicModel" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">DynamicModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">static_model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">leonard</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minimisation</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/dynamic_sgs_model.html#DynamicModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.dynamic_sgs_model.DynamicModel" title="Link to this definition">¶</a></dt>
 <dd><p>Dynamic model for SGS model</p>
 <dl class="field-list simple">
 <dt class="field-odd">Variables<span class="colon">:</span></dt>
@@ -762,7 +572,7 @@ test and regularisation filters</p>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="sgs_tools.sgs.dynamic_sgs_model.DynamicModel.compute_coeff">
-<span class="sig-name descname"><span class="pre">compute_coeff</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">test_filter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_filter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/dynamic_sgs_model.html#DynamicModel.compute_coeff"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.dynamic_sgs_model.DynamicModel.compute_coeff" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">compute_coeff</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">test_filter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_filter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/dynamic_sgs_model.html#DynamicModel.compute_coeff"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.dynamic_sgs_model.DynamicModel.compute_coeff" title="Link to this definition">¶</a></dt>
 <dd><p>compute the amplitude coefficient for the SGS model</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -779,7 +589,7 @@ test and regularisation filters</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="sgs_tools.sgs.dynamic_sgs_model.DynamicModel.sgs_tensor">
-<span class="sig-name descname"><span class="pre">sgs_tensor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">test_filter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_filter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/dynamic_sgs_model.html#DynamicModel.sgs_tensor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.dynamic_sgs_model.DynamicModel.sgs_tensor" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">sgs_tensor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">test_filter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_filter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/dynamic_sgs_model.html#DynamicModel.sgs_tensor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.dynamic_sgs_model.DynamicModel.sgs_tensor" title="Link to this definition">¶</a></dt>
 <dd><p>compute the SGS tensor for a given test and regularisation filter</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -798,7 +608,7 @@ test and regularisation filters</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="sgs_tools.sgs.dynamic_sgs_model.LinCombDynamicModel">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">LinCombDynamicModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">static_model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">leonard</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minimisation</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/dynamic_sgs_model.html#LinCombDynamicModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.dynamic_sgs_model.LinCombDynamicModel" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">LinCombDynamicModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">static_model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">leonard</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minimisation</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/dynamic_sgs_model.html#LinCombDynamicModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.dynamic_sgs_model.LinCombDynamicModel" title="Link to this definition">¶</a></dt>
 <dd><p>Dynamic model for linear combination SGS model</p>
 <dl class="field-list simple">
 <dt class="field-odd">Variables<span class="colon">:</span></dt>
@@ -817,7 +627,7 @@ test and regularisation filters</p>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="sgs_tools.sgs.dynamic_sgs_model.LinCombDynamicModel.compute_coeff">
-<span class="sig-name descname"><span class="pre">compute_coeff</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">test_filter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_filter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/dynamic_sgs_model.html#LinCombDynamicModel.compute_coeff"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.dynamic_sgs_model.LinCombDynamicModel.compute_coeff" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">compute_coeff</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">test_filter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_filter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/dynamic_sgs_model.html#LinCombDynamicModel.compute_coeff"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.dynamic_sgs_model.LinCombDynamicModel.compute_coeff" title="Link to this definition">¶</a></dt>
 <dd><p>compute the coefficients for the SGS model</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -834,7 +644,7 @@ test and regularisation filters</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="sgs_tools.sgs.dynamic_sgs_model.LinCombDynamicModel.sgs_tensor">
-<span class="sig-name descname"><span class="pre">sgs_tensor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">test_filter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_filter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/dynamic_sgs_model.html#LinCombDynamicModel.sgs_tensor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.dynamic_sgs_model.LinCombDynamicModel.sgs_tensor" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">sgs_tensor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">test_filter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_filter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/dynamic_sgs_model.html#LinCombDynamicModel.sgs_tensor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.dynamic_sgs_model.LinCombDynamicModel.sgs_tensor" title="Link to this definition">¶</a></dt>
 <dd><p>compute the SGS tensor for a given test and regularisation filter</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -853,7 +663,7 @@ test and regularisation filters</p>
 
 <dl class="py class" id="module-sgs_tools.sgs.dynamic_coefficient">
 <dt class="sig sig-object py" id="sgs_tools.sgs.dynamic_coefficient.Minimisation">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">Minimisation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/dynamic_coefficient.html#Minimisation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.dynamic_coefficient.Minimisation" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">Minimisation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/dynamic_coefficient.html#Minimisation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.dynamic_coefficient.Minimisation" title="Link to this definition">¶</a></dt>
 <dd><p>Protocol for solving the over-determined tensor equation
 <span class="math notranslate nohighlight">\(L = \sum_i c_i M_i\)</span>, where <span class="math notranslate nohighlight">\(L\)</span> and <span class="math notranslate nohighlight">\(M_i\)</span> are tensors and
 <span class="math notranslate nohighlight">\(c_i\)</span> are scalar coefficients to be computed.</p>
@@ -869,7 +679,7 @@ tensor products <span class="math notranslate nohighlight">\(L M_i\)</span> and 
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="sgs_tools.sgs.dynamic_coefficient.Minimisation.compute">
-<span class="sig-name descname"><span class="pre">compute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">L</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Mi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_filter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/dynamic_coefficient.html#Minimisation.compute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.dynamic_coefficient.Minimisation.compute" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">compute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">L</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Mi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_filter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/dynamic_coefficient.html#Minimisation.compute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.dynamic_coefficient.Minimisation.compute" title="Link to this definition">¶</a></dt>
 <dd><dl class="simple">
 <dt>solve for <span class="math notranslate nohighlight">\({c_i}\)</span> the over-determined system</dt><dd><p><span class="math notranslate nohighlight">\(L = \sum_i(c_i M_i)\)</span>.</p>
 </dd>
@@ -892,7 +702,7 @@ tensor products <span class="math notranslate nohighlight">\(L M_i\)</span> and 
 
 <dl class="py class">
 <dt class="sig sig-object py" id="sgs_tools.sgs.dynamic_coefficient.LillyMinimisation1Model">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">LillyMinimisation1Model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">contraction_dims</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coeff_dim</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/dynamic_coefficient.html#LillyMinimisation1Model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.dynamic_coefficient.LillyMinimisation1Model" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">LillyMinimisation1Model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">contraction_dims</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coeff_dim</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/dynamic_coefficient.html#LillyMinimisation1Model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.dynamic_coefficient.LillyMinimisation1Model" title="Link to this definition">¶</a></dt>
 <dd><dl class="simple">
 <dt>Lilly Minimisation (least square error) for a 1-global-coefficient model using</dt><dd><p>the Lilly identity as <span class="math notranslate nohighlight">\(\overline{L \cdot M} / \overline{M \cdot M}\)</span>.
 where <span class="math notranslate nohighlight">\(\cdot\)</span> means  tensor contraction, <span class="math notranslate nohighlight">\(\overline{*}\)</span> means
@@ -911,7 +721,7 @@ regularisation filtering</p>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="sgs_tools.sgs.dynamic_coefficient.LillyMinimisation1Model.compute">
-<span class="sig-name descname"><span class="pre">compute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">L</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Mi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_filter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/dynamic_coefficient.html#LillyMinimisation1Model.compute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.dynamic_coefficient.LillyMinimisation1Model.compute" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">compute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">L</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Mi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_filter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/dynamic_coefficient.html#LillyMinimisation1Model.compute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.dynamic_coefficient.LillyMinimisation1Model.compute" title="Link to this definition">¶</a></dt>
 <dd><p>Compute <span class="math notranslate nohighlight">\(\overline{L\cdot M} / \overline{M \cdot M}\)</span>.
 where <span class="math notranslate nohighlight">\(\overline{*}\)</span> means regularisation filtering</p>
 <dl class="field-list simple">
@@ -932,7 +742,7 @@ where <span class="math notranslate nohighlight">\(\overline{*}\)</span> means r
 
 <dl class="py class">
 <dt class="sig sig-object py" id="sgs_tools.sgs.dynamic_coefficient.LillyMinimisation2Model">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">LillyMinimisation2Model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">contraction_dims</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coeff_dim</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/dynamic_coefficient.html#LillyMinimisation2Model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.dynamic_coefficient.LillyMinimisation2Model" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">LillyMinimisation2Model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">contraction_dims</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coeff_dim</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/dynamic_coefficient.html#LillyMinimisation2Model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.dynamic_coefficient.LillyMinimisation2Model" title="Link to this definition">¶</a></dt>
 <dd><p>Lilly Minimisation (least square error) for a 2-coefficient model using
 the Lilly identity as <span class="math notranslate nohighlight">\(L = \sum_i^2 c_i M_i\)</span>.</p>
 <dl class="field-list simple">
@@ -947,7 +757,7 @@ the Lilly identity as <span class="math notranslate nohighlight">\(L = \sum_i^2 
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="sgs_tools.sgs.dynamic_coefficient.LillyMinimisation2Model.compute">
-<span class="sig-name descname"><span class="pre">compute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">L</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Mi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_filter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/dynamic_coefficient.html#LillyMinimisation2Model.compute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.dynamic_coefficient.LillyMinimisation2Model.compute" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">compute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">L</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Mi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_filter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/dynamic_coefficient.html#LillyMinimisation2Model.compute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.dynamic_coefficient.LillyMinimisation2Model.compute" title="Link to this definition">¶</a></dt>
 <dd><p>Compute dynamic coefficients of a 2-component models using Germano identity
 as <span class="math notranslate nohighlight">\(L = C_1 M_1 + C_2 M_2\)</span> using regularized least-square minimisation.
 Inverting the <span class="math notranslate nohighlight">\(\overline{M_i M_j}\)</span> matrix analytically.</p>
@@ -969,7 +779,7 @@ Inverting the <span class="math notranslate nohighlight">\(\overline{M_i M_j}\)<
 
 <dl class="py class">
 <dt class="sig sig-object py" id="sgs_tools.sgs.dynamic_coefficient.LillyMinimisation3Model">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">LillyMinimisation3Model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">contraction_dims</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coeff_dim</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/dynamic_coefficient.html#LillyMinimisation3Model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.dynamic_coefficient.LillyMinimisation3Model" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">LillyMinimisation3Model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">contraction_dims</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coeff_dim</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/dynamic_coefficient.html#LillyMinimisation3Model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.dynamic_coefficient.LillyMinimisation3Model" title="Link to this definition">¶</a></dt>
 <dd><dl class="simple">
 <dt>Lilly Minimisation (least square error) for a 3-coefficient model using</dt><dd><p>the Lilly identity as <span class="math notranslate nohighlight">\(L = \sum_i^3 c_i M_i\)</span>.</p>
 </dd>
@@ -986,7 +796,7 @@ Inverting the <span class="math notranslate nohighlight">\(\overline{M_i M_j}\)<
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="sgs_tools.sgs.dynamic_coefficient.LillyMinimisation3Model.compute">
-<span class="sig-name descname"><span class="pre">compute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">L</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Mi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_filter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/dynamic_coefficient.html#LillyMinimisation3Model.compute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.dynamic_coefficient.LillyMinimisation3Model.compute" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">compute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">L</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Mi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_filter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/dynamic_coefficient.html#LillyMinimisation3Model.compute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.dynamic_coefficient.LillyMinimisation3Model.compute" title="Link to this definition">¶</a></dt>
 <dd><p>Compute dynamic coefficients of a 3-component models using Germano identity
 as <span class="math notranslate nohighlight">\(L = C_1 M_1 + C_2 M_2 + C_3 M_3\)</span> using
 regularized least-square minimisation
@@ -1009,7 +819,7 @@ regularized least-square minimisation
 
 <dl class="py class">
 <dt class="sig sig-object py" id="sgs_tools.sgs.dynamic_coefficient.LillyMinimisationNModel">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">LillyMinimisationNModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">contraction_dims</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coeff_dim</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/dynamic_coefficient.html#LillyMinimisationNModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.dynamic_coefficient.LillyMinimisationNModel" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">LillyMinimisationNModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">contraction_dims</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coeff_dim</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/dynamic_coefficient.html#LillyMinimisationNModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.dynamic_coefficient.LillyMinimisationNModel" title="Link to this definition">¶</a></dt>
 <dd><dl class="simple">
 <dt>Lilly Minimisation (least square error) for an N-coefficient model using</dt><dd><p>the Lilly identity as <span class="math notranslate nohighlight">\(L = \sum_i^N c_i M_i\)</span>.</p>
 </dd>
@@ -1026,7 +836,7 @@ regularized least-square minimisation
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="sgs_tools.sgs.dynamic_coefficient.LillyMinimisationNModel.compute">
-<span class="sig-name descname"><span class="pre">compute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">L</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Mi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_filter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/dynamic_coefficient.html#LillyMinimisationNModel.compute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.dynamic_coefficient.LillyMinimisationNModel.compute" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">compute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">L</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Mi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_filter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/dynamic_coefficient.html#LillyMinimisationNModel.compute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.dynamic_coefficient.LillyMinimisationNModel.compute" title="Link to this definition">¶</a></dt>
 <dd><p>Solve the system
 <span class="math notranslate nohighlight">\(\overline{L \cdot M_i} = \sum_i^N c_j \overline{M_i \cdot M_j}\)</span>
 using np.linalg.SVD, where
@@ -1049,10 +859,10 @@ using np.linalg.SVD, where
 
 </section>
 <section id="module-sgs_tools.sgs.Smagorinsky">
-<span id="sgg-models"></span><h3>SGG models<a class="headerlink" href="#module-sgs_tools.sgs.Smagorinsky" title="Link to this heading">#</a></h3>
+<span id="sgg-models"></span><h3>SGG models<a class="headerlink" href="#module-sgs_tools.sgs.Smagorinsky" title="Link to this heading">¶</a></h3>
 <dl class="py class">
 <dt class="sig sig-object py" id="sgs_tools.sgs.Smagorinsky.SmagorinskyVelocityModel">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">SmagorinskyVelocityModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strain</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tensor_dims</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/Smagorinsky.html#SmagorinskyVelocityModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.Smagorinsky.SmagorinskyVelocityModel" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">SmagorinskyVelocityModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strain</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tensor_dims</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/Smagorinsky.html#SmagorinskyVelocityModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.Smagorinsky.SmagorinskyVelocityModel" title="Link to this definition">¶</a></dt>
 <dd><p>Smagorinsky model for the velocity equation</p>
 <dl class="field-list simple">
 <dt class="field-odd">Variables<span class="colon">:</span></dt>
@@ -1066,7 +876,7 @@ using np.linalg.SVD, where
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="sgs_tools.sgs.Smagorinsky.SmagorinskyVelocityModel.sgs_tensor">
-<span class="sig-name descname"><span class="pre">sgs_tensor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/Smagorinsky.html#SmagorinskyVelocityModel.sgs_tensor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.Smagorinsky.SmagorinskyVelocityModel.sgs_tensor" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">sgs_tensor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/Smagorinsky.html#SmagorinskyVelocityModel.sgs_tensor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.Smagorinsky.SmagorinskyVelocityModel.sgs_tensor" title="Link to this definition">¶</a></dt>
 <dd><dl class="simple">
 <dt>compute model for SGS tensor</dt><dd><p><span class="math notranslate nohighlight">\(\tau = (c_s \Delta) ^2 |\overline{S_{ij}}| \overline{S_{ij}}\)</span>
 for a given <cite>filter</cite> (which can be trivial, i.e. <code class="docutils literal notranslate"><span class="pre">IdentityFilter</span></code>)</p>
@@ -1086,7 +896,7 @@ for a given <cite>filter</cite> (which can be trivial, i.e. <code class="docutil
 
 <dl class="py class">
 <dt class="sig sig-object py" id="sgs_tools.sgs.Smagorinsky.SmagorinskyHeatModel">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">SmagorinskyHeatModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grad_theta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strain</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ctheta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tensor_dims</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/Smagorinsky.html#SmagorinskyHeatModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.Smagorinsky.SmagorinskyHeatModel" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">SmagorinskyHeatModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grad_theta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strain</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ctheta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tensor_dims</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/Smagorinsky.html#SmagorinskyHeatModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.Smagorinsky.SmagorinskyHeatModel" title="Link to this definition">¶</a></dt>
 <dd><p>Smagorinsky model for the Heat equation</p>
 <dl class="field-list simple">
 <dt class="field-odd">Variables<span class="colon">:</span></dt>
@@ -1101,7 +911,7 @@ for a given <cite>filter</cite> (which can be trivial, i.e. <code class="docutil
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="sgs_tools.sgs.Smagorinsky.SmagorinskyHeatModel.sgs_tensor">
-<span class="sig-name descname"><span class="pre">sgs_tensor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/Smagorinsky.html#SmagorinskyHeatModel.sgs_tensor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.Smagorinsky.SmagorinskyHeatModel.sgs_tensor" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">sgs_tensor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/Smagorinsky.html#SmagorinskyHeatModel.sgs_tensor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.Smagorinsky.SmagorinskyHeatModel.sgs_tensor" title="Link to this definition">¶</a></dt>
 <dd><dl class="simple">
 <dt>compute model for SGS tensor</dt><dd><p><span class="math notranslate nohighlight">\(\tau =  c_\theta \Delta^2
 |\overline{S_{ij}}| \overline{\nabla \theta}\)</span>
@@ -1119,7 +929,7 @@ for a given filter (which can be trivial, i.e. IdentityFilter)</p>
 
 <dl class="py class" id="module-sgs_tools.sgs.Kosovic">
 <dt class="sig sig-object py" id="sgs_tools.sgs.Kosovic.SSquaredVelocityModel">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">SSquaredVelocityModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">strain</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tensor_dims</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/Kosovic.html#SSquaredVelocityModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.Kosovic.SSquaredVelocityModel" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">SSquaredVelocityModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">strain</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tensor_dims</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/Kosovic.html#SSquaredVelocityModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.Kosovic.SSquaredVelocityModel" title="Link to this definition">¶</a></dt>
 <dd><p>Kosovic JFM 1997, 336 and Speziale 1991 Ann Rev Fluid Mech 23
 compoment <span class="math notranslate nohighlight">\(\tau =
 (c_s \Delta)^2 \mathrm{Traceless}(\overline{S_{ik}} \overline{S_{kj}})\)</span></p>
@@ -1135,7 +945,7 @@ compoment <span class="math notranslate nohighlight">\(\tau =
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="sgs_tools.sgs.Kosovic.SSquaredVelocityModel.sgs_tensor">
-<span class="sig-name descname"><span class="pre">sgs_tensor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/Kosovic.html#SSquaredVelocityModel.sgs_tensor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.Kosovic.SSquaredVelocityModel.sgs_tensor" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">sgs_tensor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/Kosovic.html#SSquaredVelocityModel.sgs_tensor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.Kosovic.SSquaredVelocityModel.sgs_tensor" title="Link to this definition">¶</a></dt>
 <dd><dl class="simple">
 <dt>compute model for SGS tensor</dt><dd><p><span class="math notranslate nohighlight">\(\tau = (c_s \Delta) ^2 \overline{S_{ik}}\overline{S_{kj}}\)</span>
 for a given <cite>filter</cite> (which can be trivial, i.e. <code class="docutils literal notranslate"><span class="pre">IdentityFilter</span></code>)</p>
@@ -1155,7 +965,7 @@ for a given <cite>filter</cite> (which can be trivial, i.e. <code class="docutil
 
 <dl class="py class">
 <dt class="sig sig-object py" id="sgs_tools.sgs.Kosovic.SOmegaVelocityModel">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">SOmegaVelocityModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">strain</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rot</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tensor_dims</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/Kosovic.html#SOmegaVelocityModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.Kosovic.SOmegaVelocityModel" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">SOmegaVelocityModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">strain</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rot</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tensor_dims</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/Kosovic.html#SOmegaVelocityModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.Kosovic.SOmegaVelocityModel" title="Link to this definition">¶</a></dt>
 <dd><p>Kosovic JFM 1997, 336 / Speziale 1991 Ann Rev Fluid Mech 23
 component <span class="math notranslate nohighlight">\(\tau =
 (c_s \Delta) ^2 \mathrm{Sym}[\overline{S_{ik}}\overline{\Omega_{kj}}]\)</span></p>
@@ -1172,7 +982,7 @@ component <span class="math notranslate nohighlight">\(\tau =
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="sgs_tools.sgs.Kosovic.SOmegaVelocityModel.sgs_tensor">
-<span class="sig-name descname"><span class="pre">sgs_tensor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/Kosovic.html#SOmegaVelocityModel.sgs_tensor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.Kosovic.SOmegaVelocityModel.sgs_tensor" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">sgs_tensor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/Kosovic.html#SOmegaVelocityModel.sgs_tensor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.Kosovic.SOmegaVelocityModel.sgs_tensor" title="Link to this definition">¶</a></dt>
 <dd><dl class="simple">
 <dt>compute model for SGS tensor</dt><dd><p><span class="math notranslate nohighlight">\(\tau =
 (c_s \Delta) ^2 \mathrm{Sym}[\overline{S_{ik}}\overline{\Omega_{kj}}]\)</span>
@@ -1193,7 +1003,7 @@ for a given <cite>filter</cite> (which can be trivial, i.e. <code class="docutil
 
 <dl class="py function">
 <dt class="sig sig-object py" id="sgs_tools.sgs.Kosovic.DynamicKosovicModel">
-<span class="sig-name descname"><span class="pre">DynamicKosovicModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sij</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">omegaij</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">res</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compoment_coeff</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tensor_dims</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">('c1',</span> <span class="pre">'c2')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minimisation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">LillyMinimisation2Model(contraction_dims=['c1',</span> <span class="pre">'c2'],</span> <span class="pre">coeff_dim='cdim')</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/Kosovic.html#DynamicKosovicModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.Kosovic.DynamicKosovicModel" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">DynamicKosovicModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sij</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">omegaij</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">res</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compoment_coeff</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tensor_dims</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">('c1',</span> <span class="pre">'c2')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minimisation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">LillyMinimisation2Model(contraction_dims=['c1',</span> <span class="pre">'c2'],</span> <span class="pre">coeff_dim='cdim')</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/Kosovic.html#DynamicKosovicModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.Kosovic.DynamicKosovicModel" title="Link to this definition">¶</a></dt>
 <dd><p>Dynamic version of the model by
 Carati &amp; Cabot Proceedings of the 1996 Summer Program –
 Center for Turbulence Research</p>
@@ -1221,7 +1031,7 @@ defaults to (“c1”, “c2”)</p></li>
 
 <dl class="py function" id="module-sgs_tools.sgs.CaratiCabot">
 <dt class="sig sig-object py" id="sgs_tools.sgs.CaratiCabot.s_parallel">
-<span class="sig-name descname"><span class="pre">s_parallel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tensor_dims</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/CaratiCabot.html#s_parallel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.CaratiCabot.s_parallel" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">s_parallel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tensor_dims</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/CaratiCabot.html#s_parallel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.CaratiCabot.s_parallel" title="Link to this definition">¶</a></dt>
 <dd><p>Projection of s in the n-direction:
 <span class="math notranslate nohighlight">\(s^{\parallel}=(n_i (s.n)_j + (s.n)_i n_j - \frac{2}{3} \delta_{ij} (n.s.n) )\)</span></p>
 <dl class="field-list simple">
@@ -1233,7 +1043,7 @@ defaults to (“c1”, “c2”)</p></li>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="sgs_tools.sgs.CaratiCabot.s_perpendicular">
-<span class="sig-name descname"><span class="pre">s_perpendicular</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tensor_dims</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/CaratiCabot.html#s_perpendicular"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.CaratiCabot.s_perpendicular" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">s_perpendicular</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tensor_dims</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/CaratiCabot.html#s_perpendicular"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.CaratiCabot.s_perpendicular" title="Link to this definition">¶</a></dt>
 <dd><p>Projection of s perpendicular to the n-direction: <span class="math notranslate nohighlight">\(s - s^{\parallel}\)</span></p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
@@ -1244,7 +1054,7 @@ defaults to (“c1”, “c2”)</p></li>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="sgs_tools.sgs.CaratiCabot.SparallelVelocityModel">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">SparallelVelocityModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">strain</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tensor_dims</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/CaratiCabot.html#SparallelVelocityModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.CaratiCabot.SparallelVelocityModel" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">SparallelVelocityModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">strain</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tensor_dims</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/CaratiCabot.html#SparallelVelocityModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.CaratiCabot.SparallelVelocityModel" title="Link to this definition">¶</a></dt>
 <dd><p>Carati &amp; Cabot Proceedings of the 1996 Summer Program –
 Center for Turbulence Research
 S_parallel component = <span class="math notranslate nohighlight">\(|S| Traceless[Symmetric[(S.n)n]]\)</span></p>
@@ -1262,7 +1072,7 @@ along one of the tensor dimensions</p></li>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="sgs_tools.sgs.CaratiCabot.SparallelVelocityModel.sgs_tensor">
-<span class="sig-name descname"><span class="pre">sgs_tensor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/CaratiCabot.html#SparallelVelocityModel.sgs_tensor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.CaratiCabot.SparallelVelocityModel.sgs_tensor" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">sgs_tensor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/CaratiCabot.html#SparallelVelocityModel.sgs_tensor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.CaratiCabot.SparallelVelocityModel.sgs_tensor" title="Link to this definition">¶</a></dt>
 <dd><dl class="simple">
 <dt>compute model for SGS tensor</dt><dd><p><span class="math notranslate nohighlight">\(\tau = |S| Traceless[Symmetric[(S.n)n]]\)</span></p>
 </dd>
@@ -1281,7 +1091,7 @@ along one of the tensor dimensions</p></li>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="sgs_tools.sgs.CaratiCabot.SperpVelocityModel">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">SperpVelocityModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">strain</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tensor_dims</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/CaratiCabot.html#SperpVelocityModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.CaratiCabot.SperpVelocityModel" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">SperpVelocityModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">strain</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tensor_dims</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/CaratiCabot.html#SperpVelocityModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.CaratiCabot.SperpVelocityModel" title="Link to this definition">¶</a></dt>
 <dd><p>Carati &amp; Cabot Proceedings of the 1996 Summer Program –
 Center for Turbulence Research
 <span class="math notranslate nohighlight">\(S_{\textrm{perp component}} = |S| Traceless(S - (S.n + n.S))\)</span></p>
@@ -1299,7 +1109,7 @@ along one of the tensor dimensions</p></li>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="sgs_tools.sgs.CaratiCabot.SperpVelocityModel.sgs_tensor">
-<span class="sig-name descname"><span class="pre">sgs_tensor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/CaratiCabot.html#SperpVelocityModel.sgs_tensor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.CaratiCabot.SperpVelocityModel.sgs_tensor" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">sgs_tensor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/CaratiCabot.html#SperpVelocityModel.sgs_tensor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.CaratiCabot.SperpVelocityModel.sgs_tensor" title="Link to this definition">¶</a></dt>
 <dd><dl class="simple">
 <dt>compute model for SGS tensor</dt><dd><p><span class="math notranslate nohighlight">\(\tau = |S| Traceless(S - (S.n + n.S))\)</span>
 for a given <cite>filter</cite> (which can be trivial, i.e. <code class="docutils literal notranslate"><span class="pre">IdentityFilter</span></code>)</p>
@@ -1319,7 +1129,7 @@ for a given <cite>filter</cite> (which can be trivial, i.e. <code class="docutil
 
 <dl class="py class">
 <dt class="sig sig-object py" id="sgs_tools.sgs.CaratiCabot.NVelocityModel">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">NVelocityModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">strain</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tensor_dims</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/CaratiCabot.html#NVelocityModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.CaratiCabot.NVelocityModel" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">NVelocityModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">strain</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tensor_dims</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/CaratiCabot.html#NVelocityModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.CaratiCabot.NVelocityModel" title="Link to this definition">¶</a></dt>
 <dd><p>Carati &amp; Cabot Proceedings of the 1996 Summer Program –
 Center for Turbulence Research
 <span class="math notranslate nohighlight">\(N component = |S|(n.s.n) Traceless(n * n)\)</span></p>
@@ -1337,7 +1147,7 @@ along one of the tensor dimensions</p></li>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="sgs_tools.sgs.CaratiCabot.NVelocityModel.sgs_tensor">
-<span class="sig-name descname"><span class="pre">sgs_tensor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/CaratiCabot.html#NVelocityModel.sgs_tensor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.CaratiCabot.NVelocityModel.sgs_tensor" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">sgs_tensor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/CaratiCabot.html#NVelocityModel.sgs_tensor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.CaratiCabot.NVelocityModel.sgs_tensor" title="Link to this definition">¶</a></dt>
 <dd><dl class="simple">
 <dt>compute model for SGS tensor</dt><dd><p><span class="math notranslate nohighlight">\(\tau = (c_s \Delta) ^2 |\overline{S_{ij}}| \overline{S_{ik} N_{kj}}\)</span>
 for a given <cite>filter</cite> (which can be trivial, i.e. <code class="docutils literal notranslate"><span class="pre">IdentityFilter</span></code>)</p>
@@ -1357,7 +1167,7 @@ for a given <cite>filter</cite> (which can be trivial, i.e. <code class="docutil
 
 <dl class="py function">
 <dt class="sig sig-object py" id="sgs_tools.sgs.CaratiCabot.DynamicCaratiCabotModel">
-<span class="sig-name descname"><span class="pre">DynamicCaratiCabotModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sij</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">res</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compoment_coeff</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tensor_dims</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">('c1',</span> <span class="pre">'c2')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minimisation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">LillyMinimisation3Model(contraction_dims=['c1',</span> <span class="pre">'c2'],</span> <span class="pre">coeff_dim='cdim')</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/CaratiCabot.html#DynamicCaratiCabotModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.CaratiCabot.DynamicCaratiCabotModel" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">DynamicCaratiCabotModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sij</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">res</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compoment_coeff</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tensor_dims</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">('c1',</span> <span class="pre">'c2')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minimisation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">LillyMinimisation3Model(contraction_dims=['c1',</span> <span class="pre">'c2'],</span> <span class="pre">coeff_dim='cdim')</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/CaratiCabot.html#DynamicCaratiCabotModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.CaratiCabot.DynamicCaratiCabotModel" title="Link to this definition">¶</a></dt>
 <dd><dl class="simple">
 <dt>Dynamic version of the model by</dt><dd><p>Carati &amp; Cabot Proceedings of the 1996 Summer Program –
 Center for Turbulence Research</p>
@@ -1390,231 +1200,190 @@ defaults to (“c1”, “c2”)</p></li>
 </section>
 </section>
 
-
-                </article>
-              
-              
-              
-              
-              
-                <footer class="prev-next-footer d-print-none">
-                  
-<div class="prev-next-area">
-    <a class="left-prev"
-       href="physics.html"
-       title="previous page">
-      <i class="fa-solid fa-angle-left"></i>
-      <div class="prev-next-info">
-        <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Physical Fields</p>
+        </article>
       </div>
-    </a>
-    <a class="right-next"
-       href="diagnostics.html"
-       title="next page">
-      <div class="prev-next-info">
-        <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Diagnostics</p>
-      </div>
-      <i class="fa-solid fa-angle-right"></i>
-    </a>
-</div>
-                </footer>
-              
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="diagnostics.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Diagnostics</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="physics.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Physical Fields</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2024, the HiFi project
             </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
             
-            
-              
-                <dialog id="pst-secondary-sidebar-modal"></dialog>
-                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
-
-
-  <div class="sidebar-secondary-item">
-<div
-    id="pst-page-navigation-heading-2"
-    class="page-toc tocsection onthispage">
-    <i class="fa-solid fa-list"></i> On this page
-  </div>
-  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
-    <ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sgs</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#module-sgs_tools.sgs.filter">Filtering</a><ul class="nav section-nav flex-column">
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.sgs.filter.weight_gauss_3d"><code class="docutils literal notranslate"><span class="pre">weight_gauss_3d</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.sgs.filter.weight_gauss_5d"><code class="docutils literal notranslate"><span class="pre">weight_gauss_5d</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.sgs.filter.box_kernel"><code class="docutils literal notranslate"><span class="pre">box_kernel()</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.sgs.filter.Filter"><code class="docutils literal notranslate"><span class="pre">Filter</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.sgs.filter.Filter.kernel"><code class="docutils literal notranslate"><span class="pre">Filter.kernel</span></code></a></li>
-<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.sgs.filter.Filter.filter_dims"><code class="docutils literal notranslate"><span class="pre">Filter.filter_dims</span></code></a></li>
-<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.sgs.filter.Filter.scales"><code class="docutils literal notranslate"><span class="pre">Filter.scales()</span></code></a></li>
-<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.sgs.filter.Filter.scale"><code class="docutils literal notranslate"><span class="pre">Filter.scale()</span></code></a></li>
-<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.sgs.filter.Filter.window"><code class="docutils literal notranslate"><span class="pre">Filter.window</span></code></a></li>
-<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.sgs.filter.Filter.with_dims"><code class="docutils literal notranslate"><span class="pre">Filter.with_dims()</span></code></a></li>
-<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.sgs.filter.Filter.filter"><code class="docutils literal notranslate"><span class="pre">Filter.filter()</span></code></a></li>
-</ul>
-</li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.sgs.filter.IdentityFilter"><code class="docutils literal notranslate"><span class="pre">IdentityFilter</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.sgs.filter.IdentityFilter.filter"><code class="docutils literal notranslate"><span class="pre">IdentityFilter.filter()</span></code></a></li>
-</ul>
-</li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.sgs.coarse_grain.CoarseGrain"><code class="docutils literal notranslate"><span class="pre">CoarseGrain</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.sgs.coarse_grain.CoarseGrain.filter"><code class="docutils literal notranslate"><span class="pre">CoarseGrain.filter()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#module-sgs_tools.sgs.sgs_model">SGS Model Core</a><ul class="nav section-nav flex-column">
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.sgs.sgs_model.SGSModel"><code class="docutils literal notranslate"><span class="pre">SGSModel</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.sgs.sgs_model.SGSModel.sgs_tensor"><code class="docutils literal notranslate"><span class="pre">SGSModel.sgs_tensor()</span></code></a></li>
-</ul>
-</li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.sgs.sgs_model.LinCombSGSModel"><code class="docutils literal notranslate"><span class="pre">LinCombSGSModel</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.sgs.dynamic_sgs_model.LeonardTensor"><code class="docutils literal notranslate"><span class="pre">LeonardTensor</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.sgs.dynamic_sgs_model.LeonardVelocityTensor"><code class="docutils literal notranslate"><span class="pre">LeonardVelocityTensor</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.sgs.dynamic_sgs_model.LeonardVelocityTensor.compute"><code class="docutils literal notranslate"><span class="pre">LeonardVelocityTensor.compute()</span></code></a></li>
-</ul>
-</li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.sgs.dynamic_sgs_model.LeonardThetaTensor"><code class="docutils literal notranslate"><span class="pre">LeonardThetaTensor</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.sgs.dynamic_sgs_model.LeonardThetaTensor.compute"><code class="docutils literal notranslate"><span class="pre">LeonardThetaTensor.compute()</span></code></a></li>
-</ul>
-</li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.sgs.dynamic_sgs_model.M_Germano_tensor"><code class="docutils literal notranslate"><span class="pre">M_Germano_tensor()</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.sgs.dynamic_sgs_model.DynamicModelProtcol"><code class="docutils literal notranslate"><span class="pre">DynamicModelProtcol</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.sgs.dynamic_sgs_model.DynamicModel"><code class="docutils literal notranslate"><span class="pre">DynamicModel</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.sgs.dynamic_sgs_model.DynamicModel.compute_coeff"><code class="docutils literal notranslate"><span class="pre">DynamicModel.compute_coeff()</span></code></a></li>
-<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.sgs.dynamic_sgs_model.DynamicModel.sgs_tensor"><code class="docutils literal notranslate"><span class="pre">DynamicModel.sgs_tensor()</span></code></a></li>
-</ul>
-</li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.sgs.dynamic_sgs_model.LinCombDynamicModel"><code class="docutils literal notranslate"><span class="pre">LinCombDynamicModel</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.sgs.dynamic_sgs_model.LinCombDynamicModel.compute_coeff"><code class="docutils literal notranslate"><span class="pre">LinCombDynamicModel.compute_coeff()</span></code></a></li>
-<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.sgs.dynamic_sgs_model.LinCombDynamicModel.sgs_tensor"><code class="docutils literal notranslate"><span class="pre">LinCombDynamicModel.sgs_tensor()</span></code></a></li>
-</ul>
-</li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.sgs.dynamic_coefficient.Minimisation"><code class="docutils literal notranslate"><span class="pre">Minimisation</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.sgs.dynamic_coefficient.Minimisation.compute"><code class="docutils literal notranslate"><span class="pre">Minimisation.compute()</span></code></a></li>
-</ul>
-</li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.sgs.dynamic_coefficient.LillyMinimisation1Model"><code class="docutils literal notranslate"><span class="pre">LillyMinimisation1Model</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.sgs.dynamic_coefficient.LillyMinimisation1Model.compute"><code class="docutils literal notranslate"><span class="pre">LillyMinimisation1Model.compute()</span></code></a></li>
-</ul>
-</li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.sgs.dynamic_coefficient.LillyMinimisation2Model"><code class="docutils literal notranslate"><span class="pre">LillyMinimisation2Model</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.sgs.dynamic_coefficient.LillyMinimisation2Model.compute"><code class="docutils literal notranslate"><span class="pre">LillyMinimisation2Model.compute()</span></code></a></li>
-</ul>
-</li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.sgs.dynamic_coefficient.LillyMinimisation3Model"><code class="docutils literal notranslate"><span class="pre">LillyMinimisation3Model</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.sgs.dynamic_coefficient.LillyMinimisation3Model.compute"><code class="docutils literal notranslate"><span class="pre">LillyMinimisation3Model.compute()</span></code></a></li>
-</ul>
-</li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.sgs.dynamic_coefficient.LillyMinimisationNModel"><code class="docutils literal notranslate"><span class="pre">LillyMinimisationNModel</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.sgs.dynamic_coefficient.LillyMinimisationNModel.compute"><code class="docutils literal notranslate"><span class="pre">LillyMinimisationNModel.compute()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#module-sgs_tools.sgs.Smagorinsky">SGG models</a><ul class="nav section-nav flex-column">
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.sgs.Smagorinsky.SmagorinskyVelocityModel"><code class="docutils literal notranslate"><span class="pre">SmagorinskyVelocityModel</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.sgs.Smagorinsky.SmagorinskyVelocityModel.sgs_tensor"><code class="docutils literal notranslate"><span class="pre">SmagorinskyVelocityModel.sgs_tensor()</span></code></a></li>
-</ul>
-</li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.sgs.Smagorinsky.SmagorinskyHeatModel"><code class="docutils literal notranslate"><span class="pre">SmagorinskyHeatModel</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.sgs.Smagorinsky.SmagorinskyHeatModel.sgs_tensor"><code class="docutils literal notranslate"><span class="pre">SmagorinskyHeatModel.sgs_tensor()</span></code></a></li>
-</ul>
-</li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.sgs.Kosovic.SSquaredVelocityModel"><code class="docutils literal notranslate"><span class="pre">SSquaredVelocityModel</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.sgs.Kosovic.SSquaredVelocityModel.sgs_tensor"><code class="docutils literal notranslate"><span class="pre">SSquaredVelocityModel.sgs_tensor()</span></code></a></li>
-</ul>
-</li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.sgs.Kosovic.SOmegaVelocityModel"><code class="docutils literal notranslate"><span class="pre">SOmegaVelocityModel</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.sgs.Kosovic.SOmegaVelocityModel.sgs_tensor"><code class="docutils literal notranslate"><span class="pre">SOmegaVelocityModel.sgs_tensor()</span></code></a></li>
-</ul>
-</li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.sgs.Kosovic.DynamicKosovicModel"><code class="docutils literal notranslate"><span class="pre">DynamicKosovicModel()</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.sgs.CaratiCabot.s_parallel"><code class="docutils literal notranslate"><span class="pre">s_parallel()</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.sgs.CaratiCabot.s_perpendicular"><code class="docutils literal notranslate"><span class="pre">s_perpendicular()</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.sgs.CaratiCabot.SparallelVelocityModel"><code class="docutils literal notranslate"><span class="pre">SparallelVelocityModel</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.sgs.CaratiCabot.SparallelVelocityModel.sgs_tensor"><code class="docutils literal notranslate"><span class="pre">SparallelVelocityModel.sgs_tensor()</span></code></a></li>
-</ul>
-</li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.sgs.CaratiCabot.SperpVelocityModel"><code class="docutils literal notranslate"><span class="pre">SperpVelocityModel</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.sgs.CaratiCabot.SperpVelocityModel.sgs_tensor"><code class="docutils literal notranslate"><span class="pre">SperpVelocityModel.sgs_tensor()</span></code></a></li>
-</ul>
-</li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.sgs.CaratiCabot.NVelocityModel"><code class="docutils literal notranslate"><span class="pre">NVelocityModel</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.sgs.CaratiCabot.NVelocityModel.sgs_tensor"><code class="docutils literal notranslate"><span class="pre">NVelocityModel.sgs_tensor()</span></code></a></li>
-</ul>
-</li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#sgs_tools.sgs.CaratiCabot.DynamicCaratiCabotModel"><code class="docutils literal notranslate"><span class="pre">DynamicCaratiCabotModel()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-  </nav></div>
-
-  <div class="sidebar-secondary-item">
-
-  <div class="tocsection sourcelink">
-    <a href="_sources/sgs.rst.txt">
-      <i class="fa-solid fa-file-lines"></i> Show Source
-    </a>
-  </div>
-</div>
-
-</div></div>
-              
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
             
           </div>
-          <footer class="bd-footer-content">
+          <div class="right-details">
             
-          </footer>
+          </div>
+        </div>
         
-      </main>
+      </footer>
     </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Sub-grid scales</a><ul>
+<li><a class="reference internal" href="#sgs"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sgs</span></code></a><ul>
+<li><a class="reference internal" href="#module-sgs_tools.sgs.filter">Filtering</a><ul>
+<li><a class="reference internal" href="#sgs_tools.sgs.filter.weight_gauss_3d"><code class="docutils literal notranslate"><span class="pre">weight_gauss_3d</span></code></a></li>
+<li><a class="reference internal" href="#sgs_tools.sgs.filter.weight_gauss_5d"><code class="docutils literal notranslate"><span class="pre">weight_gauss_5d</span></code></a></li>
+<li><a class="reference internal" href="#sgs_tools.sgs.filter.box_kernel"><code class="docutils literal notranslate"><span class="pre">box_kernel()</span></code></a></li>
+<li><a class="reference internal" href="#sgs_tools.sgs.filter.Filter"><code class="docutils literal notranslate"><span class="pre">Filter</span></code></a><ul>
+<li><a class="reference internal" href="#sgs_tools.sgs.filter.Filter.kernel"><code class="docutils literal notranslate"><span class="pre">Filter.kernel</span></code></a></li>
+<li><a class="reference internal" href="#sgs_tools.sgs.filter.Filter.filter_dims"><code class="docutils literal notranslate"><span class="pre">Filter.filter_dims</span></code></a></li>
+<li><a class="reference internal" href="#sgs_tools.sgs.filter.Filter.scales"><code class="docutils literal notranslate"><span class="pre">Filter.scales()</span></code></a></li>
+<li><a class="reference internal" href="#sgs_tools.sgs.filter.Filter.scale"><code class="docutils literal notranslate"><span class="pre">Filter.scale()</span></code></a></li>
+<li><a class="reference internal" href="#sgs_tools.sgs.filter.Filter.window"><code class="docutils literal notranslate"><span class="pre">Filter.window</span></code></a></li>
+<li><a class="reference internal" href="#sgs_tools.sgs.filter.Filter.with_dims"><code class="docutils literal notranslate"><span class="pre">Filter.with_dims()</span></code></a></li>
+<li><a class="reference internal" href="#sgs_tools.sgs.filter.Filter.filter"><code class="docutils literal notranslate"><span class="pre">Filter.filter()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#sgs_tools.sgs.filter.IdentityFilter"><code class="docutils literal notranslate"><span class="pre">IdentityFilter</span></code></a><ul>
+<li><a class="reference internal" href="#sgs_tools.sgs.filter.IdentityFilter.filter"><code class="docutils literal notranslate"><span class="pre">IdentityFilter.filter()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#sgs_tools.sgs.coarse_grain.CoarseGrain"><code class="docutils literal notranslate"><span class="pre">CoarseGrain</span></code></a><ul>
+<li><a class="reference internal" href="#sgs_tools.sgs.coarse_grain.CoarseGrain.filter"><code class="docutils literal notranslate"><span class="pre">CoarseGrain.filter()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-sgs_tools.sgs.sgs_model">SGS Model Core</a><ul>
+<li><a class="reference internal" href="#sgs_tools.sgs.sgs_model.SGSModel"><code class="docutils literal notranslate"><span class="pre">SGSModel</span></code></a><ul>
+<li><a class="reference internal" href="#sgs_tools.sgs.sgs_model.SGSModel.sgs_tensor"><code class="docutils literal notranslate"><span class="pre">SGSModel.sgs_tensor()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#sgs_tools.sgs.sgs_model.LinCombSGSModel"><code class="docutils literal notranslate"><span class="pre">LinCombSGSModel</span></code></a></li>
+<li><a class="reference internal" href="#sgs_tools.sgs.dynamic_sgs_model.LeonardTensor"><code class="docutils literal notranslate"><span class="pre">LeonardTensor</span></code></a></li>
+<li><a class="reference internal" href="#sgs_tools.sgs.dynamic_sgs_model.LeonardVelocityTensor"><code class="docutils literal notranslate"><span class="pre">LeonardVelocityTensor</span></code></a><ul>
+<li><a class="reference internal" href="#sgs_tools.sgs.dynamic_sgs_model.LeonardVelocityTensor.compute"><code class="docutils literal notranslate"><span class="pre">LeonardVelocityTensor.compute()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#sgs_tools.sgs.dynamic_sgs_model.LeonardThetaTensor"><code class="docutils literal notranslate"><span class="pre">LeonardThetaTensor</span></code></a><ul>
+<li><a class="reference internal" href="#sgs_tools.sgs.dynamic_sgs_model.LeonardThetaTensor.compute"><code class="docutils literal notranslate"><span class="pre">LeonardThetaTensor.compute()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#sgs_tools.sgs.dynamic_sgs_model.M_Germano_tensor"><code class="docutils literal notranslate"><span class="pre">M_Germano_tensor()</span></code></a></li>
+<li><a class="reference internal" href="#sgs_tools.sgs.dynamic_sgs_model.DynamicModelProtcol"><code class="docutils literal notranslate"><span class="pre">DynamicModelProtcol</span></code></a></li>
+<li><a class="reference internal" href="#sgs_tools.sgs.dynamic_sgs_model.DynamicModel"><code class="docutils literal notranslate"><span class="pre">DynamicModel</span></code></a><ul>
+<li><a class="reference internal" href="#sgs_tools.sgs.dynamic_sgs_model.DynamicModel.compute_coeff"><code class="docutils literal notranslate"><span class="pre">DynamicModel.compute_coeff()</span></code></a></li>
+<li><a class="reference internal" href="#sgs_tools.sgs.dynamic_sgs_model.DynamicModel.sgs_tensor"><code class="docutils literal notranslate"><span class="pre">DynamicModel.sgs_tensor()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#sgs_tools.sgs.dynamic_sgs_model.LinCombDynamicModel"><code class="docutils literal notranslate"><span class="pre">LinCombDynamicModel</span></code></a><ul>
+<li><a class="reference internal" href="#sgs_tools.sgs.dynamic_sgs_model.LinCombDynamicModel.compute_coeff"><code class="docutils literal notranslate"><span class="pre">LinCombDynamicModel.compute_coeff()</span></code></a></li>
+<li><a class="reference internal" href="#sgs_tools.sgs.dynamic_sgs_model.LinCombDynamicModel.sgs_tensor"><code class="docutils literal notranslate"><span class="pre">LinCombDynamicModel.sgs_tensor()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#sgs_tools.sgs.dynamic_coefficient.Minimisation"><code class="docutils literal notranslate"><span class="pre">Minimisation</span></code></a><ul>
+<li><a class="reference internal" href="#sgs_tools.sgs.dynamic_coefficient.Minimisation.compute"><code class="docutils literal notranslate"><span class="pre">Minimisation.compute()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#sgs_tools.sgs.dynamic_coefficient.LillyMinimisation1Model"><code class="docutils literal notranslate"><span class="pre">LillyMinimisation1Model</span></code></a><ul>
+<li><a class="reference internal" href="#sgs_tools.sgs.dynamic_coefficient.LillyMinimisation1Model.compute"><code class="docutils literal notranslate"><span class="pre">LillyMinimisation1Model.compute()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#sgs_tools.sgs.dynamic_coefficient.LillyMinimisation2Model"><code class="docutils literal notranslate"><span class="pre">LillyMinimisation2Model</span></code></a><ul>
+<li><a class="reference internal" href="#sgs_tools.sgs.dynamic_coefficient.LillyMinimisation2Model.compute"><code class="docutils literal notranslate"><span class="pre">LillyMinimisation2Model.compute()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#sgs_tools.sgs.dynamic_coefficient.LillyMinimisation3Model"><code class="docutils literal notranslate"><span class="pre">LillyMinimisation3Model</span></code></a><ul>
+<li><a class="reference internal" href="#sgs_tools.sgs.dynamic_coefficient.LillyMinimisation3Model.compute"><code class="docutils literal notranslate"><span class="pre">LillyMinimisation3Model.compute()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#sgs_tools.sgs.dynamic_coefficient.LillyMinimisationNModel"><code class="docutils literal notranslate"><span class="pre">LillyMinimisationNModel</span></code></a><ul>
+<li><a class="reference internal" href="#sgs_tools.sgs.dynamic_coefficient.LillyMinimisationNModel.compute"><code class="docutils literal notranslate"><span class="pre">LillyMinimisationNModel.compute()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-sgs_tools.sgs.Smagorinsky">SGG models</a><ul>
+<li><a class="reference internal" href="#sgs_tools.sgs.Smagorinsky.SmagorinskyVelocityModel"><code class="docutils literal notranslate"><span class="pre">SmagorinskyVelocityModel</span></code></a><ul>
+<li><a class="reference internal" href="#sgs_tools.sgs.Smagorinsky.SmagorinskyVelocityModel.sgs_tensor"><code class="docutils literal notranslate"><span class="pre">SmagorinskyVelocityModel.sgs_tensor()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#sgs_tools.sgs.Smagorinsky.SmagorinskyHeatModel"><code class="docutils literal notranslate"><span class="pre">SmagorinskyHeatModel</span></code></a><ul>
+<li><a class="reference internal" href="#sgs_tools.sgs.Smagorinsky.SmagorinskyHeatModel.sgs_tensor"><code class="docutils literal notranslate"><span class="pre">SmagorinskyHeatModel.sgs_tensor()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#sgs_tools.sgs.Kosovic.SSquaredVelocityModel"><code class="docutils literal notranslate"><span class="pre">SSquaredVelocityModel</span></code></a><ul>
+<li><a class="reference internal" href="#sgs_tools.sgs.Kosovic.SSquaredVelocityModel.sgs_tensor"><code class="docutils literal notranslate"><span class="pre">SSquaredVelocityModel.sgs_tensor()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#sgs_tools.sgs.Kosovic.SOmegaVelocityModel"><code class="docutils literal notranslate"><span class="pre">SOmegaVelocityModel</span></code></a><ul>
+<li><a class="reference internal" href="#sgs_tools.sgs.Kosovic.SOmegaVelocityModel.sgs_tensor"><code class="docutils literal notranslate"><span class="pre">SOmegaVelocityModel.sgs_tensor()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#sgs_tools.sgs.Kosovic.DynamicKosovicModel"><code class="docutils literal notranslate"><span class="pre">DynamicKosovicModel()</span></code></a></li>
+<li><a class="reference internal" href="#sgs_tools.sgs.CaratiCabot.s_parallel"><code class="docutils literal notranslate"><span class="pre">s_parallel()</span></code></a></li>
+<li><a class="reference internal" href="#sgs_tools.sgs.CaratiCabot.s_perpendicular"><code class="docutils literal notranslate"><span class="pre">s_perpendicular()</span></code></a></li>
+<li><a class="reference internal" href="#sgs_tools.sgs.CaratiCabot.SparallelVelocityModel"><code class="docutils literal notranslate"><span class="pre">SparallelVelocityModel</span></code></a><ul>
+<li><a class="reference internal" href="#sgs_tools.sgs.CaratiCabot.SparallelVelocityModel.sgs_tensor"><code class="docutils literal notranslate"><span class="pre">SparallelVelocityModel.sgs_tensor()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#sgs_tools.sgs.CaratiCabot.SperpVelocityModel"><code class="docutils literal notranslate"><span class="pre">SperpVelocityModel</span></code></a><ul>
+<li><a class="reference internal" href="#sgs_tools.sgs.CaratiCabot.SperpVelocityModel.sgs_tensor"><code class="docutils literal notranslate"><span class="pre">SperpVelocityModel.sgs_tensor()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#sgs_tools.sgs.CaratiCabot.NVelocityModel"><code class="docutils literal notranslate"><span class="pre">NVelocityModel</span></code></a><ul>
+<li><a class="reference internal" href="#sgs_tools.sgs.CaratiCabot.NVelocityModel.sgs_tensor"><code class="docutils literal notranslate"><span class="pre">NVelocityModel.sgs_tensor()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#sgs_tools.sgs.CaratiCabot.DynamicCaratiCabotModel"><code class="docutils literal notranslate"><span class="pre">DynamicCaratiCabotModel()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
   </div>
-  
-  <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb"></script>
-<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb"></script>
-
-  <footer class="bd-footer">
-<div class="bd-footer__inner bd-page-width">
-  
-    <div class="footer-items__start">
-      
-        <div class="footer-item">
-
-  <p class="copyright">
-    
-      © Copyright 2024, the HiFi project.
-      <br/>
-    
-  </p>
-</div>
-      
-        <div class="footer-item">
-
-  <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.0.4.
-    <br/>
-  </p>
-</div>
-      
-    </div>
-  
-  
-  
-    <div class="footer-items__end">
-      
-        <div class="footer-item">
-<p class="theme-version">
-  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.17.1.
-</p></div>
-      
-    </div>
-  
-</div>
-
-  </footer>
-  </body>
+</div><script src="_static/documentation_options.js?v=8a448e45"></script>
+    <script src="_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="_static/scripts/furo.js?v=46bd48cc"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+    </body>
 </html>

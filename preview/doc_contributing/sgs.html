@@ -1,0 +1,1389 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="./">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html"><link rel="next" title="Diagnostics" href="diagnostics.html"><link rel="prev" title="Physical Fields" href="physics.html">
+
+    <!-- Generated with Sphinx 9.0.4 and Furo 2025.12.19 -->
+        <title>Sub-grid scales - SGS_toolsv0.0.0</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx_argparse_cli.css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=8dab3a3b" />
+    <link rel="stylesheet" type="text/css" href="_static/custom.css?v=d74f5c2e" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="index.html"><div class="brand">SGS_tools<span class='version-label'>v0.0.0</span></div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
+  
+  <span class="sidebar-brand-text">SGS_tools<span class='version-label'>v0.0.0</span></span>
+  
+</a><form class="sidebar-search-container" method="get" action="search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="index.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="devlog.html">Development</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="io.html">IO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="physics.html">Physical Fields</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Sub-grid scales</a></li>
+<li class="toctree-l1"><a class="reference internal" href="diagnostics.html">Diagnostics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="simple_flow.html">Simple Flow Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="scripts.html">Scripts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plotting.html">Plotting</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="_sources/sgs.rst.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="sub-grid-scales">
+<h1>Sub-grid scales<a class="headerlink" href="#sub-grid-scales" title="Link to this heading">¶</a></h1>
+<section id="sgs">
+<h2><a class="reference internal" href="io.html#module-sgs_tools.io.sgs" title="sgs_tools.io.sgs"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sgs</span></code></a><a class="headerlink" href="#sgs" title="Link to this heading">¶</a></h2>
+<section id="module-sgs_tools.sgs.filter">
+<span id="filtering"></span><h3>Filtering<a class="headerlink" href="#module-sgs_tools.sgs.filter" title="Link to this heading">¶</a></h3>
+<dl class="py data">
+<dt class="sig sig-object py" id="sgs_tools.sgs.filter.weight_gauss_3d">
+<span class="sig-name descname"><span class="pre">weight_gauss_3d</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;xarray.DataArray</span> <span class="pre">'truediv-049dc5ac3a49cba1205f46208d5623e9'</span> <span class="pre">(w1:</span> <span class="pre">3,</span> <span class="pre">w2:</span> <span class="pre">3)&gt;</span> <span class="pre">Size:</span> <span class="pre">72B</span> <span class="pre">dask.array&lt;truediv,</span> <span class="pre">shape=(3,</span> <span class="pre">3),</span> <span class="pre">dtype=float64,</span> <span class="pre">chunksize=(3,</span> <span class="pre">3),</span> <span class="pre">chunktype=numpy.ndarray&gt;</span> <span class="pre">Dimensions</span> <span class="pre">without</span> <span class="pre">coordinates:</span> <span class="pre">w1,</span> <span class="pre">w2</span></span><a class="headerlink" href="#sgs_tools.sgs.filter.weight_gauss_3d" title="Link to this definition">¶</a></dt>
+<dd><p>3x3 2d Gaussian filter – binomial approximation</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="sgs_tools.sgs.filter.weight_gauss_5d">
+<span class="sig-name descname"><span class="pre">weight_gauss_5d</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;xarray.DataArray</span> <span class="pre">'array-3ff26ea89580fcbc973ad0755922e2c1'</span> <span class="pre">(w1:</span> <span class="pre">5,</span> <span class="pre">w2:</span> <span class="pre">5)&gt;</span> <span class="pre">Size:</span> <span class="pre">200B</span> <span class="pre">dask.array&lt;truediv,</span> <span class="pre">shape=(5,</span> <span class="pre">5),</span> <span class="pre">dtype=float64,</span> <span class="pre">chunksize=(5,</span> <span class="pre">5),</span> <span class="pre">chunktype=numpy.ndarray&gt;</span> <span class="pre">Dimensions</span> <span class="pre">without</span> <span class="pre">coordinates:</span> <span class="pre">w1,</span> <span class="pre">w2</span></span><a class="headerlink" href="#sgs_tools.sgs.filter.weight_gauss_5d" title="Link to this definition">¶</a></dt>
+<dd><p>5x5 2d Gaussian filter – binomial approximation</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sgs_tools.sgs.filter.box_kernel">
+<span class="sig-name descname"><span class="pre">box_kernel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shape</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/filter.html#box_kernel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.filter.box_kernel" title="Link to this definition">¶</a></dt>
+<dd><p>returns a normalized box kernel with given shape</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>shape</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]</span>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the kernel array with dimesions <code class="docutils literal notranslate"><span class="pre">w1</span></code>, <code class="docutils literal notranslate"><span class="pre">w2</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="sgs_tools.sgs.filter.Filter">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">Filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kernel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_dims</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/filter.html#Filter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.filter.Filter" title="Link to this definition">¶</a></dt>
+<dd><p>Basic filter class with kernel along dimensions
+the dimensions of kernel and filter_dims are matched one-to-one as given</p>
+<dl class="field-list simple">
+<dt class="field-odd">Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>kernel</strong> – filter kernel</p></li>
+<li><p><strong>filter_dims</strong> – dimensions along which to perform filtering;
+will be paired with dimensions of the kernel.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="sgs_tools.sgs.filter.Filter.kernel">
+<span class="sig-name descname"><span class="pre">kernel</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">DataArray</span></span><a class="headerlink" href="#sgs_tools.sgs.filter.Filter.kernel" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="sgs_tools.sgs.filter.Filter.filter_dims">
+<span class="sig-name descname"><span class="pre">filter_dims</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">Hashable</span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#sgs_tools.sgs.filter.Filter.filter_dims" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sgs_tools.sgs.filter.Filter.scales">
+<span class="sig-name descname"><span class="pre">scales</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/filter.html#Filter.scales"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.filter.Filter.scales" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">...</span></code>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sgs_tools.sgs.filter.Filter.scale">
+<span class="sig-name descname"><span class="pre">scale</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/filter.html#Filter.scale"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.filter.Filter.scale" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sgs_tools.sgs.filter.Filter.window">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">window</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">Hashable</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#sgs_tools.sgs.filter.Filter.window" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sgs_tools.sgs.filter.Filter.with_dims">
+<span class="sig-name descname"><span class="pre">with_dims</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dims</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/filter.html#Filter.with_dims"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.filter.Filter.with_dims" title="Link to this definition">¶</a></dt>
+<dd><p>return a new filter with same kernel and updated filter_dims</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>dims</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Hashable</span></code>]</span>) – new dimensions; must be the same length as the original ones.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sgs_tools.sgs.filter.Filter.filter">
+<span class="sig-name descname"><span class="pre">filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">field</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/filter.html#Filter.filter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.filter.Filter.filter" title="Link to this definition">¶</a></dt>
+<dd><p>filterer field</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>field</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code></span>) – array to be filtered; must contain all of <cite>filter_dims</cite></p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="sgs_tools.sgs.filter.IdentityFilter">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">IdentityFilter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kernel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_dims</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/filter.html#IdentityFilter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.filter.IdentityFilter" title="Link to this definition">¶</a></dt>
+<dd><p>identity filter</p>
+<dl class="field-list simple">
+<dt class="field-odd">Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>kernel</strong> – filter kernel will be ignored</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="sgs_tools.sgs.filter.IdentityFilter.filter">
+<span class="sig-name descname"><span class="pre">filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">field</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/filter.html#IdentityFilter.filter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.filter.IdentityFilter.filter" title="Link to this definition">¶</a></dt>
+<dd><p>returns original field</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>field</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code></span>) – array to be filtered</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class" id="module-sgs_tools.sgs.coarse_grain">
+<dt class="sig sig-object py" id="sgs_tools.sgs.coarse_grain.CoarseGrain">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">CoarseGrain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">window</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'exact'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/coarse_grain.html#CoarseGrain"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.coarse_grain.CoarseGrain" title="Link to this definition">¶</a></dt>
+<dd><p>Coarse-graining filter class with kernel along dimensions
+the dimensions of kernel and filter_dims are matched one-to-one as given</p>
+<dl class="field-list simple">
+<dt class="field-odd">Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>window</strong> – {dimension_name: number of grid points to average over}</p></li>
+<li><p><strong>bdry_cnd</strong> – boundary conditions: support the same as xr.coarsen,
+notably ‘trim’ and ‘exact’</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="sgs_tools.sgs.coarse_grain.CoarseGrain.filter">
+<span class="sig-name descname"><span class="pre">filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">field</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/coarse_grain.html#CoarseGrain.filter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.coarse_grain.CoarseGrain.filter" title="Link to this definition">¶</a></dt>
+<dd><p>coarse grain <cite>field</cite>;
+Note: unlike Filter.filter, here the output size is different
+from the input size</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>field</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code></span>) – array to be filtered; must contain all of <cite>filter_dims</cite></p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-sgs_tools.sgs.sgs_model">
+<span id="sgs-model-core"></span><h3>SGS Model Core<a class="headerlink" href="#module-sgs_tools.sgs.sgs_model" title="Link to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="sgs_tools.sgs.sgs_model.SGSModel">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">SGSModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/sgs_model.html#SGSModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.sgs_model.SGSModel" title="Link to this definition">¶</a></dt>
+<dd><p>Base subgrid-scale (SGS) model class</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#sgs_tools.sgs.sgs_model.SGSModel.sgs_tensor" title="sgs_tools.sgs.sgs_model.SGSModel.sgs_tensor"><code class="xref py py-meth docutils literal notranslate"><span class="pre">sgs_tensor()</span></code></a>: returns the SGS tensor for a given filter</p></li>
+</ul>
+<dl class="py method">
+<dt class="sig sig-object py" id="sgs_tools.sgs.sgs_model.SGSModel.sgs_tensor">
+<span class="sig-name descname"><span class="pre">sgs_tensor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/sgs_model.html#SGSModel.sgs_tensor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.sgs_model.SGSModel.sgs_tensor" title="Link to this definition">¶</a></dt>
+<dd><p>compute model for SGS tensor :math:`    au` for a given filter</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>filter</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#sgs_tools.sgs.filter.Filter" title="sgs_tools.sgs.filter.Filter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Filter</span></code></a></span>) – compute the SGS tensor at this scale</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="sgs_tools.sgs.sgs_model.LinCombSGSModel">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">LinCombSGSModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_components</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/sgs_model.html#LinCombSGSModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.sgs_model.LinCombSGSModel" title="Link to this definition">¶</a></dt>
+<dd><p>Linear combination of subgrid-scale (SGS) models</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>models</strong> – List of SGS model components</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class" id="module-sgs_tools.sgs.dynamic_sgs_model">
+<dt class="sig sig-object py" id="sgs_tools.sgs.dynamic_sgs_model.LeonardTensor">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">LeonardTensor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/dynamic_sgs_model.html#LeonardTensor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.dynamic_sgs_model.LeonardTensor" title="Link to this definition">¶</a></dt>
+<dd><p>compute the Leonard tensor for a large-scale equation</p>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">compute()</span></code>: returns the Leonard tensor for a given filter</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="sgs_tools.sgs.dynamic_sgs_model.LeonardVelocityTensor">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">LeonardVelocityTensor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tensor_dims</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/dynamic_sgs_model.html#LeonardVelocityTensor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.dynamic_sgs_model.LeonardVelocityTensor" title="Link to this definition">¶</a></dt>
+<dd><p>Leonard tensor for the velocity</p>
+<dl class="field-list simple">
+<dt class="field-odd">Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>vel</strong> – grid-scale/base velocity field</p></li>
+<li><p><strong>tensor_dims</strong> – tensor dimensions</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="sgs_tools.sgs.dynamic_sgs_model.LeonardVelocityTensor.compute">
+<span class="sig-name descname"><span class="pre">compute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/dynamic_sgs_model.html#LeonardVelocityTensor.compute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.dynamic_sgs_model.LeonardVelocityTensor.compute" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>compute the Leonard tensor as</dt><dd><p><span class="math notranslate nohighlight">\(\overline{v_i v_j} - \overline{v_i} \overline{v_j}\)</span>,
+where <span class="math notranslate nohighlight">\(\overline{\ast}\)</span> means filtering</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>filter</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#sgs_tools.sgs.filter.Filter" title="sgs_tools.sgs.filter.Filter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Filter</span></code></a></span>) – Filter used to separate “large” and “small” scales</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="sgs_tools.sgs.dynamic_sgs_model.LeonardThetaTensor">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">LeonardThetaTensor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tensor_dims</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/dynamic_sgs_model.html#LeonardThetaTensor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.dynamic_sgs_model.LeonardThetaTensor" title="Link to this definition">¶</a></dt>
+<dd><p>Leonard tensor for the (potential) temperature <span class="math notranslate nohighlight">\(\theta\)</span></p>
+<dl class="field-list simple">
+<dt class="field-odd">Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>vel</strong> – grid-scale/base velocity field</p></li>
+<li><p><strong>theta</strong> – grid-scale/base temperature field</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="sgs_tools.sgs.dynamic_sgs_model.LeonardThetaTensor.compute">
+<span class="sig-name descname"><span class="pre">compute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/dynamic_sgs_model.html#LeonardThetaTensor.compute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.dynamic_sgs_model.LeonardThetaTensor.compute" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>compute the Leonard tensor as</dt><dd><p><span class="math notranslate nohighlight">\(\overline{v_i \theta} - \overline{v_i} \overline{\theta}\)</span>,
+where <span class="math notranslate nohighlight">\(\overline{\ast}\)</span> means filtering</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>filter</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#sgs_tools.sgs.filter.Filter" title="sgs_tools.sgs.filter.Filter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Filter</span></code></a></span>) – Filter used to separate “large” and “small” scales</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sgs_tools.sgs.dynamic_sgs_model.M_Germano_tensor">
+<span class="sig-name descname"><span class="pre">M_Germano_tensor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sgs_model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/dynamic_sgs_model.html#M_Germano_tensor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.dynamic_sgs_model.M_Germano_tensor" title="Link to this definition">¶</a></dt>
+<dd><p>compute the Mij Germano model tensor as
+<span class="math notranslate nohighlight">\((&lt;\tau(\matrhm{at grid})&gt; - \alpha^2 \tau(\mathrm{at filter}))\)</span>,
+where <span class="math notranslate nohighlight">\(\Delta * \alpha\)</span> is the area/volume spanned by the filter kernel
+and <span class="math notranslate nohighlight">\(\Delta\)</span> is the filter scale.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sgs_model</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#sgs_tools.sgs.sgs_model.SGSModel" title="sgs_tools.sgs.sgs_model.SGSModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">SGSModel</span></code></a></span>) – SGS model used to compute the SGS tensor.</p></li>
+<li><p><strong>filter</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#sgs_tools.sgs.filter.Filter" title="sgs_tools.sgs.filter.Filter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Filter</span></code></a></span>) – Filter used to separate “large” and “small” scales</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="sgs_tools.sgs.dynamic_sgs_model.DynamicModelProtcol">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">DynamicModelProtcol</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/dynamic_sgs_model.html#DynamicModelProtcol"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.dynamic_sgs_model.DynamicModelProtcol" title="Link to this definition">¶</a></dt>
+<dd><p>compute the Leonard tensor for a large-scale equation</p>
+<p>:meth compute_coeff : returns the SGS tensor for a given filter
+:meth sgs_tensor: returns the SGS tensor for a given test and regularisation filter</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="sgs_tools.sgs.dynamic_sgs_model.DynamicModel">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">DynamicModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">static_model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">leonard</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minimisation</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/dynamic_sgs_model.html#DynamicModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.dynamic_sgs_model.DynamicModel" title="Link to this definition">¶</a></dt>
+<dd><p>Dynamic model for SGS model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>static_model</strong> – Static SGS model</p></li>
+<li><p><strong>leonard</strong> – Leonard tensor for the large-scale equation</p></li>
+<li><p><strong>minimisation</strong> – Minimisation method to compute coefficients</p></li>
+</ul>
+</dd>
+<dt class="field-even">Meth compute_coeff<span class="colon">:</span></dt>
+<dd class="field-even"><p>computes the amplitude coefficients for the SGS model</p>
+</dd>
+<dt class="field-odd">Meth sgs_tensor<span class="colon">:</span></dt>
+<dd class="field-odd"><p>computes the SGS tensor for a given
+test and regularisation filters</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="sgs_tools.sgs.dynamic_sgs_model.DynamicModel.compute_coeff">
+<span class="sig-name descname"><span class="pre">compute_coeff</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">test_filter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_filter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/dynamic_sgs_model.html#DynamicModel.compute_coeff"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.dynamic_sgs_model.DynamicModel.compute_coeff" title="Link to this definition">¶</a></dt>
+<dd><p>compute the amplitude coefficient for the SGS model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>test_filter</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#sgs_tools.sgs.filter.Filter" title="sgs_tools.sgs.filter.Filter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Filter</span></code></a></span>) – Filter used to separate “large” and “small” scales</p></li>
+<li><p><strong>reg_filter</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#sgs_tools.sgs.filter.Filter" title="sgs_tools.sgs.filter.Filter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Filter</span></code></a></span>) – Filter used for regularisation</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sgs_tools.sgs.dynamic_sgs_model.DynamicModel.sgs_tensor">
+<span class="sig-name descname"><span class="pre">sgs_tensor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">test_filter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_filter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/dynamic_sgs_model.html#DynamicModel.sgs_tensor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.dynamic_sgs_model.DynamicModel.sgs_tensor" title="Link to this definition">¶</a></dt>
+<dd><p>compute the SGS tensor for a given test and regularisation filter</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>test_filter</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#sgs_tools.sgs.filter.Filter" title="sgs_tools.sgs.filter.Filter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Filter</span></code></a></span>) – Filter used to separate “large” and “small” scales</p></li>
+<li><p><strong>reg_filter</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#sgs_tools.sgs.filter.Filter" title="sgs_tools.sgs.filter.Filter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Filter</span></code></a></span>) – Filter used for regularisation</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="sgs_tools.sgs.dynamic_sgs_model.LinCombDynamicModel">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">LinCombDynamicModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">static_model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">leonard</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minimisation</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/dynamic_sgs_model.html#LinCombDynamicModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.dynamic_sgs_model.LinCombDynamicModel" title="Link to this definition">¶</a></dt>
+<dd><p>Dynamic model for linear combination SGS model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>static_model</strong> – Static linear combination SGS model</p></li>
+<li><p><strong>leonard</strong> – Leonard tensor for the large-scale equation</p></li>
+<li><p><strong>minimisation</strong> – Minimisation method to compute coefficients</p></li>
+</ul>
+</dd>
+<dt class="field-even">Meth compute_coeff<span class="colon">:</span></dt>
+<dd class="field-even"><p>computes the coefficients for the SGS model</p>
+</dd>
+<dt class="field-odd">Meth sgs_tensor<span class="colon">:</span></dt>
+<dd class="field-odd"><p>computes the SGS tensor for a given test and regularisation filter</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="sgs_tools.sgs.dynamic_sgs_model.LinCombDynamicModel.compute_coeff">
+<span class="sig-name descname"><span class="pre">compute_coeff</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">test_filter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_filter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/dynamic_sgs_model.html#LinCombDynamicModel.compute_coeff"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.dynamic_sgs_model.LinCombDynamicModel.compute_coeff" title="Link to this definition">¶</a></dt>
+<dd><p>compute the coefficients for the SGS model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>test_filter</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#sgs_tools.sgs.filter.Filter" title="sgs_tools.sgs.filter.Filter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Filter</span></code></a></span>) – Filter used to separate “large” and “small” scales</p></li>
+<li><p><strong>reg_filter</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#sgs_tools.sgs.filter.Filter" title="sgs_tools.sgs.filter.Filter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Filter</span></code></a></span>) – Filter used for regularisation</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sgs_tools.sgs.dynamic_sgs_model.LinCombDynamicModel.sgs_tensor">
+<span class="sig-name descname"><span class="pre">sgs_tensor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">test_filter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_filter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/dynamic_sgs_model.html#LinCombDynamicModel.sgs_tensor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.dynamic_sgs_model.LinCombDynamicModel.sgs_tensor" title="Link to this definition">¶</a></dt>
+<dd><p>compute the SGS tensor for a given test and regularisation filter</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>test_filter</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#sgs_tools.sgs.filter.Filter" title="sgs_tools.sgs.filter.Filter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Filter</span></code></a></span>) – Filter used to separate “large” and “small” scales</p></li>
+<li><p><strong>reg_filter</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#sgs_tools.sgs.filter.Filter" title="sgs_tools.sgs.filter.Filter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Filter</span></code></a></span>) – Filter used for regularisation</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class" id="module-sgs_tools.sgs.dynamic_coefficient">
+<dt class="sig sig-object py" id="sgs_tools.sgs.dynamic_coefficient.Minimisation">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">Minimisation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/dynamic_coefficient.html#Minimisation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.dynamic_coefficient.Minimisation" title="Link to this definition">¶</a></dt>
+<dd><p>Protocol for solving the over-determined tensor equation
+<span class="math notranslate nohighlight">\(L = \sum_i c_i M_i\)</span>, where <span class="math notranslate nohighlight">\(L\)</span> and <span class="math notranslate nohighlight">\(M_i\)</span> are tensors and
+<span class="math notranslate nohighlight">\(c_i\)</span> are scalar coefficients to be computed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>contraction_dims</strong> – Names of the dimensions to contract when forming the
+tensor products <span class="math notranslate nohighlight">\(L M_i\)</span> and <span class="math notranslate nohighlight">\(M_i M_j\)</span>.</p></li>
+<li><p><strong>coeff_dim</strong> – Dimension label along which the resulting coefficients
+<span class="math notranslate nohighlight">\(c_i\)</span> are concatenated.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="sgs_tools.sgs.dynamic_coefficient.Minimisation.compute">
+<span class="sig-name descname"><span class="pre">compute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">L</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Mi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_filter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/dynamic_coefficient.html#Minimisation.compute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.dynamic_coefficient.Minimisation.compute" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>solve for <span class="math notranslate nohighlight">\({c_i}\)</span> the over-determined system</dt><dd><p><span class="math notranslate nohighlight">\(L = \sum_i(c_i M_i)\)</span>.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>L</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code></span>) – LHS tensor</p></li>
+<li><p><strong>M</strong> – a sequence of RHS tensors</p></li>
+<li><p><strong>reg_filter</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#sgs_tools.sgs.filter.Filter" title="sgs_tools.sgs.filter.Filter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Filter</span></code></a></span>) – Filter used to regularize the contracted tensor products.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="sgs_tools.sgs.dynamic_coefficient.LillyMinimisation1Model">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">LillyMinimisation1Model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">contraction_dims</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coeff_dim</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/dynamic_coefficient.html#LillyMinimisation1Model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.dynamic_coefficient.LillyMinimisation1Model" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Lilly Minimisation (least square error) for a 1-global-coefficient model using</dt><dd><p>the Lilly identity as <span class="math notranslate nohighlight">\(\overline{L \cdot M} / \overline{M \cdot M}\)</span>.
+where <span class="math notranslate nohighlight">\(\cdot\)</span> means  tensor contraction, <span class="math notranslate nohighlight">\(\overline{*}\)</span> means
+regularisation filtering</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>contraction_dims</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span>) – labels of dimensions to be contracted to form
+<span class="math notranslate nohighlight">\(L M_i\)</span> and <span class="math notranslate nohighlight">\(M_i M_j\)</span> products.</p></li>
+<li><p><strong>coeff_dim</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – label of dimension along which to concatenate the arrays
+<span class="math notranslate nohighlight">\(c_i\)</span></p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="sgs_tools.sgs.dynamic_coefficient.LillyMinimisation1Model.compute">
+<span class="sig-name descname"><span class="pre">compute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">L</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Mi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_filter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/dynamic_coefficient.html#LillyMinimisation1Model.compute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.dynamic_coefficient.LillyMinimisation1Model.compute" title="Link to this definition">¶</a></dt>
+<dd><p>Compute <span class="math notranslate nohighlight">\(\overline{L\cdot M} / \overline{M \cdot M}\)</span>.
+where <span class="math notranslate nohighlight">\(\overline{*}\)</span> means regularisation filtering</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>L</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code></span>) – LHS tensor</p></li>
+<li><p><strong>M</strong> – a sequence of <em>1</em> RHS tensors</p></li>
+<li><p><strong>reg_filter</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#sgs_tools.sgs.filter.Filter" title="sgs_tools.sgs.filter.Filter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Filter</span></code></a></span>) – Filter used to regularize the contracted tensor products.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="sgs_tools.sgs.dynamic_coefficient.LillyMinimisation2Model">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">LillyMinimisation2Model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">contraction_dims</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coeff_dim</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/dynamic_coefficient.html#LillyMinimisation2Model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.dynamic_coefficient.LillyMinimisation2Model" title="Link to this definition">¶</a></dt>
+<dd><p>Lilly Minimisation (least square error) for a 2-coefficient model using
+the Lilly identity as <span class="math notranslate nohighlight">\(L = \sum_i^2 c_i M_i\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>contraction_dims</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span>) – labels of dimensions to be contracted to form
+<span class="math notranslate nohighlight">\(L M_i\)</span> and <span class="math notranslate nohighlight">\(M_i M_j\)</span> products.</p></li>
+<li><p><strong>coeff_dim</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – label of dimension along which to concatenate the arrays
+<span class="math notranslate nohighlight">\(c_i\)</span></p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="sgs_tools.sgs.dynamic_coefficient.LillyMinimisation2Model.compute">
+<span class="sig-name descname"><span class="pre">compute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">L</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Mi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_filter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/dynamic_coefficient.html#LillyMinimisation2Model.compute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.dynamic_coefficient.LillyMinimisation2Model.compute" title="Link to this definition">¶</a></dt>
+<dd><p>Compute dynamic coefficients of a 2-component models using Germano identity
+as <span class="math notranslate nohighlight">\(L = C_1 M_1 + C_2 M_2\)</span> using regularized least-square minimisation.
+Inverting the <span class="math notranslate nohighlight">\(\overline{M_i M_j}\)</span> matrix analytically.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>L</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code></span>) – LHS tensor</p></li>
+<li><p><strong>M</strong> – a sequence of <em>2</em> RHS tensors</p></li>
+<li><p><strong>reg_filter</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#sgs_tools.sgs.filter.Filter" title="sgs_tools.sgs.filter.Filter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Filter</span></code></a></span>) – Filter used to regularize the contracted tensor products.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="sgs_tools.sgs.dynamic_coefficient.LillyMinimisation3Model">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">LillyMinimisation3Model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">contraction_dims</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coeff_dim</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/dynamic_coefficient.html#LillyMinimisation3Model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.dynamic_coefficient.LillyMinimisation3Model" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Lilly Minimisation (least square error) for a 3-coefficient model using</dt><dd><p>the Lilly identity as <span class="math notranslate nohighlight">\(L = \sum_i^3 c_i M_i\)</span>.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>contraction_dims</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span>) – labels of dimensions to be contracted to form
+<span class="math notranslate nohighlight">\(L M_i\)</span> and <span class="math notranslate nohighlight">\(M_i M_j\)</span> products.</p></li>
+<li><p><strong>coeff_dim</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – label of dimension along which to concatenate the arrays
+<span class="math notranslate nohighlight">\(c_i\)</span></p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="sgs_tools.sgs.dynamic_coefficient.LillyMinimisation3Model.compute">
+<span class="sig-name descname"><span class="pre">compute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">L</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Mi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_filter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/dynamic_coefficient.html#LillyMinimisation3Model.compute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.dynamic_coefficient.LillyMinimisation3Model.compute" title="Link to this definition">¶</a></dt>
+<dd><p>Compute dynamic coefficients of a 3-component models using Germano identity
+as <span class="math notranslate nohighlight">\(L = C_1 M_1 + C_2 M_2 + C_3 M_3\)</span> using
+regularized least-square minimisation
+(inverting the <span class="math notranslate nohighlight">\(M_i M_j\)</span> matrix explicitly).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>L</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code></span>) – LHS tensor</p></li>
+<li><p><strong>M</strong> – a sequence of <em>3</em> RHS tensors</p></li>
+<li><p><strong>reg_filter</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#sgs_tools.sgs.filter.Filter" title="sgs_tools.sgs.filter.Filter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Filter</span></code></a></span>) – Filter used to regularize the contracted tensor products.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="sgs_tools.sgs.dynamic_coefficient.LillyMinimisationNModel">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">LillyMinimisationNModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">contraction_dims</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coeff_dim</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/dynamic_coefficient.html#LillyMinimisationNModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.dynamic_coefficient.LillyMinimisationNModel" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Lilly Minimisation (least square error) for an N-coefficient model using</dt><dd><p>the Lilly identity as <span class="math notranslate nohighlight">\(L = \sum_i^N c_i M_i\)</span>.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>contraction_dims</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span>) – labels of dimensions to be contracted to form
+<span class="math notranslate nohighlight">\(L M_i\)</span> and <span class="math notranslate nohighlight">\(M_i M_j\)</span> products.</p></li>
+<li><p><strong>coeff_dim</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – label of dimension along which to concatenate the arrays
+<span class="math notranslate nohighlight">\(c_i\)</span></p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="sgs_tools.sgs.dynamic_coefficient.LillyMinimisationNModel.compute">
+<span class="sig-name descname"><span class="pre">compute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">L</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Mi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_filter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/dynamic_coefficient.html#LillyMinimisationNModel.compute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.dynamic_coefficient.LillyMinimisationNModel.compute" title="Link to this definition">¶</a></dt>
+<dd><p>Solve the system
+<span class="math notranslate nohighlight">\(\overline{L \cdot M_i} = \sum_i^N c_j \overline{M_i \cdot M_j}\)</span>
+using np.linalg.SVD, where
+<span class="math notranslate nohighlight">\(L \cdot M_i\)</span> and <span class="math notranslate nohighlight">\(M_i \cdot M_j\)</span> are scalar fields</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>L</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code></span>) – LHS tensor</p></li>
+<li><p><strong>M</strong> – a sequence of RHS tensors</p></li>
+<li><p><strong>reg_filter</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#sgs_tools.sgs.filter.Filter" title="sgs_tools.sgs.filter.Filter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Filter</span></code></a></span>) – Filter used to regularize the contracted tensor products.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-sgs_tools.sgs.Smagorinsky">
+<span id="sgg-models"></span><h3>SGG models<a class="headerlink" href="#module-sgs_tools.sgs.Smagorinsky" title="Link to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="sgs_tools.sgs.Smagorinsky.SmagorinskyVelocityModel">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">SmagorinskyVelocityModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strain</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tensor_dims</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/Smagorinsky.html#SmagorinskyVelocityModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.Smagorinsky.SmagorinskyVelocityModel" title="Link to this definition">¶</a></dt>
+<dd><p>Smagorinsky model for the velocity equation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>vel</strong> – grid-scale velocity</p></li>
+<li><p><strong>strain</strong> – grid-scale rate-of-strain</p></li>
+<li><p><strong>cs</strong> – Smagorinsky coefficient</p></li>
+<li><p><strong>dx</strong> – constant resolution with respect to dimension to-be-filtered</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="sgs_tools.sgs.Smagorinsky.SmagorinskyVelocityModel.sgs_tensor">
+<span class="sig-name descname"><span class="pre">sgs_tensor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/Smagorinsky.html#SmagorinskyVelocityModel.sgs_tensor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.Smagorinsky.SmagorinskyVelocityModel.sgs_tensor" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>compute model for SGS tensor</dt><dd><p><span class="math notranslate nohighlight">\(\tau = (c_s \Delta) ^2 |\overline{S_{ij}}| \overline{S_{ij}}\)</span>
+for a given <cite>filter</cite> (which can be trivial, i.e. <code class="docutils literal notranslate"><span class="pre">IdentityFilter</span></code>)</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>filter</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#sgs_tools.sgs.filter.Filter" title="sgs_tools.sgs.filter.Filter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Filter</span></code></a></span>) – Filter used to separate “large” and “small” scales</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="sgs_tools.sgs.Smagorinsky.SmagorinskyHeatModel">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">SmagorinskyHeatModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grad_theta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strain</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ctheta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tensor_dims</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/Smagorinsky.html#SmagorinskyHeatModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.Smagorinsky.SmagorinskyHeatModel" title="Link to this definition">¶</a></dt>
+<dd><p>Smagorinsky model for the Heat equation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>vel</strong> – grid-scale velocity</p></li>
+<li><p><strong>grad_theta</strong> – grid-scale (potential) temperature gradient</p></li>
+<li><p><strong>strain</strong> – grid-scale rate-of-strain</p></li>
+<li><p><strong>ctheta</strong> – Smagorinsky coefficient for the heat equation</p></li>
+<li><p><strong>dx</strong> – constant resolution with respect to dimension to-be-filtered</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="sgs_tools.sgs.Smagorinsky.SmagorinskyHeatModel.sgs_tensor">
+<span class="sig-name descname"><span class="pre">sgs_tensor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/Smagorinsky.html#SmagorinskyHeatModel.sgs_tensor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.Smagorinsky.SmagorinskyHeatModel.sgs_tensor" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>compute model for SGS tensor</dt><dd><p><span class="math notranslate nohighlight">\(\tau =  c_\theta \Delta^2
+|\overline{S_{ij}}| \overline{\nabla \theta}\)</span>
+for a given filter (which can be trivial, i.e. IdentityFilter)</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>filter</strong> – Filter used to separate “large” and “small” scales</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class" id="module-sgs_tools.sgs.Kosovic">
+<dt class="sig sig-object py" id="sgs_tools.sgs.Kosovic.SSquaredVelocityModel">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">SSquaredVelocityModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">strain</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tensor_dims</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/Kosovic.html#SSquaredVelocityModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.Kosovic.SSquaredVelocityModel" title="Link to this definition">¶</a></dt>
+<dd><p>Kosovic JFM 1997, 336 and Speziale 1991 Ann Rev Fluid Mech 23
+compoment <span class="math notranslate nohighlight">\(\tau =
+(c_s \Delta)^2 \mathrm{Traceless}(\overline{S_{ik}} \overline{S_{kj}})\)</span></p>
+<dl class="field-list simple">
+<dt class="field-odd">Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>strain</strong> – grid-scale rate-of-strain</p></li>
+<li><p><strong>cs</strong> – Smagorinsky coefficient</p></li>
+<li><p><strong>dx</strong> – constant resolution with respect to dimension to-be-filtered</p></li>
+<li><p><strong>tensor_dims</strong> – labels of dimensions indexing tensor components</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="sgs_tools.sgs.Kosovic.SSquaredVelocityModel.sgs_tensor">
+<span class="sig-name descname"><span class="pre">sgs_tensor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/Kosovic.html#SSquaredVelocityModel.sgs_tensor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.Kosovic.SSquaredVelocityModel.sgs_tensor" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>compute model for SGS tensor</dt><dd><p><span class="math notranslate nohighlight">\(\tau = (c_s \Delta) ^2 \overline{S_{ik}}\overline{S_{kj}}\)</span>
+for a given <cite>filter</cite> (which can be trivial, i.e. <code class="docutils literal notranslate"><span class="pre">IdentityFilter</span></code>)</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>filter</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#sgs_tools.sgs.filter.Filter" title="sgs_tools.sgs.filter.Filter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Filter</span></code></a></span>) – Filter used to separate “large” and “small” scales</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="sgs_tools.sgs.Kosovic.SOmegaVelocityModel">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">SOmegaVelocityModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">strain</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rot</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tensor_dims</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/Kosovic.html#SOmegaVelocityModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.Kosovic.SOmegaVelocityModel" title="Link to this definition">¶</a></dt>
+<dd><p>Kosovic JFM 1997, 336 / Speziale 1991 Ann Rev Fluid Mech 23
+component <span class="math notranslate nohighlight">\(\tau =
+(c_s \Delta) ^2 \mathrm{Sym}[\overline{S_{ik}}\overline{\Omega_{kj}}]\)</span></p>
+<dl class="field-list simple">
+<dt class="field-odd">Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>strain</strong> – grid-scale rate-of-strain</p></li>
+<li><p><strong>rot</strong> – grid-scale rate-of-rotation</p></li>
+<li><p><strong>cs</strong> – Smagorinsky coefficient</p></li>
+<li><p><strong>dx</strong> – constant resolution with respect to dimension to-be-filtered</p></li>
+<li><p><strong>tensor_dims</strong> – labels of dimensions indexing tensor components</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="sgs_tools.sgs.Kosovic.SOmegaVelocityModel.sgs_tensor">
+<span class="sig-name descname"><span class="pre">sgs_tensor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/Kosovic.html#SOmegaVelocityModel.sgs_tensor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.Kosovic.SOmegaVelocityModel.sgs_tensor" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>compute model for SGS tensor</dt><dd><p><span class="math notranslate nohighlight">\(\tau =
+(c_s \Delta) ^2 \mathrm{Sym}[\overline{S_{ik}}\overline{\Omega_{kj}}]\)</span>
+for a given <cite>filter</cite> (which can be trivial, i.e. <code class="docutils literal notranslate"><span class="pre">IdentityFilter</span></code>)</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>filter</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#sgs_tools.sgs.filter.Filter" title="sgs_tools.sgs.filter.Filter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Filter</span></code></a></span>) – Filter used to separate “large” and “small” scales</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sgs_tools.sgs.Kosovic.DynamicKosovicModel">
+<span class="sig-name descname"><span class="pre">DynamicKosovicModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sij</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">omegaij</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">res</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compoment_coeff</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tensor_dims</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">('c1',</span> <span class="pre">'c2')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minimisation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">LillyMinimisation2Model(contraction_dims=['c1',</span> <span class="pre">'c2'],</span> <span class="pre">coeff_dim='cdim')</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/Kosovic.html#DynamicKosovicModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.Kosovic.DynamicKosovicModel" title="Link to this definition">¶</a></dt>
+<dd><p>Dynamic version of the model by
+Carati &amp; Cabot Proceedings of the 1996 Summer Program –
+Center for Turbulence Research</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sij</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code></span>) – grid-scale rate-of-strain tensor</p></li>
+<li><p><strong>omegaij</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code></span>) – grid-scale rate-of-rotation tensor</p></li>
+<li><p><strong>vel</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code></span>) – velocity field used for dynamic coefficient computation</p></li>
+<li><p><strong>res</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></span>) – constant resolution with respect to dimension to-be-filtered</p></li>
+<li><p><strong>compoment_coeff</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]</span>) – tuple of three Smagorinsky coefficients for parallel,
+perpendicular, and normal components</p></li>
+<li><p><strong>tensor_dims</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span>) – labels of dimensions indexing tensor components,
+defaults to (“c1”, “c2”)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#sgs_tools.sgs.dynamic_sgs_model.LinCombDynamicModel" title="sgs_tools.sgs.dynamic_sgs_model.LinCombDynamicModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">LinCombDynamicModel</span></code></a></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Combined SGS model with dynamically computed coefficients</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function" id="module-sgs_tools.sgs.CaratiCabot">
+<dt class="sig sig-object py" id="sgs_tools.sgs.CaratiCabot.s_parallel">
+<span class="sig-name descname"><span class="pre">s_parallel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tensor_dims</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/CaratiCabot.html#s_parallel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.CaratiCabot.s_parallel" title="Link to this definition">¶</a></dt>
+<dd><p>Projection of s in the n-direction:
+<span class="math notranslate nohighlight">\(s^{\parallel}=(n_i (s.n)_j + (s.n)_i n_j - \frac{2}{3} \delta_{ij} (n.s.n) )\)</span></p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sgs_tools.sgs.CaratiCabot.s_perpendicular">
+<span class="sig-name descname"><span class="pre">s_perpendicular</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tensor_dims</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/CaratiCabot.html#s_perpendicular"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.CaratiCabot.s_perpendicular" title="Link to this definition">¶</a></dt>
+<dd><p>Projection of s perpendicular to the n-direction: <span class="math notranslate nohighlight">\(s - s^{\parallel}\)</span></p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="sgs_tools.sgs.CaratiCabot.SparallelVelocityModel">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">SparallelVelocityModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">strain</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tensor_dims</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/CaratiCabot.html#SparallelVelocityModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.CaratiCabot.SparallelVelocityModel" title="Link to this definition">¶</a></dt>
+<dd><p>Carati &amp; Cabot Proceedings of the 1996 Summer Program –
+Center for Turbulence Research
+S_parallel component = <span class="math notranslate nohighlight">\(|S| Traceless[Symmetric[(S.n)n]]\)</span></p>
+<dl class="field-list simple">
+<dt class="field-odd">Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>strain</strong> – grid-scale rate-of-strain</p></li>
+<li><p><strong>cs</strong> – Smagorinsky coefficient</p></li>
+<li><p><strong>dx</strong> – constant resolution with respect to dimension to-be-filtered</p></li>
+<li><p><strong>n</strong> – triple of floats to be coerce as a 3d constant vector
+along one of the tensor dimensions</p></li>
+<li><p><strong>tensor_dims</strong> – labels of dimensions indexing tensor components</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="sgs_tools.sgs.CaratiCabot.SparallelVelocityModel.sgs_tensor">
+<span class="sig-name descname"><span class="pre">sgs_tensor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/CaratiCabot.html#SparallelVelocityModel.sgs_tensor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.CaratiCabot.SparallelVelocityModel.sgs_tensor" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>compute model for SGS tensor</dt><dd><p><span class="math notranslate nohighlight">\(\tau = |S| Traceless[Symmetric[(S.n)n]]\)</span></p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>filter</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#sgs_tools.sgs.filter.Filter" title="sgs_tools.sgs.filter.Filter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Filter</span></code></a></span>) – Filter used to separate “large” and “small” scales</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="sgs_tools.sgs.CaratiCabot.SperpVelocityModel">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">SperpVelocityModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">strain</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tensor_dims</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/CaratiCabot.html#SperpVelocityModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.CaratiCabot.SperpVelocityModel" title="Link to this definition">¶</a></dt>
+<dd><p>Carati &amp; Cabot Proceedings of the 1996 Summer Program –
+Center for Turbulence Research
+<span class="math notranslate nohighlight">\(S_{\textrm{perp component}} = |S| Traceless(S - (S.n + n.S))\)</span></p>
+<dl class="field-list simple">
+<dt class="field-odd">Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>strain</strong> – grid-scale rate-of-strain</p></li>
+<li><p><strong>cs</strong> – Smagorinsky coefficient</p></li>
+<li><p><strong>dx</strong> – constant resolution with respect to dimension to-be-filtered</p></li>
+<li><p><strong>n</strong> – triple of floats to be coerce as a 3d constant vector
+along one of the tensor dimensions</p></li>
+<li><p><strong>tensor_dims</strong> – labels of dimensions indexing tensor components</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="sgs_tools.sgs.CaratiCabot.SperpVelocityModel.sgs_tensor">
+<span class="sig-name descname"><span class="pre">sgs_tensor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/CaratiCabot.html#SperpVelocityModel.sgs_tensor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.CaratiCabot.SperpVelocityModel.sgs_tensor" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>compute model for SGS tensor</dt><dd><p><span class="math notranslate nohighlight">\(\tau = |S| Traceless(S - (S.n + n.S))\)</span>
+for a given <cite>filter</cite> (which can be trivial, i.e. <code class="docutils literal notranslate"><span class="pre">IdentityFilter</span></code>)</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>filter</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#sgs_tools.sgs.filter.Filter" title="sgs_tools.sgs.filter.Filter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Filter</span></code></a></span>) – Filter used to separate “large” and “small” scales</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="sgs_tools.sgs.CaratiCabot.NVelocityModel">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">NVelocityModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">strain</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tensor_dims</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/CaratiCabot.html#NVelocityModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.CaratiCabot.NVelocityModel" title="Link to this definition">¶</a></dt>
+<dd><p>Carati &amp; Cabot Proceedings of the 1996 Summer Program –
+Center for Turbulence Research
+<span class="math notranslate nohighlight">\(N component = |S|(n.s.n) Traceless(n * n)\)</span></p>
+<dl class="field-list simple">
+<dt class="field-odd">Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>strain</strong> – grid-scale rate-of-strain</p></li>
+<li><p><strong>cs</strong> – Smagorinsky coefficient</p></li>
+<li><p><strong>dx</strong> – constant resolution with respect to dimension to-be-filtered</p></li>
+<li><p><strong>n</strong> – triple of floats to be coerce as a 3d constant vector
+along one of the tensor dimensions</p></li>
+<li><p><strong>tensor_dims</strong> – labels of dimensions indexing tensor components</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="sgs_tools.sgs.CaratiCabot.NVelocityModel.sgs_tensor">
+<span class="sig-name descname"><span class="pre">sgs_tensor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/CaratiCabot.html#NVelocityModel.sgs_tensor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.CaratiCabot.NVelocityModel.sgs_tensor" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>compute model for SGS tensor</dt><dd><p><span class="math notranslate nohighlight">\(\tau = (c_s \Delta) ^2 |\overline{S_{ij}}| \overline{S_{ik} N_{kj}}\)</span>
+for a given <cite>filter</cite> (which can be trivial, i.e. <code class="docutils literal notranslate"><span class="pre">IdentityFilter</span></code>)</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>filter</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#sgs_tools.sgs.filter.Filter" title="sgs_tools.sgs.filter.Filter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Filter</span></code></a></span>) – Filter used to separate “large” and “small” scales</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sgs_tools.sgs.CaratiCabot.DynamicCaratiCabotModel">
+<span class="sig-name descname"><span class="pre">DynamicCaratiCabotModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sij</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">res</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compoment_coeff</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tensor_dims</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">('c1',</span> <span class="pre">'c2')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minimisation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">LillyMinimisation3Model(contraction_dims=['c1',</span> <span class="pre">'c2'],</span> <span class="pre">coeff_dim='cdim')</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/sgs/CaratiCabot.html#DynamicCaratiCabotModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.sgs.CaratiCabot.DynamicCaratiCabotModel" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Dynamic version of the model by</dt><dd><p>Carati &amp; Cabot Proceedings of the 1996 Summer Program –
+Center for Turbulence Research</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sij</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code></span>) – grid-scale rate-of-strain tensor</p></li>
+<li><p><strong>vel</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code></span>) – velocity field used for dynamic coefficient computation</p></li>
+<li><p><strong>res</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></span>) – constant resolution with respect to dimension to-be-filtered</p></li>
+<li><p><strong>compoment_coeff</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]</span>) – tuple of three Smagorinsky coefficients for
+parallel, perpendicular, and normal components</p></li>
+<li><p><strong>n</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]</span>) – triple of floats to be coerced as a 3d constant vector
+along one of the tensor dimensions</p></li>
+<li><p><strong>tensor_dims</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span>) – labels of dimensions indexing tensor components,
+defaults to (“c1”, “c2”)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#sgs_tools.sgs.dynamic_sgs_model.LinCombDynamicModel" title="sgs_tools.sgs.dynamic_sgs_model.LinCombDynamicModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">LinCombDynamicModel</span></code></a></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Combined SGS model with dynamically computed coefficients</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="diagnostics.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Diagnostics</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="physics.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Physical Fields</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2024, the HiFi project
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Sub-grid scales</a><ul>
+<li><a class="reference internal" href="#sgs"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sgs</span></code></a><ul>
+<li><a class="reference internal" href="#module-sgs_tools.sgs.filter">Filtering</a><ul>
+<li><a class="reference internal" href="#sgs_tools.sgs.filter.weight_gauss_3d"><code class="docutils literal notranslate"><span class="pre">weight_gauss_3d</span></code></a></li>
+<li><a class="reference internal" href="#sgs_tools.sgs.filter.weight_gauss_5d"><code class="docutils literal notranslate"><span class="pre">weight_gauss_5d</span></code></a></li>
+<li><a class="reference internal" href="#sgs_tools.sgs.filter.box_kernel"><code class="docutils literal notranslate"><span class="pre">box_kernel()</span></code></a></li>
+<li><a class="reference internal" href="#sgs_tools.sgs.filter.Filter"><code class="docutils literal notranslate"><span class="pre">Filter</span></code></a><ul>
+<li><a class="reference internal" href="#sgs_tools.sgs.filter.Filter.kernel"><code class="docutils literal notranslate"><span class="pre">Filter.kernel</span></code></a></li>
+<li><a class="reference internal" href="#sgs_tools.sgs.filter.Filter.filter_dims"><code class="docutils literal notranslate"><span class="pre">Filter.filter_dims</span></code></a></li>
+<li><a class="reference internal" href="#sgs_tools.sgs.filter.Filter.scales"><code class="docutils literal notranslate"><span class="pre">Filter.scales()</span></code></a></li>
+<li><a class="reference internal" href="#sgs_tools.sgs.filter.Filter.scale"><code class="docutils literal notranslate"><span class="pre">Filter.scale()</span></code></a></li>
+<li><a class="reference internal" href="#sgs_tools.sgs.filter.Filter.window"><code class="docutils literal notranslate"><span class="pre">Filter.window</span></code></a></li>
+<li><a class="reference internal" href="#sgs_tools.sgs.filter.Filter.with_dims"><code class="docutils literal notranslate"><span class="pre">Filter.with_dims()</span></code></a></li>
+<li><a class="reference internal" href="#sgs_tools.sgs.filter.Filter.filter"><code class="docutils literal notranslate"><span class="pre">Filter.filter()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#sgs_tools.sgs.filter.IdentityFilter"><code class="docutils literal notranslate"><span class="pre">IdentityFilter</span></code></a><ul>
+<li><a class="reference internal" href="#sgs_tools.sgs.filter.IdentityFilter.filter"><code class="docutils literal notranslate"><span class="pre">IdentityFilter.filter()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#sgs_tools.sgs.coarse_grain.CoarseGrain"><code class="docutils literal notranslate"><span class="pre">CoarseGrain</span></code></a><ul>
+<li><a class="reference internal" href="#sgs_tools.sgs.coarse_grain.CoarseGrain.filter"><code class="docutils literal notranslate"><span class="pre">CoarseGrain.filter()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-sgs_tools.sgs.sgs_model">SGS Model Core</a><ul>
+<li><a class="reference internal" href="#sgs_tools.sgs.sgs_model.SGSModel"><code class="docutils literal notranslate"><span class="pre">SGSModel</span></code></a><ul>
+<li><a class="reference internal" href="#sgs_tools.sgs.sgs_model.SGSModel.sgs_tensor"><code class="docutils literal notranslate"><span class="pre">SGSModel.sgs_tensor()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#sgs_tools.sgs.sgs_model.LinCombSGSModel"><code class="docutils literal notranslate"><span class="pre">LinCombSGSModel</span></code></a></li>
+<li><a class="reference internal" href="#sgs_tools.sgs.dynamic_sgs_model.LeonardTensor"><code class="docutils literal notranslate"><span class="pre">LeonardTensor</span></code></a></li>
+<li><a class="reference internal" href="#sgs_tools.sgs.dynamic_sgs_model.LeonardVelocityTensor"><code class="docutils literal notranslate"><span class="pre">LeonardVelocityTensor</span></code></a><ul>
+<li><a class="reference internal" href="#sgs_tools.sgs.dynamic_sgs_model.LeonardVelocityTensor.compute"><code class="docutils literal notranslate"><span class="pre">LeonardVelocityTensor.compute()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#sgs_tools.sgs.dynamic_sgs_model.LeonardThetaTensor"><code class="docutils literal notranslate"><span class="pre">LeonardThetaTensor</span></code></a><ul>
+<li><a class="reference internal" href="#sgs_tools.sgs.dynamic_sgs_model.LeonardThetaTensor.compute"><code class="docutils literal notranslate"><span class="pre">LeonardThetaTensor.compute()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#sgs_tools.sgs.dynamic_sgs_model.M_Germano_tensor"><code class="docutils literal notranslate"><span class="pre">M_Germano_tensor()</span></code></a></li>
+<li><a class="reference internal" href="#sgs_tools.sgs.dynamic_sgs_model.DynamicModelProtcol"><code class="docutils literal notranslate"><span class="pre">DynamicModelProtcol</span></code></a></li>
+<li><a class="reference internal" href="#sgs_tools.sgs.dynamic_sgs_model.DynamicModel"><code class="docutils literal notranslate"><span class="pre">DynamicModel</span></code></a><ul>
+<li><a class="reference internal" href="#sgs_tools.sgs.dynamic_sgs_model.DynamicModel.compute_coeff"><code class="docutils literal notranslate"><span class="pre">DynamicModel.compute_coeff()</span></code></a></li>
+<li><a class="reference internal" href="#sgs_tools.sgs.dynamic_sgs_model.DynamicModel.sgs_tensor"><code class="docutils literal notranslate"><span class="pre">DynamicModel.sgs_tensor()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#sgs_tools.sgs.dynamic_sgs_model.LinCombDynamicModel"><code class="docutils literal notranslate"><span class="pre">LinCombDynamicModel</span></code></a><ul>
+<li><a class="reference internal" href="#sgs_tools.sgs.dynamic_sgs_model.LinCombDynamicModel.compute_coeff"><code class="docutils literal notranslate"><span class="pre">LinCombDynamicModel.compute_coeff()</span></code></a></li>
+<li><a class="reference internal" href="#sgs_tools.sgs.dynamic_sgs_model.LinCombDynamicModel.sgs_tensor"><code class="docutils literal notranslate"><span class="pre">LinCombDynamicModel.sgs_tensor()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#sgs_tools.sgs.dynamic_coefficient.Minimisation"><code class="docutils literal notranslate"><span class="pre">Minimisation</span></code></a><ul>
+<li><a class="reference internal" href="#sgs_tools.sgs.dynamic_coefficient.Minimisation.compute"><code class="docutils literal notranslate"><span class="pre">Minimisation.compute()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#sgs_tools.sgs.dynamic_coefficient.LillyMinimisation1Model"><code class="docutils literal notranslate"><span class="pre">LillyMinimisation1Model</span></code></a><ul>
+<li><a class="reference internal" href="#sgs_tools.sgs.dynamic_coefficient.LillyMinimisation1Model.compute"><code class="docutils literal notranslate"><span class="pre">LillyMinimisation1Model.compute()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#sgs_tools.sgs.dynamic_coefficient.LillyMinimisation2Model"><code class="docutils literal notranslate"><span class="pre">LillyMinimisation2Model</span></code></a><ul>
+<li><a class="reference internal" href="#sgs_tools.sgs.dynamic_coefficient.LillyMinimisation2Model.compute"><code class="docutils literal notranslate"><span class="pre">LillyMinimisation2Model.compute()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#sgs_tools.sgs.dynamic_coefficient.LillyMinimisation3Model"><code class="docutils literal notranslate"><span class="pre">LillyMinimisation3Model</span></code></a><ul>
+<li><a class="reference internal" href="#sgs_tools.sgs.dynamic_coefficient.LillyMinimisation3Model.compute"><code class="docutils literal notranslate"><span class="pre">LillyMinimisation3Model.compute()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#sgs_tools.sgs.dynamic_coefficient.LillyMinimisationNModel"><code class="docutils literal notranslate"><span class="pre">LillyMinimisationNModel</span></code></a><ul>
+<li><a class="reference internal" href="#sgs_tools.sgs.dynamic_coefficient.LillyMinimisationNModel.compute"><code class="docutils literal notranslate"><span class="pre">LillyMinimisationNModel.compute()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-sgs_tools.sgs.Smagorinsky">SGG models</a><ul>
+<li><a class="reference internal" href="#sgs_tools.sgs.Smagorinsky.SmagorinskyVelocityModel"><code class="docutils literal notranslate"><span class="pre">SmagorinskyVelocityModel</span></code></a><ul>
+<li><a class="reference internal" href="#sgs_tools.sgs.Smagorinsky.SmagorinskyVelocityModel.sgs_tensor"><code class="docutils literal notranslate"><span class="pre">SmagorinskyVelocityModel.sgs_tensor()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#sgs_tools.sgs.Smagorinsky.SmagorinskyHeatModel"><code class="docutils literal notranslate"><span class="pre">SmagorinskyHeatModel</span></code></a><ul>
+<li><a class="reference internal" href="#sgs_tools.sgs.Smagorinsky.SmagorinskyHeatModel.sgs_tensor"><code class="docutils literal notranslate"><span class="pre">SmagorinskyHeatModel.sgs_tensor()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#sgs_tools.sgs.Kosovic.SSquaredVelocityModel"><code class="docutils literal notranslate"><span class="pre">SSquaredVelocityModel</span></code></a><ul>
+<li><a class="reference internal" href="#sgs_tools.sgs.Kosovic.SSquaredVelocityModel.sgs_tensor"><code class="docutils literal notranslate"><span class="pre">SSquaredVelocityModel.sgs_tensor()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#sgs_tools.sgs.Kosovic.SOmegaVelocityModel"><code class="docutils literal notranslate"><span class="pre">SOmegaVelocityModel</span></code></a><ul>
+<li><a class="reference internal" href="#sgs_tools.sgs.Kosovic.SOmegaVelocityModel.sgs_tensor"><code class="docutils literal notranslate"><span class="pre">SOmegaVelocityModel.sgs_tensor()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#sgs_tools.sgs.Kosovic.DynamicKosovicModel"><code class="docutils literal notranslate"><span class="pre">DynamicKosovicModel()</span></code></a></li>
+<li><a class="reference internal" href="#sgs_tools.sgs.CaratiCabot.s_parallel"><code class="docutils literal notranslate"><span class="pre">s_parallel()</span></code></a></li>
+<li><a class="reference internal" href="#sgs_tools.sgs.CaratiCabot.s_perpendicular"><code class="docutils literal notranslate"><span class="pre">s_perpendicular()</span></code></a></li>
+<li><a class="reference internal" href="#sgs_tools.sgs.CaratiCabot.SparallelVelocityModel"><code class="docutils literal notranslate"><span class="pre">SparallelVelocityModel</span></code></a><ul>
+<li><a class="reference internal" href="#sgs_tools.sgs.CaratiCabot.SparallelVelocityModel.sgs_tensor"><code class="docutils literal notranslate"><span class="pre">SparallelVelocityModel.sgs_tensor()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#sgs_tools.sgs.CaratiCabot.SperpVelocityModel"><code class="docutils literal notranslate"><span class="pre">SperpVelocityModel</span></code></a><ul>
+<li><a class="reference internal" href="#sgs_tools.sgs.CaratiCabot.SperpVelocityModel.sgs_tensor"><code class="docutils literal notranslate"><span class="pre">SperpVelocityModel.sgs_tensor()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#sgs_tools.sgs.CaratiCabot.NVelocityModel"><code class="docutils literal notranslate"><span class="pre">NVelocityModel</span></code></a><ul>
+<li><a class="reference internal" href="#sgs_tools.sgs.CaratiCabot.NVelocityModel.sgs_tensor"><code class="docutils literal notranslate"><span class="pre">NVelocityModel.sgs_tensor()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#sgs_tools.sgs.CaratiCabot.DynamicCaratiCabotModel"><code class="docutils literal notranslate"><span class="pre">DynamicCaratiCabotModel()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="_static/documentation_options.js?v=8a448e45"></script>
+    <script src="_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="_static/scripts/furo.js?v=46bd48cc"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+    </body>
+</html>

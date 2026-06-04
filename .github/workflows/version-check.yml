@@ -2,12 +2,10 @@ name: Version check
 
 on:
   pull_request:
-    branches: [ main, devel ]
+    branches:
+      - main
+      - devel
   workflow_dispatch:
-    inputs:
-          ref:
-            description: "Branch to test"
-            required: false
 
 
 jobs:

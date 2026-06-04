@@ -9,7 +9,6 @@ on:
       - reopened
       - synchronize
       - ready_for_review
-  workflow_call:
   workflow_dispatch:
 
 jobs:

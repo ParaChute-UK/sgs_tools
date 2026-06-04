@@ -33,9 +33,11 @@ dependencies = [
   "xrft",
   "xarray-einstats",
   "f90nml",
-  "netcdf4",
-  "h5netcdf",
-  "pint"
+  "pint",
+  "numpy",
+  "dask",
+  "pandas",
+  "psutil",
 ]
 
 # optional dependencies for docs

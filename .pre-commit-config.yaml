@@ -10,6 +10,7 @@ repos:
       - id: trailing-whitespace
       - id: end-of-file-fixer
       - id: check-added-large-files
+      - id: check-merge-conflict
 
   - repo: https://github.com/charliermarsh/ruff-pre-commit
     rev: v0.12.5
@@ -25,6 +26,6 @@ repos:
     rev: v1.17.0
     hooks:
       - id: mypy
-        # type check
-        # missing --install-types --non-interactive because of pre-commit
-        args: ["--ignore-missing-imports", "--pretty"]
+        files: ^src/ ^test/
+        additional_dependencies:
+          - types-setuptools

@@ -5,7 +5,7 @@ on:
     types: [closed]
     branches:
       - devel
-
+      - main
   workflow_dispatch:
 
 jobs:

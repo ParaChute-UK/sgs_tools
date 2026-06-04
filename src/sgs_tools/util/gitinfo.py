@@ -110,7 +110,10 @@ def write_git_diff_file(git_info: dict[str, str], out_path: Path | str = ".") ->
     return str(full_path)
 
 
-def print_version_info(verbosity=1):
+def print_version_info(verbosity=1, raw=False):
     poetry_ver = get_poetry_version("sgs_tools")  # dynamic version from PDV
-    print(f"Installed Version: {poetry_ver}")
+    if raw:
+        print(poetry_ver)
+    else:
+        print(f"Installed Version: {poetry_ver}")
     print_git_state(verbosity)

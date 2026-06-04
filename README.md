@@ -149,7 +149,7 @@ Either way, the following `poe` code-hygiene tasks are available (see `pyproject
 
 - `poe doc` &mdash; re-generate the docs (run with `-- --setup` the first time to install dependencies)
 
-### Multi-environment testing
+### 🖥️ Multi-environment testing
 
 Support across python versions is mamanged with [tox](https://tox.wiki/en/4.28.1/).
 Call `tox ` or better yet `tox -p` to run the standard environment matrix.

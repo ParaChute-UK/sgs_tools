@@ -3,9 +3,9 @@ from collections.abc import Iterable, Iterator, Mapping, Sequence
 from pathlib import Path
 from typing import Any
 
-import matplotlib.pyplot as plt
+# make sure there are not pyplot imports here
+import matplotlib as mpl
 import xarray as xr
-from matplotlib.figure import Figure
 from numpy import arange, array, inf, linspace, nan, ndarray
 from pint import UnitRegistry
 
@@ -13,6 +13,7 @@ from sgs_tools.diagnostics.directional_profile import directional_profile
 from sgs_tools.io.read import read
 from sgs_tools.physics.fields import Reynolds_fluct_stress, vertical_heat_flux
 from sgs_tools.plotting.collection_plots import (
+    plot_clouds,
     plot_horizontal_slice_tseries,
     plot_vertical_prof_time_slice_compare_sims_slice,
 )
@@ -21,6 +22,7 @@ from sgs_tools.plotting.field_plot_map import (
     field_plot_kwargs,
     field_plot_map,
 )
+from sgs_tools.plotting.handle_figure import render_figure
 from sgs_tools.scripts.arg_parsers import (
     add_dask_group,
     add_plotting_group,
@@ -28,6 +30,7 @@ from sgs_tools.scripts.arg_parsers import (
     parse_json_or_file,
 )
 from sgs_tools.scripts.cli_helpers import print_args_dict, print_header
+from sgs_tools.scripts.plotting import configure_matplotlib_backend
 from sgs_tools.util.dask_adapt_chunking import chunk_ds
 from sgs_tools.util.timer import timer
 
@@ -229,7 +232,7 @@ def parse_args(arguments: Sequence[str] | None = None) -> dict[str, Any]:
     # parse plotting style
     if args["plot_styles"] is None:
         plot_styles = []
-        colors = plt.rcParams["axes.prop_cycle"].by_key()["color"]
+        colors = mpl.rcParams["axes.prop_cycle"].by_key()["color"]
         linestyles = ["-", "--", ":", "-."]
         for i in range(len(args["input_files"])):
             plot_styles.append(default_plotting_style.copy())
@@ -426,7 +429,7 @@ def plot_horiz_slices(
     zlevels: Iterable[float],
     field_plot_map,
     verbose: bool = False,
-) -> Iterator[tuple[float, str, Figure]]:
+) -> Iterator[tuple[float, str, mpl.Figure]]:
     for z in zlevels:
         for field in fields:
             if verbose:
@@ -457,7 +460,7 @@ def plot_vert_profiles(
     reductions: Iterable[str],
     plot_map,
     verbose: bool = False,
-) -> Iterator[tuple[str, str, Figure]]:
+) -> Iterator[tuple[str, str, mpl.Figure]]:
     red_coords = {coord for f in fields for coord in field_plot_map[f].hcoords}
     dred_collection = {}
     for sim in ds_collection:
@@ -496,63 +499,6 @@ def plot_vert_profiles(
                 yield reduction, field, q.get_figure()
 
 
-def plot_clouds(
-    ds_collection: Mapping[str, xr.Dataset],
-    clevels: Iterable[float],
-    field_plot_map,
-    collection_plot_map,
-) -> Iterator[Figure]:
-    fig, _ = plt.subplots(len(ds_collection), 1, figsize=(6, len(ds_collection) * 6))
-    axes = fig.axes
-    empty = True
-    for ax, k in zip(axes, ds_collection, strict=False):
-        if "q_t" in ds_collection[k]:
-            data = (
-                ds_collection[k]["q_t"].mean(field_plot_map["q_t"].hcoords) * 1000
-            ).compute()
-            if len(field_plot_map["q_t"].tcoord) > 1:
-                data.plot.contourf(
-                    ax=ax,
-                    y=field_plot_map["q_t"].zcoord,
-                    x=field_plot_map["q_t"].tcoord,
-                    levels=clevels,
-                    robust=True,
-                    cmap=field_plot_map["q_t"].cmap,
-                    extend="max",
-                    add_colorbar=True,
-                )
-                ax.text(
-                    0.01,
-                    0.99,
-                    collection_plot_map["label_map"][k],
-                    ha="left",
-                    va="top",
-                    transform=ax.transAxes,
-                    fontsize=24,
-                )
-            else:
-                data.plot(
-                    ax=ax,
-                    y=field_plot_map["q_t"].zcoord,
-                )  # type: ignore
-            # ax.tick_params(axis="x", labelsize=16)
-            # ax.tick_params(axis="y", labelsize=16)
-            empty = False
-    if not empty:
-        fig.tight_layout()
-        yield fig
-    else:
-        plt.close(fig)
-
-
-def _handle_fig(fig, path: Path, filename: str, show: bool):
-    if path:
-        fig.savefig(path / filename, dpi=180)
-    if show:
-        plt.show()
-    plt.close(fig)
-
-
 def plot(
     ds_collection: Mapping[str, xr.Dataset],
     args: dict[str, Any],
@@ -584,7 +530,7 @@ def plot(
                 field_plot_map,
                 args["verbose"],
             ):
-                _handle_fig(
+                render_figure(
                     fig,
                     path=args["plot_path"],
                     filename=f"Slice_z{z:g}m_{tlabel}_{f}.png",
@@ -616,7 +562,7 @@ def plot(
                 for red, f, fig in plot_vert_profiles(
                     ds_collection, prof_fields, reductions, plot_map, args["verbose"]
                 ):
-                    _handle_fig(
+                    render_figure(
                         fig,
                         path=args["plot_path"],
                         filename=f"Profile_{tlabel}_{red}_{f}.png",
@@ -627,10 +573,11 @@ def plot(
             print("Detected Keyboard interrupt, proceeding with cloud plot.")
 
     # cloud plots
-    for fig in plot_clouds(
+    fig = plot_clouds(
         ds_collection, arange(0.005, 0.15, 0.005), field_plot_map, plot_map
-    ):
-        _handle_fig(
+    )
+    if fig is not None:
+        render_figure(
             fig,
             path=args["plot_path"],
             filename=f"Clouds_CL_{tlabel}.png",
@@ -682,6 +629,10 @@ def run(args: dict[str, Any]) -> None:
 
 
 def main(arguments: Sequence[str] | None = None) -> None:
+    # swap mpl backends for interactive/dask-batch use
+    # needs to happen before figures
+    configure_matplotlib_backend(arguments)
+
     with timer("Arguments", "ms"):
         args = parse_args(arguments)
         print_header("sim_comparison")

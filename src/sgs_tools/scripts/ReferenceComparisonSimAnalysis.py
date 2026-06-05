@@ -18,6 +18,7 @@ from sgs_tools.scripts.BasicComparisonSimAnalysis import (
     slice_fields,
 )
 from sgs_tools.scripts.cli_helpers import print_args_dict, print_header
+from sgs_tools.scripts.plotting import configure_matplotlib_backend
 from sgs_tools.util.timer import timer
 
 default_plotting_style = [
@@ -201,6 +202,8 @@ def parse_args(arguments: Sequence[str] | None = None) -> dict[str, Any]:
 def main(arguments: Sequence[str] | None = None) -> None:
     with timer("Total execution time", "min"):
         with timer("Arguments", "ms"):
+            # needs to happen before any plotting
+            configure_matplotlib_backend(arguments)
             args = parse_args(arguments)
             print_header("ref_comparison")
             print_args_dict(args)

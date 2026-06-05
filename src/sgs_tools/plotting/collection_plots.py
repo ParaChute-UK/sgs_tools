@@ -1,6 +1,7 @@
 from collections.abc import Collection, Iterable, Mapping
 from typing import Any
 
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
 import xarray as xr
@@ -28,7 +29,7 @@ def plot_vertical_prof_time_slice_compare_sims_slice(
     tcoord: str,
     zcoord: str,
     with_markers=False,
-):
+) -> mpl.Figure:
     """
     Plot a row of plots with a different time in each panel.
     Compare simulations from `da_collection` in each panel.
@@ -80,7 +81,7 @@ def plot_horizontal_slice_tseries(
     cmap: str,
     field_lbl: str,
     zcoord: str,
-):
+) -> mpl.Figure:
     """
     Plot a grid of horizontal slices in each panel
     each row corresponds to a different simulation
@@ -152,7 +153,7 @@ def plot_vertical_prof_time_slice_compare_fields(
     les_reference=None,
     zmax=1e6,
     ds_label="",
-):
+) -> mpl.Figure:
     """
     Plot a row of plots with a time slice in each panel.
     Compare fields in each panel.
@@ -220,3 +221,50 @@ def plot_vertical_prof_time_slice_compare_fields(
         ax.set_xlabel("", fontsize=14)
         ax.set_title(f"time: {time / 60} h", fontsize=14)
     return fig
+
+
+def plot_clouds(
+    ds_collection: Mapping[str, xr.Dataset],
+    clevels: Iterable[float],
+    field_plot_map,
+    collection_plot_map,
+) -> mpl.Figure | None:
+    fig, _ = plt.subplots(len(ds_collection), 1, figsize=(6, len(ds_collection) * 6))
+    axes = fig.axes
+    empty = True
+    for ax, k in zip(axes, ds_collection, strict=False):
+        if "q_t" in ds_collection[k]:
+            data = (
+                ds_collection[k]["q_t"].mean(field_plot_map["q_t"].hcoords) * 1000
+            ).compute()
+            if len(field_plot_map["q_t"].tcoord) > 1:
+                data.plot.contourf(
+                    ax=ax,
+                    y=field_plot_map["q_t"].zcoord,
+                    x=field_plot_map["q_t"].tcoord,
+                    levels=clevels,
+                    robust=True,
+                    cmap=field_plot_map["q_t"].cmap,
+                    extend="max",
+                    add_colorbar=True,
+                )
+                ax.text(
+                    0.01,
+                    0.99,
+                    collection_plot_map["label_map"][k],
+                    ha="left",
+                    va="top",
+                    transform=ax.transAxes,
+                    fontsize=24,
+                )
+            else:
+                data.plot(
+                    ax=ax,
+                    y=field_plot_map["q_t"].zcoord,
+                )  # type: ignore
+            # ax.tick_params(axis="x", labelsize=16)
+            # ax.tick_params(axis="y", labelsize=16)
+            empty = False
+    if not empty:
+        fig.tight_layout()
+        return fig

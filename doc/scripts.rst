@@ -48,3 +48,26 @@ Pre-processing
    :prog: um_levels
    :group_title_prefix:
    :title: make_UM_level_sets.py
+
+Miscellaneous
+---------------
+
+.. sphinx_argparse_cli::
+   :module: sgs_tools.scripts.version
+   :func: main
+   :hook:
+   :prog: sgs_tools_version
+   :group_title_prefix:
+   :title: version.py
+
+Utilities:
+---------------
+
+.. automodule:: sgs_tools.scripts.arg_parsers
+   :members:
+
+.. automodule:: sgs_tools.scripts.cli_helpers
+   :members:
+
+.. automodule:: sgs_tools.scripts.plotting
+   :members:

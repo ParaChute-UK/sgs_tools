@@ -1,13 +1,19 @@
 import sys
+from collections.abc import Iterable
 
 import matplotlib
 
 
-def configure_matplotlib_backend(argv=None, strict=False):
+def configure_matplotlib_backend(argv: Iterable | None = None, strict: bool = False):
     """
-    Configure matplotlib backend based on presence of --plot_show.
+    Configure matplotlib backend based on presence of ``--plot_show``
+    in argv or sys.argv
 
     Must be called before any import of matplotlib.pyplot.
+
+    :param argv: argument list. If None will look at ``sys.argv`` instead
+    :param strict: if True will raise a ``RuntimeError`` if it detects pyplot
+        in ``sys.modules``. Otherwise just prints a Warning.
     """
 
     if "matplotlib.pyplot" in sys.modules:
@@ -22,4 +28,3 @@ def configure_matplotlib_backend(argv=None, strict=False):
         matplotlib.use("TkAgg")
     else:
         matplotlib.use("Agg")
-    print("Backend:", matplotlib.get_backend())

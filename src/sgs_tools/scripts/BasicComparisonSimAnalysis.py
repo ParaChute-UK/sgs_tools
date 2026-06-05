@@ -432,7 +432,9 @@ def plot_horiz_slices(
             if verbose:
                 print(f"Plotting {field} at {field_plot_map[field].zcoord} ~ {z}")
             da_collection = {
-                k: ds[field].sel({field_plot_map[field].zcoord: z}, method="nearest")
+                k: ds[field]
+                .sel({field_plot_map[field].zcoord: z}, method="nearest")
+                .compute()
                 for k, ds in ds_collection.items()
                 if field in ds
             }
@@ -467,7 +469,7 @@ def plot_vert_profiles(
                 ds,
                 local_red_coords,
                 list(reductions),
-            )
+            ).compute()
     for reduction in reductions:
         for field in fields:
             if verbose:
@@ -505,7 +507,9 @@ def plot_clouds(
     empty = True
     for ax, k in zip(axes, ds_collection, strict=False):
         if "q_t" in ds_collection[k]:
-            data = ds_collection[k]["q_t"].mean(field_plot_map["q_t"].hcoords) * 1000
+            data = (
+                ds_collection[k]["q_t"].mean(field_plot_map["q_t"].hcoords) * 1000
+            ).compute()
             if len(field_plot_map["q_t"].tcoord) > 1:
                 data.plot.contourf(
                     ax=ax,

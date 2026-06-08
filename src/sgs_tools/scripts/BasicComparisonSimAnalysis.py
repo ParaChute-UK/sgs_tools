@@ -472,7 +472,7 @@ def plot_vert_profiles(
                 ds,
                 local_red_coords,
                 list(reductions),
-            ).compute()
+            )
     for reduction in reductions:
         for field in fields:
             if verbose:
@@ -480,8 +480,8 @@ def plot_vert_profiles(
             da_collection = {}
             for s in dred_collection:
                 if field in dred_collection[s]:
-                    da_collection[s] = dred_collection[s][field].sel(
-                        statistic=reduction
+                    da_collection[s] = (
+                        dred_collection[s][field].sel(statistic=reduction).compute()
                     )
                 else:
                     if verbose:

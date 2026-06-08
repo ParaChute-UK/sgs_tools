@@ -609,6 +609,10 @@ def io(args) -> tuple[dict[str, xr.Dataset], dict[str, field_plot_kwargs]]:
             # add chunking for better memory management
             # will not chunk along z because staggering makes it annoying
             # for simple plotting it should be ok
+
+            # clean-up chunks in case of misalignment
+            ds = ds.unify_chunks()
+            # time slices should be independent
             ds = chunk_ds(ds, {"t": args["t_chunk_size"]})
 
             # store with a label from the plotting map

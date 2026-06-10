@@ -526,44 +526,45 @@ def plot(
         args["plot_path"].mkdir(parents=True, exist_ok=True)
 
     # plot horizontal slices
-    with timer("Plot horizontal slices", "s"):
-        try:
-            for z, f, fig in plot_horiz_slices(
-                ds_collection,
-                slice_fields,
-                args["hor_slice_levels"],
-                field_plot_map,
-                args["verbose"],
-            ):
-                render_figure(
-                    fig,
-                    path=args["plot_path"],
-                    filename=f"Slice_z{z:g}m_{tlabel}_{f}.png",
-                    show=args["plot_show"],
-                )
-        except KeyboardInterrupt:
-            print("Detected Keyboard interrupt, proceeding with vertical profiles")
+    if args["hor_slice_levels"]:
+        with timer("Plot horizontal slices", "s"):
+            try:
+                for z, f, fig in plot_horiz_slices(
+                    ds_collection,
+                    slice_fields,
+                    args["hor_slice_levels"],
+                    field_plot_map,
+                    args["verbose"],
+                ):
+                    render_figure(
+                        fig,
+                        path=args["plot_path"],
+                        filename=f"Slice_z{z:g}m_{tlabel}_{f}.png",
+                        show=args["plot_show"],
+                    )
+            except KeyboardInterrupt:
+                print("Detected Keyboard interrupt, proceeding with vertical profiles")
 
     # plot vertical profiles
     # transpose plot map and match to dataset labels
-    plot_map: dict[str, dict[str, Any]] = {
-        "color_map": {},
-        "linestyle_map": {},
-        "linewidth_map": {},
-        "marker_map": {},
-        "label_map": {},
-    }
-    for i, key in enumerate(ds_collection):
-        plot_map["color_map"][key] = args["plot_map"][i]["color"]
-        plot_map["linestyle_map"][key] = args["plot_map"][i]["linestyle"]
-        plot_map["linewidth_map"][key] = args["plot_map"][i]["linewidth"]
-        plot_map["marker_map"][key] = args["plot_map"][i]["marker"]
-        plot_map["label_map"][key] = args["plot_map"][i]["label"]
+    if not args["skip_vert_profiles"]:
+        plot_map: dict[str, dict[str, Any]] = {
+            "color_map": {},
+            "linestyle_map": {},
+            "linewidth_map": {},
+            "marker_map": {},
+            "label_map": {},
+        }
+        for i, key in enumerate(ds_collection):
+            plot_map["color_map"][key] = args["plot_map"][i]["color"]
+            plot_map["linestyle_map"][key] = args["plot_map"][i]["linestyle"]
+            plot_map["linewidth_map"][key] = args["plot_map"][i]["linewidth"]
+            plot_map["marker_map"][key] = args["plot_map"][i]["marker"]
+            plot_map["label_map"][key] = args["plot_map"][i]["label"]
 
-    reductions = ["mean", "var"]
-    with timer("Plot vertical profiles", "s"):
-        try:
-            if not args["skip_vert_profiles"]:
+        reductions = ["mean", "var"]
+        with timer("Plot vertical profiles", "s"):
+            try:
                 for red, f, fig in plot_vert_profiles(
                     ds_collection, prof_fields, reductions, plot_map, args["verbose"]
                 ):
@@ -573,21 +574,21 @@ def plot(
                         filename=f"Profile_{tlabel}_{red}_{f}.png",
                         show=args["plot_show"],
                     )
-
-        except KeyboardInterrupt:
-            print("Detected Keyboard interrupt, proceeding with cloud plot.")
+            except KeyboardInterrupt:
+                print("Detected Keyboard interrupt, proceeding with cloud plot.")
 
     # cloud plots
-    fig = plot_clouds(
-        ds_collection, arange(0.005, 0.15, 0.005), field_plot_map, plot_map
-    )
-    if fig is not None:
-        render_figure(
-            fig,
-            path=args["plot_path"],
-            filename=f"Clouds_CL_{tlabel}.png",
-            show=args["plot_show"],
+    with timer("Plot clouds", "s"):
+        fig = plot_clouds(
+            ds_collection, arange(0.005, 0.15, 0.005), field_plot_map, plot_map
         )
+        if fig is not None:
+            render_figure(
+                fig,
+                path=args["plot_path"],
+                filename=f"Clouds_CL_{tlabel}.png",
+                show=args["plot_show"],
+            )
 
 
 def io(args) -> tuple[dict[str, xr.Dataset], dict[str, field_plot_kwargs]]:

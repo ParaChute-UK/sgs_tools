@@ -149,6 +149,12 @@ def parse_args(arguments: Sequence[str] | None = None) -> dict[str, Any]:
         help="skip vertical profiles from plotting",
     )
 
+    plotting.add_argument(
+        "--skip_clouds",
+        action="store_true",
+        help="skip cloud plot",
+    )
+
     parser.add_argument(
         "--verbose",
         action="store_true",

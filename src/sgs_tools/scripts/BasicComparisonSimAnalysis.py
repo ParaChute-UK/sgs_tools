@@ -207,6 +207,12 @@ def parse_args(arguments: Sequence[str] | None = None) -> dict[str, Any]:
         help="skip vertical profiles from plotting",
     )
 
+    plotting.add_argument(
+        "--skip_clouds",
+        action="store_true",
+        help="skip cloud plot",
+    )
+
     parser.add_argument(
         "--verbose",
         action="store_true",
@@ -578,17 +584,18 @@ def plot(
                 print("Detected Keyboard interrupt, proceeding with cloud plot.")
 
     # cloud plots
-    with timer("Plot clouds", "s"):
-        fig = plot_clouds(
-            ds_collection, arange(0.005, 0.15, 0.005), field_plot_map, plot_map
-        )
-        if fig is not None:
-            render_figure(
-                fig,
-                path=args["plot_path"],
-                filename=f"Clouds_CL_{tlabel}.png",
-                show=args["plot_show"],
+    if not args["skip_clouds"]:
+        with timer("Plot clouds", "s"):
+            fig = plot_clouds(
+                ds_collection, arange(0.005, 0.15, 0.005), field_plot_map, plot_map
             )
+            if fig is not None:
+                render_figure(
+                    fig,
+                    path=args["plot_path"],
+                    filename=f"Clouds_CL_{tlabel}.png",
+                    show=args["plot_show"],
+                )
 
 
 def io(args) -> tuple[dict[str, xr.Dataset], dict[str, field_plot_kwargs]]:

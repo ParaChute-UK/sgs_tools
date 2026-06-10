@@ -457,46 +457,51 @@ def plot_horiz_slices(
 def plot_vert_profiles(
     ds_collection: Mapping[str, xr.Dataset],
     fields: Iterable[str],
-    reductions: Iterable[str],
+    reductions: list[str],
     plot_map,
     verbose: bool = False,
 ) -> Iterator[tuple[str, str, mpl.Figure]]:
     red_coords = {coord for f in fields for coord in field_plot_map[f].hcoords}
-    dred_collection = {}
-    for sim in ds_collection:
-        local_flist = [f for f in fields if f in ds_collection[sim]]
-        ds = ds_collection[sim][local_flist]
-        local_red_coords = [c for c in red_coords if c in ds.dims]
-        if ds:
+
+    for field in fields:
+        # Compute all reductions at once to optimise derived field calculation
+        if verbose:
+            print(f"Computing profiles for [{field}]")
+        dred_collection = {}
+        for sim, ds_full in ds_collection.items():
+            if field not in ds_full:
+                if verbose:
+                    print(f"Skip missing field {field} from sim {sim}")
+                continue
+
+            da = ds_full[[field]]
+            local_red_coords = [c for c in red_coords if c in da.dims]
             dred_collection[sim] = directional_profile(
-                ds,
+                da,
                 local_red_coords,
-                list(reductions),
-            )
-    for reduction in reductions:
-        for field in fields:
+                reductions,
+            ).compute()
+
+        if not dred_collection:
+            continue
+
+        for reduction in reductions:
             if verbose:
                 print(f"Plotting {reduction} of {field}")
-            da_collection = {}
-            for s in dred_collection:
-                if field in dred_collection[s]:
-                    da_collection[s] = (
-                        dred_collection[s][field].sel(statistic=reduction).compute()
-                    )
-                else:
-                    if verbose:
-                        print(f"Skip missing field {field} from sim {s}")
-            if da_collection:
-                q = plot_vertical_prof_time_slice_compare_sims_slice(
-                    da_collection,
-                    plot_map,
-                    f"{reduction} [ {field_plot_map[field].label} ]",
-                    "t",
-                    field_plot_map[field].zcoord,
-                )
-                # q.suptitle(field_plot_map[field].label)
-                q.tight_layout()
-                yield reduction, field, q.get_figure()
+            da_collection = {
+                sim: dred_collection[sim][field].sel(statistic=reduction)
+                for sim in dred_collection
+            }
+
+            q = plot_vertical_prof_time_slice_compare_sims_slice(
+                da_collection,
+                plot_map,
+                f"{reduction} [ {field_plot_map[field].label} ]",
+                "t",
+                field_plot_map[field].zcoord,
+            )
+            q.tight_layout()
+            yield reduction, field, q.get_figure()
 
 
 def plot(

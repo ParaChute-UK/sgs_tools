@@ -551,23 +551,24 @@ def plot(
             except KeyboardInterrupt:
                 print("Detected Keyboard interrupt, proceeding with vertical profiles")
 
-    # plot vertical profiles
     # transpose plot map and match to dataset labels
-    if not args["skip_vert_profiles"]:
-        plot_map: dict[str, dict[str, Any]] = {
-            "color_map": {},
-            "linestyle_map": {},
-            "linewidth_map": {},
-            "marker_map": {},
-            "label_map": {},
-        }
-        for i, key in enumerate(ds_collection):
-            plot_map["color_map"][key] = args["plot_map"][i]["color"]
-            plot_map["linestyle_map"][key] = args["plot_map"][i]["linestyle"]
-            plot_map["linewidth_map"][key] = args["plot_map"][i]["linewidth"]
-            plot_map["marker_map"][key] = args["plot_map"][i]["marker"]
-            plot_map["label_map"][key] = args["plot_map"][i]["label"]
+    # will use for vertical profiles and clouds
+    plot_map: dict[str, dict[str, Any]] = {
+        "color_map": {},
+        "linestyle_map": {},
+        "linewidth_map": {},
+        "marker_map": {},
+        "label_map": {},
+    }
+    for i, key in enumerate(ds_collection):
+        plot_map["color_map"][key] = args["plot_map"][i]["color"]
+        plot_map["linestyle_map"][key] = args["plot_map"][i]["linestyle"]
+        plot_map["linewidth_map"][key] = args["plot_map"][i]["linewidth"]
+        plot_map["marker_map"][key] = args["plot_map"][i]["marker"]
+        plot_map["label_map"][key] = args["plot_map"][i]["label"]
 
+    # plot vertical profiles
+    if not args["skip_vert_profiles"]:
         reductions = ["mean", "var"]
         with timer("Plot vertical profiles", "s"):
             try:

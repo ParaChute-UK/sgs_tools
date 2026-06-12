@@ -8,7 +8,10 @@ All notable changes to this project are documented in this file.
 ### Added
 
 - update CLI:
-  - refactor sim_comparison plotting: stream figures, reduce memory load
+  - refactor sim_comparison plotting
+    - stream figures, reduce memory load
+    - add skip_clouds arguments
+  -
   - accept json strings as inputs for plot_styles
   - add dynamic version CL arg and tags in netcdf outputs
 - Debug utility to track memory usage
@@ -27,6 +30,7 @@ All notable changes to this project are documented in this file.
 - dynamic versioning (instructions and docs)
 - enhancements to post_process
 - unify output filename convention
+- ref_comparison CLI: run with non-default plot_style
 
 ## [0.1.0] - 2025-08-22
 

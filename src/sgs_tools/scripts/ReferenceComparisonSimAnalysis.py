@@ -133,7 +133,7 @@ def parse_args(arguments: Sequence[str] | None = None) -> dict[str, Any]:
         default=None,
         help="""
                 JSON configuration describing a list of plot styles and decorations
-                matched sequentially to the target and reference.
+                matched sequentially to (1) target and (2) reference.
                 Can pass as a json-compatible string, but better a path to a JSON file.
                 See plot_config_template.json for a template.
                 If absent, will use ``default_plotting_style``.
@@ -232,13 +232,18 @@ def main(arguments: Sequence[str] | None = None) -> None:
         with timer("Make error plots", "s"):
             for f in field_plot_map:
                 field_plot_map[f] = field_plot_map[f].with_args(cmap="RdBu_r")
-            # error
+
+            tar_lbl = args["plot_map"][0]["label"]
+            ref_lbl = args["plot_map"][1]["label"]
+
             err_collection = {
-                "difference": ds_collection["target"] - ds_collection["reference"]
+                "difference": ds_collection[tar_lbl] - ds_collection[ref_lbl]
             }
+            diff_label = f"{tar_lbl} - {ref_lbl}"
+
             args["plot_map"] = [
                 {
-                    "label": "difference",
+                    "label": diff_label,
                     "linestyle": "-",
                     "color": "k",
                     "linewidth": 1,
@@ -251,13 +256,16 @@ def main(arguments: Sequence[str] | None = None) -> None:
 
             err_collection = {
                 "rel_difference": 2
-                * (ds_collection["target"] - ds_collection["reference"])
-                / (ds_collection["target"] + ds_collection["reference"])
+                * err_collection["difference"]
+                / (ds_collection[tar_lbl] + ds_collection[ref_lbl])
             }
-
+            rel_diff_label = (
+                f"$\\frac{{{tar_lbl} - {ref_lbl}}}"
+                f"{{\\langle {tar_lbl}, {ref_lbl} \\rangle}}$"
+            )
             args["plot_map"] = [
                 {
-                    "label": "rel_difference",
+                    "label": rel_diff_label,
                     "linestyle": "-",
                     "color": "k",
                     "linewidth": 1,

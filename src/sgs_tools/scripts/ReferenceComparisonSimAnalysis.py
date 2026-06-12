@@ -120,6 +120,14 @@ def parse_args(arguments: Sequence[str] | None = None) -> dict[str, Any]:
 
     plotting = add_plotting_group(parser)
     plotting.add_argument(
+        "--only_diff",
+        action="store_true",
+        help="""
+                Make only difference and relative difference figures.
+                Skip overplotting comparison figures.
+            """,
+    )
+    plotting.add_argument(
         "--plot_styles",
         type=parse_json_or_file,
         default=None,
@@ -217,8 +225,9 @@ def main(arguments: Sequence[str] | None = None) -> None:
         ds_collection, field_plot_map = io(args)
 
         # make plots
-        with timer("Make plots", "s"):
-            plot(ds_collection, args, slice_fields, prof_fields, field_plot_map)
+        if not args["only_diff"]:
+            with timer("Make plots", "s"):
+                plot(ds_collection, args, slice_fields, prof_fields, field_plot_map)
 
         with timer("Make error plots", "s"):
             for f in field_plot_map:

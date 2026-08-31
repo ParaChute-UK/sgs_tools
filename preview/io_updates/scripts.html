@@ -546,9 +546,10 @@ Smaller size leads to smaller memory footprint, but may penalize walltime.</p>
 <div class="sphinx-argparse-cli-wrap highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sim_comparison</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">V</span> <span class="p">{</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">}]</span> <span class="p">[</span><span class="o">--</span><span class="n">h_resolution</span> <span class="n">H_RESOLUTION</span> <span class="p">[</span><span class="n">H_RESOLUTION</span> <span class="o">...</span><span class="p">]]</span>
                <span class="p">[</span><span class="o">--</span><span class="n">times</span> <span class="p">[</span><span class="n">TIMES</span> <span class="o">...</span><span class="p">]]</span> <span class="p">[</span><span class="o">--</span><span class="n">z_range</span> <span class="n">Z_RANGE</span> <span class="n">Z_RANGE</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">plot_show</span><span class="p">]</span>
                <span class="p">[</span><span class="o">--</span><span class="n">plot_path</span> <span class="n">PLOT_PATH</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">plot_styles</span> <span class="n">PLOT_STYLES</span><span class="p">]</span>
-               <span class="p">[</span><span class="o">--</span><span class="n">hor_slice_levels</span> <span class="p">[</span><span class="n">HOR_SLICE_LEVELS</span> <span class="o">...</span><span class="p">]]</span> <span class="p">[</span><span class="o">--</span><span class="n">skip_vert_profiles</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">verbose</span><span class="p">]</span>
-               <span class="p">[</span><span class="o">--</span><span class="n">z_chunk_size</span> <span class="n">Z_CHUNK_SIZE</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">t_chunk_size</span> <span class="n">T_CHUNK_SIZE</span><span class="p">]</span>
-               <span class="p">[</span><span class="o">--</span><span class="n">h_chunk_size</span> <span class="n">H_CHUNK_SIZE</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">mem_limit_MB</span> <span class="n">MEM_LIMIT_MB</span><span class="p">]</span>
+               <span class="p">[</span><span class="o">--</span><span class="n">hor_slice_levels</span> <span class="p">[</span><span class="n">HOR_SLICE_LEVELS</span> <span class="o">...</span><span class="p">]]</span> <span class="p">[</span><span class="o">--</span><span class="n">skip_vert_profiles</span><span class="p">]</span>
+               <span class="p">[</span><span class="o">--</span><span class="n">skip_clouds</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">verbose</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">z_chunk_size</span> <span class="n">Z_CHUNK_SIZE</span><span class="p">]</span>
+               <span class="p">[</span><span class="o">--</span><span class="n">t_chunk_size</span> <span class="n">T_CHUNK_SIZE</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">h_chunk_size</span> <span class="n">H_CHUNK_SIZE</span><span class="p">]</span>
+               <span class="p">[</span><span class="o">--</span><span class="n">mem_limit_MB</span> <span class="n">MEM_LIMIT_MB</span><span class="p">]</span>
                <span class="n">input_files</span> <span class="p">[</span><span class="n">input_files</span> <span class="o">...</span><span class="p">]</span> <span class="p">{</span><span class="n">um</span><span class="p">,</span><span class="n">monc</span><span class="p">,</span><span class="n">sgs</span><span class="p">}</span>
 </pre></div>
 </div>
@@ -605,6 +606,7 @@ cycle through different colors.</p>
 If not given will omit these plots.</p>
  (default: <code class="docutils literal notranslate"><span class="pre">[]</span></code>)</p></li>
 <li><p id="sim_comparison---skip_vert_profiles"><a class="reference internal" href="#sim_comparison---skip_vert_profiles" title="sim_comparison --skip_vert_profiles"><strong><code class="docutils literal notranslate"><span class="pre">--skip_vert_profiles</span></code></strong></a> - skip vertical profiles from plotting</p></li>
+<li><p id="sim_comparison---skip_clouds"><a class="reference internal" href="#sim_comparison---skip_clouds" title="sim_comparison --skip_clouds"><strong><code class="docutils literal notranslate"><span class="pre">--skip_clouds</span></code></strong></a> - skip cloud plot</p></li>
 </ul>
 </section>
 <section id="sim_comparison-Dask-parameters">
@@ -643,10 +645,11 @@ Smaller size leads to smaller memory footprint, but may penalize walltime.</p>
                 </p>
 <div class="sphinx-argparse-cli-wrap highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ref_comparison</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">V</span> <span class="p">{</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">}]</span> <span class="p">[</span><span class="o">--</span><span class="n">h_resolution</span> <span class="n">H_RESOLUTION</span> <span class="p">[</span><span class="n">H_RESOLUTION</span> <span class="o">...</span><span class="p">]]</span>
                <span class="p">[</span><span class="o">--</span><span class="n">times</span> <span class="p">[</span><span class="n">TIMES</span> <span class="o">...</span><span class="p">]]</span> <span class="p">[</span><span class="o">--</span><span class="n">z_range</span> <span class="n">Z_RANGE</span> <span class="n">Z_RANGE</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">plot_show</span><span class="p">]</span>
-               <span class="p">[</span><span class="o">--</span><span class="n">plot_path</span> <span class="n">PLOT_PATH</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">plot_styles</span> <span class="n">PLOT_STYLES</span><span class="p">]</span>
-               <span class="p">[</span><span class="o">--</span><span class="n">hor_slice_levels</span> <span class="p">[</span><span class="n">HOR_SLICE_LEVELS</span> <span class="o">...</span><span class="p">]]</span> <span class="p">[</span><span class="o">--</span><span class="n">skip_vert_profiles</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">verbose</span><span class="p">]</span>
-               <span class="p">[</span><span class="o">--</span><span class="n">z_chunk_size</span> <span class="n">Z_CHUNK_SIZE</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">t_chunk_size</span> <span class="n">T_CHUNK_SIZE</span><span class="p">]</span>
-               <span class="p">[</span><span class="o">--</span><span class="n">h_chunk_size</span> <span class="n">H_CHUNK_SIZE</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">mem_limit_MB</span> <span class="n">MEM_LIMIT_MB</span><span class="p">]</span>
+               <span class="p">[</span><span class="o">--</span><span class="n">plot_path</span> <span class="n">PLOT_PATH</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">only_diff</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">plot_styles</span> <span class="n">PLOT_STYLES</span><span class="p">]</span>
+               <span class="p">[</span><span class="o">--</span><span class="n">hor_slice_levels</span> <span class="p">[</span><span class="n">HOR_SLICE_LEVELS</span> <span class="o">...</span><span class="p">]]</span> <span class="p">[</span><span class="o">--</span><span class="n">skip_vert_profiles</span><span class="p">]</span>
+               <span class="p">[</span><span class="o">--</span><span class="n">skip_clouds</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">verbose</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">z_chunk_size</span> <span class="n">Z_CHUNK_SIZE</span><span class="p">]</span>
+               <span class="p">[</span><span class="o">--</span><span class="n">t_chunk_size</span> <span class="n">T_CHUNK_SIZE</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">h_chunk_size</span> <span class="n">H_CHUNK_SIZE</span><span class="p">]</span>
+               <span class="p">[</span><span class="o">--</span><span class="n">mem_limit_MB</span> <span class="n">MEM_LIMIT_MB</span><span class="p">]</span>
                <span class="n">target</span> <span class="n">reference</span> <span class="p">{</span><span class="n">um</span><span class="p">,</span><span class="n">monc</span><span class="p">,</span><span class="n">sgs</span><span class="p">}</span>
 </pre></div>
 </div>
@@ -697,8 +700,11 @@ default (which is empty) means the full data range at 1h intervals.</p>
 <ul class="simple">
 <li><p id="ref_comparison---plot_show"><a class="reference internal" href="#ref_comparison---plot_show" title="ref_comparison --plot_show"><strong><code class="docutils literal notranslate"><span class="pre">--plot_show</span></code></strong></a> - flag to display generated plots</p></li>
 <li><p id="ref_comparison---plot_path"><a class="reference internal" href="#ref_comparison---plot_path" title="ref_comparison --plot_path"><strong><code class="docutils literal notranslate"><span class="pre">--plot_path</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">PLOT_PATH</span></code> - output directory, for storing generated plots</p></li>
+<li><p id="ref_comparison---only_diff"><a class="reference internal" href="#ref_comparison---only_diff" title="ref_comparison --only_diff"><strong><code class="docutils literal notranslate"><span class="pre">--only_diff</span></code></strong></a> - <p>Make only difference and relative difference figures.
+Skip overplotting comparison figures.</p>
+</p></li>
 <li><p id="ref_comparison---plot_styles"><a class="reference internal" href="#ref_comparison---plot_styles" title="ref_comparison --plot_styles"><strong><code class="docutils literal notranslate"><span class="pre">--plot_styles</span></code></strong></a> <code class="docutils literal notranslate"><span class="pre">PLOT_STYLES</span></code> - <p>JSON configuration describing a list of plot styles and decorations
-matched sequentially to the target and reference.
+matched sequentially to (1) target and (2) reference.
 Can pass as a json-compatible string, but better a path to a JSON file.
 See plot_config_template.json for a template.
 If absent, will use <code class="docutils literal notranslate"><span class="pre">default_plotting_style</span></code>.</p>
@@ -707,6 +713,7 @@ If absent, will use <code class="docutils literal notranslate"><span class="pre"
 If not given will omit these plots.</p>
  (default: <code class="docutils literal notranslate"><span class="pre">[]</span></code>)</p></li>
 <li><p id="ref_comparison---skip_vert_profiles"><a class="reference internal" href="#ref_comparison---skip_vert_profiles" title="ref_comparison --skip_vert_profiles"><strong><code class="docutils literal notranslate"><span class="pre">--skip_vert_profiles</span></code></strong></a> - skip vertical profiles from plotting</p></li>
+<li><p id="ref_comparison---skip_clouds"><a class="reference internal" href="#ref_comparison---skip_clouds" title="ref_comparison --skip_clouds"><strong><code class="docutils literal notranslate"><span class="pre">--skip_clouds</span></code></strong></a> - skip cloud plot</p></li>
 </ul>
 </section>
 <section id="ref_comparison-Dask-parameters">
@@ -765,6 +772,68 @@ Smaller size leads to smaller memory footprint, but may penalize walltime.</p>
 </ul>
 </section>
 </section>
+</section>
+<section id="miscellaneous">
+<h2>Miscellaneous<a class="headerlink" href="#miscellaneous" title="Link to this heading">¶</a></h2>
+<section id="version.py">
+<h3>version.py<a class="headerlink" href="#version.py" title="Link to this heading">¶</a></h3>
+<p>Show package version</p>
+<div class="sphinx-argparse-cli-wrap highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sgs_tools_version</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">v</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">raw</span><span class="p">]</span>
+</pre></div>
+</div>
+<section id="sgs_tools_version-options">
+<h4>options<a class="headerlink" href="#sgs_tools_version-options" title="Link to this heading">¶</a></h4>
+<ul class="simple">
+<li><p id="sgs_tools_version--h"><span id="sgs_tools_version---help"></span><a class="reference internal" href="#sgs_tools_version--h" title="sgs_tools_version -h"><strong><code class="docutils literal notranslate"><span class="pre">-h</span></code></strong></a>, <a class="reference internal" href="#sgs_tools_version---help" title="sgs_tools_version --help"><strong><code class="docutils literal notranslate"><span class="pre">--help</span></code></strong></a> - show this help message and exit</p></li>
+<li><p id="sgs_tools_version---raw"><a class="reference internal" href="#sgs_tools_version---raw" title="sgs_tools_version --raw"><strong><code class="docutils literal notranslate"><span class="pre">--raw</span></code></strong></a> - <p>Output directory, where to write netcdf output files.
+Will create/overwrite existing file and
+create any missing intermediate directories</p>
+</p></li>
+</ul>
+</section>
+<section id="sgs_tools_version-Output">
+<h4>Output<a class="headerlink" href="#sgs_tools_version-Output" title="Link to this heading">¶</a></h4>
+<ul class="simple">
+<li><p id="sgs_tools_version--v"><span id="sgs_tools_version---verbosity"></span><a class="reference internal" href="#sgs_tools_version--v" title="sgs_tools_version -v"><strong><code class="docutils literal notranslate"><span class="pre">-v</span></code></strong></a>, <a class="reference internal" href="#sgs_tools_version---verbosity" title="sgs_tools_version --verbosity"><strong><code class="docutils literal notranslate"><span class="pre">--verbosity</span></code></strong></a> - verbosity level. Increase by -v , -vv, etc. (default: <code class="docutils literal notranslate"><span class="pre">0</span></code>)</p></li>
+</ul>
+</section>
+</section>
+</section>
+<section id="module-sgs_tools.scripts.arg_parsers">
+<span id="utilities"></span><h2>Utilities:<a class="headerlink" href="#module-sgs_tools.scripts.arg_parsers" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="sgs_tools.scripts.arg_parsers.VersionAction">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">VersionAction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">option_strings</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dest</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">const</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">choices</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">required</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">help</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metavar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/scripts/arg_parsers.html#VersionAction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.scripts.arg_parsers.VersionAction" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function" id="module-sgs_tools.scripts.cli_helpers">
+<dt class="sig sig-object py" id="sgs_tools.scripts.cli_helpers.print_header">
+<span class="sig-name descname"><span class="pre">print_header</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version_verbosity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/scripts/cli_helpers.html#print_header"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.scripts.cli_helpers.print_header" title="Link to this definition">¶</a></dt>
+<dd><p>Print a consistent, centered CLI header.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function" id="module-sgs_tools.scripts.plotting">
+<dt class="sig sig-object py" id="sgs_tools.scripts.plotting.configure_matplotlib_backend">
+<span class="sig-name descname"><span class="pre">configure_matplotlib_backend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">argv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strict</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/scripts/plotting.html#configure_matplotlib_backend"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.scripts.plotting.configure_matplotlib_backend" title="Link to this definition">¶</a></dt>
+<dd><p>Configure matplotlib backend based on presence of <code class="docutils literal notranslate"><span class="pre">--plot_show</span></code>
+in argv or sys.argv</p>
+<p>Must be called before any import of matplotlib.pyplot.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>argv</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – argument list. If None will look at <code class="docutils literal notranslate"><span class="pre">sys.argv</span></code> instead</p></li>
+<li><p><strong>strict</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></span>) – if True will raise a <code class="docutils literal notranslate"><span class="pre">RuntimeError</span></code> if it detects pyplot
+in <code class="docutils literal notranslate"><span class="pre">sys.modules</span></code>. Otherwise just prints a Warning.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 </section>
 
@@ -872,6 +941,20 @@ Smaller size leads to smaller memory footprint, but may penalize walltime.</p>
 <li><a class="reference internal" href="#um_levels-Package-version">Package version</a></li>
 </ul>
 </li>
+</ul>
+</li>
+<li><a class="reference internal" href="#miscellaneous">Miscellaneous</a><ul>
+<li><a class="reference internal" href="#version.py">version.py</a><ul>
+<li><a class="reference internal" href="#sgs_tools_version-options">options</a></li>
+<li><a class="reference internal" href="#sgs_tools_version-Output">Output</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-sgs_tools.scripts.arg_parsers">Utilities:</a><ul>
+<li><a class="reference internal" href="#sgs_tools.scripts.arg_parsers.VersionAction"><code class="docutils literal notranslate"><span class="pre">VersionAction</span></code></a></li>
+<li><a class="reference internal" href="#sgs_tools.scripts.cli_helpers.print_header"><code class="docutils literal notranslate"><span class="pre">print_header()</span></code></a></li>
+<li><a class="reference internal" href="#sgs_tools.scripts.plotting.configure_matplotlib_backend"><code class="docutils literal notranslate"><span class="pre">configure_matplotlib_backend()</span></code></a></li>
 </ul>
 </li>
 </ul>

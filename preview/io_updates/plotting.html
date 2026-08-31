@@ -249,10 +249,32 @@
           <section id="plotting">
 <h1>Plotting<a class="headerlink" href="#plotting" title="Link to this heading">¶</a></h1>
 <section id="id1">
-<h2><code class="xref py py-mod docutils literal notranslate"><span class="pre">plotting</span></code><a class="headerlink" href="#id1" title="Link to this heading">¶</a></h2>
+<h2><a class="reference internal" href="scripts.html#module-sgs_tools.scripts.plotting" title="sgs_tools.scripts.plotting"><code class="xref py py-mod docutils literal notranslate"><span class="pre">plotting</span></code></a><a class="headerlink" href="#id1" title="Link to this heading">¶</a></h2>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p><strong>Experimental.</strong> Used by some scripts</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p><strong>Matplotlib backend rules</strong></p>
+<ul class="simple">
+<li><p><strong>For library / plotting modules</strong></p>
+<ul>
+<li><p>These modules assume the backend has already been configured.</p></li>
+<li><p>So they import <code class="docutils literal notranslate"><span class="pre">matplotlib.pyplot</span></code> normally.</p></li>
+</ul>
+</li>
+<li><p><strong>For scripts (CLI / entrypoints)</strong></p>
+<ul>
+<li><p>Configure matplotlib backend before any plotting. You can use
+<a class="reference internal" href="scripts.html#sgs_tools.scripts.plotting.configure_matplotlib_backend" title="sgs_tools.scripts.plotting.configure_matplotlib_backend"><code class="xref py py-func docutils literal notranslate"><span class="pre">sgs_tools.scripts.plotting.configure_matplotlib_backend()</span></code></a>
+to configure at runtime or import time.</p></li>
+<li><p>To allow using CLI programmatically, <strong>do not</strong> import
+<code class="docutils literal notranslate"><span class="pre">matplotlib.pyplot</span></code> at module level,
+and run <cite>configure_matplotlib_backend</cite> as first thing in <cite>main</cite>.</p></li>
+</ul>
+</li>
+</ul>
 </div>
 <dl class="py class" id="module-sgs_tools.plotting.field_plot_map">
 <dt class="sig sig-object py" id="sgs_tools.plotting.field_plot_map.field_plot_kwargs">
@@ -284,6 +306,9 @@ Will use the keys to pick plotting style from plot_kwargs.</p></li>
 <li><p><strong>with_markers</strong> – general flag to add markers to the plotted lines.</p></li>
 </ul>
 </dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Figure</span></code></span></p>
+</dd>
 </dl>
 </dd></dl>
 
@@ -303,6 +328,9 @@ One of the dimensions must be <cite>tcoord</cite></p></li>
 <li><p><strong>field_lbl</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – a display label for the plotted field</p></li>
 </ul>
 </dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Figure</span></code></span></p>
+</dd>
 </dl>
 </dd></dl>
 
@@ -314,8 +342,20 @@ Compare fields in each panel.</p>
 <p>tslice : selection of times in minutes. if None will default
 to hourly schedule from 1 to 16 hours.
 reduction: ‘mean’ or ‘median’</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Figure</span></code></span></p>
+</dd>
+</dl>
 </dd></dl>
 
+<dl class="simple">
+<dt>..automodule:: sgs_tools.plotting.handle_figure</dt><dd><dl class="field-list simple">
+<dt class="field-odd">members<span class="colon">:</span></dt>
+<dd class="field-odd"><p></p></dd>
+</dl>
+</dd>
+</dl>
 <div class="literal-block-wrapper docutils container" id="id2">
 <div class="code-block-caption"><span class="caption-text">Plot style template file</span><a class="headerlink" href="#id2" title="Link to this code">¶</a></div>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">[{</span>

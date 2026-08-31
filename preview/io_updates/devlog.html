@@ -350,7 +350,13 @@
 <ul class="simple">
 <li><p>update CLI:</p>
 <ul>
-<li><p>refactor sim_comparison plotting: close each figure after show/save</p></li>
+<li><p>refactor sim_comparison plotting</p>
+<ul>
+<li><p>stream figures, reduce memory load</p></li>
+<li><p>add skip_clouds arguments</p></li>
+</ul>
+</li>
+<li></li>
 <li><p>accept json strings as inputs for plot_styles</p></li>
 <li><p>add dynamic version CL arg and tags in netcdf outputs</p></li>
 </ul>
@@ -376,6 +382,7 @@
 <li><p>dynamic versioning (instructions and docs)</p></li>
 <li><p>enhancements to post_process</p></li>
 <li><p>unify output filename convention</p></li>
+<li><p>ref_comparison CLI: run with non-default plot_style</p></li>
 </ul>
 </section>
 </section>

@@ -227,11 +227,11 @@ def parse_args(arguments: Sequence[str] | None = None) -> dict[str, Any]:
     # check input args
     if len(args["h_resolution"]) == 1:
         args["h_resolution"] = [args["h_resolution"][0]] * len(args["input_files"])
-    else:
-        if args["input_format"] == "um_ideal":
-            assert len(args["h_resolution"]) == len(args["input_files"])
-        if args["input_format"] == "um_real":
-            args["h_resolution"] = [None] * len(args["input_files"])
+
+    if args["input_format"] == "um_ideal":
+        assert len(args["h_resolution"]) == len(args["input_files"])
+    if args["input_format"] == "um_real":
+        args["h_resolution"] = [None] * len(args["input_files"])
 
     # initial validation
     assert args["plot_show"] or args["plot_path"], (

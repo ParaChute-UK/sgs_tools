@@ -319,6 +319,9 @@ def parse_args(arguments: Sequence[str] | None = None) -> dict[str, Any]:
         )
     if args["input_format"] == "um_real":
         args["h_resolution"] = None
+        raise NotImplementedError(
+            "Can't deal with variable resolution grids of the um_real format"
+        )
 
     if args["output_path"].exists() and not args["output_path"].is_dir():
         raise NotADirectoryError(

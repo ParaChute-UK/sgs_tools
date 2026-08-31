@@ -11,8 +11,7 @@ All notable changes to this project are documented in this file.
   - refactor sim_comparison plotting
     - stream figures, reduce memory load
     - add skip_clouds arguments
-  -
-  - accept json strings as inputs for plot_styles
+    - accept json strings as inputs for plot_styles
   - add dynamic version CL arg and tags in netcdf outputs
 - Debug utility to track memory usage
 - refactor IO:

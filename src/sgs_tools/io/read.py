@@ -25,7 +25,9 @@ def read(
     :param requested_fields: List of variable names to extract from the input data.
     :param kwargs: Additional keyword arguments depending on the input format.
       The ``um`` format, requires ``resolution`` (float)
-      specifying horizontal grid spacing.
+      specifying horizontal grid spacing. It also accepts
+      ``field_names_dict`` dict[str,str] prescribing a field-names lookup table
+
 
     :return: xarray Dataset containing the requested fields and metadata, including
       the horizontal resolution stored in ``attrs["h_resolution"]``.
@@ -55,11 +57,17 @@ def read(
     elif input_format == "um":
         if interp_grid:
             simulation = data_ingest_UM_on_single_grid(
-                input_files, requested_fields=requested_fields, res=kwargs["resolution"]
+                input_files,
+                requested_fields=requested_fields,
+                res=kwargs["resolution"],
+                field_names_dict=kwargs.get("field_names_dict"),
             )
         else:
             simulation = data_ingest_UM(
-                input_files, requested_fields=requested_fields, res=kwargs["resolution"]
+                input_files,
+                requested_fields=requested_fields,
+                res=kwargs["resolution"],
+                field_names_dict=kwargs.get("field_names_dict"),
             )
 
         simulation.attrs["h_resolution"] = kwargs["resolution"]

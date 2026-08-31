@@ -1,41 +1,40 @@
-import json
 from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
 from collections.abc import Sequence
 from pathlib import Path
 from typing import Any
 
-import matplotlib.pyplot as plt
 from numpy import array, inf
 
 from sgs_tools.scripts.arg_parsers import (
     add_dask_group,
     add_plotting_group,
     add_version_group,
+    parse_json_or_file,
 )
 from sgs_tools.scripts.BasicComparisonSimAnalysis import (
-    default_plotting_style,
     io,
     plot,
     prof_fields,
     slice_fields,
 )
 from sgs_tools.scripts.cli_helpers import print_args_dict, print_header
+from sgs_tools.scripts.plotting import configure_matplotlib_backend
 from sgs_tools.util.timer import timer
 
-plot_styles = [
+default_plotting_style = [
     {
         "label": "target",
         "linestyle": "--",
         "color": "C1",
         "linewidth": 1,
-        "marker": "x",
+        "marker": "",
     },
     {
         "label": "reference",
         "linestyle": "-",
         "color": "k",
         "linewidth": 1,
-        "marker": "o",
+        "marker": "",
     },
 ]
 
@@ -121,15 +120,23 @@ def parse_args(arguments: Sequence[str] | None = None) -> dict[str, Any]:
 
     plotting = add_plotting_group(parser)
     plotting.add_argument(
-        "--plot_style_file",
-        type=Path,
+        "--only_diff",
+        action="store_true",
+        help="""
+                Make only difference and relative difference figures.
+                Skip overplotting comparison figures.
+            """,
+    )
+    plotting.add_argument(
+        "--plot_styles",
+        type=parse_json_or_file,
         default=None,
         help="""
-                Configuration file describing a list of plot style and decorations
-                to matched sequentially to each simulation.
+                JSON configuration describing a list of plot styles and decorations
+                matched sequentially to (1) target and (2) reference.
+                Can pass as a json-compatible string, but better a path to a JSON file.
                 See plot_config_template.json for a template.
-                If absent, will use ``default_plotting_style`` and
-                cycle through different colors.
+                If absent, will use ``default_plotting_style``.
             """,
     )
 
@@ -148,6 +155,12 @@ def parse_args(arguments: Sequence[str] | None = None) -> dict[str, Any]:
         "--skip_vert_profiles",
         action="store_true",
         help="skip vertical profiles from plotting",
+    )
+
+    plotting.add_argument(
+        "--skip_clouds",
+        action="store_true",
+        help="skip cloud plot",
     )
 
     parser.add_argument(
@@ -174,18 +187,10 @@ def parse_args(arguments: Sequence[str] | None = None) -> dict[str, Any]:
     )
 
     # parse plotting style
-    if args["plot_style_file"] is None:
-        plot_styles = []
-        colors = plt.rcParams["axes.prop_cycle"].by_key()["color"]
-        linestyles = ["-", "--", ":", "-."]
-        for i in range(len(args["input_files"])):
-            plot_styles.append(default_plotting_style.copy())
-            plot_styles[i]["color"] = colors[i % len(colors)]
-            plot_styles[i]["linestyle"] = linestyles[i % len(linestyles)]
-            plot_styles[i]["label"] = f"sim{i}"
+    if args["plot_styles"] is None:
+        plot_styles = default_plotting_style
     else:
-        with open(args["plot_style_file"]) as f:
-            plot_styles = json.load(f)
+        plot_styles = args["plot_styles"]
         # ensure we have enough plotting styles
         assert len(plot_styles) == len(args["input_files"])
 
@@ -202,8 +207,8 @@ def parse_args(arguments: Sequence[str] | None = None) -> dict[str, Any]:
     assert all(
         args["z_range"][0] <= z <= args["z_range"][1] for z in args["hor_slice_levels"]
     ), (
-        f"hor_slice_levels {args['hor_slice_levels']} aren't"
-        f" contained in z_range {args['z_range']}"
+        f"hor_slice_levels {args['hor_slice_levels']} aren't "
+        f"contained in z_range {args['z_range']}"
     )
     return args
 
@@ -211,6 +216,8 @@ def parse_args(arguments: Sequence[str] | None = None) -> dict[str, Any]:
 def main(arguments: Sequence[str] | None = None) -> None:
     with timer("Total execution time", "min"):
         with timer("Arguments", "ms"):
+            # needs to happen before any plotting
+            configure_matplotlib_backend(arguments)
             args = parse_args(arguments)
             print_header("ref_comparison")
             print_args_dict(args)
@@ -218,19 +225,25 @@ def main(arguments: Sequence[str] | None = None) -> None:
         ds_collection, field_plot_map = io(args)
 
         # make plots
-        with timer("Make plots", "s"):
-            plot(ds_collection, args, slice_fields, prof_fields, field_plot_map)
+        if not args["only_diff"]:
+            with timer("Make plots", "s"):
+                plot(ds_collection, args, slice_fields, prof_fields, field_plot_map)
 
         with timer("Make error plots", "s"):
             for f in field_plot_map:
                 field_plot_map[f] = field_plot_map[f].with_args(cmap="RdBu_r")
-            # error
+
+            tar_lbl = args["plot_map"][0]["label"]
+            ref_lbl = args["plot_map"][1]["label"]
+
             err_collection = {
-                "difference": ds_collection["target"] - ds_collection["reference"]
+                "difference": ds_collection[tar_lbl] - ds_collection[ref_lbl]
             }
+            diff_label = f"{tar_lbl} - {ref_lbl}"
+
             args["plot_map"] = [
                 {
-                    "label": "difference",
+                    "label": diff_label,
                     "linestyle": "-",
                     "color": "k",
                     "linewidth": 1,
@@ -243,13 +256,16 @@ def main(arguments: Sequence[str] | None = None) -> None:
 
             err_collection = {
                 "rel_difference": 2
-                * (ds_collection["target"] - ds_collection["reference"])
-                / (ds_collection["target"] + ds_collection["reference"])
+                * err_collection["difference"]
+                / (ds_collection[tar_lbl] + ds_collection[ref_lbl])
             }
-
+            rel_diff_label = (
+                f"$\\frac{{{tar_lbl} - {ref_lbl}}}"
+                f"{{\\langle {tar_lbl}, {ref_lbl} \\rangle}}$"
+            )
             args["plot_map"] = [
                 {
-                    "label": "rel_difference",
+                    "label": rel_diff_label,
                     "linestyle": "-",
                     "color": "k",
                     "linewidth": 1,

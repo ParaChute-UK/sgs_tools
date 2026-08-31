@@ -5,17 +5,26 @@ All notable changes to this project are documented in this file.
 
 ## [WIP]
 
+### Break backward compatibility
+
+- CLI
+  - in sim_comparison/ref_comparison: rename `--plot_style_file` -> `--plot_styles`, as it can take a json string or a path to a json file. (#48)
+  - Read all fields when `requested_fields` is empty (#40)
+
 ### Added
 
-- dynamic version CL arg and tags in netcdf outputs of CLIs
-- Debug utility to track memory usage
-- refactor IO:
-  - a central read dispatcher (#33)
-  - on empty requested_fields, retain all available fields (#40)
-  - accept strings (#42)
-- update packaging and testing environment management
-- update GH Action workflows -- more commit and PR merge protections
-- update docs
+- update CLI:
+  - Dynamic version arg and tags in the netCDF output
+    - better non-interactive backend support (#48)
+    - New `--skip_clouds` and `--only_diff` arguments
+- I/O:
+  - Central read dispatcher (#33)
+  - Accept string inputs (#42)
+  - Custom field-names lookup for UM files with `default_field_names_dict` (#48)
+- Debug utility for memory usage tracking
+- Updated packaging and test environment management
+- Enhanced GH Action workflows with stricter merge protections
+- Updated documentation
 
 ### Fixes
 
@@ -23,6 +32,8 @@ All notable changes to this project are documented in this file.
 - dynamic versioning (instructions and docs)
 - enhancements to post_process
 - unify output filename convention
+- ref_comparison CLI: run with non-default plot_style
+- CLI plotting: add iterators for streaming figures to help memory optimization
 
 ## [0.1.0] - 2025-08-22
 

@@ -1,12 +1,12 @@
-import json
 from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
-from collections.abc import Iterable, Mapping, Sequence
+from collections.abc import Iterable, Iterator, Mapping, Sequence
 from pathlib import Path
 from typing import Any
 
-import matplotlib.pyplot as plt
+# make sure there are not pyplot imports here
+import matplotlib as mpl
 import xarray as xr
-from matplotlib.figure import Figure
+from matplotlib.figure import Figure, SubFigure
 from numpy import arange, array, inf, linspace, nan, ndarray
 from pint import UnitRegistry
 
@@ -14,6 +14,7 @@ from sgs_tools.diagnostics.directional_profile import directional_profile
 from sgs_tools.io.read import read
 from sgs_tools.physics.fields import Reynolds_fluct_stress, vertical_heat_flux
 from sgs_tools.plotting.collection_plots import (
+    plot_clouds,
     plot_horizontal_slice_tseries,
     plot_vertical_prof_time_slice_compare_sims_slice,
 )
@@ -22,12 +23,15 @@ from sgs_tools.plotting.field_plot_map import (
     field_plot_kwargs,
     field_plot_map,
 )
+from sgs_tools.plotting.handle_figure import render_figure
 from sgs_tools.scripts.arg_parsers import (
     add_dask_group,
     add_plotting_group,
     add_version_group,
+    parse_json_or_file,
 )
 from sgs_tools.scripts.cli_helpers import print_args_dict, print_header
+from sgs_tools.scripts.plotting import configure_matplotlib_backend
 from sgs_tools.util.dask_adapt_chunking import chunk_ds
 from sgs_tools.util.timer import timer
 
@@ -132,8 +136,8 @@ def parse_args(arguments: Sequence[str] | None = None) -> dict[str, Any]:
         "input_format",
         type=str,
         choices=["um", "monc", "sgs"],
-        help="Type of 'input_files'. Only support different NetCDF flavours from"
-        " various production codes. 'sgs' refers to files produced by sgs_tools. "
+        help="Type of 'input_files'. Only support different NetCDF flavours from "
+        "various production codes. 'sgs' refers to files produced by sgs_tools. "
         "All simulations must have the same format",
     )
 
@@ -174,12 +178,13 @@ def parse_args(arguments: Sequence[str] | None = None) -> dict[str, Any]:
 
     plotting = add_plotting_group(parser)
     plotting.add_argument(
-        "--plot_style_file",
-        type=Path,
+        "--plot_styles",
+        type=parse_json_or_file,
         default=None,
         help="""
-                Configuration file describing a list of plot style and decorations
-                to matched sequentially to each simulation.
+                JSON configuration describing a list of plot styles and decorations
+                matched sequentially to each input simulation.
+                Can pass as a json-compatible string, but better a path to a JSON file.
                 See plot_config_template.json for a template.
                 If absent, will use ``default_plotting_style`` and
                 cycle through different colors.
@@ -201,6 +206,12 @@ def parse_args(arguments: Sequence[str] | None = None) -> dict[str, Any]:
         "--skip_vert_profiles",
         action="store_true",
         help="skip vertical profiles from plotting",
+    )
+
+    plotting.add_argument(
+        "--skip_clouds",
+        action="store_true",
+        help="skip cloud plot",
     )
 
     parser.add_argument(
@@ -226,9 +237,9 @@ def parse_args(arguments: Sequence[str] | None = None) -> dict[str, Any]:
     )
 
     # parse plotting style
-    if args["plot_style_file"] is None:
+    if args["plot_styles"] is None:
         plot_styles = []
-        colors = plt.rcParams["axes.prop_cycle"].by_key()["color"]
+        colors = mpl.rcParams["axes.prop_cycle"].by_key()["color"]
         linestyles = ["-", "--", ":", "-."]
         for i in range(len(args["input_files"])):
             plot_styles.append(default_plotting_style.copy())
@@ -236,8 +247,7 @@ def parse_args(arguments: Sequence[str] | None = None) -> dict[str, Any]:
             plot_styles[i]["linestyle"] = linestyles[i % len(linestyles)]
             plot_styles[i]["label"] = f"sim{i}"
     else:
-        with open(args["plot_style_file"]) as f:
-            plot_styles = json.load(f)
+        plot_styles = args["plot_styles"]
         # ensure we have enough plotting styles
         assert len(plot_styles) >= len(args["input_files"])
 
@@ -426,15 +436,15 @@ def plot_horiz_slices(
     zlevels: Iterable[float],
     field_plot_map,
     verbose: bool = False,
-) -> dict[float, dict[str, Figure]]:
-    hor_slice: dict[float, dict[str, Figure]] = {}
+) -> Iterator[tuple[float, str, Figure | SubFigure]]:
     for z in zlevels:
-        hor_slice[z] = {}
         for field in fields:
             if verbose:
                 print(f"Plotting {field} at {field_plot_map[field].zcoord} ~ {z}")
             da_collection = {
-                k: ds[field].sel({field_plot_map[field].zcoord: z}, method="nearest")
+                k: ds[field]
+                .sel({field_plot_map[field].zcoord: z}, method="nearest")
+                .compute()
                 for k, ds in ds_collection.items()
                 if field in ds
             }
@@ -448,104 +458,57 @@ def plot_horiz_slices(
                 )
                 f.suptitle(field_plot_map[field].label)
                 f.tight_layout()
-                hor_slice[z][field] = f.get_figure()
-    return hor_slice
+                yield z, field, f.get_figure()
 
 
 def plot_vert_profiles(
     ds_collection: Mapping[str, xr.Dataset],
     fields: Iterable[str],
-    reductions: Iterable[str],
+    reductions: list[str],
     plot_map,
     verbose: bool = False,
-) -> dict[str, dict[str, Figure]]:
-    vert_prof: dict[str, dict[str, Figure]] = {}
+) -> Iterator[tuple[str, str, Figure | SubFigure]]:
     red_coords = {coord for f in fields for coord in field_plot_map[f].hcoords}
-    dred_collection = {}
-    for sim in ds_collection:
-        local_flist = [f for f in fields if f in ds_collection[sim]]
-        ds = ds_collection[sim][local_flist]
-        local_red_coords = [c for c in red_coords if c in ds.dims]
-        if ds:
+
+    for field in fields:
+        # Compute all reductions at once to optimise derived field calculation
+        if verbose:
+            print(f"Computing profiles for [{field}]")
+        dred_collection = {}
+        for sim, ds_full in ds_collection.items():
+            if field not in ds_full:
+                if verbose:
+                    print(f"Skip missing field {field} from sim {sim}")
+                continue
+
+            da = ds_full[[field]]
+            local_red_coords = [c for c in red_coords if c in da.dims]
             dred_collection[sim] = directional_profile(
-                ds,
+                da,
                 local_red_coords,
-                list(reductions),
-            )
-    for reduction in reductions:
-        vert_prof[reduction] = {}
-        for field in fields:
+                reductions,
+            ).compute()
+
+        if not dred_collection:
+            continue
+
+        for reduction in reductions:
             if verbose:
                 print(f"Plotting {reduction} of {field}")
-            da_collection = {}
-            for s in dred_collection:
-                if field in dred_collection[s]:
-                    da_collection[s] = dred_collection[s][field].sel(
-                        statistic=reduction
-                    )
-                else:
-                    if verbose:
-                        print(f"Skip missing field {field} from sim {s}")
-            if da_collection:
-                q = plot_vertical_prof_time_slice_compare_sims_slice(
-                    da_collection,
-                    plot_map,
-                    f"{reduction} [ {field_plot_map[field].label} ]",
-                    "t",
-                    field_plot_map[field].zcoord,
-                )
-                # q.suptitle(field_plot_map[field].label)
-                q.tight_layout()
-                vert_prof[reduction][field] = q.get_figure()
+            da_collection = {
+                sim: dred_collection[sim][field].sel(statistic=reduction)
+                for sim in dred_collection
+            }
 
-    return vert_prof
-
-
-def plot_clouds(
-    ds_collection: Mapping[str, xr.Dataset],
-    clevels: Iterable[float],
-    field_plot_map,
-    collection_plot_map,
-) -> Figure | None:
-    fig, _ = plt.subplots(len(ds_collection), 1, figsize=(6, len(ds_collection) * 6))
-    axes = fig.axes
-    empty = True
-    for ax, k in zip(axes, ds_collection, strict=False):
-        if "q_t" in ds_collection[k]:
-            data = ds_collection[k]["q_t"].mean(field_plot_map["q_t"].hcoords) * 1000
-            if len(field_plot_map["q_t"].tcoord) > 1:
-                data.plot.contourf(
-                    ax=ax,
-                    y=field_plot_map["q_t"].zcoord,
-                    x=field_plot_map["q_t"].tcoord,
-                    levels=clevels,
-                    robust=True,
-                    cmap=field_plot_map["q_t"].cmap,
-                    extend="max",
-                    add_colorbar=True,
-                )
-                ax.text(
-                    0.01,
-                    0.99,
-                    collection_plot_map["label_map"][k],
-                    ha="left",
-                    va="top",
-                    transform=ax.transAxes,
-                    fontsize=24,
-                )
-            else:
-                data.plot(
-                    ax=ax,
-                    y=field_plot_map["q_t"].zcoord,
-                )  # type: ignore
-            # ax.tick_params(axis="x", labelsize=16)
-            # ax.tick_params(axis="y", labelsize=16)
-            empty = False
-    if not empty:
-        fig.tight_layout()
-        return fig
-    else:
-        return None
+            q = plot_vertical_prof_time_slice_compare_sims_slice(
+                da_collection,
+                plot_map,
+                f"{reduction} [ {field_plot_map[field].label} ]",
+                "t",
+                field_plot_map[field].zcoord,
+            )
+            q.tight_layout()
+            yield reduction, field, q.get_figure()
 
 
 def plot(
@@ -556,39 +519,41 @@ def plot(
     field_plot_map,
 ) -> None:
     """master plotting routine"""
+
+    # parse time range; assume all datasets use the same time scale
+    ureg = UnitRegistry()  # type: ignore
+    ds = next(iter(ds_collection.values()))
+    tunit = ds["t"].unit
+    tmin = ds["t"].min().item() * ureg(tunit)
+    tmax = ds["t"].max().item() * ureg(tunit)
+    tlabel = f"times{tmin.to('h').magnitude:0g}-{tmax.to('h').magnitude:0g}h"
+
     if args["plot_path"] is not None:
         print(f"Saving plots to {args['plot_path']}")
-        # parse time range; assume all datasets use the same time scale
-        ureg = UnitRegistry()  # type: ignore
-        ds = next(iter(ds_collection.values()))
-        tunit = ds["t"].unit
-        tmin = ds["t"].min().item() * ureg(tunit)
-        tmax = ds["t"].max().item() * ureg(tunit)
-        tlabel = f"times{tmin.to('h').magnitude:0g}-{tmax.to('h').magnitude:0g}h"
         args["plot_path"].mkdir(parents=True, exist_ok=True)
 
     # plot horizontal slices
-    with timer("Plot horizontal slices", "s"):
-        try:
-            hor_slice = plot_horiz_slices(
-                ds_collection,
-                slice_fields,
-                args["hor_slice_levels"],
-                field_plot_map,
-                args["verbose"],
-            )
-            if args["plot_path"] is not None:
-                for z in hor_slice:
-                    for f in hor_slice[z]:
-                        hor_slice[z][f].savefig(
-                            args["plot_path"] / f"Slice_z{z:g}m_{tlabel}_{f}.png",
-                            dpi=180,
-                        )
-        except KeyboardInterrupt:
-            print("Detected Keyboard interrup, proceeding with vertical profiles")
+    if args["hor_slice_levels"]:
+        with timer("Plot horizontal slices", "s"):
+            try:
+                for z, f, slice_fig in plot_horiz_slices(
+                    ds_collection,
+                    slice_fields,
+                    args["hor_slice_levels"],
+                    field_plot_map,
+                    args["verbose"],
+                ):
+                    render_figure(
+                        slice_fig,
+                        path=args["plot_path"],
+                        filename=f"Slice_z{z:g}m_{tlabel}_{f}.png",
+                        show=args["plot_show"],
+                    )
+            except KeyboardInterrupt:
+                print("Detected Keyboard interrupt, proceeding with vertical profiles")
 
-    # plot vertical profiles
     # transpose plot map and match to dataset labels
+    # will use for vertical profiles and clouds
     plot_map: dict[str, dict[str, Any]] = {
         "color_map": {},
         "linestyle_map": {},
@@ -603,43 +568,40 @@ def plot(
         plot_map["marker_map"][key] = args["plot_map"][i]["marker"]
         plot_map["label_map"][key] = args["plot_map"][i]["label"]
 
-    reductions = ["mean", "var"]
-    with timer("Plot vertical profiles", "s"):
-        try:
-            if args["skip_vert_profiles"]:
-                prof_fields = []
-            vert_prof = plot_vert_profiles(
-                ds_collection, prof_fields, reductions, plot_map, args["verbose"]
-            )
-            if args["plot_path"] is not None:
-                for red in vert_prof:
-                    for f in vert_prof[red]:
-                        vert_prof[red][f].savefig(
-                            args["plot_path"] / f"Profile_{tlabel}_{red}_{f}.png",
-                            dpi=180,
-                        )
-
-        except KeyboardInterrupt:
-            print("Detected Keyboard interrup, proceeding with cloud plot.")
+    # plot vertical profiles
+    if not args["skip_vert_profiles"]:
+        reductions = ["mean", "var"]
+        with timer("Plot vertical profiles", "s"):
+            try:
+                for red, f, prof_fig in plot_vert_profiles(
+                    ds_collection, prof_fields, reductions, plot_map, args["verbose"]
+                ):
+                    render_figure(
+                        prof_fig,  # type: ignore[arg-type]
+                        path=args["plot_path"],
+                        filename=f"Profile_{tlabel}_{red}_{f}.png",
+                        show=args["plot_show"],
+                    )
+            except KeyboardInterrupt:
+                print("Detected Keyboard interrupt, proceeding with cloud plot.")
 
     # cloud plots
-    cloud_fig = plot_clouds(
-        ds_collection, arange(0.005, 0.15, 0.005), field_plot_map, plot_map
-    )
-    if args["plot_path"] is not None and cloud_fig:
-        cloud_fig.savefig(args["plot_path"] / f"Clouds_CL_{tlabel}.png", dpi=180)
-
-    # remove spuriously created empty directory
-    if args["plot_path"] and not any(args["plot_path"].iterdir()):
-        args["plot_path"].rmdir()
-    # interactive plotting (out of local timer)
-    if args["plot_show"]:
-        plt.show()
-    plt.close()
+    if not args["skip_clouds"]:
+        with timer("Plot clouds", "s"):
+            cloud_fig = plot_clouds(
+                ds_collection, arange(0.005, 0.15, 0.005), field_plot_map, plot_map
+            )
+            if cloud_fig is not None:
+                render_figure(
+                    cloud_fig,
+                    path=args["plot_path"],
+                    filename=f"Clouds_CL_{tlabel}.png",
+                    show=args["plot_show"],
+                )
 
 
 def io(args) -> tuple[dict[str, xr.Dataset], dict[str, field_plot_kwargs]]:
-    # read UM stasth files: data
+    # read UM stash files: data
     ds_collection: dict[str, xr.Dataset] = {}
     requested_fields = list(slice_fields + prof_fields + cloud_fields)
     with timer("Read Dataset", "s"):
@@ -662,6 +624,10 @@ def io(args) -> tuple[dict[str, xr.Dataset], dict[str, field_plot_kwargs]]:
             # add chunking for better memory management
             # will not chunk along z because staggering makes it annoying
             # for simple plotting it should be ok
+
+            # clean-up chunks in case of misalignment
+            ds = ds.unify_chunks()
+            # time slices should be independent
             ds = chunk_ds(ds, {"t": args["t_chunk_size"]})
 
             # store with a label from the plotting map
@@ -682,6 +648,10 @@ def run(args: dict[str, Any]) -> None:
 
 
 def main(arguments: Sequence[str] | None = None) -> None:
+    # swap mpl backends for interactive/dask-batch use
+    # needs to happen before figures
+    configure_matplotlib_backend(arguments)
+
     with timer("Arguments", "ms"):
         args = parse_args(arguments)
         print_header("sim_comparison")

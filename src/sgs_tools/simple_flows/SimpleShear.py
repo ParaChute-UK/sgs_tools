@@ -1,5 +1,5 @@
+from collections.abc import Iterable
 from dataclasses import dataclass
-from typing import Iterable
 
 import xarray as xr
 
@@ -9,12 +9,13 @@ from ..geometry.grid import CoordScalar, Grid
 @dataclass(frozen=True)
 class SimpleShear:
     """prescribe velocity for a simple shear flow on a general grid
-        roughly: product({`amplitudes`[i] * x[i] for i in `dimensions`})
-        where x[i] is the coordinate in the i'th direction
+        roughly: product(``amplitudes [i] * x[i]`` for i in ``dimensions``)
+        where ``x[i]`` is the coordinate in the i'th direction
 
     :ivar grid: grid which provices coordinates
     :ivar dimensions: labels of shearing directions
-    :ivar velcomp: 0-indexed component of velocity vector that is sheared (all others are set to 0)
+    :ivar velcomp: 0-indexed component of velocity vector that is sheared
+      (all others are set to 0)
     :ivar amplitudes: amplification factor of gradient along `dimensions`
     """
 

@@ -44,12 +44,12 @@ MANIFEST
 dmypy.json
 
 # Sphinx documentation
-doc/_build/
+documentation/
+*.html
 
 #testing
 .tox/
 .ruff_cache
-.coverage
-
-
-
+.coverage*
+#test output directories
+__test_out

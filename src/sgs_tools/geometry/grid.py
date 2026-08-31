@@ -10,7 +10,8 @@ from xarray import DataArray
 class Grid(ABC):
     """Abstract base grid object.
 
-    * :meth:`mesh`: return a dictionary of type {axis_name : `np.meshgrid` of coordinate}
+    * :meth:`mesh`: return a dictionary of type
+       {axis_name : `np.meshgrid` of coordinate}
     * :meth:`coords`: return a dictionary of type {axis_name : 1d coordinate values}
     """
 
@@ -39,7 +40,7 @@ class UniformCartesianGrid:
     def coords(self, shape: list[int]) -> dict[str, NDArray]:
         coords = {}
         for i in range(len(self.delta)):
-            coords[f"x{i+1}"] = (
+            coords[f"x{i + 1}"] = (
                 np.linspace(0, self.delta[i] * (shape[i] - 1), shape[i])
                 + self.origin[i]
             )
@@ -51,7 +52,7 @@ class UniformCartesianGrid:
         axes = coords.values()
 
         coord_mesh = np.meshgrid(*axes, indexing="ij")
-        return dict(zip(lbls, coord_mesh))
+        return dict(zip(lbls, coord_mesh, strict=False))
 
 
 @dataclass(frozen=True)

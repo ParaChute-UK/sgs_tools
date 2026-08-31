@@ -1,24 +1,40 @@
-Sub-grid analysis: :mod:`.sgs`
-==============================================================
+Sub-grid scales
+================
+
+:mod:`.sgs`
+-----------
 
 --------------
-Filter kernels
+Filtering
 --------------
 .. automodule:: sgs_tools.sgs.filter
    :members:
    :undoc-members:
 
----------
-SGS base
----------
+.. automodule:: sgs_tools.sgs.coarse_grain
+   :members:
+
+----------------
+SGS Model Core
+----------------
 .. automodule:: sgs_tools.sgs.sgs_model
    :members:
+
+.. automodule:: sgs_tools.sgs.dynamic_sgs_model
+   :members:
+
 .. automodule:: sgs_tools.sgs.dynamic_coefficient
    :members:
 
 -----------
-Smagorinsky
+SGG models
 -----------
 
 .. automodule:: sgs_tools.sgs.Smagorinsky
+   :members:
+
+.. automodule:: sgs_tools.sgs.Kosovic
+   :members:
+
+.. automodule:: sgs_tools.sgs.CaratiCabot
    :members:

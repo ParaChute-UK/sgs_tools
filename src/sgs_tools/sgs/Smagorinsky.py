@@ -1,28 +1,22 @@
 from dataclasses import dataclass
-from typing import Hashable
 
 import xarray as xr  # only used for type hints
 
 from ..geometry.tensor_algebra import Frobenius_norm
+from .dynamic_coefficient import Minimisation
+from .dynamic_sgs_model import DynamicModel, LeonardThetaTensor, LeonardVelocityTensor
 from .filter import Filter
-from .sgs_model import DynamicHeatModel, DynamicVelocityModel, SGSModel
-
-
-# check that arr is uniform along `filter_dims` with spacing of `dx`
-def _assert_coord_dx(filter_dims: list[Hashable], arr: xr.DataArray, dx: float) -> None:
-    for c in filter_dims:
-        assert (arr[c].diff(dim=c) == dx).all(), f"Not uniform dimension {c}: {arr[c]}"
+from .util import _assert_coord_dx
 
 
 @dataclass(frozen=True)
-class SmagorinskyVelocityModel(SGSModel):
+class SmagorinskyVelocityModel:
     """Smagorinsky model for the velocity equation
 
     :ivar vel: grid-scale velocity
     :ivar strain: grid-scale rate-of-strain
     :ivar cs: Smagorinsky coefficient
     :ivar dx: constant resolution with respect to dimension to-be-filtered
-    :ivar tensor_dims: labels of dimensions indexing tensor components
     """
 
     vel: xr.DataArray
@@ -32,8 +26,8 @@ class SmagorinskyVelocityModel(SGSModel):
     tensor_dims: tuple[str, str]
 
     def sgs_tensor(self, filter: Filter) -> xr.DataArray:
-        """compute model for SGS tensor
-            :math:`$\\tau = (c_s \Delta) ^2 |\overline{Sij}| \overline{Sij}$`
+        r"""compute model for SGS tensor
+            :math:`\tau = (c_s \Delta) ^2 |\overline{S_{ij}}| \overline{S_{ij}}`
             for a given `filter` (which can be trivial, i.e. ``IdentityFilter``)
 
         :param filter: Filter used to separate "large" and "small" scales
@@ -42,7 +36,7 @@ class SmagorinskyVelocityModel(SGSModel):
         # only makes sense for uniform coordinates in the filtering directions
         # with spacing of self.dx
         for arr in [self.vel, self.strain]:
-            _assert_coord_dx(filter.filter_dims, arr, self.dx)
+            _assert_coord_dx(list(filter.filter_dims), arr, self.dx)
 
         sij = filter.filter(self.strain)
         snorm = Frobenius_norm(sij, self.tensor_dims)
@@ -51,7 +45,7 @@ class SmagorinskyVelocityModel(SGSModel):
 
 
 @dataclass(frozen=True)
-class SmagorinskyHeatModel(SGSModel):
+class SmagorinskyHeatModel:
     """Smagorinsky model for the Heat equation
 
     :ivar vel: grid-scale velocity
@@ -59,7 +53,6 @@ class SmagorinskyHeatModel(SGSModel):
     :ivar strain: grid-scale rate-of-strain
     :ivar ctheta: Smagorinsky coefficient for the heat equation
     :ivar dx: constant resolution with respect to dimension to-be-filtered
-    :ivar tensor_dims: labels of dimensions indexing tensor components
     """
 
     vel: xr.DataArray
@@ -70,8 +63,9 @@ class SmagorinskyHeatModel(SGSModel):
     tensor_dims: tuple[str, str]
 
     def sgs_tensor(self, filter):
-        """compute model for SGS tensor
-            :math:`$\\tau =  c_\\theta \\Delta^2 |\overline{Sij}| \overline{\\nabla \\theta} $`
+        r"""compute model for SGS tensor
+            :math:`\tau =  c_\theta \Delta^2
+            |\overline{S_{ij}}| \overline{\nabla \theta}`
             for a given filter (which can be trivial, i.e. IdentityFilter)
 
         :param filter: Filter used to separate "large" and "small" scales
@@ -89,12 +83,14 @@ class SmagorinskyHeatModel(SGSModel):
 
 
 def DynamicSmagorinskyVelocityModel(
-    smag_vel: SmagorinskyVelocityModel,
-) -> DynamicVelocityModel:
-    return DynamicVelocityModel(smag_vel, smag_vel.vel, smag_vel.tensor_dims)
+    smag_vel: SmagorinskyVelocityModel, minimisation: Minimisation
+) -> DynamicModel:
+    leonard = LeonardVelocityTensor(smag_vel.vel, smag_vel.tensor_dims)
+    return DynamicModel(smag_vel, leonard, minimisation)
 
 
 def DynamicSmagorinskyHeatModel(
-    smag_theta: SmagorinskyHeatModel, theta: xr.DataArray
-) -> DynamicHeatModel:
-    return DynamicHeatModel(smag_theta, smag_theta.vel, theta)
+    smag_theta: SmagorinskyHeatModel, theta: xr.DataArray, minimisation: Minimisation
+) -> DynamicModel:
+    leonard = LeonardThetaTensor(smag_theta.vel, theta, smag_theta.tensor_dims)
+    return DynamicModel(smag_theta, leonard, minimisation)

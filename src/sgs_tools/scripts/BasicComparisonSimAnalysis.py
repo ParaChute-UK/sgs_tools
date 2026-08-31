@@ -6,7 +6,7 @@ from typing import Any
 # make sure there are not pyplot imports here
 import matplotlib as mpl
 import xarray as xr
-from matplotlib.figure import Figure
+from matplotlib.figure import Figure, SubFigure
 from numpy import arange, array, inf, linspace, nan, ndarray
 from pint import UnitRegistry
 
@@ -436,7 +436,7 @@ def plot_horiz_slices(
     zlevels: Iterable[float],
     field_plot_map,
     verbose: bool = False,
-) -> Iterator[tuple[float, str, Figure]]:
+) -> Iterator[tuple[float, str, Figure | SubFigure]]:
     for z in zlevels:
         for field in fields:
             if verbose:
@@ -467,7 +467,7 @@ def plot_vert_profiles(
     reductions: list[str],
     plot_map,
     verbose: bool = False,
-) -> Iterator[tuple[str, str, Figure]]:
+) -> Iterator[tuple[str, str, Figure | SubFigure]]:
     red_coords = {coord for f in fields for coord in field_plot_map[f].hcoords}
 
     for field in fields:
@@ -536,7 +536,7 @@ def plot(
     if args["hor_slice_levels"]:
         with timer("Plot horizontal slices", "s"):
             try:
-                for z, f, fig in plot_horiz_slices(
+                for z, f, slice_fig in plot_horiz_slices(
                     ds_collection,
                     slice_fields,
                     args["hor_slice_levels"],
@@ -544,7 +544,7 @@ def plot(
                     args["verbose"],
                 ):
                     render_figure(
-                        fig,
+                        slice_fig,
                         path=args["plot_path"],
                         filename=f"Slice_z{z:g}m_{tlabel}_{f}.png",
                         show=args["plot_show"],
@@ -573,11 +573,11 @@ def plot(
         reductions = ["mean", "var"]
         with timer("Plot vertical profiles", "s"):
             try:
-                for red, f, fig in plot_vert_profiles(
+                for red, f, prof_fig in plot_vert_profiles(
                     ds_collection, prof_fields, reductions, plot_map, args["verbose"]
                 ):
                     render_figure(
-                        fig,
+                        prof_fig,  # type: ignore[arg-type]
                         path=args["plot_path"],
                         filename=f"Profile_{tlabel}_{red}_{f}.png",
                         show=args["plot_show"],
@@ -588,12 +588,12 @@ def plot(
     # cloud plots
     if not args["skip_clouds"]:
         with timer("Plot clouds", "s"):
-            fig = plot_clouds(
+            cloud_fig = plot_clouds(
                 ds_collection, arange(0.005, 0.15, 0.005), field_plot_map, plot_map
             )
-            if fig is not None:
+            if cloud_fig is not None:
                 render_figure(
-                    fig,
+                    cloud_fig,
                     path=args["plot_path"],
                     filename=f"Clouds_CL_{tlabel}.png",
                     show=args["plot_show"],

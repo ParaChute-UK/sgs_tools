@@ -279,3 +279,4 @@ def plot_clouds(
     if not empty:
         fig.tight_layout()
         return fig
+    return None

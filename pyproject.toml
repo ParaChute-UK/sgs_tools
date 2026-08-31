@@ -38,6 +38,8 @@ dependencies = [
   "dask",
   "pandas",
   "psutil",
+  "netcdf4",
+  "h5netcdf"
 ]
 
 # optional dependencies for docs

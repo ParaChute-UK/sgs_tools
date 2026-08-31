@@ -1,9 +1,14 @@
-from typing import Callable, Collection, Iterable
+from collections.abc import Callable, Collection, Iterable
 
 import xarray as xr
 
 from ..geometry.staggered_grid import compose_vector_components_on_grid
-from ..geometry.tensor_algebra import symmetrise, tensor_self_outer_product, traceless
+from ..geometry.tensor_algebra import (
+    antisymmetrise,
+    symmetrise,
+    tensor_self_outer_product,
+    traceless,
+)
 from ..geometry.vector_calculus import grad_vector
 
 
@@ -22,7 +27,8 @@ def strain_from_vel(
     :param vec_dim: label of vector dimension
     :param new_dim: label of new dimension indexing derivatives
     :param make_traceless: should we make the strain traceless
-    :param grad_operator: operator that computes vector gradient (To be replaced by a grid)
+    :param grad_operator: operator that computes vector gradient
+      (To be replaced by a grid)
     """
     gradvel = grad_operator(vel, space_dims, new_dim)
     # perform manual alignment of c1 and c2 indices (assumed sorted)
@@ -37,22 +43,50 @@ def strain_from_vel(
     return sij
 
 
+def omega_from_vel(
+    vel: xr.Dataset | Iterable[xr.DataArray],
+    space_dims: Iterable[str],
+    vec_dim: str,
+    new_dim: str = "c2",
+    grad_operator: Callable = grad_vector,
+) -> xr.DataArray:
+    """compute rate of rotation tensor from velocity
+
+    :param vel: input velocity array (on collocated grid)
+    :param space_dims: labels of spacial dimensions
+    :param vec_dim: label of vector dimension
+    :param new_dim: label of new dimension indexing derivatives
+    :param grad_operator: operator that computes vector gradient
+      (To be replaced by a grid)
+    """
+    gradvel = grad_operator(vel, space_dims, new_dim)
+    # perform manual alignment of c1 and c2 indices (assumed sorted)
+    c2 = gradvel[new_dim].data
+    gradvel[new_dim] = gradvel[vec_dim].data
+    sij = antisymmetrise(gradvel, [vec_dim, new_dim])
+
+    sij[new_dim] = c2
+    sij.name = "rate-of-rotation"
+    sij.attrs["long_name"] = r"$\Omega$"
+    return sij
+
+
 def vertical_heat_flux(
     vert_vel: xr.DataArray,
     pot_temperature: xr.DataArray,
     hor_axes: Collection[str],
 ) -> xr.DataArray:
-    r"""compute vertical heat flux :math:`$w' \\theta'$` from :math:`w` and :math:`$\\theta$`
+    r"""compute vertical heat flux :math:`w' \theta'` from :math:`w` and :math:`\theta`
 
     :param vert_vel: vertical velocity field :math:`w`
-    :param pot_temperature: potential temperature :math:`$\\theta$`
+    :param pot_temperature: potential temperature :math:`\theta`
 
     :param hor_axes: labels of horizontal dimensions
         (w.r.t which to compute the fluctuations)
     """
-    assert set(vert_vel.dims) == set(
-        pot_temperature.dims
-    ), "Mismatched dimensions of vert_vel and pot_temperature"
+    assert set(vert_vel.dims) == set(pot_temperature.dims), (
+        "Mismatched dimensions of vert_vel and pot_temperature"
+    )
     w, theta = xr.align(
         vert_vel, pot_temperature, join="exact"
     )  # assert matching coordinates
@@ -71,7 +105,7 @@ def Reynolds_fluct_stress(
     target_dims: list[str],
     fluctuation_axes: Collection[str],
 ) -> xr.DataArray:
-    r"""compute Reynolds stress :math:`$\mathbf{u}'_i \mathbf{u}'_j$`
+    r"""compute Reynolds stress :math:`\mathbf{u}'_i \mathbf{u}'_j`
 
     :param u: velocity field component 1
     :param v: velocity field component 2
@@ -82,9 +116,10 @@ def Reynolds_fluct_stress(
     :param fluctuation_axes: labels of dimensions
         w.r.t which to compute the fluctuations. Subset of ``target_dims``.
 
-    Note: First performs an interpolation to ``target_dims`` and then computes the fluctuations
-    w.r.t. ``fluctuation_axes``. There can be a commutation error when the
-    interpolation happens along dimensions other than ``fluctuation_axes``.
+    Note: First performs an interpolation to ``target_dims``
+      and then computes the fluctuations w.r.t. ``fluctuation_axes``.
+      There can be a commutation error when the interpolation happens
+      along dimensions other than ``fluctuation_axes``.
     """
     # first interpolate
     vel = compose_vector_components_on_grid(
@@ -108,7 +143,7 @@ def Fluct_TKE(
     target_dims: list[str],
     fluctuation_axes: Collection[str],
 ) -> xr.DataArray:
-    r"""compute fluctuating TKE :math:`$\mathbf{u}'_i \mathbf{u}'_i / 2$`
+    r"""compute fluctuating TKE :math:`\mathbf{u}'_i \mathbf{u}'_i / 2`
 
     :param u: velocity field component 1
     :param v: velocity field component 2
@@ -119,10 +154,12 @@ def Fluct_TKE(
     :param fluctuation_axes: labels of dimensions
         w.r.t which to compute the fluctuations. Subset of ``target_dims``.
 
-    Note: First performs an interpolation to ``target_dims`` and then computes the fluctuations
-    w.r.t. ``fluctuation_axes`` and then square. There can be a commutation error when the
+    Note: First performs an interpolation to ``target_dims``
+    and then computes the fluctuations w.r.t. ``fluctuation_axes`` and then square.
+    There can be a commutation error when the
     interpolation happens along dimensions other than ``fluctuation_axes``.
-    There is uncertainty from whether the interpolation happens before/after the squaring.
+    There is uncertainty from whether the interpolation happens
+    before/after the squaring.
     """
     # first interpolate
     vel = compose_vector_components_on_grid(

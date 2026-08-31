@@ -14,7 +14,9 @@ import os
 import sys
 
 sys.path.insert(0, os.path.abspath(".."))
+sys.path.insert(0, os.path.abspath(".entangled"))
 
+from sphinx_conf import version
 
 # -- Project information -----------------------------------------------------
 
@@ -31,11 +33,13 @@ master_doc = "index"
 # ones.
 extensions = [
     "sphinx.ext.autodoc",
-    "sphinx.ext.imgmath",
+    "sphinx.ext.mathjax",
     "sphinx_autodoc_typehints",
-    "sphinx_mdinclude",
+    "myst_parser",
     "sphinx.ext.viewcode",
     "sphinx_argparse_cli",
+    "sphinx_copybutton",
+    "sphinxemoji.sphinxemoji",
 ]
 
 
@@ -58,6 +62,26 @@ templates_path = ["_templates"]
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
 
+# Ensure .md files are parsed as Markdown (MyST)
+source_suffix = {
+    ".rst": "restructuredtext",
+    ".md": "markdown",
+}
+
+# suppress warnigns from upstream packages (iris, pandas)
+suppress_warnings = [
+    "sphinx_autodoc_typehints.guarded_import",
+    "sphinx_autodoc_typehints.forward_reference",
+]
+
+
+# Enable GitHub-style alerts (and optionally ::: fences)
+myst_enable_extensions = [
+    "alert",  # enables > [!NOTE] style GitHub alerts [4](https://myst-parser.readthedocs.io/en/latest/syntax/optional.html)[3](https://myst-parser.readthedocs.io/en/latest/syntax/admonitions.html)
+    "colon_fence",  # if you want ::::{note} ... syntax [3](https://myst-parser.readthedocs.io/en/latest/syntax/admonitions.html)[4](https://myst-parser.readthedocs.io/en/latest/syntax/optional.html)
+]
+myst_heading_anchors = 4
+
 # -- Options for HTML output -------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
@@ -66,8 +90,21 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 # html_theme = "alabaster"
 # html_theme = 'classic'
 # html_theme = "sphinxdoc"
-html_theme = "pydata_sphinx_theme"
-html_theme_options = {"show_nav_level": 2}
+# html_theme = "pydata_sphinx_theme"
+html_theme = "furo"
+
+html_theme_options = {
+    "sidebar_hide_name": False,
+    "navigation_with_keys": True,
+}
+
+
+html_static_path = ["_static"]
+html_css_files = ["custom.css"]
+html_context = {
+    "version": version,
+    "docstitle": f"{project}<span class='version-label'>v{version}</span>",
+}
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".

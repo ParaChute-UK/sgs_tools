@@ -1,5 +1,5 @@
+from collections.abc import Hashable
 from dataclasses import dataclass
-from typing import Dict
 
 import numpy as np
 import xarray as xr
@@ -9,15 +9,16 @@ import xarray as xr
 
 @dataclass(frozen=True)
 class CoarseGrain:
-    """Coarse-graining filter class with kernel along dimensions
+    r"""Coarse-graining filter class with kernel along dimensions
     the dimensions of kernel and filter_dims are matched one-to-one as given
 
-        :ivar kernel: filter kernel
-    :ivar filter_dims: dimensions along which to perform filtering;
-        will be paired with dimensions of the kernel.
+    :ivar window: {dimension_name: number of grid points to average over}
+    :ivar bdry_cnd: boundary conditions: support the same as xr.coarsen,
+        notably 'trim' and 'exact'
     """
 
-    window: Dict[str, int]
+    window: dict[Hashable, int]
+    bc: str = "exact"
 
     @property
     def filter_dims(self):
@@ -33,7 +34,7 @@ class CoarseGrain:
         if not field.chunks:
             return field
         else:
-            chunksizes = dict(zip(field.dims, field.chunks))
+            chunksizes = dict(zip(field.dims, field.chunks, strict=False))
             new_chunksizes = {}
             for d in self.window:
                 orig = chunksizes[d][0]
@@ -46,17 +47,21 @@ class CoarseGrain:
                     pass
                     # new_chunksizes[d] = orig
 
-            return field.chunk(new_chunksizes)
+            if new_chunksizes:
+                return field.chunk(new_chunksizes)
+            else:
+                return field
 
     def filter(self, field: xr.DataArray) -> xr.DataArray:
         """coarse grain `field`;
-        Note: unlike Filter.filter, here the output size is different from the input size
+        Note: unlike Filter.filter, here the output size is different
+        from the input size
 
         :param field: array to be filtered; must contain all of `filter_dims`
         """
         # Note this needs further optimisation
         rechunked = self.__rechunked__(field)
-        return rechunked.coarsen(self.window, boundary="trim").mean(keep_attrs=True)  # type: ignore
+        return rechunked.coarsen(self.window, boundary=self.bc).mean(keep_attrs=True)  # type: ignore
 
 
 def coarse_grain_fluct(field: xr.DataArray, coarse: CoarseGrain) -> xr.DataArray:

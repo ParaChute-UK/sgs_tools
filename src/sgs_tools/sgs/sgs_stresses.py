@@ -1,11 +1,11 @@
-from typing import Sequence
+from collections.abc import Sequence
 
 import xarray as xr
 
 from sgs_tools.geometry.tensor_algebra import tensor_self_outer_product
-from sgs_tools.physics.fields import strain_from_vel
 from sgs_tools.sgs.coarse_grain import CoarseGrain
 from sgs_tools.sgs.filter import Filter
+from sgs_tools.util.dask_adapt_chunking import chunk_ds
 
 
 def momentum_stresses(
@@ -20,12 +20,15 @@ def momentum_stresses(
     the sgs stress: `:math: \tau = \widetile { u v} - \widetile { u} \widetilde{v}`;
     the Reynolds stress: `:math: \widetile { u' v'}`, where the "'" indicates
     fluctuation with respect to the filter, i.e. `:math: u' = u -  \widetile {u}`;
-    the filtered rate-of-strain: `:math: S = (\widetilde{u}_{i,j} + \widetilde{u}_{j,i}) / 2`;
+    the filtered rate-of-strain:
+    `:math: S = (\widetilde{u}_{i,j} + \widetilde{u}_{j,i}) / 2`;
 
     :param vel: input velocity array (on collocated grid)
     :param filter: filtering operator that defines the `:math: \widetilde{}`
-    :param vec_dim: dimension holding the vector components of vel -- will use as the first tensor dimension of the output
-    :param new_dim: new dimension to use fo the second tensor dimension of the output. must not be present in vel
+    :param vec_dim: dimension holding the vector components of vel --
+      will use as the first tensor dimension of the output
+    :param new_dim: new dimension to use fo the second tensor dimension of the output.
+      Must not be present in vel.
     """
 
     assert new_dim not in vel.dims
@@ -33,13 +36,13 @@ def momentum_stresses(
 
     output = []
     # filt(v)
-    vel_mean = filter.filter(vel).persist()
+    vel_mean = filter.filter(vel)
 
     # filt(v v)
     covariance = tensor_self_outer_product(vel, vec_dim=vec_dim, new_dim=new_dim)
     filtered = filter.filter(covariance)
     filtered.name = "filt_v_stress"
-    filtered.attrs["long_name"] = r"$ \langle  u_i u_j \rangle $"
+    filtered.attrs["long_name"] = r"$ \\langle  u_i u_j \\rangle $"
     output.append(filtered)
 
     # tau
@@ -47,31 +50,18 @@ def momentum_stresses(
     resolved = tensor_self_outer_product(vel_mean, vec_dim=vec_dim, new_dim=new_dim)
     sgs = filtered - resolved
     sgs.name = "sgs_v_stress"
-    sgs.attrs["long_name"] = r"$\tau$"
+    sgs.attrs["long_name"] = r"$\\tau$"
     output.append(sgs)
 
     # reynolds
-    vel_prime = vel - vel_mean.reindex_like(
-        vel, method="nearest"
+    vel_prime = vel - vel_mean.reindex_like(vel, method="nearest").chunk(
+        vel.chunks  # type: ignore
     )  # up-sample vel_mean to the vel grid (in case Filter is a Coarse-graining)
-    # relegate this to fluctuation function -- filter method?
+    # TODO?: delegate this to fluctuation function -- filter method
     fluct_cov = tensor_self_outer_product(vel_prime, vec_dim=vec_dim, new_dim=new_dim)
     reynolds = filter.filter(fluct_cov)
     reynolds.name = "Reynolds_stress"
-    reynolds.attrs["long_name"] = r"$ \langle u_i' u_j' \rangle $"
+    reynolds.attrs["long_name"] = r"$ \\langle u_i' u_j' \\rangle $"
     output.append(reynolds)
 
-    # strain at scale -- leave making it traceless to the client
-
-    if all(vel_mean[x].size >= 2 for x in space_dims):
-        rechunked = vel_mean.chunk({x: "auto" for x in space_dims})
-        strain = strain_from_vel(
-            rechunked,
-            space_dims=space_dims,
-            vec_dim=vec_dim,
-            new_dim=new_dim,
-            make_traceless=False,
-        )
-        output.append(strain)
-
-    return xr.merge(output).chunk({vec_dim: -1, new_dim: -1})
+    return chunk_ds(xr.merge(output, compat="no_conflicts"), {vec_dim: -1, new_dim: -1})

@@ -17,21 +17,25 @@ def get_grid_spacing_coord(coord: xr.DataArray, new_dim: str) -> xr.DataArray:
 
 def interpolate_to_grid(
     ds: T_Xarray,
-    target_dims: list[str] = [],
-    coord_map: dict[str, xr.DataArray] = {},
+    target_dims: list[str] | str | None = None,
+    coord_map: dict[str, xr.DataArray] | None = None,
     drop_coords: bool = True,
 ) -> T_Xarray:
     """Spatial interpolation to a target_grid
 
     :param ds: input data array or dataset. Needs to have dimensions with coordinates
-        that are labelled 'x*', 'y*', 'z*' etc. or
+        that are labelled ``x*``, ``y*``, ``z*`` etc. or
 
-    :param target_dims: list of dimension names  to interpolate to, in the order xdim, ydim, zdim.
-        They must exist in ds as DataArry/coordinates
-    :param coord_map: dictionary of {existing_dimension_in_ds : target_coordinate_as_DataArray}
-    :param drop_coords: flag to exclude spatial coordinates relying on removed dims from output
+    :param target_dims: dimension or a list of dimension names to interpolate to,
+         in the order xdim, ydim, zdim. They must exist in ds as DataArry/coordinates.
+    :param coord_map: dictionary of
+      {existing_dimension_in_ds : target_coordinate_as_DataArray}.
+      If None, use an empty dict.
+    :param drop_coords: flag to exclude spatial coordinates relying on
+      removed dims from output
     :return: the input data interpolated to the target coordinates
     """
+
     if isinstance(target_dims, str):
         target_dims = [target_dims]
 
@@ -42,9 +46,9 @@ def interpolate_to_grid(
         y_dims = [y for y in ds.dims if str(y).startswith("y")]
         z_dims = [z for z in ds.dims if str(z).startswith("z")]
         missing_coords = [dim for dim in target_dims if dim not in ds.coords]
-        assert (
-            len(missing_coords) == 0
-        ), f"missing target coordinages {missing_coords} from input data"
+        assert len(missing_coords) == 0, (
+            f"missing target coordinages {missing_coords} from input data"
+        )
         x_target = [x for x in target_dims if x.startswith("x")]
         y_target = [y for y in target_dims if y.startswith("y")]
         z_target = [z for z in target_dims if z.startswith("z")]
@@ -69,10 +73,10 @@ def interpolate_to_grid(
 
     else:
         assert coord_map, "Should specify one of target_dims or coord_map"
-        missing_dims = [dim for dim in coord_map.keys() if dim not in ds.dims]
-        assert (
-            len(missing_dims) == 0
-        ), f"missing input dimensions {missing_dims} from input data"
+        missing_dims = [dim for dim in coord_map if dim not in ds.dims]
+        assert len(missing_dims) == 0, (
+            f"missing input dimensions {missing_dims} from input data"
+        )
 
     # rename any possible dimensions that will clash with coord-map targets:
     ds_interp = ds
@@ -101,23 +105,26 @@ def interpolate_to_grid(
 
 def compose_vector_components_on_grid(
     components: list[xr.DataArray],
-    target_dims: list[str] = [],
+    target_dims: list[str] | None = None,
     vector_dim: str = "c1",
     name: str = "",
     long_name: str = "",
     drop_coords: bool = True,
 ) -> xr.DataArray:
     """turn a list of arrays into a vector field
+
     :param components: list of vector components
-    :param target_dims: if target_dims is given, it will interpolate onto it first, otherwise all componets must have the same dimesions and coordinates
+    :param target_dims: if target_dims is given, it will interpolate onto it first,
+      otherwise all componets must have the same dimesions and coordinates
     :param vector_dim: label of dimension indexing vector components
     :param name: name of new array
     :param lon_name: long_name of new array
-    :param drop_coords: flag picked up by :meth:`interpolate_to_grid` to exclude spatial coordinates relying on removed dims from output
+    :param drop_coords: flag picked up by :meth:`interpolate_to_grid`
+      to exclude spatial coordinates relying on removed dims from output
     """
     # interpolate
-    if len(target_dims) == 0:
-        assert all([components[0].dims == x.dims for x in components[1:]]), (
+    if target_dims is None or len(target_dims) == 0:
+        assert all(components[0].dims == x.dims for x in components[1:]), (
             "The components' dimensions don't match. "
             "Choose a set of dimensions to interpolate to!"
         )
@@ -126,7 +133,7 @@ def compose_vector_components_on_grid(
             dim=xr.DataArray(range(1, len(components) + 1), dims=[vector_dim]),
         )
     else:
-        assert all([c.name for c in components])
+        assert all(c.name for c in components)
         vec_ds = xr.Dataset({c.name: c for c in components})
         vec_arr = interpolate_to_grid(
             vec_ds, target_dims, drop_coords=drop_coords
@@ -155,14 +162,15 @@ def diff_lin_on_grid(
         |             |                 |            |
         + ------ c_centre(i) ---------- + ----- c_centre(i+1)
 
-    where `c_{face|center}` is any dimension
+    where ``c_{face|center}`` is any dimension
+
     :param ds: input array to be differentiated
     :param dim: dimension along which to differentiate
     :param periodic_field: boundary condition treatment; if `False` will
-    fill boundary values with NaN. Note that only 1 boundary is undefined\:
-    upper boundary for face-coordinates, and lower boundary for centre-coordinates.
-    :return: the derivative on the grid with offset staggering in the differentiated dimension
-    face -> centre and v.v.
+      fill boundary values with NaN. Note that only 1 boundary is undefined\:
+      upper boundary for face-coordinates, and lower boundary for centre-coordinates.
+    :return: the derivative on the grid with offset staggering in the
+      differentiated dimension face -> centre and v.v.
     """
 
     def delta(coord, shift):
@@ -184,10 +192,10 @@ def diff_lin_on_grid(
     coord = ds[dim].astype(float)  # just in case
     val = ds.astype(float)
     if dim.endswith("_face"):
-        new_dim = dim.rstrip("_face") + "_centre"
+        new_dim = dim[: -len("_face")] + "_centre"
         shift = 1
     elif dim.endswith("_centre"):
-        new_dim = dim.rstrip("_centre") + "_face"
+        new_dim = dim[: -len("_centre")] + "_face"
         shift = -1
     else:
         raise ValueError(f"Unrecognizable coordinate staggering for dimension {dim}")
@@ -201,7 +209,7 @@ def diff_lin_on_grid(
     deriv = deriv.rename({dim: new_dim})
     deriv[new_dim] = new_coord.rename({dim: new_dim})
     for c in deriv.coords:
-        if deriv[c].dims and deriv[c].dims[0] == new_dim and not c == new_dim:
+        if deriv[c].dims and deriv[c].dims[0] == new_dim and c != new_dim:
             deriv[c] = centre_point(deriv[c], shift)
     return deriv
 
@@ -209,13 +217,18 @@ def diff_lin_on_grid(
 def grad_on_cart_grid(
     ds: xr.DataArray,
     space_dims: list[str],
-    periodic_field: list[bool] = [False, False, False],
+    periodic_field: list[bool] | None = None,
 ) -> xr.Dataset:
     """differentiate a scalar with respect to given space dims on staggered grid
+
     :param ds: input array to be differentiated
-    :param space_dims: labels for the spatial dimensions (to be differentiated against)
-    :param periodic_field: boundary condition treatment; passed to :meth:`diff_lin_on_grid`
+    :param space_dims: labels for the spatial dimensions (to be differentiated against).
+      If None, use [False, False, False]
+    :param periodic_field: boundary condition treatment;
+      passed to :meth:`diff_lin_on_grid`
     """
+    if periodic_field is None:
+        periodic_field = [False, False, False]
     name = ds.name
     if name is None:
         name = "d"
@@ -233,27 +246,31 @@ def grad_on_cart_grid(
 
 def grad_vec_on_grid(
     ds: xr.Dataset,
-    target_dims: list[str] = ["x_centre", "y_centre", "z_centre"],
-    new_dim_name: list[str] = ["c1", "c2"],
+    target_dims: list[str],
+    new_dim_name: tuple[str, str] = ("c1", "c2"),
     name: str | None = None,
 ) -> xr.DataArray:
     """computes gradient of a vector described onto target dimensions
-    ds: should be a dataset which only contains the components of the vector in sorted order and target coordinates.
-    target_dims: the dimensions to compute the derivative on (must be coordinates in input dataset)
-    new_dim_name: the names of the new dimensions: [vector component, differential component]
-    name : name for output dataarray (optional)
+
+    :param ds: should be a dataset which only contains the components of the vector
+      in sorted order and target coordinates.
+    :param target_dims: the dimensions to compute the derivative on
+      (must be coordinates in input dataset)
+    :param new_dim_name: the names of the new dimensions:
+      [vector component, differential component]
+    :param name: name for output dataarray (optional)
     """
     # unpack new_dim_name
     vec_name, d_name = new_dim_name
     gradvec_comp = {}
 
-    for i, f in enumerate(ds):
+    for _, f in enumerate(ds):
         # individual space dimensions for each staggered field
         space_dims = sorted([str(d) for d in ds[f].dims if str(d)[0] in "xyz"])
         grad_f = grad_on_cart_grid(ds[f], space_dims)
         # interpolate onto target coordinates from original ds (must exist)
-        # careful grad_on_cart_grid will create coordinates with possibly classhing names
-        # so make an explicit coordinate map
+        # careful grad_on_cart_grid will create coordinates
+        # with possibly classhing names, so make an explicit coordinate map
         coord_map = {}
         for k in grad_f.dims:
             # xr.Dataset.dims is a Hashable and interpolate expects a str

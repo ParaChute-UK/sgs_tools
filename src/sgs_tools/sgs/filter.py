@@ -1,6 +1,7 @@
+from collections.abc import Hashable, Sequence
 from dataclasses import dataclass
-from typing import Hashable, Sequence
 
+import dask.array as da
 import numpy as np
 import xarray as xr
 
@@ -8,20 +9,22 @@ import xarray as xr
 
 #: 3x3 2d Gaussian filter -- binomial approximation
 weight_gauss_3d = xr.DataArray(
-    np.array([[1, 2, 1], [2, 4, 2], [1, 2, 1]]) / 16.0, dims=["w1", "w2"]
+    da.from_array([[1, 2, 1], [2, 4, 2], [1, 2, 1]], chunks={}) / 16.0,
+    dims=["w1", "w2"],
 )
 
 #: 5x5 2d Gaussian filter -- binomial approximation
 weight_gauss_5d = (
     xr.DataArray(
-        np.array(
+        da.from_array(
             [
                 [1, 2, 2, 2, 1],
                 [2, 4, 4, 4, 2],
                 [2, 4, 4, 4, 2],
                 [2, 4, 4, 4, 2],
                 [1, 2, 2, 2, 1],
-            ]
+            ],
+            chunks={},
         ),
         dims=["w1", "w2"],
     )
@@ -35,7 +38,9 @@ def box_kernel(shape: list[int]) -> xr.DataArray:
     :param shape:
     :return: the kernel array with dimesions ``w1``, ``w2``
     """
-    return xr.DataArray(np.ones(shape) / np.prod(shape), dims=["w1", "w2"])
+    np_arr = np.ones(shape) / np.prod(shape)
+    da_arr = da.from_array(np_arr, chunks={})
+    return xr.DataArray(da_arr, dims=["w1", "w2"])
 
 
 # Filter objects
@@ -56,7 +61,18 @@ class Filter:
         return tuple(self.kernel.shape)
 
     def scale(self) -> float:
-        return float(np.prod(self.scales()) ** (1 / len(self.filter_dims)))
+        shape = self.scales()
+        return np.prod(shape) ** (1 / len(shape))
+
+    @property
+    def window(self) -> dict[Hashable, int]:
+        dic_dims = self._filter_kernel_map()
+        dic_roll = {}
+        for d in self.filter_dims:
+            axnum = self.kernel.get_axis_num(dic_dims[d])
+            assert isinstance(axnum, int)  # appease xarray typing
+            dic_roll[d] = self.kernel.shape[axnum]
+        return dic_roll
 
     def _filter_kernel_map(self) -> dict[Hashable, str]:
         """matches the dimesions of the `kernel` against `self.filter_dims`"""
@@ -78,13 +94,7 @@ class Filter:
         """
         assert (d in field.dims for d in self.filter_dims)
         dic_dims = self._filter_kernel_map()
-        dic_roll: dict[Hashable, int] = {}
-        for d in self.filter_dims:
-            axnum = self.kernel.get_axis_num(dic_dims[d])
-            assert isinstance(axnum, int)  # appease xarray typing
-            dic_roll[d] = self.kernel.shape[axnum]
-
-        filtered = field.rolling(dic_roll).construct(dic_dims).dot(self.kernel)
+        filtered = field.rolling(self.window).construct(dic_dims).dot(self.kernel)
         # arr.rolling().construct.() blows up the underlying chunksizes -- restore
         filtered = filtered.chunk(
             {k: field.chunks[i] for i, k in enumerate(field.dims)}  # type: ignore

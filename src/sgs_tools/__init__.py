@@ -1,7 +1,6 @@
-from importlib.metadata import PackageNotFoundError, version
-
 try:
+    from importlib.metadata import PackageNotFoundError, version
+
     __version__ = version("sgs_tools")
 except PackageNotFoundError:
-    # package is not installed
-    pass
+    __version__ = "0.0.0"

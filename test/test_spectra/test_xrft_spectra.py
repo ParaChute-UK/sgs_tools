@@ -2,6 +2,7 @@ import numpy as np
 import pytest
 import xarray as xr
 import xrft
+
 from sgs_tools.diagnostics.spectra import radial_spectrum
 
 
@@ -51,6 +52,8 @@ def plane_wave():
 
 # Assert Parseval's using xrft.dft
 # this is for illustration of xrft normalisations
+@pytest.mark.unit
+@pytest.mark.fast
 def test_parseval_1d_dft(rand, plane_wave):
     for data in [rand, plane_wave]:
         da = data["val"].isel(y=0)
@@ -65,6 +68,8 @@ def test_parseval_1d_dft(rand, plane_wave):
 
 # Assert Parseval's using xrft.power_spectrum with scaling='density'
 # this is for illustration of xrft normalisations
+@pytest.mark.unit
+@pytest.mark.fast
 def test_parseval_1d_powerspec(rand, plane_wave):
     for data in [rand, plane_wave]:
         da = data["val"].isel(y=0)
@@ -84,6 +89,8 @@ def test_parseval_1d_powerspec(rand, plane_wave):
 
 # Assert 2dim Parseval's using xrft.power_spectrum with scaling='density'
 # this is for illustration of xrft normalisations
+@pytest.mark.unit
+@pytest.mark.fast
 def test_parseval_2d_powerspec(rand, plane_wave):
     for data in [rand, plane_wave]:
         da = data["val"]
@@ -103,6 +110,8 @@ def test_parseval_2d_powerspec(rand, plane_wave):
 
 
 # radial spectrum Parseval test
+@pytest.mark.unit
+@pytest.mark.slow
 def test_parseval_2d_radial_powerspec(rand, plane_wave):
     for data in [rand, plane_wave]:
         da = data["val"]
@@ -130,6 +139,8 @@ def test_parseval_2d_radial_powerspec(rand, plane_wave):
 
 
 # radial spectrum wavenumber test
+@pytest.mark.unit
+@pytest.mark.fast
 def test_wavelength_2d_radial_powerspec(plane_wave):
     da = plane_wave["val"]
     wavelengths = plane_wave["lambda"]

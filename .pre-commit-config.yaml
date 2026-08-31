@@ -1,0 +1,31 @@
+ci:
+  autoupdate_branch: 'devel'
+  autofix_prs: true
+  skip: []
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-added-large-files
+      - id: check-merge-conflict
+
+  - repo: https://github.com/charliermarsh/ruff-pre-commit
+    rev: v0.12.5
+    hooks:
+      - id: ruff
+        args: ["--fix"]
+        types_or: [ python, pyi ]
+      - id: ruff-format
+        # formatter
+        types_or: [ python, pyi ]
+
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.17.0
+    hooks:
+      - id: mypy
+        files: ^src/ ^test/
+        additional_dependencies:
+          - types-setuptools

@@ -12,4 +12,4 @@ def timer(label, units="s", title=""):
     tstart = time()
     yield
     elapsed = time() - tstart
-    print(f"{label}: {elapsed/unit_map[units]:g} {units}")
+    print(f"{label}: {elapsed / unit_map[units]:g} {units}")

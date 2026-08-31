@@ -1,5 +1,5 @@
+from collections.abc import Iterable
 from dataclasses import dataclass
-from typing import Iterable
 
 import xarray as xr
 
@@ -14,7 +14,8 @@ class SimpleShear:
 
     :ivar grid: grid which provices coordinates
     :ivar dimensions: labels of shearing directions
-    :ivar velcomp: 0-indexed component of velocity vector that is sheared (all others are set to 0)
+    :ivar velcomp: 0-indexed component of velocity vector that is sheared
+      (all others are set to 0)
     :ivar amplitudes: amplification factor of gradient along `dimensions`
     """
 

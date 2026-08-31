@@ -1,4 +1,4 @@
-from typing import Callable, Collection, Iterable
+from collections.abc import Callable, Collection, Iterable
 
 import xarray as xr
 
@@ -27,7 +27,8 @@ def strain_from_vel(
     :param vec_dim: label of vector dimension
     :param new_dim: label of new dimension indexing derivatives
     :param make_traceless: should we make the strain traceless
-    :param grad_operator: operator that computes vector gradient (To be replaced by a grid)
+    :param grad_operator: operator that computes vector gradient
+      (To be replaced by a grid)
     """
     gradvel = grad_operator(vel, space_dims, new_dim)
     # perform manual alignment of c1 and c2 indices (assumed sorted)
@@ -55,7 +56,8 @@ def omega_from_vel(
     :param space_dims: labels of spacial dimensions
     :param vec_dim: label of vector dimension
     :param new_dim: label of new dimension indexing derivatives
-    :param grad_operator: operator that computes vector gradient (To be replaced by a grid)
+    :param grad_operator: operator that computes vector gradient
+      (To be replaced by a grid)
     """
     gradvel = grad_operator(vel, space_dims, new_dim)
     # perform manual alignment of c1 and c2 indices (assumed sorted)
@@ -114,9 +116,10 @@ def Reynolds_fluct_stress(
     :param fluctuation_axes: labels of dimensions
         w.r.t which to compute the fluctuations. Subset of ``target_dims``.
 
-    Note: First performs an interpolation to ``target_dims`` and then computes the fluctuations
-    w.r.t. ``fluctuation_axes``. There can be a commutation error when the
-    interpolation happens along dimensions other than ``fluctuation_axes``.
+    Note: First performs an interpolation to ``target_dims``
+      and then computes the fluctuations w.r.t. ``fluctuation_axes``.
+      There can be a commutation error when the interpolation happens
+      along dimensions other than ``fluctuation_axes``.
     """
     # first interpolate
     vel = compose_vector_components_on_grid(
@@ -151,10 +154,12 @@ def Fluct_TKE(
     :param fluctuation_axes: labels of dimensions
         w.r.t which to compute the fluctuations. Subset of ``target_dims``.
 
-    Note: First performs an interpolation to ``target_dims`` and then computes the fluctuations
-    w.r.t. ``fluctuation_axes`` and then square. There can be a commutation error when the
+    Note: First performs an interpolation to ``target_dims``
+    and then computes the fluctuations w.r.t. ``fluctuation_axes`` and then square.
+    There can be a commutation error when the
     interpolation happens along dimensions other than ``fluctuation_axes``.
-    There is uncertainty from whether the interpolation happens before/after the squaring.
+    There is uncertainty from whether the interpolation happens
+    before/after the squaring.
     """
     # first interpolate
     vel = compose_vector_components_on_grid(

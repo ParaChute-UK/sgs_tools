@@ -1,10 +1,14 @@
-from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
+from argparse import (
+    ArgumentDefaultsHelpFormatter,
+    ArgumentParser,
+    RawDescriptionHelpFormatter,
+)
+from collections.abc import Sequence
 from pathlib import Path
-from typing import Any, Dict, Sequence
+from typing import Any
 
 import matplotlib.pyplot as plt
 import xarray as xr
-from dask.diagnostics import ProgressBar
 from numpy import inf
 from xarray.core.types import T_Xarray
 
@@ -12,13 +16,18 @@ from sgs_tools.geometry.staggered_grid import (
     compose_vector_components_on_grid,
 )
 from sgs_tools.geometry.vector_calculus import grad_scalar
+from sgs_tools.io.fname_out import build_output_fname
 from sgs_tools.io.read import read
 from sgs_tools.physics.fields import omega_from_vel, strain_from_vel
 from sgs_tools.scripts.arg_parsers import (
     add_dask_group,
     add_input_group,
+    add_output_group,
     add_plotting_group,
+    add_version_group,
 )
+from sgs_tools.scripts.cli_helpers import print_args_dict, print_header
+from sgs_tools.scripts.post_process import main as vprof_main
 from sgs_tools.sgs.CaratiCabot import DynamicCaratiCabotModel
 from sgs_tools.sgs.dynamic_coefficient import (
     LillyMinimisation1Model,
@@ -36,12 +45,16 @@ from sgs_tools.sgs.Smagorinsky import (
     SmagorinskyHeatModel,
     SmagorinskyVelocityModel,
 )
+from sgs_tools.util.dask_adapt_chunking import chunk_ds
+from sgs_tools.util.gitinfo import get_git_state, write_git_diff_file
+from sgs_tools.util.terminal_progress_bar import TerminalProgressBar
 from sgs_tools.util.timer import timer
 
 # supported models
 vel_models = ["Smag_vel", "Smag_vel_diag", "Carati", "Kosovic"]
 theta_models = ["Smag_theta", "Smag_theta_diag"]
 model_choices = ["all", "vel_all", "theta_all"] + vel_models + theta_models
+
 
 model_name_map = {
     "Smag_vel": "Cs_isotropic",
@@ -52,17 +65,51 @@ model_name_map = {
     "Smag_theta_diag": "Ctheta_diagonal",
 }
 
+SCRIPT_TAG = "offline"
 
-def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
+
+class CustomFormatter(ArgumentDefaultsHelpFormatter, RawDescriptionHelpFormatter):
+    pass
+
+
+def parse_args(arguments: Sequence[str] | None = None) -> dict[str, Any]:
     parser = ArgumentParser(
-        description="""Compute dynamic Smagorinsky coefficients as function
-                        of scale from UM NetCDF output and store them in
-                        a NetCDF files""",
-        formatter_class=ArgumentDefaultsHelpFormatter,
+        description="""
+        CS Dynamic Workflow
+
+        A unified interface for computing and analyzing dynamic model coefficients.
+
+        This tool provides three independent but interoperable sub-commands.
+          - 'compute' — compute dynamic coefficient fields
+             for selected SGS models and store them as NetCDF output files. (default)
+
+          - 'vprof' — compute vertical profiles by reading the coefficient
+             datasets produced by 'compute' and writing the results back to disk.
+
+          - 'plot' — generate basic diagnostic plots from the outputs of 'compute';
+             plots can be shown interactively or saved to disk.
+
+        Can run the sub-command individually or together, provided the necessary
+        input or intermediate files exist on disk. If no sub-command is given
+        will run just 'compute'
+        """,
+        formatter_class=CustomFormatter,
+    )
+    parser.add_argument(
+        "commands",
+        nargs="*",
+        choices=["compute", "vprof", "plot"],
+        help="Workflow steps to execute",
+        default="compute",
     )
 
-    io = add_input_group(parser)
-    io.add_argument(
+    add_version_group(parser)
+    add_input_group(parser)
+
+    output = add_output_group(parser)
+    output.title = "Output datasets on disk"
+
+    output.add_argument(
         "output_path",
         type=Path,
         help="""
@@ -70,16 +117,21 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
         Will create/overwrite existing file and
         create any missing intermediate directories""",
     )
-    io.add_argument(
-        "--input_format", type=str, choices=["um", "monc", "sgs"], default="um"
+
+    output.add_argument(
+        "--fname_suffix",
+        type=str,
+        default="",
+        help="""
+            Optional suffix appended to output filenames.
+            Final pattern: ``<model_name>_<fname_suffix>_pp.nc``
+            where <model_name> is detemined by the ``sgs_model``
+            """,
     )
 
-    add_plotting_group(parser)
     add_dask_group(parser)
 
-    model = parser.add_argument_group("Model parameters")
-
-    model.add_argument(
+    parser.add_argument(
         "--sgs_model",
         type=str,
         nargs="+",
@@ -88,7 +140,15 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
         help="Choice of models for which to compute dynamic coefficients.",
     )
 
-    model.add_argument(
+    compute = parser.add_argument_group(
+        title="Compute dynamic coefficients fields",
+        description=(
+            "Compute dynamic coefficient fields for the selected SGS models, "
+            "filtering and regularization kernels and scale. "
+            "Save each model to separate NetCDF file."
+        ),
+    )
+    compute.add_argument(
         "--filter_type",
         type=str,
         default="box",
@@ -96,17 +156,18 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
         help="Shape of filter kernel to use for scale separation.",
     )
 
-    model.add_argument(
+    compute.add_argument(
         "--filter_scales",
         type=int,
         default=(2,),
         nargs="+",
         help="Scales to perform filter at, in number of cells. "
-        "If a single value is given, it will be used for all `regularize_filter_scales`. "
-        "Otherwise, must provide as many values as for `regularize_filter_scales`",
+        "If a single value is given, it will be used"
+        "for all `regularize_filter_scales`. Otherwise, must provide as many values"
+        " as for `regularize_filter_scales`",
     )
 
-    model.add_argument(
+    compute.add_argument(
         "--regularize_filter_type",
         type=str,
         default="box",
@@ -114,7 +175,7 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
         help="Shape of filter kernel used for coefficient regularization.",
     )
 
-    model.add_argument(
+    compute.add_argument(
         "--regularize_filter_scales",
         type=int,
         default=(2,),
@@ -124,6 +185,22 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
         "Otherwise, must provide as many values as for `filter_scale`",
     )
 
+    # Vertical profile workflow
+    parser.add_argument_group(
+        title="Compute vertical profiles",
+        description=(
+            "Compute vertical profiles for each selected SGS model "
+            "and save them as NetCDF files."
+        ),
+    )
+
+    # Plotting workflow
+    plotting = add_plotting_group(parser)
+    plotting.title = "Plotting parameters"
+    plotting.description = (
+        "Generate basic diagnostic plots from the compute output. "
+        "Plots can be shown interactively or saved to disk."
+    )
     # parse arguments into a dictionary
     args = vars(parser.parse_args(arguments))
 
@@ -145,22 +222,16 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
         args["z_range"][1] = inf
 
     # model parsing:
-    if "all" in args["sgs_model"]:
-        args["sgs_model"] = set(vel_models + theta_models)
-    elif "vel_all" in args["sgs_model"]:
-        args["sgs_model"].remove("vel_all")
-        args["sgs_model"] += vel_models
-    elif "theta_all" in args["sgs_model"]:
-        args["sgs_model"].remove("theta_all")
-        args["sgs_model"] += theta_models
-    args["sgs_model"] = set(args["sgs_model"])
+    args["sgs_model"] = parse_model_names(args["sgs_model"])
+
     # parameter consistency checks
     if args["filter_type"] == "gaussian":
-        assert all([x in [2, 4] for x in args["filter_scales"]]), (
+        assert all(x in [2, 4] for x in args["filter_scales"]), (
             "Gaussian filters only support scales 2 and 4 for now..."
         )
 
-    # singleton filter_scales or regularize_filter_scales means broadcast against the other
+    # singleton filter_scales or regularize_filter_scales
+    #  means broadcast against the other
     if len(args["filter_scales"]) == 1:
         args["filter_scales"] = args["filter_scales"] * len(
             args["regularize_filter_scales"]
@@ -174,6 +245,19 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
     assert len(args["filter_scales"]) == len(args["regularize_filter_scales"])
 
     return args
+
+
+def parse_model_names(in_models: Sequence[str]) -> set[str]:
+    sgs_models = list(in_models)
+    if "all" in in_models:
+        sgs_models = vel_models + theta_models
+    elif "vel_all" in in_models:
+        sgs_models.remove("vel_all")
+        sgs_models += vel_models
+    elif "theta_all" in sgs_models:
+        sgs_models.remove("theta_all")
+        sgs_models += theta_models
+    return set(sgs_models)
 
 
 def make_filter(shape: str, scale: int, dims=Sequence[str]) -> Filter:
@@ -218,7 +302,7 @@ def add_scale_coords(
 def data_slice(
     ds: xr.Dataset, t_range: Sequence[float], z_range: Sequence[float]
 ) -> xr.Dataset:
-    """restrit ds to the intervals inside [t,z]_range.
+    """Restrict ds to the intervals inside [t,z]_range.
        Restrict a set of standard coordinate names for t and z.
     :param ds: input dataset/dataarray
     :param t_range: time interval
@@ -236,91 +320,95 @@ def data_slice(
         if t in ds:
             tslice = (t_range[0] <= ds[t]) * (ds[t] <= t_range[1])
             ds = ds.where(tslice, drop=True)
-        assert not all(ds[var].size == 0 for var in ds), (
-            f"Data t-slice {t_range} results in empty variables. "
-            "Consider relaxing t_range"
-        )
+    assert not all(ds[var].size == 0 for var in ds), (
+        f"Data t-slice {t_range} results in empty variables. Consider relaxing t_range"
+    )
     return ds
 
 
-def gather_model_inputs(simulation: xr.Dataset) -> xr.Dataset:
+def gather_model_inputs(simulation: xr.Dataset, req_fields: list[str]) -> xr.Dataset:
     # ensure velocity components are co-located
     simple_dims = ["x", "y", "z"]  # coordinates already exist in simulation
-    if "vel" in simulation:
-        vel = simulation["vel"]
-    else:
-        vel = compose_vector_components_on_grid(
-            [simulation["u"], simulation["v"], simulation["w"]],
-            simple_dims,
-            name="vel",
-            vector_dim="c1",
-        )
+    ds = xr.Dataset()
 
-    # compute strain, rotation and potential temperature gradient
-    if "sij" in simulation:
-        sij = simulation["sij"]
-    else:
-        sij = strain_from_vel(
-            vel,
-            space_dims=simple_dims,
-            vec_dim="c1",
-            new_dim="c2",
-            make_traceless=True,
-        )
+    if "vel" in req_fields:
+        if "vel" in simulation:
+            ds["vel"] = simulation["vel"]
+        else:
+            ds["vel"] = compose_vector_components_on_grid(
+                [simulation["u"], simulation["v"], simulation["w"]],
+                simple_dims,
+                name="vel",
+                vector_dim="c1",
+            )
 
-    if "omegaij" in simulation:
-        omegaij = simulation["omegaij"]
-    else:
-        omegaij = omega_from_vel(
-            vel,
-            space_dims=simple_dims,
-            vec_dim="c1",
-            new_dim="c2",
-        )
+    if "sij" in req_fields:
+        # compute strain, rotation and potential temperature gradient
+        if "sij" in simulation:
+            ds["sij"] = simulation["sij"]
+        else:
+            ds["sij"] = strain_from_vel(
+                ds["vel"],
+                space_dims=simple_dims,
+                vec_dim="c1",
+                new_dim="c2",
+                make_traceless=True,
+            )
 
-    if "grad_theta" in simulation:
-        grad_theta = simulation["grad_theta"]
-    else:
-        grad_theta = grad_scalar(
-            simulation["theta"],
-            space_dims=simple_dims,
-            new_dim_name="c1",
-            name="grad_theta",
-        )
+    if "omegaij" in req_fields:
+        if "omegaij" in simulation:
+            ds["omegaij"] = simulation["omegaij"]
+        else:
+            ds["omegaij"] = omega_from_vel(
+                ds["vel"],
+                space_dims=simple_dims,
+                vec_dim="c1",
+                new_dim="c2",
+            )
 
-    return xr.Dataset(
-        {
-            "vel": vel,
-            "theta": simulation["theta"],
-            "sij": sij,
-            "omegaij": omegaij,
-            "grad_theta": grad_theta,
-        }
-    )
+    if "theta" in req_fields:
+        ds["theta"] = simulation["theta"]
+
+    if "grad_theta" in req_fields:
+        if "grad_theta" in simulation:
+            ds["grad_theta"] = simulation["grad_theta"]
+        else:
+            ds["grad_theta"] = grad_scalar(
+                ds["theta"],
+                space_dims=simple_dims,
+                new_dim_name="c1",
+                name="grad_theta",
+            )
+
+    return ds
 
 
 def pre_process(args: dict[str, Any]) -> xr.Dataset:
     req_fields = {
-        "um": ["u", "v", "w", "theta", "theta"],
-        "monc": ["u", "v", "w", "theta", "theta"],
+        "um": ["u", "v", "w", "theta"],
+        "monc": ["u", "v", "w", "theta"],
         "sgs": ["vel", "theta", "sij", "omegaij", "theta", "grad_theta"],
     }
+
     simulation = read(
         args["input_files"],
         args["input_format"],
         requested_fields=req_fields[args["input_format"]],
         resolution=args["h_resolution"],
     )
-
     # overwrite resolution if recorded during read
     if "h_resolution" in simulation.attrs:
         args["h_resolution"] = simulation.attrs["h_resolution"]
 
-    with ProgressBar():
-        with timer("Extract grid-based fields", "s"):
-            # slice to the requested sub-domain
-            simulation = data_slice(simulation, args["t_range"], args["z_range"])
-            simulation = gather_model_inputs(simulation)
+    with TerminalProgressBar(), timer("Extract grid-based fields", "s"):
+        # slice to the requested sub-domain
+        simulation = data_slice(simulation, args["t_range"], args["z_range"])
+        model_req_fields = []
+        if args["sgs_model"].intersection(vel_models):
+            model_req_fields += ["vel", "sij", "omegaij"]
+        if args["sgs_model"].intersection(theta_models):
+            model_req_fields += ["theta", "grad_theta"]
+        simulation = gather_model_inputs(simulation, model_req_fields)
     # chunk
     chunks = {
         "z": args["z_chunk_size"],
@@ -330,9 +418,9 @@ def pre_process(args: dict[str, Any]) -> xr.Dataset:
         "c1": -1,
         "c2": -1,
     }
-    # add caveate for degenerate t or z-slice that may drop a coordinate
-    simulation = simulation.chunk(
-        chunks={x: y for x, y in chunks.items() if x in simulation.dims}
+    # add caveat for degenerate t or z-slice that may drop a coordinate
+    simulation = chunk_ds(
+        simulation, chunks={x: y for x, y in chunks.items() if x in simulation.dims}
     )
     simulation = simulation.persist()
     return simulation
@@ -423,7 +511,7 @@ def compute_cs(
     reg_filters: list[Filter],
 ) -> xr.DataArray:
     cs_at_scale_ls = []
-    for test_filter, reg_filter in zip(test_filters, reg_filters):
+    for test_filter, reg_filter in zip(test_filters, reg_filters, strict=False):
         # compute Cs
         cs = dyn_model.compute_coeff(test_filter, reg_filter)
         # force execution for timer logging
@@ -437,8 +525,50 @@ def compute_cs(
     return cs_at_scale
 
 
+def compute_vprof(args: dict[str, Any]) -> None:
+    """Compute vertical profiles and save to disk
+    -- can be called standalone provided args contain the required keys
+    """
+    for model in args["sgs_model"]:
+        cs_model_path = build_output_fname(
+            args["output_path"] / model_name_map[model],
+            args["fname_suffix"],
+            SCRIPT_TAG,
+            ext=".nc",
+        )
+
+        vprof_args = [
+            cs_model_path,
+            "sgs",
+            args["output_path"],
+            "--fname_suffix",
+            "_".join([args["fname_suffix"], SCRIPT_TAG]),
+            "--overwrite_existing",
+            "--vertical_profiles",
+            "--vprofile_fname_out",
+            model_name_map[model],
+            "--z_chunk_size",
+            args["z_chunk_size"],
+            "--t_chunk_size",
+            args["t_chunk_size"],
+            "--vprofile_fields",
+            model,
+        ]
+        if args["verbosity"]:
+            vprof_args += ["-" + "v" * args["verbosity"]]
+        # convert all to str for parsing
+        vprof_args = list(map(str, vprof_args))
+        with timer(f"Statistics {model}", "s"):
+            vprof_main(vprof_args)
+
+
 def plot(args: dict[str, Any]) -> None:
+    """Plot Cs basic plots and save to disk
+    -- can be called standalone provided args contain the required keys
+    """
     row_lbl = "scale"
+
+    assert args["plot_path"] is not None or args["plot_show"]
 
     def wrap_label(text: str, width: int = 20) -> str:
         """
@@ -457,10 +587,15 @@ def plot(args: dict[str, Any]) -> None:
 
     figures = {}
     for model in args["sgs_model"]:
-        mpath = args["output_path"] / f"{model_name_map[model]}.nc"
+        mpath = build_output_fname(
+            args["output_path"] / model_name_map[model],
+            args["fname_suffix"],
+            SCRIPT_TAG,
+            ext=".nc",
+        )
 
         with timer(f"Plotting {model}", "s"):
-            model_data = xr.open_mfdataset(mpath)
+            model_data = xr.open_mfdataset(mpath, compat="no_conflicts")
             model_data = model_data[model]
             mean = model_data.mean(["x", "y"])
             if "cdim" in mean.dims:
@@ -476,7 +611,13 @@ def plot(args: dict[str, Any]) -> None:
             figures[model].suptitle(str(model).replace("_", " "), fontsize=14, y=1)
         if args["plot_path"] is not None:
             args["plot_path"].mkdir(parents=True, exist_ok=True)
-            figures[model].savefig(args["plot_path"] / f"{model}.pdf", dpi=180)
+            fname = build_output_fname(
+                args["plot_path"] / model_name_map[model],
+                args["fname_suffix"],
+                SCRIPT_TAG,
+                ext=".pdf",
+            )
+            figures[model].savefig(fname, dpi=180)
     # interactive plotting out of time
     if args["plot_show"]:
         for name, fig in figures.items():
@@ -485,7 +626,7 @@ def plot(args: dict[str, Any]) -> None:
         plt.show()
 
 
-def run(args: Dict[str, Any]) -> None:
+def compute(args: dict[str, Any]) -> None:
     # read and pre-process simulation
     # read UM stasth files: data
     with timer("Read Dataset", "s"):
@@ -499,14 +640,15 @@ def run(args: Dict[str, Any]) -> None:
         )
     for scale in args["regularize_filter_scales"]:
         assert scale in range(1, nhoriz), (
-            f"regularization_scale {scale} must be less than horizontal number of grid cells {nhoriz}"
+            "regularization_scale {scale} must be less than "
+            f"horizontal number of grid cells {nhoriz}"
         )
 
     with timer("Setup filtering operators"):
         test_filters = []
         regularization_filters = []
         for scale, regularization_scale in zip(
-            args["filter_scales"], args["regularize_filter_scales"]
+            args["filter_scales"], args["regularize_filter_scales"], strict=False
         ):
             test_filters.append(make_filter(args["filter_type"], scale, ["x", "y"]))
             regularization_filters.append(
@@ -515,9 +657,21 @@ def run(args: Dict[str, Any]) -> None:
                 )
             )
 
+    # get repo state and setup as attributes of netcdf
+    git_info = get_git_state(verbosity=3)
+    git_attrs = {"git_commit": git_info["Repository Status"]}
+    if git_info.get("Changes"):
+        git_attrs["git_diff_file"] = write_git_diff_file(args["output_path"])
+
     for m in args["sgs_model"]:
         # setup dynamic model
-        with timer(f"Coeff calculation SETUP for {model_name_map[m]} model", "s"):
+        out_fname = build_output_fname(
+            args["output_path"] / model_name_map[m],
+            args["fname_suffix"],
+            SCRIPT_TAG,
+            ext=".nc",
+        )
+        with timer(f"Coeff calculation SETUP for {out_fname.stem} model", "s"):
             dynamic_model = model_selection(m, simulation, args["h_resolution"])
 
             coeff = compute_cs(
@@ -530,38 +684,51 @@ def run(args: Dict[str, Any]) -> None:
                 coeff = coeff.rename({"cdim": "c1"})
             coeff.name = m
 
-        out_fname = args["output_path"] / f"{model_name_map[m]}.nc"
-
         # trigger computation -- split for time logging
-        with timer(f"Coeff calculation compute for {model_name_map[m]} model", "s"):
-            with ProgressBar():
-                coeff.compute()
+        with (
+            timer(f"Coeff calculation compute for {out_fname.stem} model", "s"),
+            TerminalProgressBar(),
+        ):
+            coeff.compute()
+
         # write to disk
-        with timer(f"Coeff calculation write for {model_name_map[m]} model", "s"):
-            with ProgressBar():
-                args["output_path"].mkdir(parents=True, exist_ok=True)
-                coeff.to_netcdf(
-                    out_fname,
-                    mode="w",
-                    compute=True,
-                    unlimited_dims=["scale"],
-                    engine="h5netcdf",
-                )
+        with (
+            timer(f"Coeff calculation write for {out_fname.stem} model", "s"),
+            TerminalProgressBar(),
+        ):
+            args["output_path"].mkdir(parents=True, exist_ok=True)
+            # tag with git info
+            coeff.attrs.update(git_attrs)
+            # write to disk
+            coeff.to_netcdf(
+                out_fname,
+                mode="w",
+                compute=True,
+                unlimited_dims=["scale"],
+                engine="h5netcdf",
+            )
 
 
-def main():
-    args = parse_args()
-    print(args)
-    with timer("Total execution time", "min"):
-        run(args)
+def main(arguments: Sequence[str] | None = None) -> None:
+    args = parse_args(arguments)
+    print_header("cs_dynamic", args["verbosity"])
+    print_args_dict(args)
 
-    # plot
-    if args["plot_show"] or args["plot_path"] is not None:
-        with timer("Plotting", "s"):
-            # try:
-            plot(args)
-        # except:
-        #   print("Failed in generating plots")
+    # Map sub-command names to functions and sort in logical order
+    command_map = {"compute": compute, "vprof": compute_vprof, "plot": plot}
+    command_priority = {"compute": 0, "vprof": 1, "plot": 1}
+    # Sort any provided commands according to priority
+    commands = sorted(
+        dict.fromkeys(args["commands"]),  # deduplicate but preserve order
+        key=lambda c: command_priority.get(c, 99),
+    )
+
+    for cmd in commands:
+        func = command_map.get(cmd)
+        if func is None:
+            raise ValueError(f"Unknown command: {cmd}")
+        with timer(f"{cmd} execution", "min"):
+            func(args)
 
 
 if __name__ == "__main__":

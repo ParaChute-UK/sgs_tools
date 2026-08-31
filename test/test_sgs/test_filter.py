@@ -5,6 +5,8 @@ import xarray as xr
 from sgs_tools.sgs.coarse_grain import CoarseGrain
 
 
+@pytest.mark.unit
+@pytest.mark.fast
 def test_coarse_grain_filter():
     # Create a sample 4x4 field
     field_data = np.arange(1.0, 17.0).reshape(4, 4)
@@ -18,7 +20,9 @@ def test_coarse_grain_filter():
     expected_2d = np.array([[3.5, 5.5], [11.5, 13.5]])
     expected_1d = np.array([[3, 11], [4, 12], [5, 13], [6, 14]]).T
 
-    for cg, expected_data in zip([cg_2d, cg_1d], [expected_2d, expected_1d]):
+    for cg, expected_data in zip(
+        [cg_2d, cg_1d], [expected_2d, expected_1d], strict=False
+    ):
         # Apply the filter
         result = cg.filter(field)
         #
@@ -31,6 +35,8 @@ def test_coarse_grain_filter():
         xr.testing.assert_allclose(result, expected)
 
 
+@pytest.mark.unit
+@pytest.mark.fast
 def test_coarse_grain_invalid_dims():
     # Test with missing dimensions
     field = xr.DataArray(

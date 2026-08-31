@@ -6,7 +6,11 @@ import numpy as np
 import xarray as xr
 
 from sgs_tools.geometry.staggered_grid import interpolate_to_grid
-from sgs_tools.io.read_util import restrict_ds, standardize_varnames
+from sgs_tools.io.read_util import (
+    parse_fname_pattern,
+    restrict_ds,
+    standardize_varnames,
+)
 
 base_fields_dict = {
     "U_COMPNT_OF_WIND_AFTER_TIMESTEP": "u",
@@ -90,7 +94,7 @@ dynamic_SGS_diag_dict = {
 }
 ""
 
-field_names_dict = (
+default_field_names_dict = (
     base_fields_dict
     | Water_dict
     | Smagorinsky_dict
@@ -102,33 +106,29 @@ field_names_dict = (
 
 # IO
 # open datasets
-def read_stash_files(fname_pattern: Path, chunks: Any = "auto") -> xr.Dataset:
+def read_stash_files(fname_pattern: Path | str, chunks: Any = "auto") -> xr.Dataset:
     """combine a list of output Stash files
 
     :param fname_pattern: filename(s) to read. Will be interpreted as a glob pattern.
     :return: `xarray.Dataset` with all available variables
     """
 
-    print(f"Reading {fname_pattern}")
-    # parse any glob wildcards in directory or filena
-    # turn parsed into list because of incomplete typehints of xr.open_mfdataset
-    parsed = list(
-        Path(fname_pattern.root).glob(
-            str(Path(*fname_pattern.parts[fname_pattern.is_absolute() :]))
-        )
-    )
+    # parse any glob wildcards in directory or filenames
+    parsed = parse_fname_pattern(fname_pattern)
     print(f"Reading {parsed}")
-    dataset = xr.open_mfdataset(parsed, chunks="auto", parallel=True, engine="h5netcdf")
+    dataset = xr.open_mfdataset(
+        parsed, chunks="auto", parallel=True, engine="h5netcdf", compat="no_conflicts"
+    )
     return dataset
 
 
 # Pre-process input UM arrays
 def rename_variables(ds: xr.Dataset) -> xr.Dataset:
     """rename STASH variables:
-       UM STASH varaibles adopt their `long_name` with special characters replaced by '_'.
-       The stash code is retained as an attribute for back-searches.
-       Spacial coordinates/dimesions are renamed to ``z_{theta|rho}`` and ``{x|y}_{face|centre}``.
-       Time coordinate becomes ``t`` and ``t_0``.
+       UM STASH varaibles adopt their `long_name` with special characters
+       replaced by '_'. The stash code is retained as an attribute for back-searches.
+       Spacial coordinates/dimesions are renamed to ``z_{theta|rho}`` and
+       ``{x|y}_{face|centre}``. Time coordinate becomes ``t`` and ``t_0``.
 
     :param ds: input dataset
     :return: dataset with renamed variables
@@ -146,7 +146,8 @@ def rename_variables(ds: xr.Dataset) -> xr.Dataset:
             varname_dict[var] = varname_str(lname)
     ds = ds.rename(varname_dict)
 
-    # swap vertical dimension to height about sea level (in m) to better compare across simulations
+    # swap vertical dimension to height about sea level (in m)
+    # to better compare across simulations
     vertical_dim_map = {
         "thlev_eta_theta": "thlev_zsea_theta",
         "thlev_bl_eta_theta": "thlev_bl_zsea_theta",
@@ -173,10 +174,7 @@ def rename_variables(ds: xr.Dataset) -> xr.Dataset:
 
     # swap to an easy time-dimension
     tname = "min15T0"
-    if "min15T0_0" in ds:
-        torigin = ds["min15T0_0"][0]
-    else:
-        torigin = ds["min15T0"][0]
+    torigin = ds["min15T0_0"][0] if "min15T0_0" in ds else ds["min15T0"][0]
     for tsuffix in "", "_0":
         if tname + tsuffix in ds:
             delta_t = np.rint(
@@ -197,11 +195,13 @@ def rename_variables(ds: xr.Dataset) -> xr.Dataset:
 def unify_coords(ds: xr.Dataset, res: float) -> xr.Dataset:
     """unify coordinate names
 
-    implement correct x-spacing using ``res``, assume ``res`` is given in the correct units
+    implement correct x-spacing using ``res``, assume ``res`` is given in
+    the correct units
     rename coordinates with reference to a logically-cartesian grid
 
     :param ds: input dataset
-    :param res: resolution of dataset -- to create correct x-y grid for idealised runs (the existing one is in lat-lon coords)
+    :param res: resolution of dataset -- to create correct x-y grid for idealised runs
+      (the existing one is in lat-lon coords)
     :return: dataset with renamed variables
 
     """
@@ -252,7 +252,7 @@ def unify_coords(ds: xr.Dataset, res: float) -> xr.Dataset:
         ds_cent = ds_cent.swap_dims({"x_theta": "x_centre", "y_theta": "y_centre"})
 
     if ds_stag and ds_cent:
-        ds = xr.merge([ds_stag, ds_cent])
+        ds = xr.merge([ds_stag, ds_cent], compat="no_conflicts")
     elif ds_stag:
         ds = ds_stag
     elif ds_cent:
@@ -279,27 +279,36 @@ def compose_diagnostic_tensor(ds: xr.Dataset) -> xr.Dataset:
     return ds
 
 
+__default_req_fields = ["u", "v", "w", "theta"]
+
+
 def data_ingest_UM(
-    fname_pattern: Path,
+    fname_pattern: Path | str,
     res: float,
-    requested_fields: list[str] = ["u", "v", "w", "theta"],
+    requested_fields: list[str] = __default_req_fields,
+    field_names_dict: dict[str, str] | None = None,
 ) -> xr.Dataset:
     """read and pre-process UM data using sgs_tools naming convention.
     Any unknown fields will retain their original names.
 
-    :param fname_pattern: UM NetCDF diagnostic file(s) to read. will be interpreted as a glob pattern. (should belong to the same simulation)
-    :param res: horizontal resolution (will use to overwrite horizontal coordinates). **NB** works for ideal simulations
+    :param fname_pattern: UM NetCDF diagnostic file(s) to read.
+      will be interpreted as a glob pattern. (should belong to the same simulation)
+    :param res: horizontal resolution (will use to overwrite horizontal coordinates).
+      **NB** works for ideal simulations
     :param requested_fields: list of fields to retain in ds, if falsy will retain all.
+    :param field_names_dict: a look-up table used to rename fields in the input dataset
+      will use `default_field_names_dict` if None
     """
-    # all the fields we will need for the Cs calculations
+
+    # open file(s)
     simulation = read_stash_files(fname_pattern)
     # parse UM stash codes into variable names
     simulation = rename_variables(simulation)
-
     # rename to sgs_tools naming convention
+    if field_names_dict is None:
+        field_names_dict = default_field_names_dict
     simulation = standardize_varnames(simulation, field_names_dict)
-
-    # restrict to interesting fields and rename to simple names
+    # restrict to interesting fields
     if requested_fields:
         simulation, _ = restrict_ds(simulation, fields=requested_fields)
     assert len(simulation) > 0, "None of the requested fields are available"
@@ -309,26 +318,31 @@ def data_ingest_UM(
 
 
 def data_ingest_UM_on_single_grid(
-    fname_pattern: Path,
+    fname_pattern: Path | str,
     res: float,
-    requested_fields: list[str] = ["u", "v", "w", "theta"],
+    requested_fields: list[str] = __default_req_fields,
+    field_names_dict: dict[str, str] | None = None,
 ) -> xr.Dataset:
     """read, pre-process UM data and interpolate to a cell-centred grid
     Any unknown fields will retain their original names.
 
-    :param fname_pattern: UM NetCDF diagnostic file(s) to read. will be interpreted as a glob pattern. (should belong to the same simulation)
-    :param res: horizontal resolution (will use to overwrite horizontal coordinates). **NB** works for ideal simulations
+    :param fname_pattern: UM NetCDF diagnostic file(s) to read.
+      will be interpreted as a glob pattern. (should belong to the same simulation)
+    :param res: horizontal resolution (will use to overwrite horizontal coordinates).
+       **NB** works for ideal simulations
     :param  requested_fields: list of fields to retain in ds, if falsy will retain all.
+    :param field_names_dict: a look-up table used to rename fields in the input dataset.
+       will use `default_field_names_dict` if None
     """
     # read, constrain fields, unify grids
-    simulation = data_ingest_UM(fname_pattern, res, requested_fields)
+    simulation = data_ingest_UM(fname_pattern, res, requested_fields, field_names_dict)
 
     # interpolate all vars to a cell-centred grid
     centre_dims = ["x_centre", "y_centre", "z_theta"]
     simulation = interpolate_to_grid(simulation, centre_dims, drop_coords=True)
     # rename spatial dimensions to 'xyz'
     simple_dims = ["x", "y", "z"]
-    dim_names = {d_new: d_old for d_new, d_old in zip(centre_dims, simple_dims)}
+    dim_names = dict(zip(centre_dims, simple_dims, strict=False))
     simulation = simulation.rename(dim_names)
 
     return simulation

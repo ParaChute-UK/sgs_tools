@@ -1,69 +1,156 @@
+# build system
 [build-system]
-requires = ["poetry-core>=1.0.0", "poetry-dynamic-versioning>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+  requires = ["poetry-core>=1.0.0", "poetry-dynamic-versioning>=1.0.0,<2.0.0"]
+  build-backend = "poetry_dynamic_versioning.backend"
 
-[tool.poetry-dynamic-versioning]
-enable = true
-style = "semver"        # or "pep440" depending on your preference
-vcs = "git"
-
-[tool.poetry-dynamic-versioning.substitution]
-files = ["src/sgs_tools/__init__.py"]
-
-[tool.poetry]
+# standard metadata
+[project]
 name = "sgs_tools"
-version = "0.0.0" # placeholder replaced dynamically
+version = "0.0.0"  # placeholder, replaced dynamically
+
 description = "Python tools for sub-grid scale fluid analyis"
+readme = "README.md"
+requires-python = ">=3.11"
 authors = [
-    "Dimtar Vlaykov <d.vlaykov@exeter.ac.uk>"
+  { name = "Dimitar Vlaykov", email = "d.vlaykov@exeter.ac.uk" }
 ]
-readme="README.md"
-repository = "https://github.com/dvlaykov/sgs_tools.git"
-packages = [
-{ include = "sgs_tools", from = "src"}
-]
+
+urls = { "Repository" = "https://github.com/dvlaykov/sgs_tools.git"}
 
 classifiers = [
-    "Development Status :: 2 - Pre-Alpha",
-    "Intended Audience :: Science/Research",
-    "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.11"
+  "Development Status :: 2 - Pre-Alpha",
+  "Intended Audience :: Science/Research",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.14",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.11"
 ]
 
+dependencies = [
+  "matplotlib>=3.6",
+  "xarray[io,accel,parallel]>=2023.9",
+  "xrft",
+  "xarray-einstats",
+  "f90nml",
+  "pint",
+  "numpy",
+  "dask",
+  "pandas",
+  "psutil",
+  "netcdf4",
+  "h5netcdf"
+]
+
+# optional dependencies for docs
+[project.optional-dependencies]
+  doc = [
+    "sphinx",
+    "furo",
+    "myst-parser",
+    "sphinx-autodoc-typehints",
+    "sphinx-copybutton",
+    "sphinxemoji",
+    "sphinx-argparse-cli"
+  ]
+
+# dynamic versioning
+[tool.poetry-dynamic-versioning]
+  enable = true
+  style = "semver"        # expects tags v?.?.?; otherwise "pep440" takes it without the "v"
+  vcs = "git"
+
+[tool.poetry-dynamic-versioning.substitution]
+  files = ["src/sgs_tools/__init__.py"]
+
+# CLI scripts
+[project.scripts]
+  cs_dynamic = "sgs_tools.scripts.CS_calculation_genmodel:main"
+  sim_comparison = "sgs_tools.scripts.BasicComparisonSimAnalysis:main"
+  ref_comparison = "sgs_tools.scripts.ReferenceComparisonSimAnalysis:main"
+  um_levels = "sgs_tools.scripts.make_UM_level_sets:main"
+  post_process = "sgs_tools.scripts.post_process:main"
+  sgs_tools_version = "sgs_tools.scripts.version:main"
+
+# for Devs -- poetry env.
+[tool.poetry]
+  name = "sgs_tools"
+  version = "0.1.0-post.113+13045bc" # placeholder replaced dynamically
+  packages = [
+    { include = "sgs_tools", from = "src" }
+  ]
+
 [tool.poetry.dependencies]
-python = ">=3.11"
-matplotlib = ">=3.6"
-xarray = {version = ">=2023.9", extras = ["io","accel","parallel"]}
-xrft = "*"
-xarray-einstats = "*"
-f90nml = "*"
-netcdf4= "*"
-h5netcdf="*"
-pint = "*"
+  python = ">=3.11,<4.0"
+
+[tool.poetry.requires-plugins]
+  poetry-dynamic-versioning = { version = ">=1.0.0,<2.0.0", extras = ["plugin"] }
 
 [tool.poetry.group.dev.dependencies]
-tox = "*"
-mypy  = "~=1.17.0"
-pytest = "~=7.2"
-pytest-cov = "~=4.0"
-ruff  = "0.12.5"
-pre-commit="~=3.4.0"
+  tox = "*"
+  mypy  = "~=1.17.0"
+  pytest = "~=7.2"
+  pytest-cov = "~=4.0"
+  ruff  = "0.12.5"
+  pre-commit="~=3.4.0"
+  poethepoet = "^0.46.0"
 
 
+# task orchestrator -- for docs and code check
+[tool.poe.tasks]
+  doc = "python build_doc.py"
+  style = "env SKIP=mypy pre-commit run --all-files"
+  lint = "pre-commit run --all-files"
+  mypy = "mypy src/ --install-types --non-interactive"
+  check = ["lint", "mypy", "test"]
+  ci = ["check"]
 
-[tool.poetry.group.doc.dependencies]
-    sphinx  = "*"
-    sphinx_autodoc_typehints = "*"
-    sphinx_argparse_cli = "*"
-    sphinx-mdinclude = "*"
-    pydata-sphinx-theme = "*"
-    sphinx_copybutton = "*"
-    sphinxemoji="*"
+# set up explicit cwd
+# for tox tests in virtual environments
+# expect to run poe test from project root
+# or point --rootdir to project root
+[tool.poe.tasks.test]
+  cmd = 'pytest'
+  cwd = "$POE_PWD"
 
+[tool.poe.tasks.test-all]
+  cmd = 'pytest --all'
+  cwd = "$POE_PWD"
 
-[tool.poetry.scripts]
-cs_dynamic = "sgs_tools.scripts.CS_calculation_genmodel:main"
-sim_comparison = "sgs_tools.scripts.BasicComparisonSimAnalysis:main"
-ref_comparison = "sgs_tools.scripts.ReferenceComparisonSimAnalysis:main"
-um_levels = "sgs_tools.scripts.make_UM_level_sets:main"
-post_process = "sgs_tools.scripts.post_process:main"
+#check for the POE cwd
+[tool.poe.tasks.cwd]
+  cwd = "$POE_PWD"
+  shell = """
+  echo Poe PWD: $(pwd)
+  """
+
+# Tool configs
+[tool.mypy]
+  # python_version = "3.11"
+  strict = false
+  pretty = true
+  show_error_codes = true
+  exclude = ".*ipynb"
+  cache_dir = "/tmp/mypy-cache"
+
+[tool.pytest.ini_options]
+  testpaths = ["test"]
+  addopts = "-rs --cov=sgs_tools --cov-report=term-missing"
+  markers = [
+    "slow: take more than ~1 sec. to run.",
+    "fast: take less than ~1 sec. to run.",
+    "unit: basic logic, contained.",
+    "integration: comprehensive, exercise interactions."
+  ]
+  tmp_path_retention_count = 3
+  tmp_path_retention_policy = "failed"
+
+[tool.ruff]
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "C4"]
+ignore = []
+
+[tool.ruff.format]
+quote-style="double"

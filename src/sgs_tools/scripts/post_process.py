@@ -1,6 +1,7 @@
 import warnings
+from collections.abc import Sequence
 from pathlib import Path
-from typing import Any, Dict, Sequence
+from typing import Any
 
 import numpy as np
 import xarray as xr
@@ -8,12 +9,21 @@ import xarray as xr
 from sgs_tools.diagnostics.anisotropy import anisotropy_analysis
 from sgs_tools.diagnostics.directional_profile import directional_profile
 from sgs_tools.diagnostics.spectra import spectra_1d_radial
+from sgs_tools.io.fname_out import build_output_fname
 from sgs_tools.io.netcdf_writer import NetCDFWriter
 from sgs_tools.io.read import read
+from sgs_tools.scripts.cli_helpers import print_args_dict, print_header
+from sgs_tools.util.dask_adapt_chunking import chunk_ds
+from sgs_tools.util.gitinfo import get_git_state, write_git_diff_file
+from sgs_tools.util.memory import get_mem_limit_MB, memory_watch
+from sgs_tools.util.terminal_progress_bar import TerminalProgressBar
 from sgs_tools.util.timer import timer
+
+BASE_NAME = "post_proc"
 
 v_profile_fields_out = [
     "vel",
+    "vel_horiz",
     "theta",
     "s",
     "vert_heat_flux",
@@ -29,35 +39,19 @@ v_profile_fields_out = [
     "cs_diag",
     "cs_theta_diag",
 ]
-v_profile_fields_in = [
-    # base
-    "u",
-    "v",
-    "w",
-    "theta",
-    # sgs
-    "tke",
-    "csDelta",
-    "cs",
-    "cs_theta",
-    "cs_1",
-    "cs_2",
-    "cs_3",
-    "cs_theta_1",
-    "cs_theta_2",
-    "cs_theta_3",
-    # diffusivities
-    "s",
-    "smag_visc_m",
-    "smag_visc_h",
-    "smag_visc_m_vert",
-    "smag_visc_h_vert",
-    # stability
-    # "Richardson",
-]
+v_profile_fields_map = {
+    "vel": {"u", "v", "w"},
+    "vel_horiz": {"u", "v"},
+    "s": {"Sij"},
+    "vert_heat_flux": {"theta", "w"},
+    "vert_mom_flux": {"u", "v", "w"},
+    "fluct_ke": {"u", "v", "w"},
+    "tke": {"u", "v", "w"},
+    "cs_diag": {"cs_1", "cs_2", "cs_3"},
+    "cs_theta_diag": {"cs_theta_1", "cs_theta_2", "cs_theta_3"},
+}
 v_profiles_stats = ["mean", "std", "median"]
-v_prof_name = "post_proc_vert_profiles.nc"
-
+VPROF_TAG = "vprof"
 
 power_spectra_fields = ["u", "v", "w", "theta"]
 cross_spectra_fields = [
@@ -66,36 +60,40 @@ cross_spectra_fields = [
     ("u", "v"),
     ("theta", "w"),
 ]
-spectra_name = "post_proc_spectra.nc"
-
+SPECTRA_TAG = "spectra"
 
 anisotropy_fields = ["u", "v", "w"]
 box_delta_scales = [2, 4, 8, 16]
 box_meter_scales = [800, 400, 200, 100]
 box_domain_scales = [1, 0.5, 0.25]
 gauss_scales = [2, 4]
+filter_shapes = ["gauss", "box", "coarse"]
+ANISOTROPY_TAG = "anisotropy"
 
 
-anisotropy_name = r"post_proc_anisotropy"
-
-
-def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
+def parse_args(arguments: Sequence[str] | None = None) -> dict[str, Any]:
     from argparse import (
         ArgumentDefaultsHelpFormatter,
         ArgumentParser,
         ArgumentTypeError,
     )
 
-    from sgs_tools.scripts.arg_parsers import add_dask_group, add_input_group
+    from sgs_tools.scripts.arg_parsers import (
+        add_dask_group,
+        add_input_group,
+        add_output_group,
+        add_version_group,
+    )
 
     parser = ArgumentParser(
         description="""Post process a simulation and save result as NetCDF files
                 """,
         formatter_class=ArgumentDefaultsHelpFormatter,
     )
+    add_version_group(parser)
     add_input_group(parser)
-
-    output = parser.add_argument_group("Output datasets on disk")
+    output = add_output_group(parser)
+    output.title = "Output datasets on disk"
     output.add_argument(
         "output_path",
         type=Path,
@@ -108,7 +106,18 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
         action="store_true",
         help="""behaviour if diagnostic file already exists. default: skip""",
     )
-
+    output.add_argument(
+        "--fname_suffix",
+        type=str,
+        default="",
+        help=(
+            "Optional suffix appended to output filenames. "
+            "Final pattern: ``<base_name>_<fname_suffix>_<statistics_tag>.nc``, "
+            "where <base_name> and <statistics_tag> are detemined in "
+            "the respective statistics group: ``Vertical profiles`` | "
+            "``Horizontal spectra`` | ``Anisotropy diagnostics``"
+        ),
+    )
     parser.add_argument(
         "--hdims",
         default=["x", "y"],
@@ -142,9 +151,14 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
 
     vprof.add_argument(
         "--vprofile_fname_out",
-        default=v_prof_name,
+        default=BASE_NAME,
         type=str,
-        help="""Filename where to save the generated vertical profile. relative to output_path""",
+        help=f"""**Core** filename where to save the generated vertical profile.
+                relative to output_path.
+                Will add an '.nc' extension (so don't give one).
+                The final pattern will be
+                ``<vprofile_fname_out>_<fname_suffix>_{VPROF_TAG}.nc``
+              """,
     )
 
     spectra = parser.add_argument_group("Horizontal spectra")
@@ -167,7 +181,8 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
         tup = tuple(s.split(","))
         if len(tup) != 2:
             raise ArgumentTypeError(
-                f"Expected only 2 fields for each comma-separated cross-spectrum, got {len(tup)}"
+                "Expected only 2 fields for each comma-separated cross-spectrum"
+                f", got {len(tup)}"
             )
         return tup
 
@@ -178,15 +193,16 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
         type=tuple_from_comma_str,
         help="""
         Fields whose cross spectra to compute.
-        Use spaces to between cross spectra and commas between fields in each cross-spectrim, e.g.
-        u,v v,w""",
+        Use spaces to between cross spectra and commas between fields
+        in each cross-spectrum, e.g. u,v v,w""",
     )
 
     spectra.add_argument(
         "--radial_smooth_factor",
         default=1,
         type=int,
-        help="""Radial binning of radial horizontal spectrum in units of delta_kx spacings""",
+        help="""Radial binning of radial horizontal spectrum
+                in units of delta_kx spacings""",
     )
 
     spectra.add_argument(
@@ -200,9 +216,14 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
 
     spectra.add_argument(
         "--hspectra_fname_out",
-        default=spectra_name,
+        default=BASE_NAME,
         type=str,
-        help="""Filename where to save the generated horisontal spectra. relative to output_path""",
+        help=f"""**Core** filename where to save the generated horisontal spectra.
+                relative to output_path.
+                Will add an '.nc' extension (so don't give one).
+                The final pattern will be
+                ``<hspectra_fname_out>_<fname_suffix>_{SPECTRA_TAG}.nc``
+              """,
     )
 
     anisotropy = parser.add_argument_group("Anisotropy diagnostics")
@@ -216,66 +237,90 @@ def parse_args(arguments: Sequence[str] | None = None) -> Dict[str, Any]:
     anisotropy.add_argument(
         "--box_domain_scales",
         nargs="+",
-        default=box_domain_scales,
+        default=[],
         type=float,
         help="""
-        Anisotropy box filter and coarse-graining scales in fraction of the horizontal domain size.
-        Will round to nearest integer number of horizontal grid cells.
-        Will combine all box scales and ignore entries which are less than `2 delta` apart.
+        Anisotropy box filter and coarse-graining scales in fraction of
+        the horizontal domain size. Will round to nearest integer number
+        of horizontal grid cells. Will combine all box scales and ignore
+        entries which are less than `2 delta` apart.
         """,
     )
 
     anisotropy.add_argument(
         "--box_meter_scales",
         nargs="+",
-        default=box_meter_scales,
+        default=[],
         type=float,
         help="""
         Anisotropy box filter and coarse-graining scales in meters.
         Will round to nearest integer number of horizontal grid cells.
-        Will combine all box scales and ignore entries which are less than `2 delta` apart
+        Will combine all box scales and ignore entries which are
+        less than `2 delta` apart.
         """,
     )
 
     anisotropy.add_argument(
         "--box_delta_scales",
         nargs="+",
-        default=box_delta_scales,
+        default=[],
         type=int,
         help="""
-        Anisotropy box filter and coarse-graining scales in units of horizontal grid spacing `delta`.
-        Will combine all box scales and ignore entries which are less than `2 delta` apart.
+        Anisotropy box filter and coarse-graining scales
+        in units of horizontal grid spacing `delta`. Will combine all box scales
+        and ignore entries which are less than `2 delta` apart.
         """,
     )
     anisotropy.add_argument(
         "--gauss_scales",
         nargs="+",
-        default=gauss_scales,
+        default=[],
         type=int,
-        help="""Anisotropy Gaussian filter scales in  units of horizontal grid spacing. Support 2 and 4""",
+        help="""Anisotropy Gaussian filter scales in  units of horizontal grid spacing.
+          Support 2 and 4""",
+    )
+    anisotropy.add_argument(
+        "--filter_shapes",
+        nargs="+",
+        default=filter_shapes,
+        type=str,
+        help=f"""Anisotropy filter shapes. Support any of {filter_shapes}""",
     )
 
-    spectra.add_argument(
+    anisotropy.add_argument(
         "--aniso_fname_out",
-        default=anisotropy_name,
-        type=Path,
-        help="""
-        **Core** filename where to save the generated anisotropy eigen values. relative to output_path.
-        Will append the filter label. Will set an '.nc' extension (whether given or not).
+        default=BASE_NAME,
+        type=str,
+        help=f"""
+        **Core** filename where to save the generated anisotropy eigen values.
+        relative to output_path.
+        Will append the filter label.
+        Will add an '.nc' extension (so don't give one).
+        The final pattern will be
+        ``<aniso_fname_out>_<fname_suffix>_{ANISOTROPY_TAG}.nc``
         """,
     )
 
     add_dask_group(parser)
-
     # parse arguments into a dictionary
     args = vars(parser.parse_args(arguments))
 
+    if not (
+        args["vertical_profiles"] or args["horizontal_spectra"] or args["anisotropy"]
+    ):
+        parser.error(
+            "No analysis selected. Please enable at least one of "
+            "--anisotropy, --horizontal-spectra, or --vertical-profiles."
+        )
     # check io group consistency
     if args["input_format"] == "um":
         assert args["h_resolution"] > 0, (
             "Missing required a positive h_resolution for UM datasets"
         )
-    assert args["output_path"].is_dir()
+    if args["output_path"].exists() and not args["output_path"].is_dir():
+        raise NotADirectoryError(
+            f"{args['output_path']} exists but is not a directory."
+        )
 
     # parse negative values in the [t,z]_range
     if args["t_range"][0] < 0:
@@ -321,7 +366,9 @@ def data_slice(
 
 
 # create simple post-processing fields
-def post_process_fields(simulation: xr.Dataset) -> xr.Dataset:
+def post_process_fields(
+    simulation: xr.Dataset, requested_fields: Sequence[str]
+) -> xr.Dataset:
     from sgs_tools.geometry.tensor_algebra import Frobenius_norm
     from sgs_tools.physics.fields import (
         Fluct_TKE,
@@ -330,49 +377,59 @@ def post_process_fields(simulation: xr.Dataset) -> xr.Dataset:
         vertical_heat_flux,
     )
 
-    simulation["vel"] = compose_vector_components_on_grid(
-        [simulation["u"], simulation["v"], simulation["w"]],
-        target_dims=["x", "y", "z"],
-        vector_dim="c1",
-    )
+    supported = []
+    available = {str(s) for s in simulation}
+    for f in requested_fields:
+        dependencies = v_profile_fields_map.get(f, {f})
+        missing = dependencies - available
+        if not missing:
+            supported.append(f)
+        else:
+            print(f"Skipping {f} because of missing dependencies {missing}")
 
-    if all([diag in simulation for diag in ["theta", "w"]]):
+    if "vel" in supported:
+        simulation["vel"] = compose_vector_components_on_grid(
+            [simulation["u"], simulation["v"], simulation["w"]],
+            target_dims=["x", "y", "z"],
+            vector_dim="c1",
+        )
+    # horizontal wind
+    if "vel_horiz" in supported:
+        simulation["vel_horiz"] = (simulation["u"] ** 2 + simulation["v"] ** 2) ** 0.5
+
+    if "vert_heat_flux" in supported:
         simulation["vert_heat_flux"] = vertical_heat_flux(
             simulation["w"], simulation["theta"], ["x", "y"]
         )
-    else:
-        print(
-            "Skipping missing inputs for cs_theta_diag: "
-            "['cs_theta_1', 'cs_theta_2', 'cs_theta_3']"
+
+    if "s" in supported:
+        simulation["Sij"] = strain_from_vel(
+            simulation["vel"],
+            space_dims=["x", "y", "z"],
+            vec_dim="c1",
+            new_dim="c2",
+            make_traceless=True,
         )
-        print("Available fields:", sorted(simulation, key=str))
+        simulation["s"] = Frobenius_norm(simulation["Sij"], ["c1", "c2"])
 
-    simulation["Sij"] = strain_from_vel(
-        simulation["vel"],
-        space_dims=["x", "y", "z"],
-        vec_dim="c1",
-        new_dim="c2",
-        make_traceless=True,
-    )
-    simulation["s"] = Frobenius_norm(simulation["Sij"], ["c1", "c2"])
+    if "vert_mom_flux" in supported:
+        simulation["vert_mom_flux"] = simulation["vel"] * simulation["w"]
 
-    simulation["vert_mom_flux"] = simulation["vel"] * simulation["w"]
-
-    simulation["fluct_ke"] = Fluct_TKE(
-        simulation["u"], simulation["v"], simulation["w"], ["x", "y", "z"], ["x", "y"]
-    )
-
-    if all([diag in simulation for diag in ["cs_1", "cs_2", "cs_3"]]):
+    if "fluct_ke" in supported:
+        simulation["fluct_ke"] = Fluct_TKE(
+            simulation["u"],
+            simulation["v"],
+            simulation["w"],
+            ["x", "y", "z"],
+            ["x", "y"],
+        )
+    if "cs_diag" in supported:
         simulation["cs_diag"] = compose_vector_components_on_grid(
             [simulation["cs_1"], simulation["cs_2"], simulation["cs_3"]],
             target_dims=[],
             vector_dim="c1",
         )
-    else:
-        print("Skipping missing inputs for cs_diag: ['cs_1', 'cs_2', 'cs_3']")
-        print("Available fields:", sorted(simulation, key=str))
-
-    if all([diag in simulation for diag in ["cs_theta_1", "cs_theta_2", "cs_theta_3"]]):
+    if "cs_theta_diag" in supported:
         simulation["cs_theta_diag"] = compose_vector_components_on_grid(
             [
                 simulation["cs_theta_1"],
@@ -382,13 +439,40 @@ def post_process_fields(simulation: xr.Dataset) -> xr.Dataset:
             target_dims=[],
             vector_dim="c1",
         )
-    else:
-        print(
-            "Skipping missing inputs for cs_theta_diag: "
-            "['cs_theta_1', 'cs_theta_2', 'cs_theta_3']"
-        )
-        print("Available fields:", sorted(simulation, key=str))
+    return simulation
 
+
+def pre_process(args: dict[str, Any], req_fields: list[str]) -> xr.Dataset:
+    simulation = read(
+        args["input_files"],
+        args["input_format"],
+        requested_fields=req_fields,
+        resolution=args["h_resolution"],
+    )
+    # overwrite resolution if recorded during read
+    if "h_resolution" in simulation.attrs:
+        args["h_resolution"] = simulation.attrs["h_resolution"]
+
+    # slice to the requested sub-domain
+    simulation = data_slice(simulation, args["t_range"], args["z_range"])
+    # compute secondary diagnostics (if available)
+    simulation = post_process_fields(simulation, args["vprofile_fields"])
+
+    # chunk
+    chunks = {
+        "z": args["z_chunk_size"],
+        "t_0": args["t_chunk_size"],
+        "t": args["t_chunk_size"],
+        "x": args["h_chunk_size"],
+        "y": args["h_chunk_size"],
+        "c1": -1,
+        "c2": -1,
+        "c1_1": -1,
+    }
+    # add caveat for degenerate t or z-slice that may drop a coordinate
+    simulation = chunk_ds(
+        simulation, chunks={x: y for x, y in chunks.items() if x in simulation.dims}
+    )
     return simulation
 
 
@@ -396,20 +480,11 @@ def post_process_fields(simulation: xr.Dataset) -> xr.Dataset:
 def choose_filter_set(
     hminsize: int,  # number of grid points in horizontal direction
     dx: float,  # horizontal grid spacing
-    box_delta_scales: Sequence[int] = [
-        2,
-        4,
-        8,
-        16,
-    ],  # effective resolution/decorelation scales
-    box_meter_scales: Sequence[float] = [
-        800.0,
-        400.0,
-        200.0,
-        100.0,
-    ],  # sub-km grey zone horizontal resolutions
-    box_domain_scales: Sequence[float] = [0.25, 0.5, 1],  # domain unit scales
-    gauss_scales: Sequence[float] = [2, 4],  # Gaussian filter scales
+    box_delta_scales: Sequence[int] = box_delta_scales,  # grid cell unit scales
+    box_meter_scales: Sequence[float] = box_meter_scales,  # SI unit scales
+    box_domain_scales: Sequence[float] = box_domain_scales,  # domain unit scales
+    gauss_scales: Sequence[float] = gauss_scales,  # Gaussian filter scales
+    filter_shapes: Sequence[str] = ["gauss", "box", "coarse"],  # filter shapes
     hdims: Sequence[str] = ["x", "y"],
 ):
     from sgs_tools.sgs.coarse_grain import CoarseGrain
@@ -421,7 +496,7 @@ def choose_filter_set(
     )
 
     # dictionary of filters
-    filter_dic: Dict[str, Filter | CoarseGrain] = {}
+    filter_dic: dict[str, Filter | CoarseGrain] = {}
 
     # Box-cart scales
     meter_scales = [int(res / dx) for res in box_meter_scales]
@@ -430,9 +505,10 @@ def choose_filter_set(
     # only allows scales at least 2 (delta_<x>) apart
     # order of loop determines precedence
     for x in set(domain_scales + meter_scales + list(box_delta_scales)):
-        if x > 1 and x < hminsize:
-            if not box_scales or np.min(np.abs([x - y for y in box_scales])) >= 2:
-                box_scales += [x]
+        if (x > 1 and x <= hminsize) and (
+            not box_scales or np.min(np.abs([x - y for y in box_scales])) >= 2
+        ):
+            box_scales += [x]
 
     # sort from fast to slow to compute coarse grain(small to large scales)
     box_scales = sorted(box_scales)
@@ -442,69 +518,101 @@ def choose_filter_set(
     assert min(box_scales) > 1, "Unsupported box_scales less than 0."
 
     # Coarse-graining filters
-    filter_dic = filter_dic | {
-        f"Coarse{scale}delta": CoarseGrain({x: int(scale) for x in hdims})
-        for scale in box_scales
-    }
+    if "coarse" in filter_shapes:
+        filter_dic = filter_dic | {
+            f"Coarse{scale}delta": CoarseGrain({x: int(scale) for x in hdims})
+            for scale in box_scales
+        }
 
     # Box filters
-    # stencil size is (filter_scale + 1)delta under finite-difference data interpretation
-    box_scales = [x for x in box_scales if x < hminsize]
-    filter_dic = filter_dic | {
-        f"Box{scale}delta": Filter(box_kernel([int(scale) + 1 for x in hdims]), hdims)
-        for scale in box_scales
-    }
-
-    # Gausssian filters
-    for s in gauss_scales:
-        if s == 2:
-            filter_dic[f"Gauss{2}delta"] = Filter(weight_gauss_3d, filter_dims=hdims)
-        elif s == 4:
-            filter_dic[f"Gauss{4}delta"] = Filter(weight_gauss_5d, filter_dims=hdims)
-        else:
-            warnings.warn(
-                f"Skipping unsupported Gauss scale {s}. Support only 2 and 4."
+    # stencil size is (filter_scale + 1)delta
+    # under finite-difference data interpretation
+    if "box" in filter_shapes:
+        box_scales = [x for x in box_scales if x <= hminsize // 10]
+        filter_dic = filter_dic | {
+            f"Box{scale}delta": Filter(
+                box_kernel([int(scale) + 1 for x in hdims]), hdims
             )
+            for scale in box_scales
+        }
+
+    if "gauss" in filter_shapes:
+        # Gausssian filters
+        for s in gauss_scales:
+            if s == 2:
+                filter_dic[f"Gauss{2}delta"] = Filter(
+                    weight_gauss_3d, filter_dims=hdims
+                )
+            elif s == 4:
+                filter_dic[f"Gauss{4}delta"] = Filter(
+                    weight_gauss_5d, filter_dims=hdims
+                )
+            else:
+                warnings.warn(
+                    f"Skipping unsupported Gauss scale {s}. Support only 2 and 4.",
+                    stacklevel=2,
+                )
 
     return filter_dic
 
 
-def run(args: Dict[str, Any]) -> None:
-    spectra_fields_list = set(
-        [f for fl in args["cross_spectra_fields"] for f in fl]
-        + args["power_spectra_fields"]
-    )
+def run(args: dict[str, Any]) -> None:
+    with (
+        timer("Read and Preprocess", "s"),
+        TerminalProgressBar(),
+        memory_watch("Read and PreProcess", "GB"),
+    ):
+        # get the flattened set of args['prof_fields'] and args["cross_spectra_fields"]
+        spectra_fields_list = set(
+            [f for fl in args["cross_spectra_fields"] for f in fl]
+            + args["power_spectra_fields"]
+        )
+        # parse args['prof_fields'] through if v_profile_fields_map, add them if missing
+        v_profile_fields_in = {
+            v
+            for f in args["vprofile_fields"]
+            for v in (v_profile_fields_map.get(f, {f}))
+        }
+        all_fields: set[str] = set()
+        if args["vertical_profiles"]:
+            all_fields = all_fields.union(v_profile_fields_in)
 
-    all_fields = (
-        set()
-        .union(v_profile_fields_in)
-        .union(spectra_fields_list)
-        .union(anisotropy_fields)
-    )
+        if args["horizontal_spectra"]:
+            all_fields = all_fields.union(spectra_fields_list)
 
-    simulation = read(
-        args["input_files"],
-        args["input_format"],
-        list(all_fields),
-        resolution=args["h_resolution"],
-    )
-    # slice to the requested sub-domain
-    simulation = data_slice(simulation, args["t_range"], args["z_range"])
-    simulation = post_process_fields(simulation)
+        if args["anisotropy"]:
+            all_fields = all_fields.union(anisotropy_fields)
+            # read and pre-process simulation
+
+        simulation = pre_process(args, list(all_fields))  # .persist()
 
     writer = NetCDFWriter(overwrite=args["overwrite_existing"])
-    output_dir = args["output_path"]
 
     hdims = args["hdims"]
 
+    # get repo state and setup as attributes of netcdf
+    git_info = get_git_state(verbosity=3)
+    git_attrs = {"git_commit": git_info["Repository Status"]}
+    if git_info.get("Changes"):
+        git_attrs["git_diff_file"] = write_git_diff_file(args["output_path"])
+
     if args["vertical_profiles"]:
-        with timer("Vertical profiles", "s"):
+        with (
+            timer("Vertical profiles", "s"),
+            TerminalProgressBar(),
+            memory_watch("Vertical profiles", "GB"),
+        ):
             f_pr = [f for f in args["vprofile_fields"] if f in simulation]
             f_missing = [f for f in args["vprofile_fields"] if f not in simulation]
             if f_missing:
                 print(f"Missing vertical profile fields {f_missing}")
             # don't overwrite but skip existing filters/scales
-            output_path = output_dir / args["vprofile_fname_out"]
+            output_path = build_output_fname(
+                args["output_path"] / args["vprofile_fname_out"],
+                args["fname_suffix"],
+                VPROF_TAG,
+                ext=".nc",
+            )
             if writer.check_filename(output_path) and not writer.overwrite:
                 print(f"Warning: Skip existing file {output_path}.")
             else:
@@ -513,27 +621,37 @@ def run(args: Dict[str, Any]) -> None:
                 )
                 with timer(f"write {output_path}", "s"):
                     # rechunk for IO optimisation??
-                    # have to do explicit rechunking because UM date-time coordinate is an object
-                    profile = profile.chunk({"z": "auto"})
+                    # have to do explicit rechunking because
+                    # UM date-time coordinate is an object
+                    profile = chunk_ds(profile, {"z": "auto"})
+                    profile.attrs.update(git_attrs)
                     writer.write(profile, output_path)
 
     if args["horizontal_spectra"]:
-        with timer("Horizontal spectra", "s", "Horizontal spectra"):
+        with (
+            timer("Horizontal spectra"),
+            TerminalProgressBar(),
+            memory_watch("Horizontal Spectra", "GB"),
+        ):
             pspec_fields = [f for f in args["power_spectra_fields"] if f in simulation]
             cspec_fields = [
                 s
                 for s in args["cross_spectra_fields"]
                 if s[0] in simulation and s[1] in simulation
             ]
-            cross_fields_set = set([f for fl in cspec_fields for f in fl])
+            cross_fields_set = {f for fl in cspec_fields for f in fl}
             spec_fields = cross_fields_set.union(pspec_fields)
             # get the missing fields from the power-spectra fields
             # since they contain all the cross-spectra fields
             spec_f_missing = set(args["power_spectra_fields"]) - set(pspec_fields)
             if spec_f_missing:
                 print(f"Missing spectra fields {spec_f_missing}")
-
-            output_path = output_dir / args["hspectra_fname_out"]
+            output_path = build_output_fname(
+                args["output_path"] / args["hspectra_fname_out"],
+                args["fname_suffix"],
+                SPECTRA_TAG,
+                ext=".nc",
+            )
             if writer.check_filename(output_path) and not writer.overwrite:
                 print(f"Warning: Skip existing file {output_path}.")
             else:
@@ -548,14 +666,17 @@ def run(args: Dict[str, Any]) -> None:
 
                 with timer(f"write {output_path}", "s"):
                     # rechunk for IO optimisation ??
-                    # have to do explicit rechunking because UM date-time coordinate is an object
-                    spec_ds = spec_ds.chunk(
-                        {dim: "auto" for dim in ["x", "y", "z"] if dim in spec_ds.dims}
+                    # have to do explicit rechunking because
+                    # UM date-time coordinate is an object
+                    spec_ds = chunk_ds(
+                        spec_ds,
+                        {dim: "auto" for dim in ["x", "y", "z"] if dim in spec_ds.dims},
                     )
+                    spec_ds.attrs.update(git_attrs)
                     writer.write(spec_ds, output_path)
 
     if args["anisotropy"]:
-        with timer("Anisotropy", "s", "Anisotropy"):
+        with timer("Anisotropy", "s"):
             # anisotropy diagnostic
 
             # min horizontal number of cells
@@ -571,43 +692,51 @@ def run(args: Dict[str, Any]) -> None:
                 box_meter_scales=args["box_meter_scales"],
                 box_domain_scales=args["box_domain_scales"],
                 gauss_scales=args["gauss_scales"],
+                filter_shapes=args["filter_shapes"],
                 hdims=hdims,
             )
-            print(f"Filters: {filter_dic.keys()}")
 
-            # rechunk velocity -- unify filtering and vector dimensions
-            vel = simulation["vel"].chunk({x: -1 for x in hdims + ["c1"]}).persist()
+            print(f"Filters: {filter_dic.keys()}")
+            mem_limit_MB = args["mem_limit_MB"] or get_mem_limit_MB(0.5, 0.1)
+            print(f"Mem limit {mem_limit_MB:.0g} MB")
             # run analysis
             for filt_lbl, filt in filter_dic.items():
-                with timer(
-                    f"{filt_lbl}:{filt.scales()}", "s", f"{filt_lbl}:{filt.scales()}"
+                with (
+                    timer(
+                        f"{filt_lbl}:{filt.scales()}",
+                        "s",
+                        f"{filt_lbl}:{filt.scales()}",
+                    ),
+                    TerminalProgressBar(),
+                    memory_watch(f"{filt_lbl}:{filt.scales()}", "GB"),
                 ):
-                    output_path = (
-                        output_dir / f"{args['aniso_fname_out'].stem}_{filt_lbl}"
-                    ).with_suffix(".nc")
+                    output_path = build_output_fname(
+                        args["output_path"] / args["aniso_fname_out"],
+                        args["fname_suffix"],
+                        filt_lbl,
+                        ANISOTROPY_TAG,
+                        ext=".nc",
+                    )
                     # don't over-write but skip existing filters/scales
                     if not writer.overwrite and writer.check_filename(output_path):
                         print(f"Warning: Skip existing file {output_path}.")
                     else:
-                        evals = anisotropy_analysis(vel, filt)
+                        evals = anisotropy_analysis(
+                            simulation["vel"], filt, "c1", mem_limit_MB
+                        )
                         evals = evals.expand_dims(
                             {"filter": xr.DataArray([filt_lbl], dims=["filter"])}
                         )
                         with timer(f"write {output_path}", "s"):
-                            # rechunk for IO optimisation
-                            # have to do explicit rechunking because UM date-time coordinate is an object
-                            evals.chunk(
-                                {
-                                    dim: "auto"
-                                    for dim in ["x", "y", "z", "c1", "c2"]
-                                    if dim in evals.dims
-                                }
-                            )
+                            evals.attrs.update(git_attrs)
                             writer.write(evals, output_path)
 
 
-def main() -> None:
-    args = parse_args()
+def main(arguments: Sequence[str] | None = None) -> None:
+    args = parse_args(arguments)
+    print_header("post_process", args["verbosity"])
+    print_args_dict(args)
+
     with timer("Total execution time", "min"):
         run(args)
 

@@ -8,10 +8,12 @@ import xarray as xr
 class NetCDFWriter:
     """A class to write xarray datasets to NetCDF files.
 
-    :ivar overwrite: overwrite existing files if set to True. If False, raises an OSError if the file already exists.
+    :ivar overwrite: overwrite existing files if set to True.
+      If False, raises an OSError if the file already exists.
     """
 
     overwrite: bool = False
+    verbose: bool = False
 
     def check_filename(self, filename: Path) -> bool:
         """Check if the file exists.
@@ -37,3 +39,5 @@ class NetCDFWriter:
             engine="netcdf4",
             auto_complex=True,
         )
+        if self.verbose:
+            print(f"Wrote: {filename}")

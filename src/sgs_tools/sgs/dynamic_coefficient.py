@@ -1,6 +1,7 @@
 import warnings
+from collections.abc import Sequence
 from dataclasses import dataclass
-from typing import Protocol, Sequence
+from typing import Protocol
 
 import numpy as np
 import xarray as xr
@@ -29,7 +30,8 @@ class Minimisation(Protocol):
     def compute(
         self, L: xr.DataArray, Mi: Sequence[xr.DataArray], reg_filter: Filter
     ) -> xr.DataArray:
-        r"""solve for :math:`{c_i}` the over-determined system :math:`L = \sum_i(c_i M_i)`.
+        r"""solve for :math:`{c_i}` the over-determined system
+          :math:`L = \sum_i(c_i M_i)`.
 
         :param L: LHS tensor
         :param M: a sequence of RHS tensors
@@ -41,10 +43,13 @@ class Minimisation(Protocol):
 class LillyMinimisation1Model:
     r"""Lilly Minimisation (least square error) for a 1-global-coefficient model using
        the Lilly identity as :math:`\overline{L \cdot M} / \overline{M \cdot M}`.
-       where :math:`\cdot` means  tensor contraction, :math:`\overline{*}` means regularisation filtering
+       where :math:`\cdot` means  tensor contraction, :math:`\overline{*}` means
+       regularisation filtering
 
-    :param contraction_dims: labels of dimensions to be contracted to form :math:`L M_i` and :math:`M_i M_j` products.
-    :param coeff_dim: label of dimension along which to concatenate the arrays :math:`c_i`
+    :param contraction_dims: labels of dimensions to be contracted to form
+      :math:`L M_i` and :math:`M_i M_j` products.
+    :param coeff_dim: label of dimension along which to concatenate the arrays
+      :math:`c_i`
     """
 
     contraction_dims: Sequence[str]
@@ -78,8 +83,10 @@ class LillyMinimisation2Model:
     r"""Lilly Minimisation (least square error) for a 2-coefficient model using
     the Lilly identity as :math:`L = \sum_i^2 c_i M_i`.
 
-    :param contraction_dims: labels of dimensions to be contracted to form :math:`L M_i` and :math:`M_i M_j` products.
-    :param coeff_dim: label of dimension along which to concatenate the arrays :math:`c_i`
+    :param contraction_dims: labels of dimensions to be contracted to form
+      :math:`L M_i` and :math:`M_i M_j` products.
+    :param coeff_dim: label of dimension along which to concatenate the arrays
+      :math:`c_i`
     """
 
     contraction_dims: Sequence[str]
@@ -136,8 +143,10 @@ class LillyMinimisation3Model:
     r"""Lilly Minimisation (least square error) for a 3-coefficient model using
        the Lilly identity as :math:`L = \sum_i^3 c_i M_i`.
 
-    :param contraction_dims: labels of dimensions to be contracted to form :math:`L M_i` and :math:`M_i M_j` products.
-    :param coeff_dim: label of dimension along which to concatenate the arrays :math:`c_i`
+    :param contraction_dims: labels of dimensions to be contracted to form
+      :math:`L M_i` and :math:`M_i M_j` products.
+    :param coeff_dim: label of dimension along which to concatenate the arrays
+      :math:`c_i`
     """
 
     contraction_dims: Sequence[str]
@@ -147,7 +156,8 @@ class LillyMinimisation3Model:
         self, L: xr.DataArray, Mi: Sequence[xr.DataArray], reg_filter: Filter
     ) -> xr.DataArray:
         r"""Compute dynamic coefficients of a 3-component models using Germano identity
-        as :math:`L = C_1 M_1 + C_2 M_2 + C_3 M_3` using regularized least-square minimisation
+        as :math:`L = C_1 M_1 + C_2 M_2 + C_3 M_3` using
+        regularized least-square minimisation
         (inverting the :math:`M_i M_j` matrix explicitly).
 
         :param L: LHS tensor
@@ -219,8 +229,10 @@ class LillyMinimisationNModel:
     r"""Lilly Minimisation (least square error) for an N-coefficient model using
        the Lilly identity as :math:`L = \sum_i^N c_i M_i`.
 
-    :param contraction_dims: labels of dimensions to be contracted to form :math:`L M_i` and :math:`M_i M_j` products.
-    :param coeff_dim: label of dimension along which to concatenate the arrays :math:`c_i`
+    :param contraction_dims: labels of dimensions to be contracted to form
+      :math:`L M_i` and :math:`M_i M_j` products.
+    :param coeff_dim: label of dimension along which to concatenate the arrays
+      :math:`c_i`
     """
 
     contraction_dims: Sequence[str]
@@ -229,8 +241,10 @@ class LillyMinimisationNModel:
     def compute(
         self, L: xr.DataArray, Mi: Sequence[xr.DataArray], reg_filter: Filter
     ) -> xr.DataArray:
-        r"""Solve the system  :math:`\overline{L \cdot M_i} = \sum_i^N c_j \overline{M_i \cdot M_j}`
-        using np.linalg.SVD, where :math:`L \cdot M_i` and :math:`M_i \cdot M_j` are scalar fields
+        r"""Solve the system
+        :math:`\overline{L \cdot M_i} = \sum_i^N c_j \overline{M_i \cdot M_j}`
+        using np.linalg.SVD, where
+        :math:`L \cdot M_i` and :math:`M_i \cdot M_j` are scalar fields
 
         :param L: LHS tensor
         :param M: a sequence of RHS tensors
@@ -274,8 +288,11 @@ class LillyMinimisationNModel:
         )
 
         if mm_condition > 1e15:
-            s = f"Warning: Large condtion number max={mm_condition:g} for the MM tensor. May degrade accuracy of coefficients"
-            warnings.warn(s)
+            s = (
+                f"Warning: Large condtion number max={mm_condition:g}"
+                " for the MM tensor. May degrade accuracy of coefficients"
+            )
+            warnings.warn(s, stacklevel=2)
 
         coefficients = xr.apply_ufunc(
             np.linalg.solve,

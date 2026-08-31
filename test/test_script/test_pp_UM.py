@@ -1,17 +1,17 @@
-import shutil
-from pathlib import Path
-
 import pytest
 
 import sgs_tools.scripts.post_process as pp_um
+from sgs_tools.io.fname_out import build_output_fname
 
 
 @pytest.fixture
-def test_args():
+def test_args(output_dir, testing_rootdir):
     return [
-        "test/test_script/df667_800m_L63_Slicea_pr.nc",
+        str(testing_rootdir / "test_script/df667_800m_L63_Slicea_pr.nc"),
         "um",
-        "__test_pp_UM",
+        str(output_dir),
+        "--fname_suffix",
+        "test_me",
         "--h_resolution",
         "800",
         "--overwrite_existing",
@@ -35,19 +35,19 @@ def test_args():
         "y",
         "--vertical_profiles",
         "--vprofile_fname_out",
-        "profiles.nc",
+        "profiles",
         "--horizontal_spectra",
         "--hspectra_fname_out",
-        "spectra.nc",
+        "spectra",
         "--radial_smooth_factor",
         "1",
         "--radial_truncation",
         "--anisotropy",
         "--aniso_fname_out",
-        "aniso.nc",
+        "aniso",
         "--box_delta_scales",
         "2",
-        "4",
+        "5",
         "--box_meter_scales",
         "100",
         "--box_domain_scales",
@@ -57,20 +57,25 @@ def test_args():
     ]
 
 
+@pytest.mark.slow
+@pytest.mark.integration
 def test_main_full_pipeline(test_args):
-    tmp_path = Path(test_args[2])
-    tmp_path.mkdir(exist_ok=False, parents=False)
-    try:
-        # Execute
-        args = pp_um.parse_args(test_args)
-        pp_um.run(args)
+    # Execute
+    args = pp_um.parse_args(test_args)
+    pp_um.run(args)
+    # Assert outputs exist
 
-        # Assert outputs exist
-        assert (tmp_path / args["vprofile_fname_out"]).exists()
-        assert (tmp_path / args["hspectra_fname_out"]).exists()
-        assert len(list(tmp_path.glob(f"{args['aniso_fname_out'].stem}*.nc"))) > 0
-
-    finally:
-        # Cleanup
-        if tmp_path.exists():
-            shutil.rmtree(tmp_path)
+    assert build_output_fname(
+        args["output_path"] / args["vprofile_fname_out"],
+        args["fname_suffix"],
+        pp_um.VPROF_TAG,
+    ).exists()
+    assert build_output_fname(
+        args["output_path"] / args["hspectra_fname_out"],
+        args["fname_suffix"],
+        pp_um.SPECTRA_TAG,
+    ).exists()
+    aniso_glob = build_output_fname(
+        args["aniso_fname_out"], args["fname_suffix"], "*", pp_um.ANISOTROPY_TAG
+    )
+    assert len(list(args["output_path"].glob(str(aniso_glob)))) > 0

@@ -1,4 +1,4 @@
-from typing import Sequence
+from collections.abc import Sequence
 
 import dask.array as da
 import numpy as np
@@ -14,10 +14,13 @@ def tensor_self_outer_product(
     r"""Tensor product :math:`a_i a_j` from vector field ``arr``.
     Assumes that ``arr`` has dimensions ``vec_dim`` but not dimension ``new_dim``.
 
-    :param arr: xarray Dataset with dimension `vec_dim` which will be used for the tensor product
-    :param vec_dim: the dimension of the vector field to be used to form the tensor product
+    :param arr: xarray Dataset with dimension `vec_dim` which will be used
+      for the tensor product
+    :param vec_dim: the dimension of the vector field to be used to form
+      the tensor product
     :param new_dim: the name of the new dimension to be created for the tensor product
-    :param returns: xarray DataArray with the ``vec_dim`` and ``new_dim`` dimensions sorted to the front.
+    :param returns: xarray DataArray with the ``vec_dim`` and ``new_dim``
+      dimensions sorted to the front.
     """
     assert vec_dim in arr.dims
     assert new_dim not in arr.dims
@@ -110,7 +113,7 @@ def symmetrise(
         )
         # xr.align(tensor[dims[0]], tensor[c], join="exact")
 
-    transpose_map = dict(zip(dims, dims[::-1]))
+    transpose_map = dict(zip(dims, dims[::-1], strict=False))
     sij = 0.5 * (tensor + tensor.rename(transpose_map))
     if name is not None:
         sij.name = name
@@ -136,7 +139,7 @@ def antisymmetrise(
             "Coordinates must match"
         )
 
-    transpose_map = dict(zip(dims, dims[::-1]))
+    transpose_map = dict(zip(dims, dims[::-1], strict=False))
     omij = 0.5 * (tensor - tensor.rename(transpose_map))
     if name is not None:
         omij.name = name

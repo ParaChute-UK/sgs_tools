@@ -1,5 +1,52 @@
-from argparse import ArgumentParser, _ArgumentGroup
+import json
+from argparse import Action, ArgumentParser, ArgumentTypeError, _ArgumentGroup
 from pathlib import Path
+
+from sgs_tools.util.gitinfo import print_version_info
+
+
+def parse_json_or_file(input: str | None):
+    if input is None:
+        return None
+
+    # check if value JSON string first
+    try:
+        return json.loads(input)
+    except json.JSONDecodeError:
+        pass
+
+    # Otherwise treat as file path
+    path = Path(input)
+    if path.exists():
+        with open(path) as f:
+            return json.load(f)
+
+    raise ArgumentTypeError(f"Invalid JSON or file path: {input}")
+
+
+class VersionAction(Action):
+    def __call__(self, parser, namespace, values, option_string=None):
+        # Call the git info printer and exit immediately
+        if values > 0:
+            print_version_info(values)
+            parser.exit()
+
+
+def add_version_group(parser: ArgumentParser) -> _ArgumentGroup:
+    version = parser.add_argument_group("Package version")
+    version.add_argument(
+        "-V",
+        "--git_version",
+        type=int,
+        choices=range(4),
+        default=0,
+        action=VersionAction,
+        help=(
+            "show package version (0=installed, 1=+last commit, 2=+modified files,"
+            " 3=+ full file difference) and exit"
+        ),
+    )
+    return version
 
 
 def add_input_group(parser: ArgumentParser) -> _ArgumentGroup:
@@ -8,9 +55,9 @@ def add_input_group(parser: ArgumentParser) -> _ArgumentGroup:
         "input_files",
         type=Path,
         help="""
-        location of NetCDF diagnostic file(s).
+        Location of NetCDF diagnostic file(s).
         Recognizes glob patterns and walks directory trees, e.g. './my_file_p[br]*nc'
-        (All files in the pattern should belong to the same simulation).
+        All files in a glob pattern should belong to the same simulation.
         """,
     )
 
@@ -18,7 +65,8 @@ def add_input_group(parser: ArgumentParser) -> _ArgumentGroup:
         "input_format",
         type=str,
         choices=["um", "monc", "sgs"],
-        help="Type of 'input_files'. Only support different NetCDF flavours from various production codes. 'sgs' refers to files produced by sgs_tools.",
+        help="Type of 'input_files'. Only support different NetCDF flavours "
+        "from various production codes. 'sgs' refers to files produced by sgs_tools.",
     )
 
     fname.add_argument(
@@ -26,8 +74,8 @@ def add_input_group(parser: ArgumentParser) -> _ArgumentGroup:
         type=float,
         default=0,
         help="""
-        horizontal resolution in meters.
-        *ONLY* used for UM ideal simulations(will use to overwrite horizontal coordinates).
+        horizontal resolution in meters. *ONLY* used for UM ideal simulations
+        (will use to overwrite horizontal coordinates).
         """,
     )
 
@@ -36,7 +84,8 @@ def add_input_group(parser: ArgumentParser) -> _ArgumentGroup:
         type=float,
         nargs=2,
         default=[-1, -1],
-        help="time interval to consider, in code coordinates, negative value are interpreted as min/max respectively",
+        help="time interval to consider, in code coordinates,"
+        " negative value are interpreted as min/max respectively",
     )
 
     fname.add_argument(
@@ -44,7 +93,8 @@ def add_input_group(parser: ArgumentParser) -> _ArgumentGroup:
         type=float,
         nargs=2,
         default=[-1, -1],
-        help="vertical interval to consider, in code coordinates, negative values are interpreted as take the min/max respectively",
+        help="vertical interval to consider, in code coordinates, "
+        "negative values are interpreted as take the min/max respectively",
     )
 
     return fname
@@ -77,9 +127,10 @@ def add_dask_group(parser: ArgumentParser) -> _ArgumentGroup:
         type=int,
         default=None,
         help="""
-      Size of dask array chunks in the vertical direction. Should divide the total number of levels.
+      Size of dask array chunks in the vertical direction.
+      Should divide the total number of levels.
       Smaller size leads to smaller memory footprint, but may penalize walltime.
-      NB:The default value has not been optimised.""",
+      """,
     )
 
     dask.add_argument(
@@ -87,9 +138,46 @@ def add_dask_group(parser: ArgumentParser) -> _ArgumentGroup:
         type=int,
         default=None,
         help="""
-      Size of dask array chunks in the time direction. Should divide the total number time snapshots.
+      Size of dask array chunks in the time direction.
+      Should divide the total number time snapshots.
       Smaller size leads to smaller memory footprint, but may penalize walltime.
-      NB:The default value has not been optimised.""",
+    """,
+    )
+    dask.add_argument(
+        "--h_chunk_size",
+        type=int,
+        default=-1,
+        help="""
+      Size of dask array chunks in the "horizontal" directions.
+      Should divide into the domain size.
+      Smaller size leads to smaller memory footprint, but can penalize walltime heavily
+      (building DAGs). Default -1 means don't chunk, keep dimesions together --
+      useful for horizontal filtering. If it doesn't fit in memory
+      try 1/2 to 1/4 of domain size.
+    """,
     )
 
+    dask.add_argument(
+        "--mem_limit_MB",
+        type=float,
+        default=None,
+        help="""
+        Target memory limit in MB used to control chunk size of dask array chunks.
+        If on a dask cluster it is
+        May not be fully enforced by this CLI.
+        Smaller size leads to smaller memory footprint, but may penalize walltime.
+        """,
+    )
     return dask
+
+
+def add_output_group(parser: ArgumentParser) -> _ArgumentGroup:
+    output = parser.add_argument_group("Output")
+    output.add_argument(
+        "-v",
+        "--verbosity",
+        action="count",
+        default=0,
+        help="verbosity level. Increase by -v , -vv, etc.",
+    )
+    return output

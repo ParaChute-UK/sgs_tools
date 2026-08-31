@@ -1,21 +1,33 @@
-from typing import Dict, Iterable
+import glob
+from collections.abc import Iterable
+from pathlib import Path
 
 import xarray as xr
 
 
+def parse_fname_pattern(fname_pattern: str | Path) -> list[Path]:
+    """
+    parse any glob wildcards from ``fname_pattern``
+    return a list of concrete Paths
+    """
+    print(f"Parsing {fname_pattern}")
+    # return list because of incomplete typehints of xr.open_mfdataset
+    return [Path(p) for p in glob.glob(str(fname_pattern), recursive=True)]
+
+
 def standardize_varnames(
-    ds: xr.Dataset, field_names_convention: Dict[str, str]
+    ds: xr.Dataset, field_names_convention: dict[str, str]
 ) -> xr.Dataset:
     """rename variables in ``ds`` using ``field_names_dict``
 
     :param ds: input dataset
     :return: dataset with renamed variables
     """
-    restricted_dict = {k: v for k, v in field_names_convention.items() if k in ds}
-    return ds.rename(restricted_dict)
+    known_fields = {k: v for k, v in field_names_convention.items() if k in ds}
+    return ds.rename(known_fields)
 
 
-def restrict_ds(ds: xr.Dataset, fields: Iterable[str]) -> xr.Dataset:
+def restrict_ds(ds: xr.Dataset, fields: Iterable[str]) -> tuple[xr.Dataset, set[str]]:
     """restrict the dataset to fields of interest and rename using fields dict
 
     :param ds: input dataset

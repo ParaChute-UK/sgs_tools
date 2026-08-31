@@ -16,7 +16,7 @@ repos:
     rev: v0.12.5
     hooks:
       - id: ruff
-        args: ["--fix"]
+        args: ["--fix", "--ignore", "SIM108"]
         types_or: [ python, pyi ]
       - id: ruff-format
         # formatter

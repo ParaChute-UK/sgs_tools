@@ -266,7 +266,8 @@
 <li><p><strong>requested_fields</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span>) – List of variable names to extract from the input data.</p></li>
 <li><p><strong>kwargs</strong> – Additional keyword arguments depending on the input format.
 The <code class="docutils literal notranslate"><span class="pre">um</span></code> format, requires <code class="docutils literal notranslate"><span class="pre">resolution</span></code> (float)
-specifying horizontal grid spacing.</p></li>
+specifying horizontal grid spacing. It also accepts
+<code class="docutils literal notranslate"><span class="pre">field_names_dict</span></code> dict[str,str] prescribing a field-names lookup table</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
@@ -394,7 +395,7 @@ rename coordinates with reference to a logically-cartesian grid</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="sgs_tools.io.um.data_ingest_UM">
-<span class="sig-name descname"><span class="pre">data_ingest_UM</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname_pattern</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">res</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">requested_fields</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['u',</span> <span class="pre">'v',</span> <span class="pre">'w',</span> <span class="pre">'theta']</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/io/um.html#data_ingest_UM"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.io.um.data_ingest_UM" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">data_ingest_UM</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname_pattern</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">res</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">requested_fields</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['u',</span> <span class="pre">'v',</span> <span class="pre">'w',</span> <span class="pre">'theta']</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_names_dict</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/io/um.html#data_ingest_UM"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.io.um.data_ingest_UM" title="Link to this definition">¶</a></dt>
 <dd><p>read and pre-process UM data using sgs_tools naming convention.
 Any unknown fields will retain their original names.</p>
 <dl class="field-list simple">
@@ -405,6 +406,8 @@ will be interpreted as a glob pattern. (should belong to the same simulation)</p
 <li><p><strong>res</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></span>) – horizontal resolution (will use to overwrite horizontal coordinates).
 <strong>NB</strong> works for ideal simulations</p></li>
 <li><p><strong>requested_fields</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span>) – list of fields to retain in ds, if falsy will retain all.</p></li>
+<li><p><strong>field_names_dict</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>] | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – a look-up table used to rename fields in the input dataset
+will use <cite>default_field_names_dict</cite> if None</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
@@ -415,7 +418,7 @@ will be interpreted as a glob pattern. (should belong to the same simulation)</p
 
 <dl class="py function">
 <dt class="sig sig-object py" id="sgs_tools.io.um.data_ingest_UM_on_single_grid">
-<span class="sig-name descname"><span class="pre">data_ingest_UM_on_single_grid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname_pattern</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">res</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">requested_fields</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['u',</span> <span class="pre">'v',</span> <span class="pre">'w',</span> <span class="pre">'theta']</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/io/um.html#data_ingest_UM_on_single_grid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.io.um.data_ingest_UM_on_single_grid" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">data_ingest_UM_on_single_grid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname_pattern</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">res</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">requested_fields</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['u',</span> <span class="pre">'v',</span> <span class="pre">'w',</span> <span class="pre">'theta']</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_names_dict</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sgs_tools/io/um.html#data_ingest_UM_on_single_grid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sgs_tools.io.um.data_ingest_UM_on_single_grid" title="Link to this definition">¶</a></dt>
 <dd><p>read, pre-process UM data and interpolate to a cell-centred grid
 Any unknown fields will retain their original names.</p>
 <dl class="field-list simple">
@@ -426,6 +429,8 @@ will be interpreted as a glob pattern. (should belong to the same simulation)</p
 <li><p><strong>res</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></span>) – horizontal resolution (will use to overwrite horizontal coordinates).
 <strong>NB</strong> works for ideal simulations</p></li>
 <li><p><strong>requested_fields</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span>) – list of fields to retain in ds, if falsy will retain all.</p></li>
+<li><p><strong>field_names_dict</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>] | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – a look-up table used to rename fields in the input dataset.
+will use <cite>default_field_names_dict</cite> if None</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>

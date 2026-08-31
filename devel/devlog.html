@@ -345,21 +345,41 @@
 <p>All notable changes to this project are documented in this file.</p>
 <section id="wip">
 <h3>[WIP]<a class="headerlink" href="#wip" title="Link to this heading">¶</a></h3>
+<section id="break-backward-compatibility">
+<h4>Break backward compatibility<a class="headerlink" href="#break-backward-compatibility" title="Link to this heading">¶</a></h4>
+<ul class="simple">
+<li><p>CLI</p>
+<ul>
+<li><p>in sim_comparison/ref_comparison: rename <code class="docutils literal notranslate"><span class="pre">--plot_style_file</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">--plot_styles</span></code>, as it can take a json string or a path to a json file. (#48)</p></li>
+<li><p>Read all fields when <code class="docutils literal notranslate"><span class="pre">requested_fields</span></code> is empty (#40)</p></li>
+</ul>
+</li>
+</ul>
+</section>
 <section id="added">
 <h4>Added<a class="headerlink" href="#added" title="Link to this heading">¶</a></h4>
 <ul class="simple">
-<li><p>dynamic version CL arg and tags in netcdf outputs of CLIs</p></li>
-<li><p>Debug utility to track memory usage</p></li>
-<li><p>refactor IO:</p>
+<li><p>update CLI:</p>
 <ul>
-<li><p>a central read dispatcher (#33)</p></li>
-<li><p>on empty requested_fields, retain all available fields (#40)</p></li>
-<li><p>accept strings (#42)</p></li>
+<li><p>Dynamic version arg and tags in the netCDF output</p>
+<ul>
+<li><p>better non-interactive backend support (#48)</p></li>
+<li><p>New <code class="docutils literal notranslate"><span class="pre">--skip_clouds</span></code> and <code class="docutils literal notranslate"><span class="pre">--only_diff</span></code> arguments</p></li>
 </ul>
 </li>
-<li><p>update packaging and testing environment management</p></li>
-<li><p>update GH Action workflows – more commit and PR merge protections</p></li>
-<li><p>update docs</p></li>
+</ul>
+</li>
+<li><p>I/O:</p>
+<ul>
+<li><p>Central read dispatcher (#33)</p></li>
+<li><p>Accept string inputs (#42)</p></li>
+<li><p>Custom field-names lookup for UM files with <code class="docutils literal notranslate"><span class="pre">default_field_names_dict</span></code> (#48)</p></li>
+</ul>
+</li>
+<li><p>Debug utility for memory usage tracking</p></li>
+<li><p>Updated packaging and test environment management</p></li>
+<li><p>Enhanced GH Action workflows with stricter merge protections</p></li>
+<li><p>Updated documentation</p></li>
 </ul>
 </section>
 <section id="fixes">
@@ -369,6 +389,8 @@
 <li><p>dynamic versioning (instructions and docs)</p></li>
 <li><p>enhancements to post_process</p></li>
 <li><p>unify output filename convention</p></li>
+<li><p>ref_comparison CLI: run with non-default plot_style</p></li>
+<li><p>CLI plotting: add iterators for streaming figures to help memory optimization</p></li>
 </ul>
 </section>
 </section>
@@ -474,6 +496,7 @@
 <li><a class="reference internal" href="#task-list">Task List</a></li>
 <li><a class="reference internal" href="#changelog">Changelog</a><ul>
 <li><a class="reference internal" href="#wip">[WIP]</a><ul>
+<li><a class="reference internal" href="#break-backward-compatibility">Break backward compatibility</a></li>
 <li><a class="reference internal" href="#added">Added</a></li>
 <li><a class="reference internal" href="#fixes">Fixes</a></li>
 </ul>

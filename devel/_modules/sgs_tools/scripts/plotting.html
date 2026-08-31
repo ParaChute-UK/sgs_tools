@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../genindex.html"><link rel="search" title="Search" href="../../../search.html">
 
     <!-- Generated with Sphinx 9.0.4 and Furo 2025.12.19 -->
-        <title>sgs_tools.io.read - SGS_toolsv0.0.0</title>
+        <title>sgs_tools.scripts.plotting - SGS_toolsv0.0.0</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sphinx_argparse_cli.css" />
@@ -239,99 +239,39 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <h1>Source code for sgs_tools.io.read</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+          <h1>Source code for sgs_tools.scripts.plotting</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Iterable</span>
 
-<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
-
-<span class="kn">from</span><span class="w"> </span><span class="nn">sgs_tools.io.monc</span><span class="w"> </span><span class="kn">import</span> <span class="n">data_ingest_MONC</span><span class="p">,</span> <span class="n">data_ingest_MONC_on_single_grid</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">sgs_tools.io.sgs</span><span class="w"> </span><span class="kn">import</span> <span class="n">data_ingest_SGS</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">sgs_tools.io.um</span><span class="w"> </span><span class="kn">import</span> <span class="n">data_ingest_UM</span><span class="p">,</span> <span class="n">data_ingest_UM_on_single_grid</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib</span>
 
 
-<div class="viewcode-block" id="read">
-<a class="viewcode-back" href="../../../io.html#sgs_tools.io.read.read">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">read</span><span class="p">(</span>
-    <span class="n">input_files</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
-    <span class="n">input_format</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-    <span class="n">requested_fields</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
-    <span class="n">interp_grid</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-    <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
+<div class="viewcode-block" id="configure_matplotlib_backend">
+<a class="viewcode-back" href="../../../scripts.html#sgs_tools.scripts.plotting.configure_matplotlib_backend">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">configure_matplotlib_backend</span><span class="p">(</span><span class="n">argv</span><span class="p">:</span> <span class="n">Iterable</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">strict</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Read simulation data from input files and return an xarray Dataset.</span>
+<span class="sd">    Configure matplotlib backend based on presence of ``--plot_show``</span>
+<span class="sd">    in argv or sys.argv</span>
 
-<span class="sd">    :param input_files: Path to the input file(s) containing simulation data.</span>
-<span class="sd">    :param input_format: Format of the input data. Supported formats are:</span>
-<span class="sd">        ``sgs``, ``um``, ``monc``</span>
+<span class="sd">    Must be called before any import of matplotlib.pyplot.</span>
 
-<span class="sd">    :param requested_fields: List of variable names to extract from the input data.</span>
-<span class="sd">    :param kwargs: Additional keyword arguments depending on the input format.</span>
-<span class="sd">      The ``um`` format, requires ``resolution`` (float)</span>
-<span class="sd">      specifying horizontal grid spacing. It also accepts</span>
-<span class="sd">      ``field_names_dict`` dict[str,str] prescribing a field-names lookup table</span>
-
-
-<span class="sd">    :return: xarray Dataset containing the requested fields and metadata, including</span>
-<span class="sd">      the horizontal resolution stored in ``attrs[&quot;h_resolution&quot;]``.</span>
-
-<span class="sd">    .. note::</span>
-<span class="sd">        - For ``monc`` format, resolution is inferred from metadata and assumed</span>
-<span class="sd">            isotropic in x and y</span>
-<span class="sd">        - For ``um`` format, resolution must be explicitly provided via `kwargs`.</span>
-<span class="sd">        - For ``sgs`` format, if h_resolution is not a dataset attribute</span>
-<span class="sd">            it is guessed by the spacing in &quot;x&quot; and &quot;y&quot; coordinates</span>
+<span class="sd">    :param argv: argument list. If None will look at ``sys.argv`` instead</span>
+<span class="sd">    :param strict: if True will raise a ``RuntimeError`` if it detects pyplot</span>
+<span class="sd">        in ``sys.modules``. Otherwise just prints a Warning.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">input_format</span> <span class="o">==</span> <span class="s2">&quot;sgs&quot;</span><span class="p">:</span>
-        <span class="n">simulation</span> <span class="o">=</span> <span class="n">data_ingest_SGS</span><span class="p">(</span>
-            <span class="n">input_files</span><span class="p">,</span>
-            <span class="n">requested_fields</span><span class="o">=</span><span class="n">requested_fields</span><span class="p">,</span>
-        <span class="p">)</span>
 
-        <span class="k">if</span> <span class="s2">&quot;h_resolution&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">simulation</span><span class="o">.</span><span class="n">attrs</span><span class="p">:</span>
-            <span class="n">dx</span> <span class="o">=</span> <span class="n">simulation</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">)</span>
-            <span class="n">dy</span> <span class="o">=</span> <span class="n">simulation</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">)</span>
-            <span class="k">assert</span> <span class="n">dx</span><span class="o">.</span><span class="n">std</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mf">1e-10</span>
-            <span class="k">assert</span> <span class="n">dy</span><span class="o">.</span><span class="n">std</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mf">1e-10</span>
-
-            <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">dx</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dy</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-            <span class="n">simulation</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;h_resolution&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dx</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
-
-    <span class="k">elif</span> <span class="n">input_format</span> <span class="o">==</span> <span class="s2">&quot;um&quot;</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">interp_grid</span><span class="p">:</span>
-            <span class="n">simulation</span> <span class="o">=</span> <span class="n">data_ingest_UM_on_single_grid</span><span class="p">(</span>
-                <span class="n">input_files</span><span class="p">,</span>
-                <span class="n">requested_fields</span><span class="o">=</span><span class="n">requested_fields</span><span class="p">,</span>
-                <span class="n">res</span><span class="o">=</span><span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;resolution&quot;</span><span class="p">],</span>
-                <span class="n">field_names_dict</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;field_names_dict&quot;</span><span class="p">),</span>
-            <span class="p">)</span>
+    <span class="k">if</span> <span class="s2">&quot;matplotlib.pyplot&quot;</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;pyplot already imported before backend configuration&quot;</span>
+        <span class="k">if</span> <span class="n">strict</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">simulation</span> <span class="o">=</span> <span class="n">data_ingest_UM</span><span class="p">(</span>
-                <span class="n">input_files</span><span class="p">,</span>
-                <span class="n">requested_fields</span><span class="o">=</span><span class="n">requested_fields</span><span class="p">,</span>
-                <span class="n">res</span><span class="o">=</span><span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;resolution&quot;</span><span class="p">],</span>
-                <span class="n">field_names_dict</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;field_names_dict&quot;</span><span class="p">),</span>
-            <span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;WARNING:&quot;</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
 
-        <span class="n">simulation</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;h_resolution&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;resolution&quot;</span><span class="p">]</span>
-    <span class="k">elif</span> <span class="n">input_format</span> <span class="o">==</span> <span class="s2">&quot;monc&quot;</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">interp_grid</span><span class="p">:</span>
-            <span class="n">meta</span><span class="p">,</span> <span class="n">simulation</span> <span class="o">=</span> <span class="n">data_ingest_MONC_on_single_grid</span><span class="p">(</span>
-                <span class="n">input_files</span><span class="p">,</span>
-                <span class="n">requested_fields</span><span class="o">=</span><span class="n">requested_fields</span><span class="p">,</span>
-            <span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">meta</span><span class="p">,</span> <span class="n">simulation</span> <span class="o">=</span> <span class="n">data_ingest_MONC</span><span class="p">(</span>
-                <span class="n">input_files</span><span class="p">,</span>
-                <span class="n">requested_fields</span><span class="o">=</span><span class="n">requested_fields</span><span class="p">,</span>
-            <span class="p">)</span>
-        <span class="c1"># overwrite resolution</span>
-        <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;dxx&quot;</span><span class="p">],</span> <span class="n">meta</span><span class="p">[</span><span class="s2">&quot;dyy&quot;</span><span class="p">])</span>
-        <span class="n">simulation</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;h_resolution&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">meta</span><span class="p">[</span><span class="s2">&quot;dxx&quot;</span><span class="p">]</span>
+    <span class="n">argv</span> <span class="o">=</span> <span class="n">argv</span> <span class="ow">or</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+    <span class="k">if</span> <span class="s2">&quot;--plot_show&quot;</span> <span class="ow">in</span> <span class="n">argv</span><span class="p">:</span>
+        <span class="n">matplotlib</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s2">&quot;TkAgg&quot;</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unsupported input format </span><span class="si">{</span><span class="n">input_format</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">simulation</span></div>
+        <span class="n">matplotlib</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s2">&quot;Agg&quot;</span><span class="p">)</span></div>
 
 </pre></div>
         </article>

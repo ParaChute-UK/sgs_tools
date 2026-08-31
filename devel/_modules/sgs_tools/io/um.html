@@ -336,7 +336,7 @@
 <span class="p">}</span>
 <span class="s2">&quot;&quot;</span>
 
-<span class="n">field_names_dict</span> <span class="o">=</span> <span class="p">(</span>
+<span class="n">default_field_names_dict</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">base_fields_dict</span>
     <span class="o">|</span> <span class="n">Water_dict</span>
     <span class="o">|</span> <span class="n">Smagorinsky_dict</span>
@@ -539,6 +539,7 @@
     <span class="n">fname_pattern</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">res</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">requested_fields</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">__default_req_fields</span><span class="p">,</span>
+    <span class="n">field_names_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;read and pre-process UM data using sgs_tools naming convention.</span>
 <span class="sd">    Any unknown fields will retain their original names.</span>
@@ -548,6 +549,8 @@
 <span class="sd">    :param res: horizontal resolution (will use to overwrite horizontal coordinates).</span>
 <span class="sd">      **NB** works for ideal simulations</span>
 <span class="sd">    :param requested_fields: list of fields to retain in ds, if falsy will retain all.</span>
+<span class="sd">    :param field_names_dict: a look-up table used to rename fields in the input dataset</span>
+<span class="sd">      will use `default_field_names_dict` if None</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="c1"># open file(s)</span>
@@ -555,6 +558,8 @@
     <span class="c1"># parse UM stash codes into variable names</span>
     <span class="n">simulation</span> <span class="o">=</span> <span class="n">rename_variables</span><span class="p">(</span><span class="n">simulation</span><span class="p">)</span>
     <span class="c1"># rename to sgs_tools naming convention</span>
+    <span class="k">if</span> <span class="n">field_names_dict</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">field_names_dict</span> <span class="o">=</span> <span class="n">default_field_names_dict</span>
     <span class="n">simulation</span> <span class="o">=</span> <span class="n">standardize_varnames</span><span class="p">(</span><span class="n">simulation</span><span class="p">,</span> <span class="n">field_names_dict</span><span class="p">)</span>
     <span class="c1"># restrict to interesting fields</span>
     <span class="k">if</span> <span class="n">requested_fields</span><span class="p">:</span>
@@ -572,6 +577,7 @@
     <span class="n">fname_pattern</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">res</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">requested_fields</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">__default_req_fields</span><span class="p">,</span>
+    <span class="n">field_names_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;read, pre-process UM data and interpolate to a cell-centred grid</span>
 <span class="sd">    Any unknown fields will retain their original names.</span>
@@ -581,9 +587,11 @@
 <span class="sd">    :param res: horizontal resolution (will use to overwrite horizontal coordinates).</span>
 <span class="sd">       **NB** works for ideal simulations</span>
 <span class="sd">    :param  requested_fields: list of fields to retain in ds, if falsy will retain all.</span>
+<span class="sd">    :param field_names_dict: a look-up table used to rename fields in the input dataset.</span>
+<span class="sd">       will use `default_field_names_dict` if None</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># read, constrain fields, unify grids</span>
-    <span class="n">simulation</span> <span class="o">=</span> <span class="n">data_ingest_UM</span><span class="p">(</span><span class="n">fname_pattern</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">requested_fields</span><span class="p">)</span>
+    <span class="n">simulation</span> <span class="o">=</span> <span class="n">data_ingest_UM</span><span class="p">(</span><span class="n">fname_pattern</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">requested_fields</span><span class="p">,</span> <span class="n">field_names_dict</span><span class="p">)</span>
 
     <span class="c1"># interpolate all vars to a cell-centred grid</span>
     <span class="n">centre_dims</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;x_centre&quot;</span><span class="p">,</span> <span class="s2">&quot;y_centre&quot;</span><span class="p">,</span> <span class="s2">&quot;z_theta&quot;</span><span class="p">]</span>

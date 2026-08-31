@@ -4,7 +4,7 @@ import threading
 import time
 
 import psutil
-from dask.distributed import default_client, get_worker
+from dask.distributed import default_client, get_worker  # type: ignore[attr-defined]
 
 unit_map = {"GB": 3, "MB": 2, "KB": 1, "B": 0}
 

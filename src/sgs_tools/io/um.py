@@ -94,7 +94,7 @@ dynamic_SGS_diag_dict = {
 }
 ""
 
-field_names_dict = (
+default_field_names_dict = (
     base_fields_dict
     | Water_dict
     | Smagorinsky_dict
@@ -286,6 +286,7 @@ def data_ingest_UM(
     fname_pattern: Path | str,
     res: float,
     requested_fields: list[str] = __default_req_fields,
+    field_names_dict: dict[str, str] | None = None,
 ) -> xr.Dataset:
     """read and pre-process UM data using sgs_tools naming convention.
     Any unknown fields will retain their original names.
@@ -295,6 +296,8 @@ def data_ingest_UM(
     :param res: horizontal resolution (will use to overwrite horizontal coordinates).
       **NB** works for ideal simulations
     :param requested_fields: list of fields to retain in ds, if falsy will retain all.
+    :param field_names_dict: a look-up table used to rename fields in the input dataset
+      will use `default_field_names_dict` if None
     """
 
     # open file(s)
@@ -302,6 +305,8 @@ def data_ingest_UM(
     # parse UM stash codes into variable names
     simulation = rename_variables(simulation)
     # rename to sgs_tools naming convention
+    if field_names_dict is None:
+        field_names_dict = default_field_names_dict
     simulation = standardize_varnames(simulation, field_names_dict)
     # restrict to interesting fields
     if requested_fields:
@@ -316,6 +321,7 @@ def data_ingest_UM_on_single_grid(
     fname_pattern: Path | str,
     res: float,
     requested_fields: list[str] = __default_req_fields,
+    field_names_dict: dict[str, str] | None = None,
 ) -> xr.Dataset:
     """read, pre-process UM data and interpolate to a cell-centred grid
     Any unknown fields will retain their original names.
@@ -325,9 +331,11 @@ def data_ingest_UM_on_single_grid(
     :param res: horizontal resolution (will use to overwrite horizontal coordinates).
        **NB** works for ideal simulations
     :param  requested_fields: list of fields to retain in ds, if falsy will retain all.
+    :param field_names_dict: a look-up table used to rename fields in the input dataset.
+       will use `default_field_names_dict` if None
     """
     # read, constrain fields, unify grids
-    simulation = data_ingest_UM(fname_pattern, res, requested_fields)
+    simulation = data_ingest_UM(fname_pattern, res, requested_fields, field_names_dict)
 
     # interpolate all vars to a cell-centred grid
     centre_dims = ["x_centre", "y_centre", "z_theta"]

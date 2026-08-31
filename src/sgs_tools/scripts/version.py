@@ -12,8 +12,18 @@ def main(arguments: Sequence[str] | None = None) -> None:
         formatter_class=ArgumentDefaultsHelpFormatter,
     )
     add_output_group(parser)
+    parser.add_argument(
+        "--raw",
+        action="store_true",
+        help="""
+        Output directory, where to write netcdf output files.
+        Will create/overwrite existing file and
+        create any missing intermediate directories""",
+    )
+
     args = parser.parse_args(arguments)
-    print_version_info(args.verbosity)
+
+    print_version_info(args.verbosity, args.raw)
 
 
 if __name__ == "__main__":

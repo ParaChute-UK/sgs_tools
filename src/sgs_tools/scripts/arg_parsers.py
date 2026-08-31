@@ -1,7 +1,27 @@
-from argparse import Action, ArgumentParser, _ArgumentGroup
+import json
+from argparse import Action, ArgumentParser, ArgumentTypeError, _ArgumentGroup
 from pathlib import Path
 
 from sgs_tools.util.gitinfo import print_version_info
+
+
+def parse_json_or_file(input: str | None):
+    if input is None:
+        return None
+
+    # check if value JSON string first
+    try:
+        return json.loads(input)
+    except json.JSONDecodeError:
+        pass
+
+    # Otherwise treat as file path
+    path = Path(input)
+    if path.exists():
+        with open(path) as f:
+            return json.load(f)
+
+    raise ArgumentTypeError(f"Invalid JSON or file path: {input}")
 
 
 class VersionAction(Action):

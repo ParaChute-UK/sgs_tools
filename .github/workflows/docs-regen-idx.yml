@@ -1,6 +1,7 @@
 name: Update Pages Index
 on:
   workflow_call:
+  workflow_dispatch:
 
 jobs:
   update-index:

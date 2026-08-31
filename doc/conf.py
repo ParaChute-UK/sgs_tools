@@ -90,10 +90,20 @@ myst_heading_anchors = 4
 # html_theme = "alabaster"
 # html_theme = 'classic'
 # html_theme = "sphinxdoc"
-html_theme = "pydata_sphinx_theme"
+# html_theme = "pydata_sphinx_theme"
+html_theme = "furo"
+
 html_theme_options = {
-    "show_nav_level": 2,
-    "announcement": f"Version: {version}",
+    "sidebar_hide_name": False,
+    "navigation_with_keys": True,
+}
+
+
+html_static_path = ["_static"]
+html_css_files = ["custom.css"]
+html_context = {
+    "version": version,
+    "docstitle": f"{project}<span class='version-label'>v{version}</span>",
 }
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,

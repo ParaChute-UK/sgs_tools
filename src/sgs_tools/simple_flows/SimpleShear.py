@@ -24,15 +24,12 @@ class SimpleShear:
     velcomp: int
     amplitudes: list[float]
 
-    def velocity(self, shape: list[int]) -> xr.DataArray:
-        """produce a velocity field with a given shape
-
-        :param shape: shape of velocity field
-        """
+    def velocity(self) -> xr.DataArray:
+        """produce a velocity field"""
         v_shear = xr.DataArray(1.0)
         for i, d in enumerate(self.dimensions):
             scalar_gdt = ScalarGradient(self.grid, d, self.amplitudes[i], 0.0)
-            v_shear = v_shear * scalar_gdt.field(shape)
+            v_shear = v_shear * scalar_gdt.field()
         v_zero = xr.zeros_like(v_shear)
         vel = xr.concat([v_shear, v_zero, v_zero], dim="c1")
         return vel.roll(shifts={"c1": self.velcomp})
@@ -53,12 +50,9 @@ class ScalarGradient:
     gdt: float
     offset: float = 0.0
 
-    def field(self, shape: list[int]) -> xr.DataArray:
-        """produce a scalar field with a given shape
-
-        :param shape: shape of scalar field
-        """
+    def field(self) -> xr.DataArray:
+        """produce a scalar field with a constant gradient"""
         coord = CoordScalar(self.grid, self.dimension, self.gdt)
-        coord_array = coord.scalar(shape)
+        coord_array = coord.scalar()
         coord_array += self.offset - coord_array.isel({self.dimension: 0})
         return coord_array

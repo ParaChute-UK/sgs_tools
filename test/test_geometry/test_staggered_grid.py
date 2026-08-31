@@ -15,36 +15,36 @@ from sgs_tools.simple_flows.SimpleShear import ScalarGradient
 
 @pytest.fixture
 def u_grid():
-    return UniformCartesianGrid([0.5, 0, 0.5], [1, 1, 1])
+    return UniformCartesianGrid([0.5, 0, 0.5], [1, 1, 1], [64, 64, 64])
 
 
 @pytest.fixture
 def v_grid():
-    return UniformCartesianGrid([0, 0.5, 0.5], [1, 1, 1])
+    return UniformCartesianGrid([0, 0.5, 0.5], [1, 1, 1], [64, 64, 64])
 
 
 @pytest.fixture
 def w_grid():
-    return UniformCartesianGrid([0.5, 0.5, 0], [1, 1, 1])
+    return UniformCartesianGrid([0.5, 0.5, 0], [1, 1, 1], [64, 64, 64])
 
 
 @pytest.fixture
 def vel_shear(u_grid, v_grid, w_grid):
     u = (
-        CoordScalar(grid=u_grid, direction=0, amplitude=1)
-        .scalar([64, 64, 64])
+        CoordScalar(grid=u_grid, dimension="x1", amplitude=1)
+        .scalar()
         .rename({"x1": "x_centre", "x2": "y_face", "x3": "z_centre"})
     )
 
     v = (
-        CoordScalar(grid=v_grid, direction=1, amplitude=2)
-        .scalar([64, 64, 64])
+        CoordScalar(grid=v_grid, dimension="x2", amplitude=2)
+        .scalar()
         .rename({"x1": "x_face", "x2": "y_centre", "x3": "z_centre"})
     )
 
     w = (
-        CoordScalar(grid=w_grid, direction=2, amplitude=3)
-        .scalar([64, 64, 64])
+        CoordScalar(grid=w_grid, dimension="x3", amplitude=3)
+        .scalar()
         .rename({"x1": "x_centre", "x2": "y_centre", "x3": "z_face"})
     )
     return xr.Dataset({"u": u, "v": v, "w": w})
@@ -54,7 +54,7 @@ def vel_shear(u_grid, v_grid, w_grid):
 def scalar_x_gdt(u_grid):
     return (
         ScalarGradient(u_grid, "x1", 1.0, 0.0)
-        .field([64, 64, 64])
+        .field()
         .rename({"x1": "x_centre", "x2": "y_face", "x3": "z_centre"})
     )
 
@@ -63,7 +63,7 @@ def scalar_x_gdt(u_grid):
 def scalar_y_gdt(v_grid):
     return (
         ScalarGradient(v_grid, "x2", 2.0, 0.0)
-        .field([64, 64, 64])
+        .field()
         .rename({"x1": "x_face", "x2": "y_centre", "x3": "z_centre"})
     )
 
@@ -72,7 +72,7 @@ def scalar_y_gdt(v_grid):
 def scalar_z_gdt(w_grid):
     return (
         ScalarGradient(w_grid, "x3", 3.0, 0.0)
-        .field([64, 64, 64])
+        .field()
         .rename({"x1": "x_centre", "x2": "y_centre", "x3": "z_face"})
     )
 

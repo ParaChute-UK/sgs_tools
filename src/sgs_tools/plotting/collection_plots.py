@@ -1,10 +1,10 @@
 from collections.abc import Collection, Iterable, Mapping
 from typing import Any
 
-import matplotlib as mpl
-import matplotlib.pyplot as plt
 import numpy as np
 import xarray as xr
+from matplotlib.backends.backend_agg import FigureCanvasAgg
+from matplotlib.figure import Figure
 
 
 def arrays_equal(a, b):
@@ -29,7 +29,7 @@ def plot_vertical_prof_time_slice_compare_sims_slice(
     tcoord: str,
     zcoord: str,
     with_markers=False,
-) -> mpl.Figure:
+) -> Figure:
     """
     Plot a row of plots with a different time in each panel.
     Compare simulations from `da_collection` in each panel.
@@ -50,8 +50,10 @@ def plot_vertical_prof_time_slice_compare_sims_slice(
             times = da_collection[k][tcoord].data
         assert len(da_collection[k].dims) == 2, f"Too many dimensions in dataarray {k}"
 
-    # num_sims = len(da_collection)
-    fig, _ = plt.subplots(1, len(times), figsize=(6 * len(times), 4), sharey=False)
+    # attach backend-safe figure + canvas
+    fig = Figure(figsize=(6 * len(times), 4))
+    FigureCanvasAgg(fig)
+    fig.subplots(1, len(times), sharey=False)
     axes = fig.axes
     for time, ax in zip(times, axes, strict=False):
         for k, da in da_collection.items():
@@ -81,7 +83,7 @@ def plot_horizontal_slice_tseries(
     cmap: str,
     field_lbl: str,
     zcoord: str,
-) -> mpl.Figure:
+) -> Figure:
     """
     Plot a grid of horizontal slices in each panel
     each row corresponds to a different simulation
@@ -104,10 +106,12 @@ def plot_horizontal_slice_tseries(
 
     num_times = len(times)
     num_sims = len(da_collection)
-    fig, axes = plt.subplots(
+    # attach backend-safe figure + canvas
+    fig = Figure(figsize=(6 * num_times, 4 * num_sims))
+    FigureCanvasAgg(fig)
+    axes = fig.subplots(
         num_sims,
         num_times,
-        figsize=(6 * num_times, 4 * num_sims),
         sharey=False,
         squeeze=False,
     )
@@ -153,7 +157,7 @@ def plot_vertical_prof_time_slice_compare_fields(
     les_reference=None,
     zmax=1e6,
     ds_label="",
-) -> mpl.Figure:
+) -> Figure:
     """
     Plot a row of plots with a time slice in each panel.
     Compare fields in each panel.
@@ -165,7 +169,11 @@ def plot_vertical_prof_time_slice_compare_fields(
     if tslice is None:
         tslice = {"t": np.arange(1, 16) * 60}
     times = list(tslice.values())[0]
-    fig, axes = plt.subplots(1, len(times), figsize=(6 * len(times), 5), sharey=False)
+    # attach backend-safe figure + canvas
+    fig = Figure(figsize=(6 * len(times), 5))
+    FigureCanvasAgg(fig)
+    fig.subplots(1, len(times), sharey=False)
+    axes = fig.axes
 
     tcoord = list(tslice.keys())[0]
 
@@ -228,8 +236,11 @@ def plot_clouds(
     clevels: Iterable[float],
     field_plot_map,
     collection_plot_map,
-) -> mpl.Figure | None:
-    fig, _ = plt.subplots(len(ds_collection), 1, figsize=(6, len(ds_collection) * 6))
+) -> Figure | None:
+    # attach backend-safe figure + canvas
+    fig = Figure(figsize=(6, len(ds_collection) * 6))
+    FigureCanvasAgg(fig)
+    fig.subplots(len(ds_collection), 1)
     axes = fig.axes
     empty = True
     for ax, k in zip(axes, ds_collection, strict=False):

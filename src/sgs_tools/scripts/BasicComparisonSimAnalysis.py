@@ -6,6 +6,7 @@ from typing import Any
 # make sure there are not pyplot imports here
 import matplotlib as mpl
 import xarray as xr
+from matplotlib.figure import Figure
 from numpy import arange, array, inf, linspace, nan, ndarray
 from pint import UnitRegistry
 
@@ -435,7 +436,7 @@ def plot_horiz_slices(
     zlevels: Iterable[float],
     field_plot_map,
     verbose: bool = False,
-) -> Iterator[tuple[float, str, mpl.Figure]]:
+) -> Iterator[tuple[float, str, Figure]]:
     for z in zlevels:
         for field in fields:
             if verbose:
@@ -466,7 +467,7 @@ def plot_vert_profiles(
     reductions: list[str],
     plot_map,
     verbose: bool = False,
-) -> Iterator[tuple[str, str, mpl.Figure]]:
+) -> Iterator[tuple[str, str, Figure]]:
     red_coords = {coord for f in fields for coord in field_plot_map[f].hcoords}
 
     for field in fields:

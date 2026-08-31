@@ -64,7 +64,7 @@ def add_input_group(parser: ArgumentParser) -> _ArgumentGroup:
     fname.add_argument(
         "input_format",
         type=str,
-        choices=["um", "monc", "sgs"],
+        choices=["um_real", "um_ideal", "monc", "sgs"],
         help="Type of 'input_files'. Only support different NetCDF flavours "
         "from various production codes. 'sgs' refers to files produced by sgs_tools.",
     )
@@ -74,7 +74,7 @@ def add_input_group(parser: ArgumentParser) -> _ArgumentGroup:
         type=float,
         default=0,
         help="""
-        horizontal resolution in meters. *ONLY* used for UM ideal simulations
+        horizontal resolution in meters. *ONLY* used for um_ideal simulations
         (will use to overwrite horizontal coordinates).
         """,
     )

@@ -313,10 +313,13 @@ def parse_args(arguments: Sequence[str] | None = None) -> dict[str, Any]:
             "--anisotropy, --horizontal-spectra, or --vertical-profiles."
         )
     # check io group consistency
-    if args["input_format"] == "um":
+    if args["input_format"] == "um_ideal":
         assert args["h_resolution"] > 0, (
             "Missing required a positive h_resolution for UM datasets"
         )
+    if args["input_format"] == "um_real":
+        args["h_resolution"] = None
+
     if args["output_path"].exists() and not args["output_path"].is_dir():
         raise NotADirectoryError(
             f"{args['output_path']} exists but is not a directory."

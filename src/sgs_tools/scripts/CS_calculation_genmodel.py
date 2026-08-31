@@ -205,9 +205,13 @@ def parse_args(arguments: Sequence[str] | None = None) -> dict[str, Any]:
     args = vars(parser.parse_args(arguments))
 
     # check io group consistency
-    if args["input_format"] == "um":
+    if args["input_format"] == "um_ideal":
         assert args["h_resolution"] > 0, (
             "Missing required a positive h_resolution for UM datasets"
+        )
+    if args["input_format"] == "um_real":
+        raise NotImplementedError(
+            "Can't deal with variable resolution grids of the um_real format"
         )
 
     # parse negative values in the [t,z]_range
@@ -385,7 +389,7 @@ def gather_model_inputs(simulation: xr.Dataset, req_fields: list[str]) -> xr.Dat
 
 def pre_process(args: dict[str, Any]) -> xr.Dataset:
     req_fields = {
-        "um": ["u", "v", "w", "theta"],
+        "um_ideal": ["u", "v", "w", "theta"],
         "monc": ["u", "v", "w", "theta"],
         "sgs": ["vel", "theta", "sij", "omegaij", "theta", "grad_theta"],
     }

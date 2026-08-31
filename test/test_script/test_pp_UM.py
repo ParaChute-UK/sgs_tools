@@ -8,7 +8,7 @@ from sgs_tools.io.fname_out import build_output_fname
 def test_args(output_dir, testing_rootdir):
     return [
         str(testing_rootdir / "test_script/df667_800m_L63_Slicea_pr.nc"),
-        "um",
+        "um_ideal",
         str(output_dir),
         "--fname_suffix",
         "test_me",

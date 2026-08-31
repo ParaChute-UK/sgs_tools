@@ -192,64 +192,99 @@ def rename_variables(ds: xr.Dataset) -> xr.Dataset:
 
 # unify coordinate names and implement correct x-spacing for UM ideal sims
 # xarray doesn't handle duplicate dimensions well, so use clunkily split-rename-merge
-def unify_coords(ds: xr.Dataset, res: float) -> xr.Dataset:
-    """unify coordinate names
+def unify_coords(ds: xr.Dataset, res: float | None = None) -> xr.Dataset:
+    """Unify coordinate names, mapping UM staggered dims to the sgs_tools
+    convention.
 
-    implement correct x-spacing using ``res``, assume ``res`` is given in
-    the correct units
-    rename coordinates with reference to a logically-cartesian grid
+    Two modes are supported:
 
-    :param ds: input dataset
-    :param res: resolution of dataset -- to create correct x-y grid for idealised runs
-      (the existing one is in lat-lon coords)
-    :return: dataset with renamed variables
+    * **Idealised** (``res`` given): replaces the lat-lon coords with a
+      Cartesian grid whose spacing equals ``res``.  Use for idealised UM
+      runs where the existing lat-lon values are not physically meaningful.
+    * **Real / lat-lon** (``res=None``): retains the actual
+      latitude-longitude coordinate values from the file.  Use for
+      real-world UM output.
 
+    In both modes the dimension names are mapped to the standard
+    sgs_tools convention following the UM Arakawa C-grid staggering:
+
+    * theta / scalar / w: ``(x_theta, y_theta)``
+      → ``(x_centre, y_centre)``
+    * u-component (staggered in x): ``(x_cu, y_cu)``
+      → ``(x_face, y_centre)``
+    * v-component (staggered in y): ``(x_cv, y_cv)``
+      → ``(x_centre, y_face)``
+
+    :param ds: input dataset, after :func:`rename_variables` has been
+      applied.
+    :param res: horizontal resolution in metres used to build a Cartesian
+      coordinate grid.  Pass ``None`` (default) to retain the actual
+      lat-lon coordinate values.
+    :return: dataset with unified dimension names.
     """
-    # actual coordinates
-    x_face = np.linspace(
-        0, (ds.x_theta.size) * res, num=ds.x_theta.size, endpoint=False
-    )
-    x_centre = x_face + res / 2
+    stag_dim_map = {
+        "x_cu": "x_face",
+        "x_cv": "x_centre",
+        "y_cu": "y_centre",
+        "y_cv": "y_face",
+    }
+    cent_dim_map = {"x_theta": "x_centre", "y_theta": "y_centre"}
 
-    # split into centered and staggered variables
+    # split into centred (theta-grid) and staggered variables
     cent_vars = [x for x in ds if "x_theta" in ds[x].dims and "y_theta" in ds[x].dims]
     stag_vars = [x for x in ds if x not in cent_vars]
 
-    # rename dimensions/coords of staggered variables
     ds_stag = ds[stag_vars]
-    if ds_stag:
-        ds_stag["x_centre"] = xr.DataArray(
-            x_centre, coords={"x_cv": ds.x_cv}, dims="x_cv", name="x_centre"
-        )
-        ds_stag["y_centre"] = xr.DataArray(
-            x_centre, coords={"y_cu": ds.y_cu}, dims="y_cu", name="y_centre"
-        )
-        ds_stag["x_face"] = xr.DataArray(
-            x_face, coords={"x_cu": ds.x_cu}, dims="x_cu", name="x_face"
-        )
-        ds_stag["y_face"] = xr.DataArray(
-            x_face, coords={"y_cv": ds.y_cv}, dims="y_cv", name="y_face"
-        )
-
-        ds_stag = ds_stag.swap_dims(
-            {
-                "x_cu": "x_face",
-                "x_cv": "x_centre",
-                "y_cu": "y_centre",
-                "y_cv": "y_face",
-            }
-        )
-
-    # rename dimensions/coords of centred variables
     ds_cent = ds[cent_vars]
-    if ds_cent:
-        ds_cent["x_centre"] = xr.DataArray(
-            x_centre, coords={"x_theta": ds.x_theta}, dims="x_theta", name="x_centre"
+
+    if res is not None:
+        # build Cartesian coordinate arrays from the supplied resolution
+        x_face = np.linspace(
+            0, ds.x_theta.size * res, num=ds.x_theta.size, endpoint=False
         )
-        ds_cent["y_centre"] = xr.DataArray(
-            x_centre, coords={"y_theta": ds.y_theta}, dims="y_theta", name="y_centre"
-        )
-        ds_cent = ds_cent.swap_dims({"x_theta": "x_centre", "y_theta": "y_centre"})
+        x_centre = x_face + res / 2
+        if ds_stag:
+            ds_stag["x_centre"] = xr.DataArray(
+                x_centre, coords={"x_cv": ds.x_cv}, dims="x_cv", name="x_centre"
+            )
+            ds_stag["y_centre"] = xr.DataArray(
+                x_centre, coords={"y_cu": ds.y_cu}, dims="y_cu", name="y_centre"
+            )
+            ds_stag["x_face"] = xr.DataArray(
+                x_face, coords={"x_cu": ds.x_cu}, dims="x_cu", name="x_face"
+            )
+            ds_stag["y_face"] = xr.DataArray(
+                x_face, coords={"y_cv": ds.y_cv}, dims="y_cv", name="y_face"
+            )
+            ds_stag = ds_stag.swap_dims(
+                {k: v for k, v in stag_dim_map.items() if k in ds_stag.dims}
+            )
+        if ds_cent:
+            ds_cent["x_centre"] = xr.DataArray(
+                x_centre,
+                coords={"x_theta": ds.x_theta},
+                dims="x_theta",
+                name="x_centre",
+            )
+            ds_cent["y_centre"] = xr.DataArray(
+                x_centre,
+                coords={"y_theta": ds.y_theta},
+                dims="y_theta",
+                name="y_centre",
+            )
+            ds_cent = ds_cent.swap_dims(
+                {k: v for k, v in cent_dim_map.items() if k in ds_cent.dims}
+            )
+    else:
+        # retain existing lat-lon coordinate values; just rename the dimensions
+        if ds_stag:
+            ds_stag = ds_stag.rename(
+                {k: v for k, v in stag_dim_map.items() if k in ds_stag.dims}
+            )
+        if ds_cent:
+            ds_cent = ds_cent.rename(
+                {k: v for k, v in cent_dim_map.items() if k in ds_cent.dims}
+            )
 
     if ds_stag and ds_cent:
         ds = xr.merge([ds_stag, ds_cent], compat="no_conflicts")
@@ -284,7 +319,7 @@ __default_req_fields = ["u", "v", "w", "theta"]
 
 def data_ingest_UM(
     fname_pattern: Path | str,
-    res: float,
+    res: float | None,
     requested_fields: list[str] = __default_req_fields,
     field_names_dict: dict[str, str] | None = None,
 ) -> xr.Dataset:
@@ -293,8 +328,9 @@ def data_ingest_UM(
 
     :param fname_pattern: UM NetCDF diagnostic file(s) to read.
       will be interpreted as a glob pattern. (should belong to the same simulation)
-    :param res: horizontal resolution (will use to overwrite horizontal coordinates).
-      **NB** works for ideal simulations
+    :param res: horizontal resolution,
+      if given will use to overwrite horizontal coordinates.
+      **NB** works for ideal simulations. Otherwise will read grid from coords
     :param requested_fields: list of fields to retain in ds, if falsy will retain all.
     :param field_names_dict: a look-up table used to rename fields in the input dataset
       will use `default_field_names_dict` if None
@@ -319,7 +355,7 @@ def data_ingest_UM(
 
 def data_ingest_UM_on_single_grid(
     fname_pattern: Path | str,
-    res: float,
+    res: float | None,
     requested_fields: list[str] = __default_req_fields,
     field_names_dict: dict[str, str] | None = None,
 ) -> xr.Dataset:
@@ -327,12 +363,16 @@ def data_ingest_UM_on_single_grid(
     Any unknown fields will retain their original names.
 
     :param fname_pattern: UM NetCDF diagnostic file(s) to read.
-      will be interpreted as a glob pattern. (should belong to the same simulation)
-    :param res: horizontal resolution (will use to overwrite horizontal coordinates).
-       **NB** works for ideal simulations
-    :param  requested_fields: list of fields to retain in ds, if falsy will retain all.
-    :param field_names_dict: a look-up table used to rename fields in the input dataset.
-       will use `default_field_names_dict` if None
+      will be interpreted as a glob pattern.
+      (should belong to the same simulation)
+    :param res: horizontal resolution,
+      if given will use to overwrite horizontal coordinates.
+      **NB** works for ideal simulations. Otherwise will read grid from coords
+    :param  requested_fields: list of fields to retain in ds,
+      if falsy will retain all.
+    :param field_names_dict: a look-up table
+      used to rename fields in the input dataset.
+      will use `default_field_names_dict` if None
     """
     # read, constrain fields, unify grids
     simulation = data_ingest_UM(fname_pattern, res, requested_fields, field_names_dict)

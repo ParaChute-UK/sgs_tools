@@ -10,6 +10,7 @@ All notable changes to this project are documented in this file.
 - CLI
   - in sim_comparison/ref_comparison: rename `--plot_style_file` -> `--plot_styles`, as it can take a json string or a path to a json file. (#48)
   - Read all fields when `requested_fields` is empty (#40)
+  - change format names: 'um' -> 'um_ideal' and 'um_real'
 
 ### Added
 
@@ -18,6 +19,7 @@ All notable changes to this project are documented in this file.
     - better non-interactive backend support (#48)
     - New `--skip_clouds` and `--only_diff` arguments
 - I/O:
+  - support for reading real-case um sims (lat-lon grid)
   - Central read dispatcher (#33)
   - Accept string inputs (#42)
   - Custom field-names lookup for UM files with `default_field_names_dict` (#48)

@@ -8,7 +8,7 @@ def test_args(output_dir, testing_rootdir):
     output = output_dir
     return [
         str(testing_rootdir / "test_script/df667_800m_L63_Slicea_p*.nc"),
-        "um",
+        "um_ideal",
         str(output),
         "--h_resolution",
         "800",

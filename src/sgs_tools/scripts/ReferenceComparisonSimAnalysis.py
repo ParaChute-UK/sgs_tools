@@ -77,7 +77,7 @@ def parse_args(arguments: Sequence[str] | None = None) -> dict[str, Any]:
     fname.add_argument(
         "input_format",
         type=str,
-        choices=["um", "monc", "sgs"],
+        choices=["um_real", "um_ideal", "monc", "sgs"],
         help="Type of 'input_files'. Only support different NetCDF flavours from "
         "various production codes. 'sgs' refers to files produced by sgs_tools. "
         "All simulations must have the same format",
@@ -90,7 +90,7 @@ def parse_args(arguments: Sequence[str] | None = None) -> dict[str, Any]:
         default=[0],
         help="""
         horizontal resolution in meters.
-        *ONLY* used for UM ideal simulations
+        *ONLY* used for um_ideal simulations
         (will use to overwrite horizontal coordinates).
         If a single resolution is given, assume it applies to all input files.
         Else, must give as many resolutions as inpu_file glob patterns.
@@ -178,8 +178,10 @@ def parse_args(arguments: Sequence[str] | None = None) -> dict[str, Any]:
     if len(args["h_resolution"]) == 1:
         args["h_resolution"] = [args["h_resolution"][0]] * len(args["input_files"])
     else:
-        if args["input_format"] == "um":
+        if args["input_format"] == "um_ideal":
             assert len(args["h_resolution"]) == len(args["input_files"])
+        if args["input_format"] == "um_real":
+            args["h_resolution"] = [None] * len(args["input_files"])
 
     # initial validation
     assert args["plot_show"] or args["plot_path"], (

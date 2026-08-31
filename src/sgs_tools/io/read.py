@@ -20,13 +20,15 @@ def read(
 
     :param input_files: Path to the input file(s) containing simulation data.
     :param input_format: Format of the input data. Supported formats are:
-        ``sgs``, ``um``, ``monc``
+        ``sgs``, ``um_ideal``, ``um_real``, ``monc``
 
     :param requested_fields: List of variable names to extract from the input data.
     :param kwargs: Additional keyword arguments depending on the input format.
-      The ``um`` format, requires ``resolution`` (float)
+      The ``um_ideal`` format requires ``resolution`` (float)
       specifying horizontal grid spacing. It also accepts
-      ``field_names_dict`` dict[str,str] prescribing a field-names lookup table
+      ``field_names_dict`` dict[str,str] prescribing a field-names lookup table.
+      The ``um_real`` format accepts ``field_names_dict`` only;
+      ``resolution`` is not required because coordinate values are read from the file.
 
 
     :return: xarray Dataset containing the requested fields and metadata, including
@@ -35,7 +37,9 @@ def read(
     .. note::
         - For ``monc`` format, resolution is inferred from metadata and assumed
             isotropic in x and y
-        - For ``um`` format, resolution must be explicitly provided via `kwargs`.
+        - For ``um_ideal`` format, resolution must be explicitly provided via `kwargs`.
+        - For ``um_real`` format, resolution is not required and
+            ``attrs["h_resolution"]`` is set to ``None``.
         - For ``sgs`` format, if h_resolution is not a dataset attribute
             it is guessed by the spacing in "x" and "y" coordinates
     """
@@ -54,23 +58,33 @@ def read(
             assert np.isclose(dx[0], dy[0])
             simulation.attrs["h_resolution"] = dx[0].item()
 
-    elif input_format == "um":
+    elif "um" in input_format:
+        if input_format == "um_ideal":
+            assert kwargs.get("resolution"), "missing resolution reqiured for um_ideal"
+            res = kwargs["resolution"]
+        elif input_format == "um_real":
+            res = None
+        else:
+            raise ValueError(
+                f"Unknown um format: {input_format}, accept 'um_real' and 'um_ideal'"
+            )
+
         if interp_grid:
             simulation = data_ingest_UM_on_single_grid(
                 input_files,
                 requested_fields=requested_fields,
-                res=kwargs["resolution"],
+                res=res,
                 field_names_dict=kwargs.get("field_names_dict"),
             )
         else:
             simulation = data_ingest_UM(
                 input_files,
                 requested_fields=requested_fields,
-                res=kwargs["resolution"],
+                res=res,
                 field_names_dict=kwargs.get("field_names_dict"),
             )
+        simulation.attrs["h_resolution"] = res
 
-        simulation.attrs["h_resolution"] = kwargs["resolution"]
     elif input_format == "monc":
         if interp_grid:
             meta, simulation = data_ingest_MONC_on_single_grid(
